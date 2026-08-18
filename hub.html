@@ -10,6 +10,8 @@
   <meta name="theme-color" content="#080a12" />
   <link rel="canonical" href="https://mechanicsreference.com/hub.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
   <meta property="og:title" content="Learning Hub | Mechanics Reference" />
@@ -179,30 +181,21 @@
       display:flex;align-items:center;gap:14px;
       text-decoration:none;color:inherit;min-width:0;
     }
-    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:10px}
+    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px}
     .visually-hidden{
       position:absolute;width:1px;height:1px;padding:0;margin:-1px;
       overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
     }
-    .logo{
-      width:34px;height:34px;border-radius:10px;
-      background:
-        linear-gradient(145deg, rgba(255,255,255,0.16) 0%, transparent 52%),
-        linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 48%, var(--accent-2) 100%);
-      box-shadow:
-        0 0 0 1px color-mix(in srgb, white 14%, transparent) inset,
-        0 4px 18px var(--accent-glow),
-        var(--shadow-soft);
-    }
-    .title{
-      font-weight:700;
-      letter-spacing:-0.02em;
-      font-size:1.05rem;
-      white-space:nowrap;
-      background: linear-gradient(92deg, var(--text) 0%, color-mix(in srgb, var(--accent) 72%, var(--text)) 100%);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color: transparent;
+    .brand-logo{
+      display:block;
+      height:44px;
+      width:auto;
+      max-width:min(240px, 46vw);
+      object-fit:contain;
+      background:#fff;
+      border-radius:10px;
+      padding:5px 8px;
+      box-shadow: 0 0 0 1px color-mix(in srgb, white 14%, transparent) inset, var(--shadow-soft);
     }
     .top-nav{
       display:flex;align-items:center;gap:4px;
@@ -515,7 +508,7 @@
       .sidebar{display:none}
       .grid2{grid-template-columns:1fr}
       .search input{width:min(140px, 28vw)}
-      .title{font-size:0.92rem}
+      .brand-logo{height:36px;padding:4px 6px}
       .top-nav a{padding:8px 10px}
     }
 
@@ -534,9 +527,8 @@
 <body>
   <div class="app">
     <header>
-      <a class="brand" href="./" aria-label="mechanicsreference.com home">
-        <div class="logo" aria-hidden="true"></div>
-        <div class="title">mechanicsreference.com</div>
+      <a class="brand" href="./" aria-label="Mechanics Reference home">
+        <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="220" height="74" />
       </a>
       <h1 class="visually-hidden">Learning hub for continuum mechanics and finite elements</h1>
       <nav class="top-nav" aria-label="Site">
