@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FEM Learning Hub | Mechanics Reference</title>
+  <title>mechanicsreference.com</title>
   <meta name="description" content="A reference hub for continuum mechanics, finite element methods, solvers, and engineering applications." />
   <link rel="canonical" href="https://mechanicsreference.com/" />
-  <meta property="og:title" content="FEM Learning Hub | Mechanics Reference" />
+  <meta property="og:title" content="mechanicsreference.com" />
   <meta property="og:description" content="A reference hub for continuum mechanics, finite element methods, solvers, and engineering applications." />
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
@@ -112,7 +112,11 @@
       display:flex;align-items:center;gap:16px;
       padding:14px 20px;
     }
-    header .brand{display:flex;align-items:center;gap:14px}
+    header .brand{
+      display:flex;align-items:center;gap:14px;
+      text-decoration:none;color:inherit;min-width:0;
+    }
+    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:10px}
     .logo{
       width:34px;height:34px;border-radius:10px;
       background:
@@ -127,6 +131,7 @@
       font-weight:700;
       letter-spacing:-0.02em;
       font-size:1.05rem;
+      white-space:nowrap;
       background: linear-gradient(92deg, var(--text) 0%, color-mix(in srgb, var(--accent) 72%, var(--text)) 100%);
       -webkit-background-clip:text;
       background-clip:text;
@@ -426,6 +431,7 @@
       .sidebar{display:none}
       .grid2{grid-template-columns:1fr}
       .search input{width:min(200px, 38vw)}
+      .title{font-size:0.92rem}
     }
 
     /* Tiny test badge */
@@ -443,10 +449,10 @@
 <body>
   <div class="app">
     <header>
-      <div class="brand">
+      <a class="brand" href="https://mechanicsreference.com/" aria-label="mechanicsreference.com home">
         <div class="logo" aria-hidden="true"></div>
-        <div class="title">FEM Learning Hub</div>
-      </div>
+        <div class="title">mechanicsreference.com</div>
+      </a>
       <div class="search" role="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 6.03-3.03l4 4-1.5 1.5-4-4A7.46 7.46 0 0 1 10.5 18Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"/></svg>
         <input id="searchInput" placeholder="Search topics… (e.g. Gauss, Schur, GPU)" />
