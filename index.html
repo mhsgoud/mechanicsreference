@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mechanics Reference | Continuum Mechanics, FEM, and Solvers</title>
-  <meta name="description" content="A compact reference for continuum mechanics, finite element methods, solvers, GPU computing, and engineering applications." />
+  <meta name="description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, solvers, and engineering applications." />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Mechanics Reference" />
   <meta name="theme-color" content="#080a12" />
@@ -13,13 +13,13 @@
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
   <meta property="og:title" content="Mechanics Reference | Continuum Mechanics, FEM, and Solvers" />
-  <meta property="og:description" content="A compact reference for continuum mechanics, finite element methods, solvers, GPU computing, and engineering applications." />
+  <meta property="og:description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers." />
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Mechanics Reference | Continuum Mechanics, FEM, and Solvers" />
-  <meta name="twitter:description" content="A compact reference for continuum mechanics, finite element methods, solvers, GPU computing, and engineering applications." />
+  <meta name="twitter:description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers." />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -30,7 +30,7 @@
         "url": "https://mechanicsreference.com/",
         "name": "Mechanics Reference",
         "alternateName": "mechanicsreference.com",
-        "description": "A compact reference for continuum mechanics, finite element methods, solvers, GPU computing, and engineering applications.",
+        "description": "A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers.",
         "inLanguage": "en",
         "publisher": {
           "@type": "Organization",
@@ -44,10 +44,12 @@
         "url": "https://mechanicsreference.com/",
         "name": "Mechanics Reference | Continuum Mechanics, FEM, and Solvers",
         "isPartOf": { "@id": "https://mechanicsreference.com/#website" },
-        "description": "Landing page for a searchable hub covering continuum mechanics, finite elements, solvers, and engineering applications.",
+        "description": "Landing page covering solid mechanics, fluid mechanics, continuum mechanics, finite elements, and solvers.",
         "about": [
-          "Finite element method",
+          "Solid mechanics",
+          "Fluid mechanics",
           "Continuum mechanics",
+          "Finite element method",
           "Computational mechanics"
         ]
       }
@@ -304,6 +306,64 @@
     .track p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5;flex:1}
     .track .go{margin-top:4px;font-size:12.5px;font-weight:600;color:var(--accent)}
 
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .primer{
+      position:relative;
+      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:24px 22px 22px;
+      overflow:hidden;
+    }
+    .primer::before{
+      content:"";
+      position:absolute;top:0;left:0;right:0;height:1px;
+      background: linear-gradient(90deg, transparent, var(--accent-line), color-mix(in srgb, var(--accent-2) 38%, transparent), transparent);
+    }
+    .primer h3{margin:0 0 10px;font-size:1.12rem;letter-spacing:-0.015em}
+    .primer p{
+      margin:0 0 12px;
+      color:var(--text-body);
+      font-size:14.5px;
+      line-height:1.65;
+    }
+    .primer p:last-of-type{margin-bottom:14px}
+    .primer ul{
+      margin:0;padding:0;
+      list-style:none;
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .primer li{
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.5;
+      padding-left:14px;
+      position:relative;
+    }
+    .primer li::before{
+      content:"";
+      position:absolute;left:0;top:0.55em;
+      width:6px;height:6px;border-radius:50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    .bridge{
+      margin-top:14px;
+      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px 20px;
+    }
+    .bridge p{
+      margin:0;
+      color:var(--text-body);
+      font-size:14.5px;
+      line-height:1.65;
+    }
+
     .steps{
       display:grid;
       grid-template-columns:repeat(3, 1fr);
@@ -337,7 +397,7 @@
     footer a:hover{text-decoration:underline}
 
     @media (max-width: 900px){
-      .hero, .tracks, .steps{grid-template-columns:1fr}
+      .hero, .tracks, .steps, .split{grid-template-columns:1fr}
       .hero{padding-top:44px}
       .title{font-size:0.92rem}
       header{padding:14px 16px}
@@ -354,6 +414,7 @@
       </a>
       <nav class="top-nav" aria-label="Site">
         <a href="./" class="active" aria-current="page">Home</a>
+        <a href="#mechanics">Mechanics</a>
         <a href="hub.html">Hub</a>
       </nav>
     </header>
@@ -364,21 +425,53 @@
           <div>
             <div class="eyebrow">Computational mechanics</div>
             <h1>A working reference for continuum mechanics and finite elements.</h1>
-            <p class="lede">Searchable notes on kinematics, discretization, solvers, GPU computing, and the engineering problems those methods are used for.</p>
+            <p class="lede">Searchable notes on solid and fluid mechanics, kinematics, discretization, solvers, GPU computing, and the engineering problems those methods are used for.</p>
             <div class="actions">
               <a class="btn btn-primary" href="hub.html">Open the learning hub</a>
-              <a class="btn btn-ghost" href="#tracks">Browse topics</a>
+              <a class="btn btn-ghost" href="#mechanics">Solid &amp; fluid mechanics</a>
             </div>
           </div>
           <aside class="hero-panel" aria-label="Topic map preview">
             <div class="panel-kicker">topic map</div>
             <div class="stack">
-              <div class="stack-row"><strong>Fundamentals</strong><span>kinematics · constitutive laws</span></div>
+              <div class="stack-row"><strong>Solids</strong><span>stress · strain · constitutive laws</span></div>
+              <div class="stack-row"><strong>Fluids</strong><span>Navier–Stokes · viscosity · flow</span></div>
               <div class="stack-row"><strong>Finite elements</strong><span>weak form · elements · assembly</span></div>
               <div class="stack-row"><strong>Solvers &amp; HPC</strong><span>Newton · sparse · GPU</span></div>
-              <div class="stack-row"><strong>Applications</strong><span>fracture · soils · batteries</span></div>
             </div>
           </aside>
+        </section>
+
+        <section class="section" id="mechanics">
+          <h2>Solid and fluid mechanics</h2>
+          <p class="section-lead">Continuum mechanics treats matter as a continuous medium rather than a collection of atoms. The two classical branches—solids and fluids—share the same conservation laws and differ mainly in how they resist deformation.</p>
+          <div class="split">
+            <article class="primer">
+              <h3>Solid mechanics</h3>
+              <p>Solid mechanics describes how a body with a preferred reference shape deforms and carries load. A solid can sustain shear at rest: that is why a beam, a soil specimen, or a battery electrode holds its form until the stress is large enough to yield, crack, or buckle.</p>
+              <p>The usual ingredients are kinematics (how strain is measured from motion), stress (internal force per area), balance of momentum, and a constitutive model that relates stress to strain or strain history. Linear elasticity is the small-strain starting point. Plasticity, viscoelasticity, hyperelasticity, damage, and contact extend it when the material or the geometry is no longer linear.</p>
+              <ul>
+                <li>Small-strain vs finite-deformation kinematics, including Green and logarithmic strain</li>
+                <li>Constitutive models: elasticity, plasticity, viscoelasticity, hyperelasticity</li>
+                <li>Equilibrium, buckling, fracture, and contact as typical boundary-value problems</li>
+                <li>FEM as the standard discretization: weak form, elements, assembly, Newton–Raphson</li>
+              </ul>
+            </article>
+            <article class="primer">
+              <h3>Fluid mechanics</h3>
+              <p>Fluid mechanics describes liquids and gases, which cannot support a static shear stress. In a fluid, shear is resisted only while the material is deforming: the constitutive response depends on the rate of strain, not on a remembered solid-like shape.</p>
+              <p>Mass conservation (continuity), momentum balance, and an energy equation close the problem together with a constitutive law. For a Newtonian fluid that is Newton’s law of viscosity, and the momentum statement becomes the Navier–Stokes equations. The Reynolds number compares inertia to viscous diffusion and organizes laminar, transitional, and turbulent regimes. Many engineering flows are treated as incompressible; high-speed gas dynamics needs compressibility and thermodynamics.</p>
+              <ul>
+                <li>Continuity, Navier–Stokes, and energy; inviscid Euler flow as a limiting model</li>
+                <li>Viscosity, Reynolds number, laminar vs turbulent, boundary layers</li>
+                <li>Incompressible vs compressible flow; internal flow, aerodynamics, free surfaces</li>
+                <li>Shared numerical ideas with solids: conservation form, stabilization, and coupled fluid–structure problems</li>
+              </ul>
+            </article>
+          </div>
+          <div class="bridge">
+            <p>Both branches are continuum theories: write kinematics, enforce conservation of mass, momentum, and energy, then close the system with a constitutive model. Finite elements, finite volumes, and related methods turn that field problem into algebraic equations. The hub is organized around that pipeline—especially for solids and FEM—with notes on solvers, GPU computing, and applications such as fracture, soils, and batteries.</p>
+          </div>
         </section>
 
         <section class="section" id="tracks">
