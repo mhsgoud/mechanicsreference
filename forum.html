@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forum | Mechanics Reference</title>
+  <meta name="description" content="Ask questions and discuss solid mechanics, fluid mechanics, finite elements, and solvers in the Mechanics Reference forum." />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Mechanics Reference" />
+  <meta name="theme-color" content="#080a12" />
+  <link rel="canonical" href="https://mechanicsreference.com/forum.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
+  <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
+  <meta property="og:site_name" content="Mechanics Reference" />
+  <meta property="og:title" content="Forum | Mechanics Reference" />
+  <meta property="og:description" content="Ask questions and discuss solid mechanics, fluid mechanics, finite elements, and solvers." />
+  <meta property="og:url" content="https://mechanicsreference.com/forum.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Forum | Mechanics Reference" />
+  <meta name="twitter:description" content="Ask questions and discuss solid mechanics, fluid mechanics, finite elements, and solvers." />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Forum | Mechanics Reference",
+    "url": "https://mechanicsreference.com/forum.html",
+    "discussionUrl": "https://github.com/mhsgoud/mechanicsreference/discussions",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Mechanics Reference",
+      "url": "https://mechanicsreference.com/"
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      color-scheme: dark;
+      --bg-deep: #04050a;
+      --bg: #080a12;
+      --surface-1: #0d101e;
+      --surface-2: #12172a;
+      --surface-3: #1a2238;
+      --text: #f2f4fd;
+      --text-body: #c8cfec;
+      --muted: #8c96b5;
+      --accent: #9aa6ff;
+      --accent-mid: #7d8cf0;
+      --accent-deep: #5c6bd8;
+      --accent-glow: color-mix(in srgb, var(--accent) 34%, transparent);
+      --accent-faint: color-mix(in srgb, var(--accent) 11%, transparent);
+      --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
+      --accent-line: color-mix(in srgb, var(--accent) 42%, transparent);
+      --accent-2: #3dd9c4;
+      --accent-2-dim: color-mix(in srgb, var(--accent-2) 13%, transparent);
+      --border: color-mix(in srgb, var(--accent) 15%, transparent);
+      --border-hover: color-mix(in srgb, var(--accent) 26%, transparent);
+      --border-strong: color-mix(in srgb, var(--accent) 34%, transparent);
+      --grid-line: color-mix(in srgb, var(--accent) 4.5%, transparent);
+      --shadow: 0 4px 8px rgba(0,0,0,.16), 0 26px 56px rgba(0,0,0,.4);
+      --shadow-soft: 0 12px 44px rgba(4, 8, 28, 0.55);
+      --radius: 18px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --transition: 0.2s var(--ease);
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    html{scroll-behavior:smooth}
+    ::selection{
+      background: color-mix(in srgb, var(--accent) 38%, transparent);
+      color: var(--text);
+    }
+    body{
+      margin:0;
+      font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--text);
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(ellipse 120% 85% at 50% -25%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 58%),
+        radial-gradient(ellipse 65% 45% at 100% -5%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 52%),
+        linear-gradient(168deg, var(--bg-deep) 0%, var(--bg) 38%, color-mix(in srgb, var(--surface-1) 65%, var(--bg-deep)) 100%);
+      background-attachment: fixed;
+    }
+    body::before{
+      content:"";
+      position:fixed;inset:0;pointer-events:none;z-index:0;
+      opacity:0.55;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 18%, transparent 78%);
+    }
+    .page{position:relative;z-index:1}
+    header{
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:saturate(160%) blur(14px);
+      -webkit-backdrop-filter:saturate(160%) blur(14px);
+      background:linear-gradient(180deg, color-mix(in srgb, var(--surface-1) 88%, transparent), color-mix(in srgb, var(--bg) 76%, transparent));
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:16px;
+      padding:14px 24px;
+    }
+    header .brand{display:flex;align-items:center;text-decoration:none;min-width:0}
+    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px}
+    .brand-logo{
+      display:block;height:44px;width:auto;max-width:min(280px, 52vw);
+      object-fit:contain;background:#fff;border-radius:10px;padding:5px 8px;
+    }
+    .top-nav{display:flex;align-items:center;gap:4px;margin-left:auto}
+    .top-nav a{
+      color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;
+      padding:8px 12px;border-radius:999px;
+    }
+    .top-nav a:hover{color:var(--text);background:var(--accent-faint)}
+    .top-nav a.active{
+      color:var(--text);background:var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+    main{padding:0 24px 72px}
+    .wrap{max-width:1100px;margin:0 auto}
+    .hero{padding:64px 0 12px;max-width:46rem}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      color:var(--accent-2);font-size:12px;font-weight:600;
+      letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;
+    }
+    .eyebrow::before{content:"";width:18px;height:1px;background:linear-gradient(90deg, var(--accent-2), transparent)}
+    h1{margin:0 0 16px;font-size:clamp(2rem, 4vw, 3rem);line-height:1.12;letter-spacing:-0.035em}
+    .lede{margin:0 0 28px;color:var(--text-body);font-size:1.08rem;line-height:1.65}
+    .actions{display:flex;flex-wrap:wrap;gap:12px}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      text-decoration:none;font-weight:600;font-size:14px;
+      padding:12px 18px;border-radius:999px;
+    }
+    .btn-primary{
+      color:#081018;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 140%);
+      box-shadow: 0 8px 28px var(--accent-glow);
+    }
+    .btn-ghost{
+      color:var(--text);border:1px solid var(--border-strong);background: var(--accent-faint);
+    }
+    .section{padding:28px 0 8px}
+    .section h2{margin:0 0 8px;font-size:1.35rem;letter-spacing:-0.02em}
+    .section-lead{margin:0 0 22px;color:var(--muted);max-width:62ch;line-height:1.6}
+    .tracks{display:grid;grid-template-columns:repeat(3, 1fr);gap:14px}
+    .track{
+      display:flex;flex-direction:column;gap:10px;
+      text-decoration:none;color:inherit;
+      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
+      border:1px solid var(--border);border-radius:16px;padding:20px 18px 18px;min-height:148px;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .track:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+    .track-index{
+      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size:11px;color:var(--accent);letter-spacing:.08em;
+    }
+    .track h3{margin:0;font-size:1.02rem}
+    .track p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5;flex:1}
+    .track .go{margin-top:4px;font-size:12.5px;font-weight:600;color:var(--accent)}
+    .steps{display:grid;grid-template-columns:repeat(3, 1fr);gap:14px}
+    .step{
+      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+      border:1px solid var(--border);border-radius:16px;padding:18px;
+    }
+    .step b{
+      display:block;font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size:11px;color:var(--accent-2);margin-bottom:8px;
+    }
+    .step p{margin:0;color:var(--text-body);font-size:14px;line-height:1.55}
+    .note{
+      margin-top:14px;border:1px solid var(--border);border-radius:16px;padding:16px 18px;
+      color:var(--muted);font-size:14px;line-height:1.55;
+    }
+    .note a{color:var(--accent)}
+    footer{
+      border-top:1px solid var(--border);padding:22px 24px 32px;color:var(--muted);font-size:13px;
+    }
+    footer .wrap{display:flex;flex-wrap:wrap;gap:10px 18px;justify-content:space-between}
+    footer a{color:var(--accent);text-decoration:none}
+    @media (max-width: 900px){
+      .tracks, .steps{grid-template-columns:1fr}
+      header{padding:14px 16px}
+      main{padding:0 16px 56px}
+      .brand-logo{height:38px;padding:4px 6px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a class="brand" href="./" aria-label="Mechanics Reference home">
+        <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="220" height="74" />
+      </a>
+      <nav class="top-nav" aria-label="Site">
+        <a href="./">Home</a>
+        <a href="hub.html">Hub</a>
+        <a href="forum.html" class="active" aria-current="page">Forum</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="wrap">
+        <section class="hero">
+          <div class="eyebrow">Community</div>
+          <h1>Ask questions, share methods, and compare notes.</h1>
+          <p class="lede">The forum runs on GitHub Discussions, which GitHub hosts for this site. Threads stay public, searchable, and tied to the same repository as the hub. A free GitHub account is required to post.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="https://github.com/mhsgoud/mechanicsreference/discussions">Open the forum</a>
+            <a class="btn btn-ghost" href="https://github.com/mhsgoud/mechanicsreference/discussions/new?category=q-a">Start a question</a>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Categories</h2>
+          <p class="section-lead">Pick a board, then continue on GitHub. That is where replies, notifications, and search live.</p>
+          <div class="tracks">
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/q-a">
+              <div class="track-index">Q&amp;A</div>
+              <h3>Questions</h3>
+              <p>FEM setup, constitutive models, locking, solvers, and “why did this simulation fail?”</p>
+              <span class="go">Open Q&amp;A →</span>
+            </a>
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/general">
+              <div class="track-index">General</div>
+              <h3>Solid &amp; fluid mechanics</h3>
+              <p>Continuum theory, kinematics, balance laws, and modeling choices that are not a single bug hunt.</p>
+              <span class="go">Open general →</span>
+            </a>
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/show-and-tell">
+              <div class="track-index">Show and tell</div>
+              <h3>Codes &amp; examples</h3>
+              <p>Meshes, benchmarks, lecture notes, and implementations worth sharing.</p>
+              <span class="go">Open show and tell →</span>
+            </a>
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/ideas">
+              <div class="track-index">Ideas</div>
+              <h3>Hub requests</h3>
+              <p>Suggest a topic, an illustration, or a gap in the learning hub.</p>
+              <span class="go">Open ideas →</span>
+            </a>
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/announcements">
+              <div class="track-index">Announcements</div>
+              <h3>Site updates</h3>
+              <p>Changes to mechanicsreference.com and the notes in the hub.</p>
+              <span class="go">Open announcements →</span>
+            </a>
+            <a class="track" href="https://github.com/mhsgoud/mechanicsreference/discussions/categories/polls">
+              <div class="track-index">Polls</div>
+              <h3>What next</h3>
+              <p>Vote on which examples and topics should be written up next.</p>
+              <span class="go">Open polls →</span>
+            </a>
+          </div>
+          <p class="note">GitHub Pages can only serve static files, so the forum itself cannot live inside this domain. Discussions is GitHub’s forum for the project: <a href="https://github.com/mhsgoud/mechanicsreference/discussions">github.com/mhsgoud/mechanicsreference/discussions</a>.</p>
+        </section>
+
+        <section class="section">
+          <h2>How to post</h2>
+          <div class="steps">
+            <div class="step">
+              <b>01 — Sign in</b>
+              <p>Create or use a GitHub account. That is what identifies authors and sends replies to your inbox.</p>
+            </div>
+            <div class="step">
+              <b>02 — Choose a category</b>
+              <p>Q&amp;A for help, General for theory, Show and tell for work you want to share.</p>
+            </div>
+            <div class="step">
+              <b>03 — Write the thread</b>
+              <p>State the continuum or numerical setting, what you tried, and what you expected. Equations in Markdown are fine.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <span>mechanicsreference.com</span>
+        <span>Forum hosted as <a href="https://github.com/mhsgoud/mechanicsreference/discussions">GitHub Discussions</a></span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
