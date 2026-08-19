@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fibre Neutrality — Composite Properties — Mechanics Reference</title>
+  <meta name="description" content="Interactive figures after Goudarzi and Simone: how effective moduli, neutrality angle, and fibre slip change with orientation, Poisson ratio, diameter, and interface." />
+  <link rel="canonical" href="https://mechanicsreference.com/fiber-neutrality.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(280px,1.15fr) 1fr;background:var(--plate)}
+    #stage{position:relative;height:min(48vh,420px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    .plots{display:grid;grid-template-columns:1fr 1fr;background:#fff}
+    .plot-cell{padding:8px 10px 6px;border-left:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+    .plot-cell h3{margin:0 0 4px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;height:128px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.82rem}
+    #formula{color:var(--navy)}
+    #legend{margin:0;flex-basis:100%;font-size:0.82rem}
+    input[type=range]{width:110px;vertical-align:middle}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{height:96px}
+    html.embed .plot-cell:nth-child(n+3){display:none}
+    html.embed #ui{background:#fff}
+    html.embed #legend{display:none}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(42vh,320px)}
+      .plot-cell{border-left:0}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fibre neutrality</a></p>
+      <h1>How the composite answers the fibre</h1>
+      <p class="standfirst">Uniaxial tension along <i>x</i>. Rotate the fibres in the <i>xy</i>-plane. The reduced fibre is unstrained at an angle that depends only on the matrix Poisson ratio; there the effective Young’s modulus is that of the matrix. A solid fibre is neutral only once its diameter is small compared with the box. The plots follow the structure of Goudarzi and Simone, <i>Int. J. Solids Struct.</i> 156–157 (2019).</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage"></div>
+        <div class="plots">
+          <div class="plot-cell"><h3>Fig. 7a · E<sub>x</sub><sup>c</sup> / E<sub>m</sub> vs θ<sub>z</sub></h3><canvas id="pEx"></canvas></div>
+          <div class="plot-cell"><h3>Fig. 7b · θ<sub>n</sub>(ν<sub>m</sub>)</h3><canvas id="pTh"></canvas></div>
+          <div class="plot-cell"><h3>Figs. 4 &amp; 11 · E<sub>x</sub><sup>c</sup> / E<sub>m</sub> vs d<sub>f</sub>/L</h3><canvas id="pD"></canvas></div>
+          <div class="plot-cell"><h3>Figs. 5 &amp; 10 · slip along the fibre</h3><canvas id="pSlip"></canvas></div>
+          <div class="plot-cell"><h3>Fig. 8 · G<sub>xy</sub><sup>c</sup> / G<sub>m</sub> vs θ<sub>z</sub></h3><canvas id="pG"></canvas></div>
+          <div class="plot-cell"><h3>Fig. 9 · effective Poisson ratios</h3><canvas id="pNu"></canvas></div>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">ε<sub>f</sub> / ε<sub>x</sub> = cos²θ − ν sin²θ</p>
+        <label>θ<sub>z</sub> <input id="ang" type="range" min="0" max="90" value="0" /> <span id="angV"></span></label>
+        <label>ν<sub>m</sub> <input id="nu" type="range" min="0" max="49" value="40" /> <span id="nuV"></span></label>
+        <label>v<sub>f</sub> <input id="vf" type="range" min="2" max="50" value="10" /> <span id="vfV"></span></label>
+        <label>E<sub>f</sub>/E<sub>m</sub> <input id="er" type="range" min="10" max="500" value="100" /> <span id="erV"></span></label>
+        <label>d<sub>f</sub>/L <input id="df" type="range" min="2" max="80" value="7" /> <span id="dfV"></span></label>
+        <label>interface <input id="kbt" type="range" min="0" max="100" value="35" /> <span id="kbtV"></span></label>
+        <p id="readout"></p>
+        <p id="legend">Navy: reduced fibre (and ν<sub>xy</sub>). Orange: solid fibre (and ν<sub>yx</sub>). On θ<sub>n</sub>(ν): navy is plane stress and 3D reduced; gray is plane strain. At θ<sub>n</sub> the reduced model sits on E<sub>m</sub>; the solid model does not, until d<sub>f</sub>/L is small.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="https://doi.org/10.1016/j.ijsolstr.2018.07.023">Goudarzi &amp; Simone (2019)</a></span>
+    </div>
+  </footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const HALF = 1.45;
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 40);
+    camera.position.set(3.8, 2.6, 4.6);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+    stage.appendChild(labels.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    scene.add(new THREE.AmbientLight(0xffffff, 1.3));
+    const key = new THREE.DirectionalLight(0xffffff, 1.5);
+    key.position.set(4, 6, 5); scene.add(key);
+
+    scene.add(new THREE.Mesh(
+      new THREE.BoxGeometry(HALF*2, HALF*2, HALF*2),
+      new THREE.MeshStandardMaterial({color:0x7eabdc, transparent:true, opacity:0.07, depthWrite:false, side:THREE.DoubleSide, roughness:0.9})
+    ));
+    scene.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(HALF*2, HALF*2, HALF*2)),
+      new THREE.LineBasicMaterial({color:0x8aa3c4})
+    ));
+    const load = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(-HALF-0.15, 0, 0), 0.55, 0xef4444, 0.1, 0.06);
+    scene.add(load);
+    const tag = document.createElement('div'); tag.className = 'label'; tag.textContent = 'σ∞ along x';
+    const tagObj = new CSS2DObject(tag); tagObj.position.set(-HALF-0.05, 0.35, 0); scene.add(tagObj);
+
+    const pack = new THREE.Group();
+    scene.add(pack);
+    const fiberGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1);
+    const fiberMat = new THREE.MeshStandardMaterial({color:0xd89b54, roughness:0.45, metalness:0.1});
+    const fiberMesh = new THREE.InstancedMesh(fiberGeo, fiberMat, 220);
+    fiberMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    pack.add(fiberMesh);
+    const dummy = new THREE.Object3D();
+    const yAxis = new THREE.Vector3(0, 1, 0);
+
+    function thetaN(nu) {
+      nu = Math.max(nu, 1e-8);
+      return Math.atan(1 / Math.sqrt(nu));
+    }
+    function thetaNstrain(nu) {
+      nu = Math.min(Math.max(nu, 1e-8), 0.499);
+      return Math.atan(Math.sqrt((1 - nu) / nu));
+    }
+    function psi(th, nu) {
+      const c = Math.cos(th), s = Math.sin(th);
+      return c*c - nu*s*s;
+    }
+    function iface(k) { return 0.45 + 0.55 * k; }
+    function ExReduced(th, nu, vf, contrast, k) {
+      const mag = 0.062 * (vf / 0.01) * (contrast / 100) * iface(k);
+      return 1 + mag * psi(th, nu) * psi(th, nu);
+    }
+    function ExSolid(th, nu, vf, contrast, k, dfL) {
+      const thin = ExReduced(th, nu, vf, contrast, k);
+      const blend = (dfL * dfL) / (dfL * dfL + 0.018 * 0.018);
+      const extra = blend * (0.012 + 0.045 * Math.cos(th) * Math.cos(th)) * (vf / 0.01) * (contrast / 100) * 0.4;
+      return thin + extra;
+    }
+    function Gxy(th, vf, contrast, k) {
+      const mag = 0.048 * (vf / 0.01) * (contrast / 100) * iface(k);
+      const s2 = Math.sin(2 * th);
+      return 1 + mag * s2 * s2;
+    }
+    function magNu(vf, contrast, k) {
+      return 0.035 * (vf / 0.01) * (contrast / 100) * iface(k);
+    }
+    function nuxy(th, nu, vf, contrast, k) {
+      return nu + magNu(vf, contrast, k) * psi(th, nu) * Math.cos(2 * th);
+    }
+    function nuyx(th, nu, vf, contrast, k) {
+      return nu + magNu(vf, contrast, k) * psi(th, nu) * Math.sin(2 * th) * 0.45;
+    }
+    function slipAmp(th, nu, k) {
+      return psi(th, nu) * (0.25 + 0.75 * (1 - k));
+    }
+    function yRange(series, pad, floorMin, floorMax) {
+      let mn = Infinity, mx = -Infinity;
+      series.forEach(s => s.pts.forEach(pt => { mn = Math.min(mn, pt[1]); mx = Math.max(mx, pt[1]); }));
+      if (!isFinite(mn)) { mn = floorMin; mx = floorMax; }
+      const span = Math.max((floorMax - floorMin) * 0.5, mx - mn);
+      return {
+        ymin: Math.min(floorMin, mn - pad * span),
+        ymax: Math.max(floorMax, mx + pad * span)
+      };
+    }
+    function tick(v) {
+      const a = Math.abs(v);
+      if (a >= 10) return v.toFixed(0);
+      if (a >= 1) return v.toFixed(2);
+      return v.toFixed(2);
+    }
+
+    const els = {
+      ang: document.getElementById('ang'),
+      nu: document.getElementById('nu'),
+      vf: document.getElementById('vf'),
+      er: document.getElementById('er'),
+      df: document.getElementById('df'),
+      kbt: document.getElementById('kbt'),
+      readout: document.getElementById('readout')
+    };
+
+    function params() {
+      return {
+        th: (+els.ang.value) * Math.PI / 180,
+        deg: +els.ang.value,
+        nu: +els.nu.value / 100,
+        vf: +els.vf.value / 1000,
+        contrast: +els.er.value,
+        dfL: +els.df.value / 1000,
+        k: +els.kbt.value / 100
+      };
+    }
+
+    function layoutFibers(p) {
+      const n = Math.max(1, Math.round(12 + 180 * (p.vf / 0.05)));
+      const r = Math.max(0.012, p.dfL * HALF * 2.2);
+      const len = HALF * 1.55;
+      const dir = new THREE.Vector3(Math.cos(p.th), Math.sin(p.th), 0);
+      const n1 = new THREE.Vector3(-Math.sin(p.th), Math.cos(p.th), 0);
+      const n2 = new THREE.Vector3(0, 0, 1);
+      fiberMesh.count = n;
+      const nx = Math.ceil(Math.sqrt(n * 0.7));
+      const nz = Math.ceil(n / nx);
+      let i = 0;
+      for (let iz = 0; iz < nz && i < n; iz++) {
+        for (let ix = 0; ix < nx && i < n; ix++) {
+          const u = nx === 1 ? 0 : (ix / (nx - 1) - 0.5);
+          const v = nz === 1 ? 0 : (iz / (nz - 1) - 0.5);
+          dummy.position.copy(n1.clone().multiplyScalar(u * HALF * 1.55).add(n2.clone().multiplyScalar(v * HALF * 1.55)));
+          dummy.quaternion.setFromUnitVectors(yAxis, dir);
+          dummy.scale.set(r, len, r);
+          dummy.updateMatrix();
+          fiberMesh.setMatrixAt(i, dummy.matrix);
+          i++;
+        }
+      }
+      fiberMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    function chart(canvas, spec) {
+      const dpr = Math.min(devicePixelRatio, 2);
+      const w = Math.max(120, canvas.clientWidth), h = Math.max(80, canvas.clientHeight);
+      if (canvas.width !== Math.round(w*dpr) || canvas.height !== Math.round(h*dpr)) {
+        canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      const pad = {l: 40, r: 8, t: 8, b: 26};
+      const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+      const x = t => pad.l + (t - spec.xmin) / (spec.xmax - spec.xmin) * iw;
+      const y = v => pad.t + (spec.ymax - v) / (spec.ymax - spec.ymin) * ih;
+      ctx.strokeStyle = '#d8d4cb'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ih); ctx.lineTo(pad.l+iw, pad.t+ih); ctx.stroke();
+      ctx.fillStyle = '#5c6574'; ctx.font = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText(spec.ylabel, 4, pad.t + 8);
+      ctx.fillText(spec.xlabel, pad.l + iw - 28, h - 8);
+      ctx.fillText(tick(spec.ymin), 6, y(spec.ymin) + 3);
+      ctx.fillText(tick(spec.ymax), 6, y(spec.ymax) + 3);
+      (spec.series || []).forEach(s => {
+        ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 1.6;
+        s.pts.forEach((pt, i) => i ? ctx.lineTo(x(pt[0]), y(pt[1])) : ctx.moveTo(x(pt[0]), y(pt[1])));
+        ctx.stroke();
+      });
+      if (spec.vline != null) {
+        ctx.setLineDash([3, 3]); ctx.strokeStyle = '#c45c26'; ctx.beginPath();
+        ctx.moveTo(x(spec.vline), pad.t); ctx.lineTo(x(spec.vline), pad.t+ih); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (spec.hline != null) {
+        ctx.setLineDash([3, 3]); ctx.strokeStyle = '#8aa3c4'; ctx.beginPath();
+        ctx.moveTo(pad.l, y(spec.hline)); ctx.lineTo(pad.l+iw, y(spec.hline)); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (spec.mark) {
+        ctx.fillStyle = spec.mark.color || '#c45c26';
+        ctx.beginPath(); ctx.arc(x(spec.mark[0]), y(spec.mark[1]), 4, 0, 6.28); ctx.fill();
+      }
+    }
+    function linspace(a, b, n) {
+      const o = [];
+      for (let i = 0; i < n; i++) o.push(a + (b - a) * i / (n - 1));
+      return o;
+    }
+
+    function redraw() {
+      const p = params();
+      const thN = thetaN(p.nu);
+      layoutFibers(p);
+      const exR = ExReduced(p.th, p.nu, p.vf, p.contrast, p.k);
+      const exS = ExSolid(p.th, p.nu, p.vf, p.contrast, p.k, p.dfL);
+      const g = Gxy(p.th, p.vf, p.contrast, p.k);
+      els.readout.textContent =
+        `θn = ${(thN*180/Math.PI).toFixed(1)}°   vf = ${(p.vf*100).toFixed(1)}%   Ex/Em = ${exR.toFixed(3)} (reduced), ${exS.toFixed(3)} (solid)   Gxy/Gm = ${g.toFixed(3)}   εf/εx = ${psi(p.th, p.nu).toFixed(3)}`;
+      document.getElementById('angV').textContent = p.deg + '°';
+      document.getElementById('nuV').textContent = p.nu.toFixed(2);
+      document.getElementById('vfV').textContent = (p.vf*100).toFixed(1) + '%';
+      document.getElementById('erV').textContent = String(p.contrast);
+      document.getElementById('dfV').textContent = p.dfL.toFixed(3);
+      document.getElementById('kbtV').textContent = Math.round(p.k * 100) + '%';
+
+      const thetas = linspace(0, Math.PI/2, 80);
+      const exSeries = [
+        {color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, ExReduced(t, p.nu, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', width: 1.2, pts: thetas.map(t => [t*180/Math.PI, ExSolid(t, p.nu, p.vf, p.contrast, p.k, p.dfL)])}
+      ];
+      const exY = yRange(exSeries, 0.15, 0.98, 1.08);
+      chart(document.getElementById('pEx'), {
+        xmin: 0, xmax: 90, ymin: exY.ymin, ymax: exY.ymax,
+        xlabel: 'θz °', ylabel: 'Ex/Em',
+        vline: p.deg, hline: 1,
+        series: exSeries,
+        mark: [p.deg, exR]
+      });
+      const nus = linspace(0.02, 0.49, 50);
+      chart(document.getElementById('pTh'), {
+        xmin: 0, xmax: 0.5, ymin: 40, ymax: 90,
+        xlabel: 'νm', ylabel: 'θn °',
+        series: [
+          {color: '#1e3a5f', pts: nus.map(n => [n, thetaN(n)*180/Math.PI])},
+          {color: '#8aa3c4', width: 1.2, pts: nus.map(n => [n, thetaNstrain(n)*180/Math.PI])}
+        ],
+        mark: [p.nu, thN*180/Math.PI]
+      });
+      const dfs = linspace(0.002, 0.08, 50);
+      const dSeries = [
+        {color: '#1e3a5f', pts: dfs.map(d => [d, ExReduced(p.th, p.nu, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', pts: dfs.map(d => [d, ExSolid(p.th, p.nu, p.vf, p.contrast, p.k, d)])}
+      ];
+      const dY = yRange(dSeries, 0.2, 0.99, 1.08);
+      chart(document.getElementById('pD'), {
+        xmin: 0, xmax: 0.08, ymin: dY.ymin, ymax: dY.ymax,
+        xlabel: 'df/L', ylabel: 'Ex/Em',
+        hline: 1, vline: p.dfL,
+        series: dSeries,
+        mark: [p.dfL, exS]
+      });
+      const ss = linspace(-0.5, 0.5, 60);
+      const amp = slipAmp(p.th, p.nu, p.k);
+      const beta = 3 + 10 * p.k;
+      const slim = Math.sinh(beta * 0.5) || 1;
+      const slipPts = ss.map(s => [s, amp * Math.sinh(beta * s) / slim]);
+      const slipY = yRange([{pts: slipPts}], 0.25, -0.15, 0.15);
+      const slipBound = Math.max(Math.abs(slipY.ymin), Math.abs(slipY.ymax), 0.12);
+      chart(document.getElementById('pSlip'), {
+        xmin: -0.5, xmax: 0.5, ymin: -slipBound, ymax: slipBound,
+        xlabel: 's / ℓf', ylabel: 'slip',
+        hline: 0,
+        series: [{
+          color: Math.abs(amp) < 0.02 ? '#2f6b4f' : '#1e3a5f',
+          pts: slipPts
+        }],
+        mark: [0, 0]
+      });
+      const gSeries = [{color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, Gxy(t, p.vf, p.contrast, p.k)])}];
+      const gY = yRange(gSeries, 0.2, 0.98, 1.08);
+      chart(document.getElementById('pG'), {
+        xmin: 0, xmax: 90, ymin: gY.ymin, ymax: gY.ymax,
+        xlabel: 'θz °', ylabel: 'Gxy/Gm',
+        vline: p.deg, hline: 1,
+        series: gSeries,
+        mark: [p.deg, g]
+      });
+      const nuSeries = [
+        {color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, nuxy(t, p.nu, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', width: 1.2, pts: thetas.map(t => [t*180/Math.PI, nuyx(t, p.nu, p.vf, p.contrast, p.k)])}
+      ];
+      const nuY = yRange(nuSeries, 0.2, p.nu - 0.08, p.nu + 0.08);
+      chart(document.getElementById('pNu'), {
+        xmin: 0, xmax: 90, ymin: nuY.ymin, ymax: nuY.ymax,
+        xlabel: 'θz °', ylabel: 'νc',
+        vline: p.deg, hline: p.nu,
+        series: nuSeries,
+        mark: [p.deg, nuxy(p.th, p.nu, p.vf, p.contrast, p.k)]
+      });
+    }
+
+    ['ang','nu','vf','er','df','kbt'].forEach(id => els[id].addEventListener('input', redraw));
+
+    function resize() {
+      const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+      renderer.setSize(w,h,false); labels.setSize(w,h);
+      redraw();
+    }
+    new ResizeObserver(resize).observe(stage);
+    window.addEventListener('resize', redraw);
+    resize();
+    (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+  </script>
+</body>
+</html>
