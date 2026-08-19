@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Random Fibres in a Matrix — Mechanics Reference</title>
+  <meta name="description" content="An RVE of discrete high-aspect-ratio fibres in a matrix. Redistribute, align, and pick a fibre; the background mesh need not follow the inclusions." />
+  <link rel="canonical" href="https://mechanicsreference.com/random-fibers.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    #stage{position:relative;background:var(--plate);height:min(58vh,480px);cursor:grab}
+    #stage.picking{cursor:pointer}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.82rem}
+    #formula{color:var(--navy)}
+    input[type=range]{width:120px;vertical-align:middle}
+    button{
+      font:inherit;font-weight:600;color:var(--navy);
+      background:#fff;border:1px solid var(--rule);padding:6px 12px;cursor:pointer;
+    }
+    button:hover{border-color:var(--navy)}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed #stage{flex:1;height:auto}
+    html.embed #ui{background:#fff}
+    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#embedded-fiber-models">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#embedded-fiber-models">Embedded fibre models</a></p>
+      <h1>Random fibres in a matrix</h1>
+      <p class="standfirst">A representative volume of discrete high-aspect-ratio fibres. Drag to orbit; scroll to zoom. Redistribute the packing, pull the orientation from random toward aligned, and click a fibre — the background mesh does not have to follow any of them.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <div id="ui">
+        <p id="formula">RVE · discrete inclusions</p>
+        <label>count <input id="count" type="range" min="20" max="400" value="120" /></label>
+        <label>orientation <input id="align" type="range" min="0" max="100" value="0" /></label>
+        <label>length <input id="len" type="range" min="30" max="160" value="90" /></label>
+        <label>diameter <input id="dia" type="range" min="4" max="22" value="9" /></label>
+        <button type="button" id="reshuffle">Redistribute</button>
+        <p id="readout"></p>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#embedded-fiber-models">Embedded fibre models</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const HALF = 1.55;
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
+    camera.position.set(4.4, 3.2, 5.2);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+    stage.appendChild(labels.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.25));
+    const key = new THREE.DirectionalLight(0xffffff, 1.55);
+    key.position.set(4, 7, 5); scene.add(key);
+    const fill = new THREE.DirectionalLight(0x9bb7d4, 0.45);
+    fill.position.set(-3, -1, -4); scene.add(fill);
+
+    const matrix = new THREE.Mesh(
+      new THREE.BoxGeometry(HALF*2, HALF*2, HALF*2),
+      new THREE.MeshStandardMaterial({
+        color: 0x7eabdc, transparent: true, opacity: 0.08,
+        roughness: 0.9, depthWrite: false, side: THREE.DoubleSide
+      })
+    );
+    scene.add(matrix);
+    scene.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(HALF*2, HALF*2, HALF*2)),
+      new THREE.LineBasicMaterial({color: 0x8aa3c4})
+    ));
+
+    const grid = new THREE.Group();
+    const gridMat = new THREE.LineBasicMaterial({color: 0x4a5d78, transparent: true, opacity: 0.35});
+    function addGridLines() {
+      const pts = [];
+      const n = 4, s = HALF * 2 / n;
+      for (let i = 1; i < n; i++) {
+        const t = -HALF + i * s;
+        pts.push(-HALF, t, -HALF, HALF, t, -HALF, -HALF, t, HALF, HALF, t, HALF);
+        pts.push(t, -HALF, -HALF, t, HALF, -HALF, t, -HALF, HALF, t, HALF, HALF);
+        pts.push(-HALF, -HALF, t, HALF, -HALF, t, -HALF, HALF, t, HALF, HALF, t);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      grid.add(new THREE.LineSegments(g, gridMat));
+    }
+    addGridLines();
+    scene.add(grid);
+
+    const tag = document.createElement('div');
+    tag.className = 'label'; tag.textContent = 'matrix';
+    const tagObj = new CSS2DObject(tag);
+    tagObj.position.set(0, HALF + 0.18, 0);
+    scene.add(tagObj);
+
+    const fiberGeo = new THREE.CylinderGeometry(1, 1, 1, 7, 1);
+    const fiberMat = new THREE.MeshStandardMaterial({
+      roughness: 0.42, metalness: 0.12, vertexColors: false
+    });
+    fiberMat.color.set(0xd89b54);
+    let fiberMesh = new THREE.InstancedMesh(fiberGeo, fiberMat, 400);
+    fiberMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    fiberMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(400 * 3), 3);
+    fiberMesh.castShadow = false;
+    scene.add(fiberMesh);
+
+    const palette = [0xd89b54, 0xe0b07a, 0xc9843e, 0xb87333, 0xefc08a];
+    const yAxis = new THREE.Vector3(0, 1, 0);
+    const dummy = new THREE.Object3D();
+    const color = new THREE.Color();
+    let fibers = [];
+    let selected = -1;
+    let seed = 1;
+
+    function rng(s) {
+      let a = (s >>> 0) || 1;
+      return function() {
+        a = (a * 1664525 + 1013904223) >>> 0;
+        return a / 4294967296;
+      };
+    }
+
+    function sampleDir(rand, align) {
+      const spread = (1 - align) * Math.PI;
+      if (spread < 1e-4) return new THREE.Vector3(1, 0, 0);
+      const u = rand();
+      const cosA = 1 - u * (1 - Math.cos(spread));
+      const sinA = Math.sqrt(Math.max(0, 1 - cosA * cosA));
+      const psi = 2 * Math.PI * rand();
+      return new THREE.Vector3(cosA, sinA * Math.cos(psi), sinA * Math.sin(psi)).normalize();
+    }
+
+    function clip(origin, dir, halfLen) {
+      let t0 = -halfLen, t1 = halfLen;
+      for (const ax of ['x', 'y', 'z']) {
+        const o = origin[ax], d = dir[ax];
+        if (Math.abs(d) < 1e-12) {
+          if (o < -HALF || o > HALF) return null;
+        } else {
+          let ta = (-HALF - o) / d, tb = (HALF - o) / d;
+          if (ta > tb) { const tmp = ta; ta = tb; tb = tmp; }
+          t0 = Math.max(t0, ta);
+          t1 = Math.min(t1, tb);
+        }
+      }
+      if (t1 - t0 < 0.12) return null;
+      const mid = origin.clone().addScaledVector(dir, 0.5 * (t0 + t1));
+      return { mid, len: t1 - t0, dir: dir.clone() };
+    }
+
+    const countEl = document.getElementById('count');
+    const alignEl = document.getElementById('align');
+    const lenEl = document.getElementById('len');
+    const diaEl = document.getElementById('dia');
+    const readout = document.getElementById('readout');
+
+    function rebuild() {
+      const nWant = +countEl.value;
+      const align = +alignEl.value / 100;
+      const L = +lenEl.value / 100;
+      const r = +diaEl.value / 400;
+      const rand = rng(seed);
+      fibers = [];
+      let guard = 0;
+      while (fibers.length < nWant && guard < nWant * 40) {
+        guard++;
+        const origin = new THREE.Vector3(
+          (rand() * 2 - 1) * HALF * 0.92,
+          (rand() * 2 - 1) * HALF * 0.92,
+          (rand() * 2 - 1) * HALF * 0.92
+        );
+        const dir = sampleDir(rand, align);
+        const hit = clip(origin, dir, L * 0.5);
+        if (hit) fibers.push(hit);
+      }
+      fiberMesh.count = fibers.length;
+      const vol = 8 * HALF * HALF * HALF;
+      let vf = 0;
+      fibers.forEach((f, i) => {
+        dummy.position.copy(f.mid);
+        dummy.quaternion.setFromUnitVectors(yAxis, f.dir);
+        dummy.scale.set(r, f.len, r);
+        dummy.updateMatrix();
+        fiberMesh.setMatrixAt(i, dummy.matrix);
+        color.setHex(palette[i % palette.length]);
+        fiberMesh.setColorAt(i, color);
+        vf += Math.PI * r * r * f.len;
+      });
+      fiberMesh.instanceMatrix.needsUpdate = true;
+      if (fiberMesh.instanceColor) fiberMesh.instanceColor.needsUpdate = true;
+      selected = -1;
+      const ori = align < 0.05 ? 'random' : align > 0.95 ? 'aligned' : `align ${align.toFixed(2)}`;
+      readout.textContent = `N = ${fibers.length}   vf ≈ ${(100 * vf / vol).toFixed(1)}%   ${ori}   click a fibre`;
+    }
+
+    function paintSelection() {
+      fibers.forEach((f, i) => {
+        color.setHex(i === selected ? 0xef4444 : palette[i % palette.length]);
+        fiberMesh.setColorAt(i, color);
+      });
+      if (fiberMesh.instanceColor) fiberMesh.instanceColor.needsUpdate = true;
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let downPt = null;
+    function ndc(ev) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+    renderer.domElement.addEventListener('pointermove', (ev) => {
+      ndc(ev);
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObject(fiberMesh, false)[0];
+      stage.classList.toggle('picking', !!hit);
+    });
+    renderer.domElement.addEventListener('pointerdown', (ev) => {
+      downPt = {x: ev.clientX, y: ev.clientY};
+    });
+    renderer.domElement.addEventListener('pointerup', (ev) => {
+      if (!downPt) return;
+      const moved = Math.hypot(ev.clientX - downPt.x, ev.clientY - downPt.y);
+      downPt = null;
+      if (moved > 6) return;
+      ndc(ev);
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObject(fiberMesh, false)[0];
+      if (hit && hit.instanceId != null) {
+        selected = hit.instanceId;
+        paintSelection();
+        const f = fibers[selected];
+        readout.textContent = `fibre ${selected + 1}   ℓ = ${f.len.toFixed(2)}   n = (${f.dir.x.toFixed(2)}, ${f.dir.y.toFixed(2)}, ${f.dir.z.toFixed(2)})`;
+      }
+    });
+
+    function onChange() { rebuild(); }
+    countEl.addEventListener('input', onChange);
+    alignEl.addEventListener('input', onChange);
+    lenEl.addEventListener('input', onChange);
+    diaEl.addEventListener('input', onChange);
+    document.getElementById('reshuffle').addEventListener('click', () => { seed = (seed * 1103515245 + 12345) >>> 0; rebuild(); });
+    rebuild();
+
+    function resize() {
+      const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false); labels.setSize(w, h);
+    }
+    new ResizeObserver(resize).observe(stage); resize();
+    (function loop(){
+      requestAnimationFrame(loop);
+      controls.update();
+      renderer.render(scene, camera);
+      labels.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
