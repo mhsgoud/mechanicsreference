@@ -1,8 +1,7 @@
 # Mechanics Reference
 
-Static site for [mechanicsreference.com](https://mechanicsreference.com), hosted with GitHub Pages.
+Static site for [mechanicsreference.com](https://mechanicsreference.com): a reference for continuum mechanics, the finite element method, and numerical methods.
 
 - `index.html` — landing page
-- `hub.html` — searchable FEM / mechanics learning hub
-- `forum.html` — community forum (GitHub Discussions)
+- `hub.html` — searchable topic hub
 - `CNAME` — custom domain for GitHub Pages

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mechanics Reference | Continuum Mechanics, FEM, and Solvers</title>
-  <meta name="description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, solvers, and engineering applications." />
-  <meta name="robots" content="index, follow" />
+  <title>Continuum Mechanics, FEM, and Numerical Methods | Mechanics Reference</title>
+  <meta name="description" content="A searchable reference for continuum mechanics, the finite element method, and numerical methods: kinematics, weak forms, discretization, quadrature, and solvers." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="author" content="Mechanics Reference" />
   <meta name="theme-color" content="#080a12" />
   <link rel="canonical" href="https://mechanicsreference.com/" />
@@ -14,14 +14,14 @@
   <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
-  <meta property="og:title" content="Mechanics Reference | Continuum Mechanics, FEM, and Solvers" />
-  <meta property="og:description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers." />
+  <meta property="og:title" content="Continuum Mechanics, FEM, and Numerical Methods | Mechanics Reference" />
+  <meta property="og:description" content="A searchable reference for continuum mechanics, the finite element method, and numerical methods: kinematics, weak forms, discretization, quadrature, and solvers." />
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Mechanics Reference | Continuum Mechanics, FEM, and Solvers" />
-  <meta name="twitter:description" content="A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers." />
+  <meta name="twitter:title" content="Continuum Mechanics, FEM, and Numerical Methods | Mechanics Reference" />
+  <meta name="twitter:description" content="A searchable reference for continuum mechanics, the finite element method, and numerical methods." />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,8 +31,8 @@
         "@id": "https://mechanicsreference.com/#website",
         "url": "https://mechanicsreference.com/",
         "name": "Mechanics Reference",
-        "alternateName": "mechanicsreference.com",
-        "description": "A compact reference for solid mechanics, fluid mechanics, continuum mechanics, finite element methods, and solvers.",
+        "alternateName": ["mechanicsreference.com", "Continuum mechanics and FEM reference"],
+        "description": "A searchable reference for continuum mechanics, the finite element method, and numerical methods.",
         "inLanguage": "en",
         "publisher": {
           "@type": "Organization",
@@ -45,15 +45,43 @@
         "@type": "WebPage",
         "@id": "https://mechanicsreference.com/#webpage",
         "url": "https://mechanicsreference.com/",
-        "name": "Mechanics Reference | Continuum Mechanics, FEM, and Solvers",
+        "name": "Continuum Mechanics, FEM, and Numerical Methods | Mechanics Reference",
         "isPartOf": { "@id": "https://mechanicsreference.com/#website" },
-        "description": "Landing page covering solid mechanics, fluid mechanics, continuum mechanics, finite elements, and solvers.",
+        "description": "Reference notes covering continuum mechanics, finite element analysis, and numerical methods used to solve them.",
         "about": [
-          "Solid mechanics",
-          "Fluid mechanics",
-          "Continuum mechanics",
-          "Finite element method",
-          "Computational mechanics"
+          { "@type": "Thing", "name": "Continuum mechanics" },
+          { "@type": "Thing", "name": "Finite element method" },
+          { "@type": "Thing", "name": "Numerical methods" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://mechanicsreference.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is continuum mechanics?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Continuum mechanics models solids and fluids as continuous media. It combines kinematics, conservation of mass, momentum, and energy, and constitutive laws that relate stress to deformation or deformation rate."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the finite element method?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The finite element method (FEM) approximates a continuum problem by dividing the domain into elements, introducing shape functions, and replacing the strong form of the governing equations with a weak integral statement that yields a discrete algebraic system."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What numerical methods does this reference cover?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The hub covers discretization, Gauss quadrature, assembly, linear and nonlinear solvers, Newton–Raphson iteration, condensation, sparse linear algebra, and related tools used to compute finite element solutions."
+            }
+          }
         ]
       }
     ]
@@ -302,7 +330,7 @@
 
     .split{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:repeat(3, 1fr);
       gap:14px;
     }
     .primer{
@@ -377,6 +405,34 @@
     }
     .step p{margin:0;color:var(--text-body);font-size:14px;line-height:1.55}
 
+    .faq{display:flex;flex-direction:column;gap:10px}
+    .faq details{
+      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:4px 18px 4px;
+    }
+    .faq summary{
+      cursor:pointer;
+      font-weight:600;
+      padding:14px 0;
+      list-style:none;
+    }
+    .faq summary::-webkit-details-marker{display:none}
+    .faq summary::after{
+      content:"+" ;
+      float:right;
+      color:var(--accent);
+      font-weight:500;
+    }
+    .faq details[open] summary::after{content:"–"}
+    .faq details p{
+      margin:0 0 16px;
+      color:var(--text-body);
+      font-size:14.5px;
+      line-height:1.65;
+    }
+
     footer{
       border-top:1px solid var(--border);
       padding:22px 24px 32px;
@@ -407,9 +463,8 @@
       </a>
       <nav class="top-nav" aria-label="Site">
         <a href="./" class="active" aria-current="page">Home</a>
-        <a href="#mechanics">Mechanics</a>
+        <a href="#topics">Topics</a>
         <a href="hub.html">Hub</a>
-        <a href="forum.html">Forum</a>
       </nav>
     </header>
 
@@ -417,76 +472,87 @@
       <div class="wrap">
         <section class="hero">
           <div>
-            <div class="eyebrow">Computational mechanics</div>
-            <h1>A working reference for continuum mechanics and finite elements.</h1>
-            <p class="lede">Searchable notes on solid and fluid mechanics, kinematics, discretization, solvers, GPU computing, and the engineering problems those methods are used for.</p>
+            <div class="eyebrow">Mechanics reference</div>
+            <h1>Continuum mechanics, finite elements, and numerical methods.</h1>
+            <p class="lede">Searchable notes on kinematics, constitutive models, weak forms, discretization, quadrature, and solvers—the pipeline from a continuum statement to a computed solution.</p>
             <div class="actions">
-              <a class="btn btn-primary" href="hub.html">Open the learning hub</a>
-              <a class="btn btn-ghost" href="#mechanics">Solid &amp; fluid mechanics</a>
+              <a class="btn btn-primary" href="hub.html">Open the reference hub</a>
+              <a class="btn btn-ghost" href="#topics">Browse topics</a>
             </div>
           </div>
           <aside class="hero-panel" aria-label="Topic map preview">
-            <div class="panel-kicker">topic map</div>
+            <div class="panel-kicker">reference map</div>
             <div class="stack">
-              <div class="stack-row"><strong>Solids</strong><span>stress · strain · constitutive laws</span></div>
-              <div class="stack-row"><strong>Fluids</strong><span>Navier–Stokes · viscosity · flow</span></div>
+              <div class="stack-row"><strong>Continuum mechanics</strong><span>kinematics · stress · constitutive laws</span></div>
               <div class="stack-row"><strong>Finite elements</strong><span>weak form · elements · assembly</span></div>
-              <div class="stack-row"><strong>Solvers &amp; HPC</strong><span>Newton · sparse · GPU</span></div>
+              <div class="stack-row"><strong>Numerical methods</strong><span>quadrature · Newton · solvers</span></div>
+              <div class="stack-row"><strong>Linear algebra</strong><span>sparse · preconditioners · GPU</span></div>
             </div>
           </aside>
         </section>
 
-        <section class="section" id="mechanics">
-          <h2>Solid and fluid mechanics</h2>
-          <p class="section-lead">Continuum mechanics treats matter as a continuous medium rather than a collection of atoms. The two classical branches—solids and fluids—share the same conservation laws and differ mainly in how they resist deformation.</p>
+        <section class="section" id="topics">
+          <h2>What this reference covers</h2>
+          <p class="section-lead">Three subjects sit on one pipeline. Continuum mechanics writes the field problem. The finite element method turns it into a discrete system. Numerical methods assemble, integrate, and solve that system.</p>
           <div class="split">
-            <article class="primer">
-              <h3>Solid mechanics</h3>
-              <p>Solid mechanics describes how a body with a preferred reference shape deforms and carries load. A solid can sustain shear at rest: that is why a beam, a soil specimen, or a battery electrode holds its form until the stress is large enough to yield, crack, or buckle.</p>
-              <p>The usual ingredients are kinematics (how strain is measured from motion), stress (internal force per area), balance of momentum, and a constitutive model that relates stress to strain or strain history. Linear elasticity is the small-strain starting point. Plasticity, viscoelasticity, hyperelasticity, damage, and contact extend it when the material or the geometry is no longer linear.</p>
+            <article class="primer" id="continuum">
+              <h3>Continuum mechanics</h3>
+              <p>Continuum mechanics treats solids and fluids as continuous media rather than collections of atoms. The same structure appears in both: kinematics (how deformation is measured), conservation of mass, momentum, and energy, and a constitutive model that closes the system.</p>
+              <p>In solids, a body can carry shear at rest. Strain, stress, elasticity, plasticity, and finite-deformation measures such as Green and logarithmic strain belong here. In fluids, shear is resisted only while the material deforms; Newton’s law of viscosity and the Navier–Stokes equations are the Newtonian case.</p>
               <ul>
-                <li>Small-strain vs finite-deformation kinematics, including Green and logarithmic strain</li>
-                <li>Constitutive models: elasticity, plasticity, viscoelasticity, hyperelasticity</li>
-                <li>Equilibrium, buckling, fracture, and contact as typical boundary-value problems</li>
-                <li>FEM as the standard discretization: weak form, elements, assembly, Newton–Raphson</li>
+                <li>Kinematics: small strain vs finite strain; deformation gradient</li>
+                <li>Balance laws: mass, linear momentum, angular momentum, energy</li>
+                <li>Constitutive models for solids and fluids</li>
+                <li>Boundary-value problems: equilibrium, contact, flow, and coupled physics</li>
               </ul>
             </article>
-            <article class="primer">
-              <h3>Fluid mechanics</h3>
-              <p>Fluid mechanics describes liquids and gases, which cannot support a static shear stress. In a fluid, shear is resisted only while the material is deforming: the constitutive response depends on the rate of strain, not on a remembered solid-like shape.</p>
-              <p>Mass conservation (continuity), momentum balance, and an energy equation close the problem together with a constitutive law. For a Newtonian fluid that is Newton’s law of viscosity, and the momentum statement becomes the Navier–Stokes equations. The Reynolds number compares inertia to viscous diffusion and organizes laminar, transitional, and turbulent regimes. Many engineering flows are treated as incompressible; high-speed gas dynamics needs compressibility and thermodynamics.</p>
+            <article class="primer" id="fem">
+              <h3>Finite element method</h3>
+              <p>The finite element method (FEM) approximates a continuum problem on a mesh. The domain is split into elements, unknown fields are interpolated with shape functions, and the strong form is replaced by a weak integral statement—virtual work or a Galerkin projection.</p>
+              <p>That step produces element matrices, which assemble into a global residual (and, for Newton methods, a tangent stiffness). Element choice, mesh quality, locking, hourglassing, and boundary conditions decide whether the discrete problem is a faithful model of the continuum one.</p>
               <ul>
-                <li>Continuity, Navier–Stokes, and energy; inviscid Euler flow as a limiting model</li>
-                <li>Viscosity, Reynolds number, laminar vs turbulent, boundary layers</li>
-                <li>Incompressible vs compressible flow; internal flow, aerodynamics, free surfaces</li>
-                <li>Shared numerical ideas with solids: conservation form, stabilization, and coupled fluid–structure problems</li>
+                <li>Weak form, Galerkin method, and isoparametric mapping</li>
+                <li>Element families: tets, hexes, mixed, high-order, and unfitted methods</li>
+                <li>Mesh generation, quadrature, and global assembly</li>
+                <li>Nonlinear FEM, contact, dynamics, and condensation</li>
+              </ul>
+            </article>
+            <article class="primer" id="numerical">
+              <h3>Numerical methods</h3>
+              <p>Once the continuum problem is discrete, the remaining work is numerical: integrating weak forms, solving linear and nonlinear algebraic systems, and controlling error. Gauss quadrature evaluates element integrals. Newton–Raphson linearizes nonlinear residuals. Direct and iterative solvers, with preconditioners, invert or reduce the resulting sparse matrices.</p>
+              <p>The same toolkit appears in time integration (implicit vs explicit), eigenvalue problems for buckling, and high-performance implementations on CPUs and GPUs. Linear algebra—sparse formats, fill-reducing orderings, and libraries such as BLAS, MKL, and cuSPARSE—is part of the method, not an afterthought.</p>
+              <ul>
+                <li>Numerical integration and Gauss points</li>
+                <li>Newton–Raphson, consistent tangents, and convergence tests</li>
+                <li>Linear solvers, preconditioning, and sparse formats</li>
+                <li>Time stepping, stability, and HPC for large systems</li>
               </ul>
             </article>
           </div>
           <div class="bridge">
-            <p>Both branches are continuum theories: write kinematics, enforce conservation of mass, momentum, and energy, then close the system with a constitutive model. Finite elements, finite volumes, and related methods turn that field problem into algebraic equations. The hub is organized around that pipeline—especially for solids and FEM—with notes on solvers, GPU computing, and applications such as fracture, soils, and batteries.</p>
+            <p>The hub follows that order: continuum fundamentals first, then finite elements and numerical methods, then applications (fracture, composites, soils, heat, batteries) and the linear-algebra tools used to compute them. Search the hub for a term such as Green strain, locking, Gauss, or Schur.</p>
           </div>
         </section>
 
         <section class="section" id="tracks">
-          <h2>Six tracks, one hub</h2>
-          <p class="section-lead">Each card opens the hub on that part. Use search there for Gauss points, Schur complements, locking, or any other tag.</p>
+          <h2>Open a track in the hub</h2>
+          <p class="section-lead">Each card jumps to that part of the searchable notebook. Continuum mechanics, finite elements, and numerical methods are Parts I–III; later parts apply and implement them.</p>
           <div class="tracks">
             <a class="track" href="hub.html#introduction-to-continuum-mechanics">
               <div class="track-index">Part I</div>
-              <h3>Fundamentals of Mechanics</h3>
-              <p>Continuum kinematics, balance laws, and constitutive models from small strain to finite deformation.</p>
+              <h3>Continuum mechanics</h3>
+              <p>Kinematics, balance laws, and constitutive models from small strain to finite deformation.</p>
               <span class="go">Open track →</span>
             </a>
             <a class="track" href="hub.html#finite-element-method-introduction">
               <div class="track-index">Part II</div>
-              <h3>Numerical Methods</h3>
+              <h3>Finite elements &amp; numerical methods</h3>
               <p>Weak forms, element families, mesh generation, quadrature, assembly, and linear solvers.</p>
               <span class="go">Open track →</span>
             </a>
             <a class="track" href="hub.html#nonlinear-fem">
               <div class="track-index">Part III</div>
-              <h3>Advanced FEM</h3>
+              <h3>Nonlinear FEM</h3>
               <p>Geometric and material nonlinearity, Newton–Raphson, condensation, and dynamics.</p>
               <span class="go">Open track →</span>
             </a>
@@ -512,12 +578,12 @@
         </section>
 
         <section class="section">
-          <h2>How to use it</h2>
-          <p class="section-lead">The hub is a single searchable notebook. Direct links keep a topic open, so you can share or bookmark a page.</p>
+          <h2>How to use the hub</h2>
+          <p class="section-lead">The hub is the searchable notebook behind this reference. Direct links keep a continuum, FEM, or numerical-methods topic open.</p>
           <div class="steps">
             <div class="step">
               <b>01 — Search</b>
-              <p>Type a keyword such as Gauss, locking, or GPU. Matching topics stay in the sidebar.</p>
+              <p>Type a keyword such as strain, locking, Gauss, or Newton. Matching topics stay in the sidebar.</p>
             </div>
             <div class="step">
               <b>02 — Read</b>
@@ -529,13 +595,36 @@
             </div>
           </div>
         </section>
+
+        <section class="section" id="faq">
+          <h2>Frequently asked questions</h2>
+          <p class="section-lead">Short answers for the three subjects this site is built around.</p>
+          <div class="faq">
+            <details>
+              <summary>What is continuum mechanics?</summary>
+              <p>Continuum mechanics models solids and fluids as continuous media. It combines kinematics, conservation of mass, momentum, and energy, and constitutive laws that relate stress to deformation or deformation rate. This reference starts there, before discretization.</p>
+            </details>
+            <details>
+              <summary>What is the finite element method?</summary>
+              <p>The finite element method (FEM) approximates a continuum problem by dividing the domain into elements, introducing shape functions, and replacing the strong form with a weak integral statement. The result is a discrete algebraic system whose solution approximates the continuum fields.</p>
+            </details>
+            <details>
+              <summary>What numerical methods are covered?</summary>
+              <p>The hub covers Gauss quadrature, assembly, linear and nonlinear solvers, Newton–Raphson iteration, static condensation, time integration, sparse linear algebra, and the libraries used to compute large finite element systems.</p>
+            </details>
+            <details>
+              <summary>Who is this reference for?</summary>
+              <p>Students, researchers, and engineers who need a compact map of continuum mechanics, FEM, and the numerical methods used to solve them—not a substitute for a textbook, but a place to look up the pipeline and the usual failure modes.</p>
+            </details>
+          </div>
+        </section>
       </div>
     </main>
 
     <footer>
       <div class="wrap">
-        <span>mechanicsreference.com</span>
-        <span><a href="forum.html">Forum</a> · <a href="https://github.com/mhsgoud/mechanicsreference">GitHub</a></span>
+        <span>Continuum mechanics · FEM · numerical methods</span>
+        <span><a href="hub.html">Open the hub</a> · <a href="https://github.com/mhsgoud/mechanicsreference">GitHub</a></span>
       </div>
     </footer>
   </div>
