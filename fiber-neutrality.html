@@ -68,7 +68,7 @@
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fibre neutrality</a></p>
       <h1>How the composite answers the fibre</h1>
-      <p class="standfirst">Uniaxial tension along <i>x</i>. Rotate the fibres in the <i>xy</i>-plane. The reduced fibre is unstrained at an angle that depends only on the matrix Poisson ratio; there the effective Young’s modulus is that of the matrix. A solid fibre is neutral only once its diameter is small compared with the box. The plots follow the structure of Goudarzi and Simone, <i>Int. J. Solids Struct.</i> 156–157 (2019).</p>
+      <p class="standfirst">Uniaxial tension along <i>x</i>. Rotate the fibres in the <i>xy</i>-plane. A reduced fibre is unstrained at an angle that depends only on the matrix Poisson ratio; there <i>E</i><sub>x</sub><sup>c</sup> = <i>E</i><sub>m</sub>. A solid fibre is neutral only for <i>d</i><sub>f</sub>/<i>L</i> ≲ 0.01. Fibres at 90° can still stiffen slightly. A random packing is Poisson-neutral at ν<sub>m</sub> ≈ 0.25. The plots follow Goudarzi and Simone, <i>Int. J. Solids Struct.</i> 156–157 (2019).</p>
     </div>
     <div class="figure-shell">
       <div class="stage-row">
@@ -76,10 +76,12 @@
         <div class="plots">
           <div class="plot-cell"><h3>Fig. 7a · E<sub>x</sub><sup>c</sup> / E<sub>m</sub> vs θ<sub>z</sub></h3><canvas id="pEx"></canvas></div>
           <div class="plot-cell"><h3>Fig. 7b · θ<sub>n</sub>(ν<sub>m</sub>)</h3><canvas id="pTh"></canvas></div>
-          <div class="plot-cell"><h3>Figs. 4 &amp; 11 · E<sub>x</sub><sup>c</sup> / E<sub>m</sub> vs d<sub>f</sub>/L</h3><canvas id="pD"></canvas></div>
-          <div class="plot-cell"><h3>Figs. 5 &amp; 10 · slip along the fibre</h3><canvas id="pSlip"></canvas></div>
+          <div class="plot-cell"><h3>Figs. 4, 11 &amp; 13 · E<sub>x</sub><sup>c</sup> vs d<sub>f</sub>/L at θ<sub>n</sub></h3><canvas id="pD"></canvas></div>
+          <div class="plot-cell"><h3>Figs. 5 &amp; 10 · slip and axial strain</h3><canvas id="pSlip"></canvas></div>
           <div class="plot-cell"><h3>Fig. 8 · G<sub>xy</sub><sup>c</sup> / G<sub>m</sub> vs θ<sub>z</sub></h3><canvas id="pG"></canvas></div>
-          <div class="plot-cell"><h3>Fig. 9 · effective Poisson ratios</h3><canvas id="pNu"></canvas></div>
+          <div class="plot-cell"><h3>Fig. 12 · G<sub>xy</sub> vs d<sub>f</sub>/L at 0°</h3><canvas id="pGd"></canvas></div>
+          <div class="plot-cell"><h3>Fig. 15 · 2d single vs double interface</h3><canvas id="p2d"></canvas></div>
+          <div class="plot-cell"><h3>Figs. 20–21 · Poisson neutrality</h3><canvas id="pNu"></canvas></div>
         </div>
       </div>
       <div id="ui">
@@ -90,8 +92,9 @@
         <label>E<sub>f</sub>/E<sub>m</sub> <input id="er" type="range" min="10" max="500" value="100" /> <span id="erV"></span></label>
         <label>d<sub>f</sub>/L <input id="df" type="range" min="2" max="80" value="7" /> <span id="dfV"></span></label>
         <label>interface <input id="kbt" type="range" min="0" max="100" value="35" /> <span id="kbtV"></span></label>
+        <label>packing <input id="pack" type="range" min="0" max="100" value="0" /> <span id="packV"></span></label>
         <p id="readout"></p>
-        <p id="legend">Navy: reduced fibre (and ν<sub>xy</sub>). Orange: solid fibre (and ν<sub>yx</sub>). On θ<sub>n</sub>(ν): navy is plane stress and 3D reduced; gray is plane strain. At θ<sub>n</sub> the reduced model sits on E<sub>m</sub>; the solid model does not, until d<sub>f</sub>/L is small.</p>
+        <p id="legend">Navy: reduced / single-interface. Orange: solid fibre or double-interface. On θ<sub>n</sub>(ν): navy is 3d reduced = Wang plane stress; gray is plane strain. At θ<sub>n</sub> a reduced fibre sits on E<sub>m</sub>; a solid fibre does so only for d<sub>f</sub>/L ≲ 0.01. A double interface can drop below E<sub>m</sub>. Random packing: ν<sub>iso</sub> is independent of volume fraction at ν<sub>m</sub> ≈ 0.25.</p>
       </div>
     </div>
   </main>
@@ -179,14 +182,48 @@
     function magNu(vf, contrast, k) {
       return 0.035 * (vf / 0.01) * (contrast / 100) * iface(k);
     }
-    function nuxy(th, nu, vf, contrast, k) {
-      return nu + magNu(vf, contrast, k) * psi(th, nu) * Math.cos(2 * th);
+    function nuxyAligned(th, nu, vf, contrast, k) {
+      const c2 = Math.cos(th) * Math.cos(th);
+      const s2 = Math.sin(th) * Math.sin(th);
+      return nu * c2 + (nu + magNu(vf, contrast, k) * 0.4 * psi(th, nu)) * s2;
     }
-    function nuyx(th, nu, vf, contrast, k) {
-      return nu + magNu(vf, contrast, k) * psi(th, nu) * Math.sin(2 * th) * 0.45;
+    function nuIsoRandom(nu, vf) {
+      const w = Math.min(0.82, 5.5 * vf);
+      return 0.25 + (nu - 0.25) * (1 - w);
+    }
+    function psiStrain(th, nu) {
+      const c = Math.cos(th), s = Math.sin(th);
+      const n = Math.min(Math.max(nu, 1e-6), 0.499);
+      return c*c - (n / (1 - n)) * s*s;
+    }
+    function ExSingle2d(th, nu, k) {
+      const mag = 0.038 * iface(k);
+      const p = psiStrain(th, nu);
+      return 1 + mag * p * p;
+    }
+    function ExDouble2d(th, nu, k) {
+      const thn = thetaNstrain(nu);
+      const thMin = thn * (0.60 + 0.40 * k);
+      const dip = 0.038 * (1.02 - k);
+      const d = th - thMin;
+      const well = dip * Math.exp(-(d * d) / (0.20 * 0.20));
+      const stiff = 0.028 * Math.pow(Math.cos(th), 4) * k;
+      return 1 - well + stiff;
+    }
+    function GxySolid(th, vf, contrast, k, dfL) {
+      const thin = Gxy(th, vf, contrast, k);
+      const blend = (dfL * dfL) / (dfL * dfL + 0.018 * 0.018);
+      const extra = blend * 0.03 * (vf / 0.01) * (contrast / 100) * 0.35;
+      return thin + extra;
     }
     function slipAmp(th, nu, k) {
       return psi(th, nu) * (0.25 + 0.75 * (1 - k));
+    }
+    function mulberry(a) {
+      let t = a + 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
     }
     function yRange(series, pad, floorMin, floorMax) {
       let mn = Infinity, mx = -Infinity;
@@ -212,6 +249,7 @@
       er: document.getElementById('er'),
       df: document.getElementById('df'),
       kbt: document.getElementById('kbt'),
+      pack: document.getElementById('pack'),
       readout: document.getElementById('readout')
     };
 
@@ -223,7 +261,8 @@
         vf: +els.vf.value / 1000,
         contrast: +els.er.value,
         dfL: +els.df.value / 1000,
-        k: +els.kbt.value / 100
+        k: +els.kbt.value / 100,
+        pack: +els.pack.value / 100
       };
     }
 
@@ -231,7 +270,7 @@
       const n = Math.max(1, Math.round(12 + 180 * (p.vf / 0.05)));
       const r = Math.max(0.012, p.dfL * HALF * 2.2);
       const len = HALF * 1.55;
-      const dir = new THREE.Vector3(Math.cos(p.th), Math.sin(p.th), 0);
+      const dir0 = new THREE.Vector3(Math.cos(p.th), Math.sin(p.th), 0);
       const n1 = new THREE.Vector3(-Math.sin(p.th), Math.cos(p.th), 0);
       const n2 = new THREE.Vector3(0, 0, 1);
       fiberMesh.count = n;
@@ -243,6 +282,13 @@
           const u = nx === 1 ? 0 : (ix / (nx - 1) - 0.5);
           const v = nz === 1 ? 0 : (iz / (nz - 1) - 0.5);
           dummy.position.copy(n1.clone().multiplyScalar(u * HALF * 1.55).add(n2.clone().multiplyScalar(v * HALF * 1.55)));
+          let dir = dir0.clone();
+          if (p.pack > 0.02) {
+            const a = mulberry(i * 17 + 3), b = mulberry(i * 31 + 11);
+            const ths = a * Math.PI, ph = Math.acos(2 * b - 1);
+            const rnd = new THREE.Vector3(Math.sin(ph)*Math.cos(ths), Math.sin(ph)*Math.sin(ths), Math.cos(ph)).normalize();
+            dir.lerp(rnd, p.pack).normalize();
+          }
           dummy.quaternion.setFromUnitVectors(yAxis, dir);
           dummy.scale.set(r, len, r);
           dummy.updateMatrix();
@@ -307,13 +353,15 @@
       const exS = ExSolid(p.th, p.nu, p.vf, p.contrast, p.k, p.dfL);
       const g = Gxy(p.th, p.vf, p.contrast, p.k);
       els.readout.textContent =
-        `θn = ${(thN*180/Math.PI).toFixed(1)}°   vf = ${(p.vf*100).toFixed(1)}%   Ex/Em = ${exR.toFixed(3)} (reduced), ${exS.toFixed(3)} (solid)   Gxy/Gm = ${g.toFixed(3)}   εf/εx = ${psi(p.th, p.nu).toFixed(3)}`;
+        `θn = ${(thN*180/Math.PI).toFixed(1)}°   vf = ${(p.vf*100).toFixed(1)}%   Ex/Em = ${exR.toFixed(3)} (reduced), ${exS.toFixed(3)} (solid)   Gxy/Gm = ${g.toFixed(3)}   εf/εx = ${psi(p.th, p.nu).toFixed(3)}` +
+        (psi(p.th, p.nu) < -0.02 ? '   fibre in compression under remote tension' : '');
       document.getElementById('angV').textContent = p.deg + '°';
       document.getElementById('nuV').textContent = p.nu.toFixed(2);
       document.getElementById('vfV').textContent = (p.vf*100).toFixed(1) + '%';
       document.getElementById('erV').textContent = String(p.contrast);
       document.getElementById('dfV').textContent = p.dfL.toFixed(3);
       document.getElementById('kbtV').textContent = Math.round(p.k * 100) + '%';
+      document.getElementById('packV').textContent = p.pack < 0.08 ? 'aligned' : (p.pack > 0.85 ? 'random' : 'mixed');
 
       const thetas = linspace(0, Math.PI/2, 80);
       const exSeries = [
@@ -340,8 +388,9 @@
       });
       const dfs = linspace(0.002, 0.08, 50);
       const dSeries = [
-        {color: '#1e3a5f', pts: dfs.map(d => [d, ExReduced(p.th, p.nu, p.vf, p.contrast, p.k)])},
-        {color: '#c45c26', pts: dfs.map(d => [d, ExSolid(p.th, p.nu, p.vf, p.contrast, p.k, d)])}
+        {color: '#1e3a5f', pts: dfs.map(d => [d, ExReduced(thN, p.nu, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', pts: dfs.map(d => [d, ExSolid(thN, p.nu, p.vf, p.contrast, p.k, d)])},
+        {color: '#8aa3c4', width: 1.2, pts: dfs.map(d => [d, ExSolid(0, p.nu, p.vf, p.contrast, p.k, d)])}
       ];
       const dY = yRange(dSeries, 0.2, 0.99, 1.08);
       chart(document.getElementById('pD'), {
@@ -349,26 +398,29 @@
         xlabel: 'df/L', ylabel: 'Ex/Em',
         hline: 1, vline: p.dfL,
         series: dSeries,
-        mark: [p.dfL, exS]
+        mark: [p.dfL, ExSolid(thN, p.nu, p.vf, p.contrast, p.k, p.dfL)]
       });
       const ss = linspace(-0.5, 0.5, 60);
       const amp = slipAmp(p.th, p.nu, p.k);
       const beta = 3 + 10 * p.k;
       const slim = Math.sinh(beta * 0.5) || 1;
       const slipPts = ss.map(s => [s, amp * Math.sinh(beta * s) / slim]);
-      const slipY = yRange([{pts: slipPts}], 0.25, -0.15, 0.15);
-      const slipBound = Math.max(Math.abs(slipY.ymin), Math.abs(slipY.ymax), 0.12);
+      const strainPts = ss.map(s => [s, psi(p.th, p.nu) * (0.55 + 0.45 * (1 - Math.cosh(beta * s) / Math.cosh(beta * 0.5)))]);
+      const slipBound = Math.max(0.12, ...slipPts.map(q => Math.abs(q[1])), ...strainPts.map(q => Math.abs(q[1]))) * 1.2;
       chart(document.getElementById('pSlip'), {
         xmin: -0.5, xmax: 0.5, ymin: -slipBound, ymax: slipBound,
-        xlabel: 's / ℓf', ylabel: 'slip',
+        xlabel: 's / ℓf', ylabel: 'slip, εf',
         hline: 0,
-        series: [{
-          color: Math.abs(amp) < 0.02 ? '#2f6b4f' : '#1e3a5f',
-          pts: slipPts
-        }],
-        mark: [0, 0]
+        series: [
+          {color: Math.abs(amp) < 0.02 ? '#2f6b4f' : '#1e3a5f', pts: slipPts},
+          {color: '#c45c26', width: 1.2, pts: strainPts}
+        ],
+        mark: [0, psi(p.th, p.nu) * 0.55]
       });
-      const gSeries = [{color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, Gxy(t, p.vf, p.contrast, p.k)])}];
+      const gSeries = [
+        {color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, Gxy(t, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', width: 1.2, pts: thetas.map(t => [t*180/Math.PI, GxySolid(t, p.vf, p.contrast, p.k, p.dfL)])}
+      ];
       const gY = yRange(gSeries, 0.2, 0.98, 1.08);
       chart(document.getElementById('pG'), {
         xmin: 0, xmax: 90, ymin: gY.ymin, ymax: gY.ymax,
@@ -377,21 +429,48 @@
         series: gSeries,
         mark: [p.deg, g]
       });
-      const nuSeries = [
-        {color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, nuxy(t, p.nu, p.vf, p.contrast, p.k)])},
-        {color: '#c45c26', width: 1.2, pts: thetas.map(t => [t*180/Math.PI, nuyx(t, p.nu, p.vf, p.contrast, p.k)])}
+      const gdSeries = [
+        {color: '#1e3a5f', pts: dfs.map(d => [d, Gxy(0, p.vf, p.contrast, p.k)])},
+        {color: '#c45c26', pts: dfs.map(d => [d, GxySolid(0, p.vf, p.contrast, p.k, d)])},
+        {color: '#8aa3c4', width: 1.2, pts: dfs.map(d => [d, GxySolid(Math.PI/4, p.vf, p.contrast, p.k, d)])}
       ];
-      const nuY = yRange(nuSeries, 0.2, p.nu - 0.08, p.nu + 0.08);
+      const gdY = yRange(gdSeries, 0.2, 0.98, 1.08);
+      chart(document.getElementById('pGd'), {
+        xmin: 0, xmax: 0.08, ymin: gdY.ymin, ymax: gdY.ymax,
+        xlabel: 'df/L', ylabel: 'Gxy/Gm',
+        hline: 1, vline: p.dfL,
+        series: gdSeries,
+        mark: [p.dfL, GxySolid(0, p.vf, p.contrast, p.k, p.dfL)]
+      });
+      const twoD = [
+        {color: '#1e3a5f', pts: thetas.map(t => [t*180/Math.PI, ExSingle2d(t, p.nu, p.k)])},
+        {color: '#c45c26', pts: thetas.map(t => [t*180/Math.PI, ExDouble2d(t, p.nu, p.k)])}
+      ];
+      const twoY = yRange(twoD, 0.2, 0.95, 1.06);
+      chart(document.getElementById('p2d'), {
+        xmin: 0, xmax: 90, ymin: twoY.ymin, ymax: twoY.ymax,
+        xlabel: 'θz °', ylabel: 'Ex/Em',
+        vline: p.deg, hline: 1,
+        series: twoD,
+        mark: [p.deg, ExSingle2d(p.th, p.nu, p.k)]
+      });
+      const nuIsoPts = nus.map(n => [n, nuIsoRandom(n, p.vf)]);
+      const nuAlPts = nus.map(n => [n, nuxyAligned(0, n, p.vf, p.contrast, p.k)]);
+      const nuSeries = [
+        {color: '#1e3a5f', pts: nuAlPts},
+        {color: '#c45c26', pts: nuIsoPts}
+      ];
+      const nuY = yRange(nuSeries, 0.15, 0, 0.5);
       chart(document.getElementById('pNu'), {
-        xmin: 0, xmax: 90, ymin: nuY.ymin, ymax: nuY.ymax,
-        xlabel: 'θz °', ylabel: 'νc',
-        vline: p.deg, hline: p.nu,
+        xmin: 0, xmax: 0.5, ymin: Math.max(0, nuY.ymin), ymax: Math.min(0.55, nuY.ymax),
+        xlabel: 'νm', ylabel: 'νc',
+        vline: p.nu, hline: 0.25,
         series: nuSeries,
-        mark: [p.deg, nuxy(p.th, p.nu, p.vf, p.contrast, p.k)]
+        mark: [p.nu, p.pack > 0.5 ? nuIsoRandom(p.nu, p.vf) : nuxyAligned(0, p.nu, p.vf, p.contrast, p.k)]
       });
     }
 
-    ['ang','nu','vf','er','df','kbt'].forEach(id => els[id].addEventListener('input', redraw));
+    ['ang','nu','vf','er','df','kbt','pack'].forEach(id => els[id].addEventListener('input', redraw));
 
     function resize() {
       const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
