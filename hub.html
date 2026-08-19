@@ -432,8 +432,9 @@ const topics = [
   {part:"Part I – Fundamentals of Mechanics", title:"Polar Decomposition", bullets:[
     "Any invertible F factors uniquely as F = R U = V R, with R a rotation and U, V symmetric positive-definite stretches. U stretches in the reference placement, then R rotates; V stretches in the current placement after the same rotation.",
     "Neither order is more physical than the other. Both describe the same final map. Strain measures that are built from U or from C = U² are blind to R, which is the point: a rigid rotation must not look like stretch.",
-    "In computation U is the unique positive square root of C. Iterative polar algorithms average a matrix with its inverse-transpose until the result is orthogonal; that limit is R."
-  ], tags:["polar decomposition","stretch","rotation","right stretch","left stretch"]},
+    "In computation U is the unique positive square root of C. Iterative polar algorithms average a matrix with its inverse-transpose until the result is orthogonal; that limit is R.",
+    "The figure runs the two factorisations side by side. They coincide on the same parallelogram: that common map is F."
+  ], tags:["polar decomposition","stretch","rotation","right stretch","left stretch"], scene:"polarDecomposition"},
   {part:"Part I – Fundamentals of Mechanics", title:"Finite Strain Measures", bullets:[
     "Change of squared length is the invariant that strain must capture. Green–Lagrange strain E = ½(C − I) = ½(FᵀF − I) lives on the reference placement. Almansi strain e = ½(I − b⁻¹) lives on the current placement. Both vanish in a rigid motion.",
     "In one dimension the same stretch λ = l/L gives engineering strain λ − 1, Green strain ½(λ² − 1), Almansi ½(1 − 1/λ²), and logarithmic (true) strain ln λ. They agree to first order as λ → 1 and disagree as soon as the stretch is finite.",
@@ -925,7 +926,8 @@ const content = document.getElementById('content');
 function renderTopicScene(topic){
   const pages = {
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
-    linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'}
+    linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
+    polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'}
   };
   const page = pages[topic.scene];
   if(!page) return '';
