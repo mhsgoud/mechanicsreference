@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linear Momentum — Mechanics Reference</title>
+  <meta name="description" content="Cauchy’s first law: the divergence of stress and the body force balance the inertia of a deforming continuum. Surface tractions t = σ n move with the current body." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mechanicsreference.com/linear-momentum.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#f7f6f2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{
+      --paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;
+      --navy:#1e3a5f;--blue:#3a5f8a;--accent:#c45c26;--plate:#1a2740;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:var(--blue)}
+    header{
+      position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;padding:12px 28px;
+    }
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    .crumb a{color:var(--blue);text-decoration:none}
+    h1{
+      margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;
+      font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy);letter-spacing:-0.02em;
+    }
+    .standfirst{margin:0 0 28px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{
+      display:grid;grid-template-columns:1fr minmax(260px,340px);
+      border:1px solid var(--rule);background:#fff;min-height:520px;
+    }
+    #stage{position:relative;background:var(--plate);min-height:420px}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{padding:20px 22px 22px;border-left:1px solid var(--rule);background:#fff}
+    #ui h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.2rem;color:var(--navy);font-weight:600}
+    #ui p{margin:0 0 12px;color:var(--ink-soft);font-size:0.95rem}
+    #formula{
+      font-family:"JetBrains Mono",ui-monospace,monospace;
+      font-size:0.95rem;line-height:1.5;color:var(--ink);
+      background:#f1efe9;padding:12px 14px;margin:0 0 14px;
+    }
+    .terms{margin:0 0 14px;padding:0;list-style:none}
+    .terms li{margin:0 0 10px;padding:0;font-size:0.9rem;color:var(--ink-soft)}
+    .terms strong{
+      display:block;font-family:"JetBrains Mono",ui-monospace,monospace;
+      font-size:0.82rem;font-weight:600;color:var(--navy);margin-bottom:2px;
+    }
+    .legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.8rem;color:var(--ink-soft)}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .hint{margin:12px 0 0;font-size:0.78rem;color:#7a8494}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--paper)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;min-height:0}
+    @media (max-width:860px){
+      .figure-shell{grid-template-columns:1fr}
+      #ui{border-left:0;border-top:1px solid var(--rule)}
+      #stage{min-height:320px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      html.embed .figure-shell{grid-template-rows:1fr auto}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./" aria-label="Mechanics Reference home">
+      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+    </a>
+    <nav class="top-nav">
+      <a href="./">Home</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#balance-laws-conservation">Library</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#balance-laws-conservation">Balance laws</a> · Linear momentum</p>
+      <h1>Linear momentum</h1>
+      <p class="standfirst">A continuous body carries mass. Surface forces act on its current boundary; body forces act in the interior. Their resultant equals the rate of change of linear momentum. Locally that statement is Cauchy’s first law.</p>
+    </div>
+
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <aside id="ui">
+        <h2>Cauchy’s first law</h2>
+        <p>Red arrows are tractions on the current surface. They move with the body because Cauchy stress is a spatial field: the force is per current area, not per reference area.</p>
+        <div id="formula">∇ · σ + ρ b = ρ a<br>t = σ n</div>
+        <ul class="terms">
+          <li><strong>t = σ n</strong> Surface traction. The red arrows. By the divergence theorem this becomes ∇ · σ in the interior.</li>
+          <li><strong>ρ b</strong> Body force per current volume — weight, or any force not acting through the surface.</li>
+          <li><strong>ρ a</strong> Inertia. The cyan points are material particles; as they accelerate, the right-hand side is not zero.</li>
+        </ul>
+        <div class="legend">
+          <div><span class="dot" style="background:#60a5fa"></span>reference</div>
+          <div><span class="dot" style="background:#d89b54"></span>current body</div>
+          <div><span class="dot" style="background:#93c5fd"></span>material points</div>
+          <div><span class="dot" style="background:#ef4444"></span>traction t</div>
+        </div>
+        <p class="hint">Drag to orbit · Scroll to zoom</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#balance-laws-conservation">Balance laws</a> · <a href="equations.html">Equations</a></span>
+    </div>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(6.8, 4.8, 7.5);
+
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    stage.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0.2, 0);
+
+    scene.add(new THREE.HemisphereLight(0xaecbff, 0x182033, 2.1));
+    const key = new THREE.DirectionalLight(0xffffff, 3.0);
+    key.position.set(4, 7, 5);
+    key.castShadow = true;
+    scene.add(key);
+
+    const ground = new THREE.Mesh(
+      new THREE.CircleGeometry(6, 64),
+      new THREE.MeshStandardMaterial({color:0x121a2c, roughness:0.9, metalness:0})
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -2.35;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const rings = 28, segs = 44;
+    const positions = [];
+    const refs = [];
+    const indices = [];
+
+    function potatoRadius(theta, phi) {
+      return 1.0
+        + 0.12 * Math.sin(3 * theta + 0.4) * Math.sin(phi)
+        + 0.07 * Math.sin(5 * phi + 0.7)
+        + 0.05 * Math.cos(2 * theta - phi);
+    }
+
+    for (let i = 0; i <= rings; i++) {
+      const phi = Math.PI * i / rings;
+      for (let j = 0; j < segs; j++) {
+        const theta = 2 * Math.PI * j / segs;
+        const r = potatoRadius(theta, phi);
+        const x = 1.75 * r * Math.sin(phi) * Math.cos(theta);
+        const y = 2.05 * r * Math.cos(phi);
+        const z = 1.35 * r * Math.sin(phi) * Math.sin(theta);
+        positions.push(x, y, z);
+        refs.push(new THREE.Vector3(x, y, z));
+      }
+    }
+    for (let i = 0; i < rings; i++) {
+      for (let j = 0; j < segs; j++) {
+        const a = i * segs + j, b = i * segs + (j + 1) % segs;
+        const c = (i + 1) * segs + (j + 1) % segs, d = (i + 1) * segs + j;
+        indices.push(a, b, d, b, c, d);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+
+    const potato = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+      color: 0xd89b54, roughness: 0.88, metalness: 0
+    }));
+    potato.castShadow = true;
+    potato.receiveShadow = true;
+    scene.add(potato);
+
+    const refGeo = geo.clone();
+    const reference = new THREE.Mesh(refGeo, new THREE.MeshBasicMaterial({
+      color: 0x60a5fa, wireframe: true, transparent: true, opacity: 0.13
+    }));
+    scene.add(reference);
+
+    const pointRefs = [];
+    const pointMeshes = [];
+    const pointMat = new THREE.MeshBasicMaterial({color: 0x93c5fd});
+    for (let iy = -2; iy <= 2; iy++) {
+      for (let iz = -2; iz <= 2; iz++) {
+        for (let ix = -2; ix <= 2; ix++) {
+          const X = new THREE.Vector3(ix * 0.48, iy * 0.55, iz * 0.36);
+          const q = (X.x / 1.65) ** 2 + (X.y / 1.95) ** 2 + (X.z / 1.25) ** 2;
+          if (q < 0.72) {
+            pointRefs.push(X.clone());
+            const m = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 10), pointMat);
+            m.castShadow = true;
+            scene.add(m);
+            pointMeshes.push(m);
+          }
+        }
+      }
+    }
+
+    const arrowRefs = [
+      new THREE.Vector3(-1.0, 0.9, 0.55),
+      new THREE.Vector3(0.0, 1.25, -0.45),
+      new THREE.Vector3(0.9, 0.55, 0.45),
+      new THREE.Vector3(-0.8, -0.55, -0.45),
+      new THREE.Vector3(0.75, -0.9, 0.0)
+    ];
+    const arrows = arrowRefs.map(X => {
+      const arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), X.clone(), 0.01, 0x7dd3fc, 0.12, 0.07);
+      scene.add(arrow);
+      return arrow;
+    });
+
+    const forceArrows = [];
+    function makeForceArrow(origin, direction, length) {
+      const a = new THREE.ArrowHelper(direction.clone().normalize(), origin.clone(), length, 0xef4444, 0.22, 0.11);
+      scene.add(a);
+      forceArrows.push(a);
+      return a;
+    }
+    const topForce = makeForceArrow(new THREE.Vector3(0, 3.15, 0), new THREE.Vector3(0, -1, 0), 0.95);
+    const bottomForce = makeForceArrow(new THREE.Vector3(0, -3.15, 0), new THREE.Vector3(0, 1, 0), 0.95);
+    const leftForce = makeForceArrow(new THREE.Vector3(-2.75, 0, 0), new THREE.Vector3(1, 0.12, 0), 0.72);
+    const rightForce = makeForceArrow(new THREE.Vector3(2.75, 0, 0), new THREE.Vector3(-1, 0.12, 0), 0.72);
+
+    function makeLabel(text) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256; canvas.height = 96;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 256, 96);
+      ctx.fillStyle = '#fecaca';
+      ctx.font = 'bold 34px "Source Sans 3", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, 128, 48);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(canvas), transparent: true, depthTest: false
+      }));
+      sprite.scale.set(1.0, 0.38, 1);
+      scene.add(sprite);
+      return sprite;
+    }
+    const topLabel = makeLabel('t');
+    const bottomLabel = makeLabel('t');
+    const leftLabel = makeLabel('t');
+    const rightLabel = makeLabel('t');
+
+    function deformation(X, t) {
+      const s = 0.5 + 0.5 * Math.sin(t);
+      const compression = 1.0 - 0.34 * s;
+      const bulge = 1.0 + 0.18 * s;
+      const twist = 0.12 * s * Math.sin(Math.PI * (X.y / 4.1));
+
+      let x = X.x * bulge;
+      let y = X.y * compression;
+      let z = X.z * bulge;
+      x += 0.24 * s * (X.y / 2.05) * (1 - 0.18 * (X.x * X.x / 3.0));
+      z += 0.12 * s * Math.sin(X.y * 1.2);
+
+      const c = Math.cos(twist), sn = Math.sin(twist);
+      return new THREE.Vector3(c * x - sn * z, y, sn * x + c * z);
+    }
+
+    const posAttr = geo.getAttribute('position');
+    const refPosAttr = refGeo.getAttribute('position');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = new THREE.Clock();
+    let running = !reduceMotion;
+    document.addEventListener('visibilitychange', () => { running = !document.hidden && !reduceMotion; });
+
+    function applyDeformation(t) {
+      const amount = 0.5 + 0.5 * Math.sin(t);
+
+      for (let i = 0; i < refs.length; i++) {
+        const p = deformation(refs[i], t);
+        posAttr.setXYZ(i, p.x, p.y, p.z);
+        refPosAttr.setXYZ(i, refs[i].x, refs[i].y, refs[i].z);
+      }
+      posAttr.needsUpdate = true;
+      refPosAttr.needsUpdate = true;
+      geo.computeVertexNormals();
+
+      for (let i = 0; i < pointRefs.length; i++) {
+        pointMeshes[i].position.copy(deformation(pointRefs[i], t));
+      }
+
+      for (let i = 0; i < arrows.length; i++) {
+        const X = arrowRefs[i];
+        const x = deformation(X, t);
+        const d = x.clone().sub(X);
+        const L = d.length();
+        arrows[i].position.copy(X);
+        if (L > 1e-4) {
+          arrows[i].setDirection(d.normalize());
+          arrows[i].setLength(L, Math.min(0.16, L * 0.35), Math.min(0.09, L * 0.18));
+        } else {
+          arrows[i].setLength(0.001, 0.001, 0.001);
+        }
+      }
+
+      const forceScale = 0.92 + 0.16 * amount;
+      const topX = deformation(new THREE.Vector3(0, 2.02, 0), t);
+      const botX = deformation(new THREE.Vector3(0, -2.02, 0), t);
+      const leftX = deformation(new THREE.Vector3(-1.72, 0.15, 0), t);
+      const rightX = deformation(new THREE.Vector3(1.72, 0.15, 0), t);
+
+      topForce.position.copy(topX).add(new THREE.Vector3(0, 0.52, 0));
+      bottomForce.position.copy(botX).add(new THREE.Vector3(0, -0.52, 0));
+      leftForce.position.copy(leftX).add(new THREE.Vector3(-0.52, 0, 0));
+      rightForce.position.copy(rightX).add(new THREE.Vector3(0.52, 0, 0));
+
+      topForce.setDirection(new THREE.Vector3(0, -1, 0));
+      bottomForce.setDirection(new THREE.Vector3(0, 1, 0));
+      leftForce.setDirection(new THREE.Vector3(1, 0.12, 0).normalize());
+      rightForce.setDirection(new THREE.Vector3(-1, 0.12, 0).normalize());
+
+      topForce.setLength(0.72 * forceScale, 0.22, 0.11);
+      bottomForce.setLength(0.72 * forceScale, 0.22, 0.11);
+      leftForce.setLength(0.58 * forceScale, 0.18, 0.09);
+      rightForce.setLength(0.58 * forceScale, 0.18, 0.09);
+
+      topLabel.position.copy(topForce.position).add(new THREE.Vector3(0, 0.34, 0));
+      bottomLabel.position.copy(bottomForce.position).add(new THREE.Vector3(0, -0.34, 0));
+      leftLabel.position.copy(leftForce.position).add(new THREE.Vector3(-0.15, 0.28, 0));
+      rightLabel.position.copy(rightForce.position).add(new THREE.Vector3(0.15, 0.28, 0));
+    }
+
+    function resize() {
+      const w = Math.max(1, stage.clientWidth);
+      const h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    applyDeformation(reduceMotion ? Math.PI / 2 : 0);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (running) applyDeformation(clock.getElapsedTime() * 0.95);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
