@@ -61,31 +61,32 @@
         { "@type": "ListItem", "position": 20, "name": "Time-Dependent Problems" },
         { "@type": "ListItem", "position": 21, "name": "Contact and Friction" },
         { "@type": "ListItem", "position": 22, "name": "Fracture Mechanics" },
-        { "@type": "ListItem", "position": 23, "name": "Fiber-Reinforced Composites" },
-        { "@type": "ListItem", "position": 24, "name": "Embedded Fiber Models" },
-        { "@type": "ListItem", "position": 25, "name": "Fiber Neutrality and Rigid Line Inclusions" },
-        { "@type": "ListItem", "position": 26, "name": "Composite Materials – Effective Properties" },
-        { "@type": "ListItem", "position": 27, "name": "Composite Materials – Failure Modes" },
-        { "@type": "ListItem", "position": 28, "name": "Soil & Geomechanics: Consolidation Theory" },
-        { "@type": "ListItem", "position": 29, "name": "Heat Transfer & Multiphysics FEM" },
-        { "@type": "ListItem", "position": 30, "name": "Battery Mechanics – Structural Aspects" },
-        { "@type": "ListItem", "position": 31, "name": "Battery FEM – Coupled Electro-Chemo-Mechanics" },
-        { "@type": "ListItem", "position": 32, "name": "Fiber-Based Electrodes" },
-        { "@type": "ListItem", "position": 33, "name": "GPU Programming for Engineers" },
-        { "@type": "ListItem", "position": 34, "name": "Sparse Linear Algebra on GPUs" },
-        { "@type": "ListItem", "position": 35, "name": "Performance Comparison: CPU vs GPU in FEM" },
-        { "@type": "ListItem", "position": 36, "name": "Future of FEM: Multiscale & Multiphysics" },
-        { "@type": "ListItem", "position": 37, "name": "Matrix Fundamentals (Dense & Sparse)" },
-        { "@type": "ListItem", "position": 38, "name": "Sparse Formats & Performance" },
-        { "@type": "ListItem", "position": 39, "name": "CPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 40, "name": "GPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 41, "name": "Solvers & Preconditioning" },
-        { "@type": "ListItem", "position": 42, "name": "Matrix Assembly & Graph Reordering" },
-        { "@type": "ListItem", "position": 43, "name": "MATLAB-like Basics for FEM" },
-        { "@type": "ListItem", "position": 44, "name": "Plotting & Postprocessing (MATLAB/Python)" },
-        { "@type": "ListItem", "position": 45, "name": "NumPy/SciPy Equivalents" },
-        { "@type": "ListItem", "position": 46, "name": "Benchmarking & Profiling" },
-        { "@type": "ListItem", "position": 47, "name": "I/O & Interchange Formats" }
+        { "@type": "ListItem", "position": 23, "name": "The J-Integral" },
+        { "@type": "ListItem", "position": 24, "name": "Fiber-Reinforced Composites" },
+        { "@type": "ListItem", "position": 25, "name": "Embedded Fiber Models" },
+        { "@type": "ListItem", "position": 26, "name": "Fiber Neutrality and Rigid Line Inclusions" },
+        { "@type": "ListItem", "position": 27, "name": "Composite Materials – Effective Properties" },
+        { "@type": "ListItem", "position": 28, "name": "Composite Materials – Failure Modes" },
+        { "@type": "ListItem", "position": 29, "name": "Soil & Geomechanics: Consolidation Theory" },
+        { "@type": "ListItem", "position": 30, "name": "Heat Transfer & Multiphysics FEM" },
+        { "@type": "ListItem", "position": 31, "name": "Battery Mechanics – Structural Aspects" },
+        { "@type": "ListItem", "position": 32, "name": "Battery FEM – Coupled Electro-Chemo-Mechanics" },
+        { "@type": "ListItem", "position": 33, "name": "Fiber-Based Electrodes" },
+        { "@type": "ListItem", "position": 34, "name": "GPU Programming for Engineers" },
+        { "@type": "ListItem", "position": 35, "name": "Sparse Linear Algebra on GPUs" },
+        { "@type": "ListItem", "position": 36, "name": "Performance Comparison: CPU vs GPU in FEM" },
+        { "@type": "ListItem", "position": 37, "name": "Future of FEM: Multiscale & Multiphysics" },
+        { "@type": "ListItem", "position": 38, "name": "Matrix Fundamentals (Dense & Sparse)" },
+        { "@type": "ListItem", "position": 39, "name": "Sparse Formats & Performance" },
+        { "@type": "ListItem", "position": 40, "name": "CPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 41, "name": "GPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 42, "name": "Solvers & Preconditioning" },
+        { "@type": "ListItem", "position": 43, "name": "Matrix Assembly & Graph Reordering" },
+        { "@type": "ListItem", "position": 44, "name": "MATLAB-like Basics for FEM" },
+        { "@type": "ListItem", "position": 45, "name": "Plotting & Postprocessing (MATLAB/Python)" },
+        { "@type": "ListItem", "position": 46, "name": "NumPy/SciPy Equivalents" },
+        { "@type": "ListItem", "position": 47, "name": "Benchmarking & Profiling" },
+        { "@type": "ListItem", "position": 48, "name": "I/O & Interchange Formats" }
       ]
     }
   }
@@ -365,6 +366,7 @@
         <li><a href="hub.html#time-dependent-problems">Time-Dependent Problems</a></li>
         <li><a href="hub.html#contact-and-friction">Contact and Friction</a></li>
         <li><a href="hub.html#fracture-mechanics">Fracture Mechanics</a></li>
+        <li><a href="hub.html#the-j-integral">The J-Integral</a></li>
         <li><a href="hub.html#fiber-reinforced-composites">Fiber-Reinforced Composites</a></li>
         <li><a href="hub.html#embedded-fiber-models">Embedded Fiber Models</a></li>
         <li><a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fiber Neutrality and Rigid Line Inclusions</a></li>
@@ -637,8 +639,21 @@ const topics = [
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
     "A crack concentrates stress. In linear elastic fracture mechanics the near-tip field is characterised by stress intensity factors K_I, K_II, K_III. Griffith’s energy argument equates the advance of the crack to the release of potential energy G = −dΠ/dA, and Irwin’s relation G = K_I² / E′ ties the two. The J-integral is the same G for a nonlinear elastic material, path-independent while there is no unloading.",
     "When the plastic zone is not small compared with the crack, LEFM ceases to apply. Cohesive-zone models put a traction–separation law on the prospective crack surface; continuum damage smears the same idea over a band whose width is a material length.",
-    "Numerically the crack may be fitted to the mesh, enriched (XFEM), or represented by a phase-field. Each choice changes what the mesh is required to resolve: a fitted mesh must be remeshed; XFEM must integrate discontinuous fields; a phase-field must resolve the length scale."
+    "Numerically the crack may be fitted to the mesh, enriched (XFEM), or represented by a phase-field. Each choice changes what the mesh is required to resolve: a fitted mesh must be remeshed; XFEM must integrate discontinuous fields; a phase-field must resolve the length scale.",
+    "The contour integral that extracts G from a single analysis, and the analogue used at the tip of a rigid line inclusion, is the next entry."
   ], tags:["fracture","SIF","Griffith","crack","J-integral","XFEM"]},
+  {part:"Part IV – Applications in Engineering", title:"The J-Integral", equations:[
+    {name:"Contour form", expr:"J = ∮_Γ (w n_1 − t · ∂u/∂x_1) dΓ", note:"Any path from the lower face to the upper that encloses the tip and no other singularity. w is the strain-energy density, t = σ n the traction on Γ."},
+    {name:"Potential energy", expr:"J = −dΠ / dA", note:"Energy released per unit area of crack advance. For a nonlinear elastic solid this is Griffith’s G. Unloading, inertia, and thermal strain take the identity away."},
+    {name:"Irwin", expr:"J = K_I² / E′", note:"Linear elasticity recovers the stress-intensity factor. E′ = E in plane stress and E/(1−ν²) in plane strain."},
+    {name:"Rigid line inclusion", expr:"J_tip ∝ (cos²θ − ν sin²θ)²", note:"The same contour around an inclusion tip measures the configurational force on that tip. It vanishes at the mechanically neutral orientation θn(ν)."}
+  ], bullets:[
+    "Rice’s J is the energy released per unit area of crack advance. For a hyperelastic solid it equals −dΠ/dA. In linear elastic fracture mechanics it recovers Griffith’s G and Irwin’s K_I²/E′. The contour form is a line integral of strain-energy density and traction-work around the tip: any path from the lower crack face to the upper that encloses the tip, and no other singularity, gives the same number.",
+    "Path independence is the divergence theorem plus equilibrium. Two contours differ by an annular region in which the integrand is a divergence that integrates to zero, provided the material is hyperelastic (or deformation-theory plastic), the crack faces are traction-free, and there are no body forces. Unloading, heat, and inertia all break that identity. Then J is defined on a small contour about the process zone, or converted to a domain integral with a weighting function q that is 1 near the tip and 0 outside — the form finite-element codes actually compute.",
+    "A rigid line inclusion has crack-like 1/√r fields at its tips, but the roles of traction and displacement are exchanged: the line does not open, it constrains the displacement. An analogous path integral around an inclusion tip is the configurational force on that tip, the energy released if the line were to lengthen. At the mechanically neutral orientation of a rigid line in a uniform remote stress, the far field is unperturbed, the tip intensities vanish, and that integral is identically zero. The inclusion is then neither a crack driver nor a reinforcement.",
+    "Fibre neutrality uses the same vanishing as a diagnostic. A thin elastic fibre, perfect or imperfect interface, sitting at θn(ν) returns J = 0 around either tip in a reduced model. Away from θn the fibre is strained, the tips are loaded, and J is finite. Neutrality is elastic: once the matrix yields, the same inclusion nucleates shear bands from the tips even at θn.",
+    "The figure is a plate under remote tension. Switch between an edge crack and a rigid line. On the crack, change the contour radius: the discrete line integral, evaluated on the Williams field, stays at K_I²/E. On the line, turn the orientation: J vanishes at θn."
+  ], tags:["J-integral","Rice","path independence","Griffith","stress intensity","rigid line inclusion","configurational force"], scene:"jIntegral", illustrations:"jIntegral", sources:[{label:"Rice, A path independent integral and the approximate analysis of strain concentration by notches and cracks, J. Appl. Mech. 35 (1968)", href:"https://doi.org/10.1115/1.3601206"},{label:"Goudarzi & Simone, Fiber neutrality in fiber-reinforced composites, Int. J. Solids Struct. 156–157 (2019)", href:"https://doi.org/10.1016/j.ijsolstr.2018.07.023"}]},
   {part:"Part IV – Applications in Engineering", title:"Fiber-Reinforced Composites", bullets:[
     "A unidirectional ply is a transversely isotropic solid. The fibre direction is the 1-axis; the plane of isotropy is 2–3. Five independent constants remain: E₁, E₂, ν₁₂, G₁₂, G₂₃. The reduced stiffness Q relating in-plane stress to in-plane strain is the 3×3 matrix used in classical lamination theory.",
     "Off-axis, the same ply is anisotropic in the plate axes. The transformed stiffness Q̄(θ) is Q rotated with the fibre angle. Longitudinal stiffness falls rapidly as θ leaves 0°; at 45° shear coupling is large. A single off-axis ply under uniaxial load therefore shears.",
@@ -1034,7 +1049,8 @@ function renderTopicScene(topic){
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
-    fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'}
+    fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
+    jIntegral: {src:'j-integral.html', title:'The J-integral'}
   };
   const page = pages[topic.scene];
   if(!page) return '';
@@ -1046,6 +1062,37 @@ function renderTopicScene(topic){
 }
 
 function renderTopicIllustrations(topic){
+  if(topic.illustrations === 'jIntegral'){
+    return `
+<section class="figure-section" aria-label="J-integral contours">
+  <h2>Figures</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="28" y="24" width="200" height="108" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <line class="ink ink-thick" x1="28" y1="78" x2="118" y2="78"/>
+        <circle cx="118" cy="78" r="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
+        <circle cx="118" cy="78" r="3.2" fill="currentColor"/>
+        <line class="ink" x1="228" y1="40" x2="228" y2="116"/>
+        <polygon points="228,40 224,50 232,50" fill="currentColor"/>
+        <text x="122" y="56">Γ</text>
+        <text x="232" y="82">σ∞</text>
+      </svg>
+      <figcaption><strong>Crack.</strong> Any contour from the lower face to the upper that encloses the tip gives the same J. In plane-stress LEFM that number is K<sub>I</sub>²/E.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="28" y="24" width="200" height="108" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <line class="ink ink-thick" x1="58" y1="108" x2="176" y2="42"/>
+        <circle cx="58" cy="108" r="16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <circle cx="176" cy="42" r="16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <text x="78" y="128">J = 0 at θ<sub>n</sub></text>
+      </svg>
+      <figcaption><strong>Rigid line.</strong> The same integral around an inclusion tip is the configurational force on that tip. At the neutral orientation both contours vanish.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
   if(topic.illustrations === 'isoparametric'){
     return `
 <section class="figure-section" aria-label="Isoparametric map">
@@ -1480,6 +1527,7 @@ window.addEventListener('keydown', (e)=>{
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction'));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
+    ok('j-integral topic', topics.some(t => t.title === 'The J-Integral' && t.scene === 'jIntegral'));
     ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));
     ok('embedded fiber models topic', topics.some(t => t.title === 'Embedded Fiber Models'));
     ok('fiber neutrality topic', topics.some(t => t.title === 'Fiber Neutrality and Rigid Line Inclusions'));
