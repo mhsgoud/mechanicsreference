@@ -211,6 +211,11 @@
     .badges,.cta-row,.footer,#test-badge{display:none !important}
     .badge{display:none}
 
+    .card:has(.scene-frame){max-width:52rem}
+    .scene-frame{
+      display:block;width:100%;height:min(78vh,640px);
+      border:1px solid var(--rule);background:#1a2740;margin-top:8px;
+    }
     .figure-section{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
     .figure-grid{
       display:grid;
@@ -399,9 +404,10 @@ const topics = [
     "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
   ], tags:["continuum","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
   {part:"Part I – Fundamentals of Mechanics", title:"Kinematics of Deformation", bullets:[
-    "Deformation is a mapping from a reference placement to the current one. When displacement gradients are small, the symmetric gradient of the displacement is enough to measure strain.",
-    "When they are not, strain is defined from the deformation gradient, and several finite-strain measures are in common use. The distinction is physical: equilibrium written on the undeformed geometry is a different statement from equilibrium on the current one."
-  ], tags:["kinematics","deformation","small strain","large strain"]},
+    "Deformation is a mapping from a reference placement X to the current placement x = χ(X). When displacement gradients are small, the symmetric gradient of the displacement is enough to measure strain.",
+    "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Rigid translation never appears in F; rotation, stretch, and shear do.",
+    "The figure runs through those cases on a homogeneous motion. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
+  ], tags:["kinematics","deformation","deformation gradient","small strain","large strain"], scene:"deformationGradient"},
   {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", bullets:[
     "Mass, linear momentum, and energy are conserved in every continuum theory. Once a stress and a heat flux are introduced, the local forms of those statements become partial differential equations.",
     "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Body forces and prescribed tractions appear as data; they do not replace the balance laws."
@@ -824,6 +830,15 @@ function mountElementChooser(){
 // ---- Render content -------------------------------------------------------
 const content = document.getElementById('content');
 
+function renderTopicScene(topic){
+  if(topic.scene !== 'deformationGradient') return '';
+  return `
+<section class="figure-section" aria-label="Deformation gradient">
+  <h2>Figure</h2>
+  <iframe class="scene-frame" title="Deformation gradient" src="deformation-gradient.html" loading="lazy"></iframe>
+</section>`;
+}
+
 function renderTopicIllustrations(topic){
   if(topic.illustrations !== 'introContinuum') return '';
   return `
@@ -938,6 +953,7 @@ function renderContent(topic){
       : "";
 
   const illustrationsBlock = renderTopicIllustrations(topic);
+  const sceneBlock = renderTopicScene(topic);
 
   const eqBlock = (topic.equations && topic.equations.length)
     ? `<h2>Field equations</h2>
@@ -955,6 +971,7 @@ function renderContent(topic){
       <h1>${escHtml(topic.title)}</h1>
       ${eqBlock}
       <div class="prose">${prose}</div>
+      ${sceneBlock}
       ${illustrationsBlock}
       ${interactiveBlock}
     </article>

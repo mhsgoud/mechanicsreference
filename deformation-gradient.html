@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deformation Gradient — Mechanics Reference</title>
+  <meta name="description" content="The deformation gradient F maps a material line element from the reference placement to the current one. Translation, rotation, stretch, and shear." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mechanicsreference.com/deformation-gradient.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#f7f6f2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{
+      --paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;
+      --navy:#1e3a5f;--blue:#3a5f8a;--accent:#c45c26;--plate:#1a2740;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:var(--blue)}
+    header{
+      position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;padding:12px 28px;
+    }
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    .crumb a{color:var(--blue);text-decoration:none}
+    h1{
+      margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;
+      font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy);letter-spacing:-0.02em;
+    }
+    .standfirst{margin:0 0 28px;max-width:40em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{
+      display:grid;grid-template-columns:1fr minmax(260px,320px);
+      border:1px solid var(--rule);background:#fff;min-height:520px;
+    }
+    #stage{position:relative;background:var(--plate);min-height:420px}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{padding:20px 22px 22px;border-left:1px solid var(--rule);background:#fff}
+    #ui h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.2rem;color:var(--navy);font-weight:600}
+    #description{min-height:4.6em;color:var(--ink-soft);font-size:0.95rem}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:14px 0}
+    .buttons button{
+      border:1px solid var(--rule);background:var(--paper);color:var(--navy);
+      padding:8px 10px;font:600 0.85rem "Source Sans 3",system-ui,sans-serif;cursor:pointer;
+    }
+    .buttons button:hover{border-color:var(--navy)}
+    .buttons button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    #formula{font-family:"Source Serif 4",Georgia,serif;font-size:1.05rem;color:var(--navy);padding:6px 0}
+    #matrix{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.82rem;line-height:1.55;color:var(--ink);background:#f1efe9;padding:10px 12px;margin:8px 0}
+    .legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.8rem;color:var(--ink-soft)}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .hint{margin:12px 0 0;font-size:0.78rem;color:#7a8494}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--paper)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;min-height:0}
+    @media (max-width:860px){
+      .figure-shell{grid-template-columns:1fr}
+      #ui{border-left:0;border-top:1px solid var(--rule)}
+      #stage{min-height:320px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      html.embed .figure-shell{grid-template-rows:1fr auto}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./" aria-label="Mechanics Reference home">
+      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+    </a>
+    <nav class="top-nav">
+      <a href="./">Home</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#kinematics-of-deformation">Library</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#kinematics-of-deformation">Kinematics</a> · Deformation gradient</p>
+      <h1>Deformation gradient</h1>
+      <p class="standfirst">A motion maps material points <i>X</i> to spatial points <i>x</i> = χ(<i>X</i>). The deformation gradient <i>F</i> = ∂<i>x</i>/∂<i>X</i> is the linear part of that map: it sends a material line element to its image. Rigid translation never appears in <i>F</i>.</p>
+    </div>
+
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <aside id="ui">
+        <h2>Homogeneous motions</h2>
+        <div id="description"></div>
+        <div class="buttons">
+          <button type="button" data-phase="0">Reference</button>
+          <button type="button" data-phase="1">Translation</button>
+          <button type="button" data-phase="2">Rotation</button>
+          <button type="button" data-phase="3">Stretch</button>
+          <button type="button" data-phase="4">Shear</button>
+          <button type="button" data-phase="5">Combined</button>
+        </div>
+        <div id="formula"><i>x</i> = χ(<i>X</i>), &nbsp; <i>F</i> = ∂<i>x</i> / ∂<i>X</i></div>
+        <div id="matrix"></div>
+        <div class="legend">
+          <div><span class="dot" style="background:#7eabdc"></span>reference</div>
+          <div><span class="dot" style="background:#e39a4a"></span>deformed</div>
+          <div><span class="dot" style="background:#e07080"></span><i>F</i> <i>e</i>₁</div>
+          <div><span class="dot" style="background:#6dcc9c"></span><i>F</i> <i>e</i>₂</div>
+        </div>
+        <p class="hint">Drag to orbit · Scroll to zoom</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#kinematics-of-deformation">Kinematics</a> · <a href="equations.html">Equations</a></span>
+    </div>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0, 13);
+
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.position = 'absolute';
+    labels.domElement.style.inset = '0';
+    labels.domElement.style.pointerEvents = 'none';
+    stage.appendChild(labels.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.minDistance = 6;
+    controls.maxDistance = 22;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.55));
+    const light = new THREE.DirectionalLight(0xffffff, 1.8);
+    light.position.set(3, 5, 8);
+    scene.add(light);
+
+    const axes = new THREE.AxesHelper(3.8);
+    axes.position.set(-4.2, -3.0, 0);
+    scene.add(axes);
+
+    const N = 12;
+    const size = 5.8;
+    const points = [];
+    for (let j = 0; j <= N; j++) {
+      for (let i = 0; i <= N; i++) {
+        points.push(new THREE.Vector3(-size/2 + size*i/N, -size/2 + size*j/N, 0));
+      }
+    }
+
+    const materialRef = new THREE.LineBasicMaterial({color:0x7eabdc, transparent:true, opacity:.5});
+    const materialDef = new THREE.LineBasicMaterial({color:0xe39a4a, transparent:true, opacity:.95});
+    const refLines = [], defLines = [];
+
+    function makeLine(mat) {
+      const line = new THREE.Line(new THREE.BufferGeometry(), mat);
+      scene.add(line);
+      return line;
+    }
+    for (let k = 0; k <= N; k++) { refLines.push(makeLine(materialRef)); defLines.push(makeLine(materialDef)); }
+    for (let k = 0; k <= N; k++) { refLines.push(makeLine(materialRef)); defLines.push(makeLine(materialDef)); }
+
+    function setLine(line, arr) {
+      const a = new Float32Array(arr.length * 3);
+      arr.forEach((p, i) => { a[3*i]=p.x; a[3*i+1]=p.y; a[3*i+2]=p.z; });
+      line.geometry.setAttribute('position', new THREE.BufferAttribute(a, 3));
+      line.geometry.computeBoundingSphere();
+    }
+
+    function referenceGrid() {
+      for (let j = 0; j <= N; j++) {
+        const row = [];
+        for (let i = 0; i <= N; i++) row.push(points[j*(N+1)+i]);
+        setLine(refLines[j], row);
+      }
+      for (let i = 0; i <= N; i++) {
+        const col = [];
+        for (let j = 0; j <= N; j++) col.push(points[j*(N+1)+i]);
+        setLine(refLines[N+1+i], col);
+      }
+    }
+    referenceGrid();
+
+    const arrow1 = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,.12), 1.7, 0xe07080, .22, .12);
+    const arrow2 = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,.12), 1.7, 0x6dcc9c, .22, .12);
+    scene.add(arrow1, arrow2);
+
+    function label(text, pos) {
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = text;
+      const obj = new CSS2DObject(div);
+      obj.position.copy(pos);
+      scene.add(obj);
+      return obj;
+    }
+    const e1Label = label('F e₁', new THREE.Vector3(1.8, 0, .1));
+    const e2Label = label('F e₂', new THREE.Vector3(0, 1.8, .1));
+    label('X', new THREE.Vector3(-2.9, -3.1, .1));
+    label('x', new THREE.Vector3(3.1, 2.6, .1));
+
+    const phases = [
+      {desc: 'Start with material coordinates X. The square grid is undeformed, so F = I.'},
+      {desc: 'Every point moves by the same translation c. The shape does not change: F = I. Translation is not contained in F.'},
+      {desc: 'The body rotates without changing lengths or angles. F = R, an orthogonal rotation tensor.'},
+      {desc: 'The two material directions are stretched differently. The columns of F show where e₁ and e₂ go.'},
+      {desc: 'One material direction tilts relative to the other. A small square becomes a parallelogram.'},
+      {desc: 'Stretch, shear, rotation, and translation together. F captures the local linear part; c captures the rigid translation.'}
+    ];
+
+    let phase = 0;
+    let t = 0;
+    let phaseStart = 0;
+    let auto = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const matrixEl = document.getElementById('matrix');
+    const descEl = document.getElementById('description');
+    const phaseButtons = document.querySelectorAll('.buttons button');
+
+    function lerp(a,b,s){ return a+(b-a)*s; }
+    function ease(s){ return s<.5 ? 4*s*s*s : 1-Math.pow(-2*s+2,3)/2; }
+
+    function deformation(X, p, u) {
+      let x = X.clone();
+      const F = new THREE.Matrix3().identity();
+      const c = new THREE.Vector3();
+
+      if (p === 1) c.set(1.55, .85, 0);
+      if (p === 2) {
+        const a = 0.72 * u;
+        F.set(Math.cos(a), -Math.sin(a), 0, Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+      }
+      if (p === 3) {
+        const sx = lerp(1, 1.55, u), sy = lerp(1, .68, u);
+        F.set(sx, 0, 0, 0, sy, 0, 0, 0, 1);
+      }
+      if (p === 4) {
+        const g = 0.85 * u;
+        F.set(1, g, 0, 0, 1, 0, 0, 0, 1);
+      }
+      if (p === 5) {
+        const a = .52 * u;
+        const R = new THREE.Matrix3().set(Math.cos(a), -Math.sin(a), 0, Math.sin(a), Math.cos(a), 0, 0, 0, 1);
+        const S = new THREE.Matrix3().set(1.45, 0, 0, .55, .78, 0, 0, 0, 1);
+        F.copy(R).multiply(S);
+        c.set(1.15 * u, -.25 * u, 0);
+      }
+
+      x.applyMatrix3(F).add(c);
+      return {x, F, c};
+    }
+
+    function fmt(n){ return (Math.abs(n) < 0.005 ? 0 : n).toFixed(2); }
+
+    function updateScene(progress) {
+      const u = ease(progress);
+
+      for (let j = 0; j <= N; j++) {
+        const row = [];
+        for (let i = 0; i <= N; i++) row.push(deformation(points[j*(N+1)+i], phase, u).x);
+        setLine(defLines[j], row);
+      }
+      for (let i = 0; i <= N; i++) {
+        const col = [];
+        for (let j = 0; j <= N; j++) col.push(deformation(points[j*(N+1)+i], phase, u).x);
+        setLine(defLines[N+1+i], col);
+      }
+
+      const center = deformation(new THREE.Vector3(), phase, u);
+      const F = center.F;
+      const e = F.elements; // column-major: n11,n21,n31, n12,n22,n32, ...
+      const e1 = new THREE.Vector3(1,0,0).applyMatrix3(F);
+      const e2 = new THREE.Vector3(0,1,0).applyMatrix3(F);
+
+      arrow1.position.set(center.c.x, center.c.y, .12);
+      arrow2.position.set(center.c.x, center.c.y, .12);
+      arrow1.setDirection(e1.clone().normalize());
+      arrow2.setDirection(e2.clone().normalize());
+      arrow1.setLength(e1.length()*1.35, .22, .12);
+      arrow2.setLength(e2.length()*1.35, .22, .12);
+
+      e1Label.position.set(center.c.x + e1.x*1.5, center.c.y + e1.y*1.5, .1);
+      e2Label.position.set(center.c.x + e2.x*1.5, center.c.y + e2.y*1.5, .1);
+
+      matrixEl.innerHTML =
+        `F = ∂x/∂X ≈<br>` +
+        `⎡ ${fmt(e[0])}  ${fmt(e[3])} ⎤<br>` +
+        `⎣ ${fmt(e[1])}  ${fmt(e[4])} ⎦` +
+        `<br><span style="color:#5c6574">c = (${fmt(center.c.x)}, ${fmt(center.c.y)})</span>`;
+
+      descEl.textContent = phases[phase].desc;
+      phaseButtons.forEach(b => b.classList.toggle('active', +b.dataset.phase === phase));
+    }
+
+    phaseButtons.forEach(b => {
+      b.addEventListener('click', () => {
+        phase = +b.dataset.phase;
+        t = 0;
+        phaseStart = performance.now();
+        auto = false;
+        updateScene(0);
+      });
+    });
+
+    function resize() {
+      const w = Math.max(1, stage.clientWidth);
+      const h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      labels.setSize(w, h);
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    let running = true;
+    document.addEventListener('visibilitychange', () => { running = !document.hidden; });
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      if (!running) return;
+      if (auto) {
+        t += .004;
+        if (t > 1) { t = 0; phase = (phase + 1) % 6; }
+      } else {
+        t = Math.min(1, (now - phaseStart) / 900);
+      }
+      updateScene(t);
+      controls.update();
+      renderer.render(scene, camera);
+      labels.render(scene, camera);
+    }
+    animate(performance.now());
+  </script>
+</body>
+</html>
