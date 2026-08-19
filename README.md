@@ -1,7 +1,7 @@
 # Mechanics Reference
 
-Static site for [mechanicsreference.com](https://mechanicsreference.com): a reference for continuum mechanics, the finite element method, and numerical methods.
+Encyclopedia of mechanics for [mechanicsreference.com](https://mechanicsreference.com): basic equations, continuum mechanics, finite elements, and numerical methods.
 
-- `index.html` — landing page
-- `hub.html` — searchable topic hub
+- `index.html` — encyclopedia landing page (starts with basic equations)
+- `hub.html` — searchable topic entries
 - `CNAME` — custom domain for GitHub Pages

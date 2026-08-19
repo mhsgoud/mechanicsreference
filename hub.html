@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Continuum Mechanics, FEM, and Numerical Methods Hub | Mechanics Reference</title>
-  <meta name="description" content="Searchable reference notes on continuum mechanics, the finite element method, and numerical methods: kinematics, weak forms, elements, quadrature, and solvers." />
+  <title>Basic Equations of Continuum Mechanics | Mechanics Reference</title>
+  <meta name="description" content="Encyclopedia of mechanics: basic equations of strain, stress, conservation laws, Hooke's law, virtual work, and finite elements." />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Mechanics Reference" />
   <meta name="theme-color" content="#080a12" />
@@ -26,10 +26,10 @@
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Continuum Mechanics, FEM, and Numerical Methods Hub | Mechanics Reference",
+    "name": "Encyclopedia of Mechanics Hub | Mechanics Reference",
     "url": "https://mechanicsreference.com/hub.html",
     "isPartOf": { "@type": "WebSite", "name": "Mechanics Reference", "url": "https://mechanicsreference.com/" },
-    "description": "Searchable reference notes on continuum mechanics, the finite element method, and numerical methods.",
+    "description": "Encyclopedia entries for continuum mechanics, starting from the basic equations, then finite elements and numerical methods.",
     "about": [
       { "@type": "Thing", "name": "Continuum mechanics" },
       { "@type": "Thing", "name": "Finite element method" },
@@ -38,7 +38,8 @@
     "hasPart": {
       "@type": "ItemList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Introduction to Continuum Mechanics" },
+        { "@type": "ListItem", "position": 1, "name": "Basic Equations" },
+        { "@type": "ListItem", "position": 2, "name": "Introduction to Continuum Mechanics" },
         { "@type": "ListItem", "position": 2, "name": "Kinematics of Deformation" },
         { "@type": "ListItem", "position": 3, "name": "Balance Laws & Conservation" },
         { "@type": "ListItem", "position": 4, "name": "Constitutive Models" },
@@ -503,6 +504,22 @@
     .ok{border-color: var(--success-border); background: var(--success-bg); color: color-mix(in srgb, var(--success) 45%, white)}
     .muted{color:var(--muted)}
     .mono{font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:0.92em}
+    .eq-list{display:flex;flex-direction:column;gap:12px;margin:16px 0 8px}
+    .eq-card{
+      background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 16px 12px;
+    }
+    .eq-card h3{margin:0 0 8px;font-size:0.95rem}
+    .eq-card .eq{
+      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-size:1.02rem;line-height:1.5;
+      color:var(--text);
+      overflow-x:auto;
+      margin:0 0 8px;
+    }
+    .eq-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
 
     @media (prefers-reduced-motion: reduce){
       .tab, .btn, .chip{transition:none}
@@ -535,14 +552,14 @@
       <a class="brand" href="./" aria-label="Mechanics Reference home">
         <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="220" height="74" />
       </a>
-      <h1 class="visually-hidden">Reference hub for continuum mechanics, finite elements, and numerical methods</h1>
+      <h1 class="visually-hidden">Encyclopedia of mechanics: basic equations, continuum mechanics, finite elements, and numerical methods</h1>
       <nav class="top-nav" aria-label="Site">
         <a href="./">Home</a>
         <a href="hub.html" class="active" aria-current="page">Hub</a>
       </nav>
       <div class="search" role="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 6.03-3.03l4 4-1.5 1.5-4-4A7.46 7.46 0 0 1 10.5 18Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"/></svg>
-        <input id="searchInput" placeholder="Search topics… (e.g. Gauss, Schur, GPU)" />
+        <input id="searchInput" placeholder="Search… (e.g. strain, Gauss, Newton)" />
       </div>
     </header>
 
@@ -555,6 +572,7 @@
       <h2>All topics</h2>
       <p>Enable JavaScript to search the hub, or open a topic below.</p>
       <ul>
+        <li><a href="hub.html#basic-equations">Basic Equations</a></li>
         <li><a href="hub.html#introduction-to-continuum-mechanics">Introduction to Continuum Mechanics</a></li>
         <li><a href="hub.html#kinematics-of-deformation">Kinematics of Deformation</a></li>
         <li><a href="hub.html#balance-laws-conservation">Balance Laws &amp; Conservation</a></li>
@@ -605,6 +623,27 @@
 // ---- Data model -----------------------------------------------------------
 const topics = [
   // Part I – Fundamentals of Mechanics
+  {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
+    "An encyclopedia of mechanics starts from a short list of field equations: how a body deforms, how forces are carried, how mass and momentum are conserved, and how those statements become a discrete system.",
+    "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ).",
+    "Stress: Cauchy traction t = σ n is force per current area. Without couple stresses, angular momentum requires σ = σᵀ.",
+    "Balance: local mass conservation is ∂ρ/∂t + ∇·(ρ v) = 0. Linear momentum is ∇·σ + ρ b = ρ a (static: ∇·σ + ρ b = 0).",
+    "Constitutive closure for isotropic linear elasticity: σ = λ tr(ε) I + 2μ ε, or σ = ℂ : ε.",
+    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV. FEM replaces u and δu with shape functions on a mesh.",
+    "Discrete linear elasticity: K a = f after interpolation uʰ = N a and assembly. Nonlinear problems solve R(u) = 0 by Newton–Raphson: K_T Δu = −R(u).",
+    "Same momentum balance describes fluids with a different constitutive law. Incompressible Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b with ∇·v = 0."
+  ], equations:[
+    {name:"Deformation gradient", expr:"F = ∂x / ∂X", note:"Maps a material line element from the reference placement X to the current placement x."},
+    {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
+    {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
+    {name:"Cauchy traction", expr:"t = σ n", note:"Force per current area on a surface with outward normal n."},
+    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Local mass balance; incompressibility is ∇ · v = 0."},
+    {name:"Linear momentum", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. At rest the right-hand side vanishes."},
+    {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
+    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", note:"Weak form of momentum. FEM interpolates u and δu with shape functions."},
+    {name:"Discrete linear system", expr:"K a = f", note:"Assembled stiffness times nodal unknowns equals the load vector."},
+    {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
+  ], tags:["basic equations","continuum","strain","stress","conservation","Hooke","virtual work","FEM","Newton-Raphson"]},
   {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
@@ -1151,11 +1190,22 @@ function renderContent(topic){
 
   const illustrationsBlock = renderTopicIllustrations(topic);
 
+  const eqBlock = (topic.equations && topic.equations.length)
+    ? `<h2>Basic equations</h2>
+      <div class="eq-list">${topic.equations.map(eq => `
+        <article class="eq-card">
+          <h3>${escHtml(eq.name)}</h3>
+          <div class="eq">${escHtml(eq.expr)}</div>
+          <p>${escHtml(eq.note)}</p>
+        </article>`).join('')}</div>`
+    : "";
+
   content.innerHTML = `
     <div class="card" role="article">
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
       <h1>${escHtml(topic.title)}</h1>
       <div class="badges">${badges}</div>
+      ${eqBlock}
       <h2>Overview</h2>
       <ul>${bullets}</ul>
 
