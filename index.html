@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Encyclopedia of Mechanics | Basic Equations, Continuum, FEM</title>
-  <meta name="description" content="Encyclopedia of mechanics starting from the basic equations: strain, stress, conservation laws, Hooke's law, virtual work, and the finite element method." />
+  <title>Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods</title>
+  <meta name="description" content="An encyclopedia of continuum mechanics, the finite element method, and numerical methods. Browse subjects first; governing equations live one layer down." />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="author" content="Mechanics Reference" />
   <meta name="theme-color" content="#080a12" />
@@ -14,14 +14,14 @@
   <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
-  <meta property="og:title" content="Encyclopedia of Mechanics | Basic Equations, Continuum, FEM" />
-  <meta property="og:description" content="Encyclopedia of mechanics starting from the basic equations of continuum mechanics, finite elements, and numerical methods." />
+  <meta property="og:title" content="Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods" />
+  <meta property="og:description" content="An encyclopedia of continuum mechanics, finite elements, and numerical methods. Governing equations live one layer down." />
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Encyclopedia of Mechanics | Basic Equations, Continuum, FEM" />
-  <meta name="twitter:description" content="Encyclopedia of mechanics starting from the basic equations of continuum mechanics, finite elements, and numerical methods." />
+  <meta name="twitter:title" content="Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods" />
+  <meta name="twitter:description" content="An encyclopedia of continuum mechanics, finite elements, and numerical methods." />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -32,7 +32,7 @@
         "url": "https://mechanicsreference.com/",
         "name": "Mechanics Reference",
         "alternateName": ["mechanicsreference.com", "Encyclopedia of mechanics"],
-        "description": "Encyclopedia of mechanics starting from the basic equations of continuum mechanics, the finite element method, and numerical methods.",
+        "description": "An encyclopedia of continuum mechanics, the finite element method, and numerical methods.",
         "inLanguage": "en",
         "publisher": {
           "@type": "Organization",
@@ -45,9 +45,9 @@
         "@type": "WebPage",
         "@id": "https://mechanicsreference.com/#webpage",
         "url": "https://mechanicsreference.com/",
-        "name": "Encyclopedia of Mechanics | Basic Equations, Continuum, FEM",
+        "name": "Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods",
         "isPartOf": { "@id": "https://mechanicsreference.com/#website" },
-        "description": "Encyclopedia of mechanics beginning with the basic governing equations of continuum mechanics, finite elements, and numerical methods.",
+        "description": "Overview of an encyclopedia of continuum mechanics, finite elements, and numerical methods. Governing equations are one layer down.",
         "about": [
           { "@type": "Thing", "name": "Encyclopedia of mechanics" },
           { "@type": "Thing", "name": "Continuum mechanics" },
@@ -61,10 +61,10 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "Where should I start in this encyclopedia of mechanics?",
+            "name": "How is this encyclopedia organized?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Start with the basic equations: deformation gradient, strain, Cauchy stress, conservation of mass and momentum, Hooke's law, virtual work, and the discrete system K a = f. The hub then expands each identity."
+              "text": "The homepage maps the subjects. The hub holds topic entries. Governing equations sit one layer down, on the equations page and inside the continuum and FEM entries."
             }
           },
           {
@@ -288,46 +288,6 @@
       background:linear-gradient(135deg, var(--accent-soft), var(--accent-2-dim));
     }
 
-    .eq-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-    .eq-card{
-      position:relative;
-      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:20px 18px 16px;
-      overflow:hidden;
-    }
-    .eq-card::before{
-      content:"";
-      position:absolute;top:0;left:0;right:0;height:1px;
-      background: linear-gradient(90deg, transparent, var(--accent-line), color-mix(in srgb, var(--accent-2) 38%, transparent), transparent);
-    }
-    .eq-kicker{
-      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:11px;color:var(--accent);letter-spacing:.08em;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-    .eq-card h3{margin:0 0 10px;font-size:1.02rem;letter-spacing:-0.015em}
-    .eq{
-      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:clamp(0.95rem, 1.6vw, 1.12rem);
-      line-height:1.55;
-      color:var(--text);
-      background: color-mix(in srgb, var(--surface-2) 80%, transparent);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px 14px;
-      margin:0 0 12px;
-      overflow-x:auto;
-      white-space:normal;
-    }
-    .eq-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
-
     .section{padding:28px 0 8px}
     .section h2{
       margin:0 0 8px;
@@ -415,6 +375,8 @@
       width:6px;height:6px;border-radius:50%;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
     }
+    .primer li a{color:var(--accent);text-decoration:none}
+    .primer li a:hover{text-decoration:underline}
     .bridge{
       margin-top:14px;
       background: color-mix(in srgb, var(--surface-2) 82%, transparent);
@@ -492,7 +454,7 @@
     footer a:hover{text-decoration:underline}
 
     @media (max-width: 900px){
-      .hero, .tracks, .steps, .split, .eq-grid{grid-template-columns:1fr}
+      .hero, .tracks, .steps, .split{grid-template-columns:1fr}
       .hero{padding-top:44px}
       header{padding:14px 16px}
       main{padding:0 16px 56px}
@@ -508,7 +470,6 @@
       </a>
       <nav class="top-nav" aria-label="Site">
         <a href="./" class="active" aria-current="page">Home</a>
-        <a href="#equations">Equations</a>
         <a href="#topics">Topics</a>
         <a href="hub.html">Hub</a>
       </nav>
@@ -519,109 +480,27 @@
         <section class="hero">
           <div>
             <div class="eyebrow">Encyclopedia of mechanics</div>
-            <h1>Start with the basic equations of continuum mechanics.</h1>
-            <p class="lede">An encyclopedia of strain, stress, conservation laws, constitutive models, and the finite element and numerical methods that turn those equations into computed solutions.</p>
+            <h1>A map of continuum mechanics, finite elements, and numerical methods.</h1>
+            <p class="lede">This page is the overview. Topic entries live in the hub. Governing equations sit one layer down, inside continuum mechanics and FEM—not on the front door.</p>
             <div class="actions">
-              <a class="btn btn-primary" href="#equations">Basic equations</a>
-              <a class="btn btn-ghost" href="hub.html#basic-equations">Open in the hub</a>
+              <a class="btn btn-primary" href="hub.html">Open the encyclopedia hub</a>
+              <a class="btn btn-ghost" href="#topics">Browse subjects</a>
             </div>
           </div>
-          <aside class="hero-panel" aria-label="Encyclopedia map">
-            <div class="panel-kicker">encyclopedia map</div>
+          <aside class="hero-panel" aria-label="Encyclopedia layers">
+            <div class="panel-kicker">layers</div>
             <div class="stack">
-              <div class="stack-row"><strong>Basic equations</strong><span>strain · stress · balance</span></div>
-              <div class="stack-row"><strong>Continuum mechanics</strong><span>kinematics · constitutive laws</span></div>
-              <div class="stack-row"><strong>Finite elements</strong><span>weak form · K a = f</span></div>
-              <div class="stack-row"><strong>Numerical methods</strong><span>quadrature · Newton · solvers</span></div>
+              <div class="stack-row"><strong>Overview</strong><span>this page · subjects</span></div>
+              <div class="stack-row"><strong>Topics</strong><span>hub entries</span></div>
+              <div class="stack-row"><strong>Equations</strong><span>inside each subject</span></div>
+              <div class="stack-row"><strong>Methods</strong><span>discretization · solvers</span></div>
             </div>
           </aside>
         </section>
 
-        <section class="section" id="equations">
-          <h2>Basic equations</h2>
-          <p class="section-lead">These are the starting identities of the encyclopedia. Continuum mechanics writes them as fields; FEM and numerical methods approximate them on a mesh.</p>
-          <div class="eq-grid">
-            <article class="eq-card">
-              <div class="eq-kicker">Kinematics</div>
-              <h3>Deformation gradient</h3>
-              <div class="eq">F = ∂x / ∂X</div>
-              <p>Maps a material line element in the reference placement <i>X</i> to the current placement <i>x</i>. All finite-strain measures are built from <i>F</i>.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Kinematics</div>
-              <h3>Green–Lagrange strain</h3>
-              <div class="eq">E = ½ (Fᵀ F − I)</div>
-              <p>Finite strain on the reference configuration. For small displacement gradients it reduces to the infinitesimal strain tensor.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Kinematics</div>
-              <h3>Infinitesimal strain</h3>
-              <div class="eq">ε = ½ (∇u + (∇u)ᵀ)</div>
-              <p>Symmetric gradient of the displacement <i>u</i>. The working strain measure in linear solid mechanics and linear FEM.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Stress</div>
-              <h3>Cauchy traction</h3>
-              <div class="eq">t = σ n</div>
-              <p>Force per current area on a surface with outward normal <i>n</i>. Cauchy stress <i>σ</i> is the primary stress in the current configuration.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Balance</div>
-              <h3>Conservation of mass</h3>
-              <div class="eq">∂ρ/∂t + ∇ · (ρ v) = 0</div>
-              <p>Local mass balance. For incompressible flow or isochoric plasticity this reduces to ∇ · <i>v</i> = 0.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Balance</div>
-              <h3>Linear momentum</h3>
-              <div class="eq">∇ · σ + ρ b = ρ a</div>
-              <p>Cauchy’s first law: divergence of stress plus body force equals mass density times acceleration. At rest, ∇ · σ + ρ <i>b</i> = 0.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Balance</div>
-              <h3>Angular momentum</h3>
-              <div class="eq">σ = σᵀ</div>
-              <p>In the absence of couple stresses, Cauchy stress is symmetric. This is why constitutive models are written for the six independent components of <i>σ</i>.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Constitutive</div>
-              <h3>Hooke’s law (isotropic)</h3>
-              <div class="eq">σ = λ tr(ε) I + 2μ ε</div>
-              <p>Linear isotropic elasticity. Lamé parameters <i>λ</i>, <i>μ</i> (shear modulus). Equivalent form: <i>σ</i> = ℂ : <i>ε</i>.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Weak form</div>
-              <h3>Principle of virtual work</h3>
-              <div class="eq">∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV</div>
-              <p>Weak statement of momentum. The finite element method replaces <i>u</i> and <i>δu</i> with shape-function expansions on a mesh.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Finite elements</div>
-              <h3>Discrete linear system</h3>
-              <div class="eq">K a = f</div>
-              <p>After interpolation <i>uʰ</i> = <i>N a</i> and assembly, linear elasticity becomes a stiffness system: unknown nodal degrees of freedom <i>a</i>, load vector <i>f</i>.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Numerical methods</div>
-              <h3>Newton–Raphson</h3>
-              <div class="eq">K<sub>T</sub> Δu = −R(u)</div>
-              <p>Nonlinear residuals <i>R(u)</i> = 0 are solved by repeated linearizations. <i>K<sub>T</sub></i> is the consistent tangent (Jacobian) of the residual.</p>
-            </article>
-            <article class="eq-card">
-              <div class="eq-kicker">Fluids</div>
-              <h3>Navier–Stokes (incompressible)</h3>
-              <div class="eq">ρ (∂v/∂t + v · ∇v) = −∇p + μ ∇²v + ρ b</div>
-              <p>Newtonian fluid with viscosity <i>μ</i>, together with ∇ · <i>v</i> = 0. Same continuum momentum law, different constitutive response.</p>
-            </article>
-          </div>
-          <div class="bridge">
-            <p>Read these as the index of the encyclopedia. Each hub topic unpacks one piece: how <i>F</i> produces strain measures, how virtual work becomes element matrices, and how Newton iteration is implemented in a nonlinear FE code. <a href="hub.html#basic-equations">Open the basic-equations entry in the hub →</a></p>
-          </div>
-        </section>
-
         <section class="section" id="topics">
           <h2>What this encyclopedia covers</h2>
-          <p class="section-lead">After the basic equations, three subjects sit on one pipeline. Continuum mechanics writes the field problem. The finite element method turns it into a discrete system. Numerical methods assemble, integrate, and solve that system.</p>
+          <p class="section-lead">Three subjects sit on one pipeline. Continuum mechanics writes the field problem. The finite element method turns it into a discrete system. Numerical methods assemble, integrate, and solve that system. The identities themselves are a click further in.</p>
           <div class="split">
             <article class="primer" id="continuum">
               <h3>Continuum mechanics</h3>
@@ -631,7 +510,7 @@
                 <li>Kinematics: small strain vs finite strain; deformation gradient</li>
                 <li>Balance laws: mass, linear momentum, angular momentum, energy</li>
                 <li>Constitutive models for solids and fluids</li>
-                <li>Boundary-value problems: equilibrium, contact, flow, and coupled physics</li>
+                <li><a href="equations.html">Governing equations for this subject →</a></li>
               </ul>
             </article>
             <article class="primer" id="fem">
@@ -642,7 +521,7 @@
                 <li>Weak form, Galerkin method, and isoparametric mapping</li>
                 <li>Element families: tets, hexes, mixed, high-order, and unfitted methods</li>
                 <li>Mesh generation, quadrature, and global assembly</li>
-                <li>Nonlinear FEM, contact, dynamics, and condensation</li>
+                <li><a href="equations.html#fem">Weak form and K a = f →</a></li>
               </ul>
             </article>
             <article class="primer" id="numerical">
@@ -653,25 +532,19 @@
                 <li>Numerical integration and Gauss points</li>
                 <li>Newton–Raphson, consistent tangents, and convergence tests</li>
                 <li>Linear solvers, preconditioning, and sparse formats</li>
-                <li>Time stepping, stability, and HPC for large systems</li>
+                <li><a href="equations.html#numerical">Newton linearization →</a></li>
               </ul>
             </article>
           </div>
           <div class="bridge">
-            <p>The hub follows that order: continuum fundamentals first, then finite elements and numerical methods, then applications (fracture, composites, soils, heat, batteries) and the linear-algebra tools used to compute them. Search the hub for a term such as Green strain, locking, Gauss, or Schur.</p>
+            <p>The hub holds the topic entries. Governing equations are one layer down: open a subject, then the identities for kinematics, balance, constitutive response, and discretization. <a href="equations.html">Open the equations layer →</a></p>
           </div>
         </section>
 
         <section class="section" id="tracks">
           <h2>Open a track in the encyclopedia</h2>
-          <p class="section-lead">Begin with the basic equations, then continuum mechanics, finite elements, and numerical methods. Later parts apply and implement them.</p>
+          <p class="section-lead">Each card is a subject in the hub. Basic field equations are nested under continuum mechanics and FEM, not listed as the front page.</p>
           <div class="tracks">
-            <a class="track" href="hub.html#basic-equations">
-              <div class="track-index">Start here</div>
-              <h3>Basic equations</h3>
-              <p>Deformation gradient, strain, Cauchy stress, balance laws, Hooke’s law, virtual work, and K a = f.</p>
-              <span class="go">Open entry →</span>
-            </a>
             <a class="track" href="hub.html#introduction-to-continuum-mechanics">
               <div class="track-index">Part I</div>
               <h3>Continuum mechanics</h3>
@@ -735,8 +608,8 @@
           <p class="section-lead">Short answers for the three subjects this site is built around.</p>
           <div class="faq">
             <details>
-              <summary>Where should I start?</summary>
-              <p>Start with the basic equations: deformation gradient, strain, Cauchy stress, conservation of mass and momentum, Hooke’s law, virtual work, and the discrete system K a = f. The hub then expands each identity into kinematics, constitutive models, FEM, and solvers.</p>
+              <summary>How is this encyclopedia organized?</summary>
+              <p>This page is the map of subjects. The hub holds searchable topic entries. Governing equations live one layer down, on the equations page and inside continuum and FEM entries.</p>
             </details>
             <details>
               <summary>What is continuum mechanics?</summary>
@@ -761,7 +634,7 @@
 
     <footer>
       <div class="wrap">
-        <span>Encyclopedia of mechanics · basic equations</span>
+        <span>Encyclopedia of mechanics</span>
         <span><a href="hub.html">Open the hub</a> · <a href="https://github.com/mhsgoud/mechanicsreference">GitHub</a></span>
       </div>
     </footer>

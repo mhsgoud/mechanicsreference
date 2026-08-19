@@ -1247,7 +1247,7 @@ function selectTopic(title){
 function initFromHash(){
   const h = location.hash.replace('#','');
   const byHash = topics.find(t => slug(t.title) === h);
-  return byHash || topics[0];
+  return byHash || topics.find(t => t.title === "Introduction to Continuum Mechanics") || topics[0];
 }
 
 // ---- Search ---------------------------------------------------------------
