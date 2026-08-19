@@ -94,6 +94,36 @@
         <p>The symmetric gradient of displacement. This is the strain used in linear elasticity and in most introductory finite element courses.</p>
       </article>
       <article class="eq-card">
+        <div class="eq-kicker">Kinematics</div>
+        <h3>Polar decomposition</h3>
+        <div class="eq">F = R U = V R</div>
+        <p>A unique rotation R and symmetric stretches U, V. Strain is built from U or from C = U², so a rigid rotation does not count as stretch.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Kinematics</div>
+        <h3>Almansi strain</h3>
+        <div class="eq">e = ½ (I − b⁻¹)</div>
+        <p>Finite strain on the current placement, with b = F Fᵀ. Like Green–Lagrange, it vanishes in a rigid motion.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Kinematics</div>
+        <h3>Velocity gradient</h3>
+        <div class="eq">L = Ḟ F⁻¹ = D + W</div>
+        <p>The symmetric part D is stretching; the skew part W is spin. This is the rate that is conjugate to Kirchhoff stress.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Stress</div>
+        <h3>Second Piola–Kirchhoff</h3>
+        <div class="eq">S = J F⁻¹ σ F⁻ᵀ</div>
+        <p>Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are usually written as S = ∂W/∂E.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Stress</div>
+        <h3>von Mises equivalent</h3>
+        <div class="eq">σ_vm = √(3/2 σ′ : σ′)</div>
+        <p>Magnitude of the stress deviator, scaled to match uniaxial tension. J₂ plasticity yields when this reaches the current yield stress.</p>
+      </article>
+      <article class="eq-card">
         <div class="eq-kicker">Stress</div>
         <h3>Cauchy traction</h3>
         <div class="eq">t = σ n</div>
