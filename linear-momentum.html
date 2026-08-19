@@ -92,25 +92,25 @@
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#balance-laws-conservation">Balance laws</a> · Linear momentum</p>
       <h1>Linear momentum</h1>
-      <p class="standfirst">A continuous body carries mass. Surface forces act on its current boundary; body forces act in the interior. Their resultant equals the rate of change of linear momentum. Locally that statement is Cauchy’s first law.</p>
+      <p class="standfirst">A continuous body carries mass. Part of its boundary is supported: displacement is prescribed there, and the reaction is unknown. On the rest, tractions are applied. Together with body force they equal the rate of change of linear momentum.</p>
     </div>
 
     <div class="figure-shell">
       <div id="stage"></div>
       <aside id="ui">
         <h2>Cauchy’s first law</h2>
-        <p>Red arrows are tractions on the current surface. They move with the body because Cauchy stress is a spatial field: the force is per current area, not per reference area.</p>
+        <p>The green patch is a support: the body cannot leave the platen. Red arrows are applied tractions on the free surface. Reactions on the support close the global force balance.</p>
         <div id="formula">∇ · σ + ρ b = ρ a<br>t = σ n</div>
         <ul class="terms">
-          <li><strong>t = σ n</strong> Surface traction. The red arrows. By the divergence theorem this becomes ∇ · σ in the interior.</li>
-          <li><strong>ρ b</strong> Body force per current volume — weight, or any force not acting through the surface.</li>
-          <li><strong>ρ a</strong> Inertia. The cyan points are material particles; as they accelerate, the right-hand side is not zero.</li>
+          <li><strong>Γ<sub>u</sub></strong> Supported area. Displacement is prescribed; the traction there is a reaction.</li>
+          <li><strong>t = σ n</strong> Applied traction on the free surface. By the divergence theorem this becomes ∇ · σ in the interior.</li>
+          <li><strong>ρ a</strong> Inertia of the material points. On the support those points stay put.</li>
         </ul>
         <div class="legend">
           <div><span class="dot" style="background:#60a5fa"></span>reference</div>
           <div><span class="dot" style="background:#d89b54"></span>current body</div>
-          <div><span class="dot" style="background:#93c5fd"></span>material points</div>
-          <div><span class="dot" style="background:#ef4444"></span>traction t</div>
+          <div><span class="dot" style="background:#3d7a62"></span>supported area</div>
+          <div><span class="dot" style="background:#ef4444"></span>applied traction</div>
         </div>
         <p class="hint">Drag to orbit · Scroll to zoom</p>
       </aside>
@@ -159,11 +159,11 @@
     scene.add(key);
 
     const ground = new THREE.Mesh(
-      new THREE.CircleGeometry(6, 64),
+      new THREE.CircleGeometry(7, 64),
       new THREE.MeshStandardMaterial({color:0x121a2c, roughness:0.9, metalness:0})
     );
     ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -2.35;
+    ground.position.y = -2.62;
     ground.receiveShadow = true;
     scene.add(ground);
 
@@ -204,12 +204,49 @@
     geo.setIndex(indices);
     geo.computeVertexNormals();
 
+    let yMin = Infinity;
+    for (const p of refs) if (p.y < yMin) yMin = p.y;
+    const ySupport = yMin;
+    const supportRadius = 0.95;
+    function onSupport(X) {
+      return (X.y - ySupport) < 0.58 && (X.x * X.x + X.z * X.z) < supportRadius * supportRadius;
+    }
+
+    const colors = new Float32Array(refs.length * 3);
+    const bodyCol = new THREE.Color(0xd89b54);
+    const supportCol = new THREE.Color(0x3d7a62);
+    for (let i = 0; i < refs.length; i++) {
+      const c = onSupport(refs[i]) ? supportCol : bodyCol;
+      colors[3 * i] = c.r; colors[3 * i + 1] = c.g; colors[3 * i + 2] = c.b;
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
     const potato = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-      color: 0xd89b54, roughness: 0.88, metalness: 0
+      vertexColors: true, roughness: 0.88, metalness: 0
     }));
     potato.castShadow = true;
     potato.receiveShadow = true;
     scene.add(potato);
+
+    const platen = new THREE.Mesh(
+      new THREE.BoxGeometry(3.4, 0.26, 2.5),
+      new THREE.MeshStandardMaterial({color: 0x8a909c, roughness: 0.5, metalness: 0.18})
+    );
+    platen.position.set(0, ySupport - 0.13, 0);
+    platen.receiveShadow = true;
+    platen.castShadow = true;
+    scene.add(platen);
+
+    const contactDisk = new THREE.Mesh(
+      new THREE.CircleGeometry(supportRadius, 48),
+      new THREE.MeshStandardMaterial({
+        color: 0x3d7a62, roughness: 0.4, metalness: 0.05,
+        emissive: 0x1a3d30, emissiveIntensity: 0.22
+      })
+    );
+    contactDisk.rotation.x = -Math.PI / 2;
+    contactDisk.position.set(0, ySupport + 0.004, 0);
+    scene.add(contactDisk);
 
     const refGeo = geo.clone();
     const reference = new THREE.Mesh(refGeo, new THREE.MeshBasicMaterial({
@@ -257,16 +294,29 @@
       return a;
     }
     const topForce = makeForceArrow(new THREE.Vector3(0, 3.15, 0), new THREE.Vector3(0, -1, 0), 0.95);
-    const bottomForce = makeForceArrow(new THREE.Vector3(0, -3.15, 0), new THREE.Vector3(0, 1, 0), 0.95);
     const leftForce = makeForceArrow(new THREE.Vector3(-2.75, 0, 0), new THREE.Vector3(1, 0.12, 0), 0.72);
     const rightForce = makeForceArrow(new THREE.Vector3(2.75, 0, 0), new THREE.Vector3(-1, 0.12, 0), 0.72);
 
-    function makeLabel(text) {
+    const reactionArrows = [];
+    const reactionOrigins = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0.55, 0, 0.15),
+      new THREE.Vector3(-0.5, 0, 0.2),
+      new THREE.Vector3(0.2, 0, -0.48),
+      new THREE.Vector3(-0.28, 0, -0.4)
+    ];
+    for (const o of reactionOrigins) {
+      const a = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(o.x, ySupport, o.z), 0.42, 0x6dcc9c, 0.12, 0.07);
+      scene.add(a);
+      reactionArrows.push(a);
+    }
+
+    function makeLabel(text, color = '#fecaca') {
       const canvas = document.createElement('canvas');
       canvas.width = 256; canvas.height = 96;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, 256, 96);
-      ctx.fillStyle = '#fecaca';
+      ctx.fillStyle = color;
       ctx.font = 'bold 34px "Source Sans 3", Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(text, 128, 48);
@@ -278,24 +328,30 @@
       return sprite;
     }
     const topLabel = makeLabel('t');
-    const bottomLabel = makeLabel('t');
     const leftLabel = makeLabel('t');
     const rightLabel = makeLabel('t');
+    const supportLabel = makeLabel('support', '#a7e6c8');
+    supportLabel.scale.set(1.35, 0.48, 1);
 
     function deformation(X, t) {
       const s = 0.5 + 0.5 * Math.sin(t);
-      const compression = 1.0 - 0.34 * s;
-      const bulge = 1.0 + 0.18 * s;
-      const twist = 0.12 * s * Math.sin(Math.PI * (X.y / 4.1));
-
+      const h = X.y - ySupport;
+      const fade = THREE.MathUtils.clamp((h - 0.08) / 1.15, 0, 1);
+      const compression = 1.0 - 0.32 * s;
+      let y = ySupport + h * compression;
+      const bulge = 1.0 + 0.18 * s * fade;
       let x = X.x * bulge;
-      let y = X.y * compression;
       let z = X.z * bulge;
-      x += 0.24 * s * (X.y / 2.05) * (1 - 0.18 * (X.x * X.x / 3.0));
-      z += 0.12 * s * Math.sin(X.y * 1.2);
-
+      x += 0.24 * s * (h / 2.05) * (1 - 0.18 * (X.x * X.x / 3.0)) * fade;
+      z += 0.12 * s * Math.sin(X.y * 1.2) * fade;
+      const twist = 0.12 * s * Math.sin(Math.PI * (h / 4.1)) * fade;
       const c = Math.cos(twist), sn = Math.sin(twist);
-      return new THREE.Vector3(c * x - sn * z, y, sn * x + c * z);
+      const xx = c * x - sn * z;
+      const zz = sn * x + c * z;
+      if (onSupport(X)) {
+        return new THREE.Vector3(X.x, ySupport, X.z);
+      }
+      return new THREE.Vector3(xx, y, zz);
     }
 
     const posAttr = geo.getAttribute('position');
@@ -337,29 +393,33 @@
 
       const forceScale = 0.92 + 0.16 * amount;
       const topX = deformation(new THREE.Vector3(0, 2.02, 0), t);
-      const botX = deformation(new THREE.Vector3(0, -2.02, 0), t);
       const leftX = deformation(new THREE.Vector3(-1.72, 0.15, 0), t);
       const rightX = deformation(new THREE.Vector3(1.72, 0.15, 0), t);
 
       topForce.position.copy(topX).add(new THREE.Vector3(0, 0.52, 0));
-      bottomForce.position.copy(botX).add(new THREE.Vector3(0, -0.52, 0));
       leftForce.position.copy(leftX).add(new THREE.Vector3(-0.52, 0, 0));
       rightForce.position.copy(rightX).add(new THREE.Vector3(0.52, 0, 0));
 
       topForce.setDirection(new THREE.Vector3(0, -1, 0));
-      bottomForce.setDirection(new THREE.Vector3(0, 1, 0));
       leftForce.setDirection(new THREE.Vector3(1, 0.12, 0).normalize());
       rightForce.setDirection(new THREE.Vector3(-1, 0.12, 0).normalize());
 
       topForce.setLength(0.72 * forceScale, 0.22, 0.11);
-      bottomForce.setLength(0.72 * forceScale, 0.22, 0.11);
       leftForce.setLength(0.58 * forceScale, 0.18, 0.09);
       rightForce.setLength(0.58 * forceScale, 0.18, 0.09);
 
       topLabel.position.copy(topForce.position).add(new THREE.Vector3(0, 0.34, 0));
-      bottomLabel.position.copy(bottomForce.position).add(new THREE.Vector3(0, -0.34, 0));
       leftLabel.position.copy(leftForce.position).add(new THREE.Vector3(-0.15, 0.28, 0));
       rightLabel.position.copy(rightForce.position).add(new THREE.Vector3(0.15, 0.28, 0));
+      supportLabel.position.set(0, ySupport - 0.42, 1.15);
+
+      const reactionLen = 0.36 + 0.22 * amount;
+      for (let i = 0; i < reactionArrows.length; i++) {
+        const o = reactionOrigins[i];
+        reactionArrows[i].position.set(o.x, ySupport, o.z);
+        reactionArrows[i].setDirection(new THREE.Vector3(0, 1, 0));
+        reactionArrows[i].setLength(reactionLen, 0.12, 0.07);
+      }
     }
 
     function resize() {
