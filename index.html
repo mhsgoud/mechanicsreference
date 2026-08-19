@@ -188,6 +188,7 @@
     <nav class="top-nav" aria-label="Site">
       <a href="./" class="active" aria-current="page">Home</a>
       <a href="#contents">Contents</a>
+      <a href="#figures">Figures</a>
       <a href="equations.html">Equations</a>
       <a href="hub.html">Library</a>
     </nav>
@@ -267,14 +268,116 @@
             <p>The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
             <p>Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
             <a class="more" href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
+            <a class="more" href="hub.html#variational-principles">Variational principles</a>
+            <a class="more" href="hub.html#mixed-methods-and-locking">Locking</a>
           </article>
           <article>
             <h3>Numerical methods</h3>
             <p>Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
             <p>Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
-            <a class="more" href="hub.html#solving-linear-systems">Linear systems and Newton iteration</a>
+            <a class="more" href="hub.html#solving-linear-systems">Linear systems</a>
+            <a class="more" href="hub.html#newton-raphson-iteration-in-fem">Newton iteration</a>
+            <a class="more" href="hub.html#path-following-and-arc-length">Arc-length</a>
           </article>
         </div>
+      </section>
+
+      <section id="figures">
+        <h2>Figures</h2>
+        <p class="deck">Interactive plates for the identities that are easiest to misread on paper.</p>
+        <ol class="contents">
+          <li>
+            <a href="deformation-gradient.html">
+              <span class="n">F</span>
+              <span class="t">Deformation gradient</span>
+              <span class="s">Translation, rotation, stretch, and shear</span>
+            </a>
+          </li>
+          <li>
+            <a href="polar-decomposition.html">
+              <span class="n">RU</span>
+              <span class="t">Polar decomposition</span>
+              <span class="s">Stretch then rotate, or rotate then stretch</span>
+            </a>
+          </li>
+          <li>
+            <a href="rotation-strain.html">
+              <span class="n">E</span>
+              <span class="t">Green versus infinitesimal strain</span>
+              <span class="s">A pure rotation that ε mistakes for stretch</span>
+            </a>
+          </li>
+          <li>
+            <a href="hydrostatic-deviatoric.html">
+              <span class="n">J</span>
+              <span class="t">Volume and shape</span>
+              <span class="s">Hydrostatic change versus a volume-preserving distort</span>
+            </a>
+          </li>
+          <li>
+            <a href="principal-stretches.html">
+              <span class="n">λ</span>
+              <span class="t">Principal stretches</span>
+              <span class="s">Incompressible pull with J = 1</span>
+            </a>
+          </li>
+          <li>
+            <a href="velocity-gradient.html">
+              <span class="n">L</span>
+              <span class="t">Rate of deformation and spin</span>
+              <span class="s">D, W, and L = D + W</span>
+            </a>
+          </li>
+          <li>
+            <a href="traction-cut.html">
+              <span class="n">t</span>
+              <span class="t">Traction on a cut</span>
+              <span class="s">The same σ, a different n</span>
+            </a>
+          </li>
+          <li>
+            <a href="linear-momentum.html">
+              <span class="n">σ</span>
+              <span class="t">Linear momentum</span>
+              <span class="s">A supported body and a moving traction</span>
+            </a>
+          </li>
+          <li>
+            <a href="work-conjugates.html">
+              <span class="n">P</span>
+              <span class="t">Work-conjugate stresses</span>
+              <span class="s">Piola on the reference face, Cauchy on the current</span>
+            </a>
+          </li>
+          <li>
+            <a href="von-mises.html">
+              <span class="n">J₂</span>
+              <span class="t">von Mises cylinder</span>
+              <span class="s">Hydrostatic axis and a yielding load path</span>
+            </a>
+          </li>
+          <li>
+            <a href="hooke-poisson.html">
+              <span class="n">ν</span>
+              <span class="t">Poisson contraction</span>
+              <span class="s">Uniaxial tension and lateral strain −ν ε</span>
+            </a>
+          </li>
+          <li>
+            <a href="objective-rates.html">
+              <span class="n">∇σ</span>
+              <span class="t">Objective rates</span>
+              <span class="s">A stress that only rotates</span>
+            </a>
+          </li>
+          <li>
+            <a href="column-buckling.html">
+              <span class="n">P</span>
+              <span class="t">Euler buckling</span>
+              <span class="s">Amplification toward π² EI / L²</span>
+            </a>
+          </li>
+        </ol>
       </section>
     </div>
   </main>

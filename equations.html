@@ -83,6 +83,12 @@
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
+        <h3>Jacobian</h3>
+        <div class="eq">J = det F = dv / dV</div>
+        <p>Local volume change. Mass balance in the reference placement is ρ₀ = ρ J. Incompressibility is J = 1, which is the constraint on the <a href="principal-stretches.html">principal stretches</a> of rubber.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Kinematics</div>
         <h3>Green–Lagrange strain</h3>
         <div class="eq">E = ½ (Fᵀ F − I)</div>
         <p>Strain on the reference configuration. When displacement gradients are small, it reduces to the infinitesimal strain. A <a href="rotation-strain.html">pure rotation</a> leaves E at zero and does not leave ε at zero.</p>
@@ -113,9 +119,15 @@
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
+        <h3>First Piola–Kirchhoff</h3>
+        <div class="eq">P = J σ F⁻ᵀ</div>
+        <p>Nominal stress: force on a current area, measured per reference area. Work-conjugate to Ḟ. <a href="work-conjugates.html">The same force on two areas</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Stress</div>
         <h3>Second Piola–Kirchhoff</h3>
         <div class="eq">S = J F⁻¹ σ F⁻ᵀ</div>
-        <p>Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are usually written as S = ∂W/∂E. <a href="work-conjugates.html">The same force on two areas</a>.</p>
+        <p>Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are usually written as S = ∂W/∂E.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
@@ -145,7 +157,25 @@
         <div class="eq-kicker">Constitutive</div>
         <h3>Isotropic Hooke’s law</h3>
         <div class="eq">σ = λ tr(ε) I + 2μ ε</div>
-        <p>Linear elasticity in the isotropic case, written with the Lamé parameters. The compact form is σ = ℂ : ε.</p>
+        <p>Linear elasticity in the isotropic case, written with the Lamé parameters. The compact form is σ = ℂ : ε. <a href="hooke-poisson.html">Uniaxial tension</a> produces lateral strain −ν ε.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Constitutive</div>
+        <h3>Neo-Hookean stored energy</h3>
+        <div class="eq">W = (μ/2)(I₁ − 3) − μ ln J + (λ/2)(ln J)²</div>
+        <p>The simplest isotropic hyperelastic law. Incompressibility drops the volumetric terms and enforces J = 1 with a pressure. <a href="principal-stretches.html">Principal stretches at J = 1</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Rates</div>
+        <h3>Jaumann rate</h3>
+        <div class="eq">∇σ = σ̇ − Wσ + σW</div>
+        <p>An objective rate of Cauchy stress. A <a href="objective-rates.html">pure rotation of a constant uniaxial stress</a> changes the laboratory components and leaves ∇σ at zero.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Balance</div>
+        <h3>Angular momentum</h3>
+        <div class="eq">σ = σᵀ</div>
+        <p>Without couple stresses, Cauchy’s second law is symmetry of σ. It is an algebraic restriction, not a differential one.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Fluids</div>
@@ -162,7 +192,19 @@
         <div class="eq-kicker">Weak form</div>
         <h3>Principle of virtual work</h3>
         <div class="eq">∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV</div>
-        <p>A weak statement of linear momentum. Finite elements replace the trial and test displacements with shape-function expansions.</p>
+        <p>A weak statement of linear momentum. Finite elements replace the trial and test displacements with shape-function expansions. <a href="hub.html#variational-principles">Stationarity of the potential</a> is the same statement when a stored energy exists.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Interpolation</div>
+        <h3>Isoparametric map</h3>
+        <div class="eq">x(ξ) = Σ N_a(ξ) x_a, &nbsp; u(ξ) = Σ N_a(ξ) a_a</div>
+        <p>The same shape functions describe geometry and the unknown field. Derivatives in physical space use J = ∂x/∂ξ. <a href="hub.html#shape-functions-isoparametric-mapping">Parent square to warped quad</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Discrete system</div>
+        <h3>Element stiffness</h3>
+        <div class="eq">Kᵉ = ∫ Bᵀ ℂ B dV</div>
+        <p>The strain–displacement matrix B holds the symmetric gradients of the shape functions. Assembly scatters Kᵉ into the global sparse matrix.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Discrete system</div>
@@ -170,16 +212,58 @@
         <div class="eq">K a = f</div>
         <p>After interpolation and assembly, the unknown nodal coefficients satisfy a stiffness system whose right-hand side carries the applied loads.</p>
       </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Quadrature</div>
+        <h3>Gauss rule</h3>
+        <div class="eq">∫ f dV ≈ Σ_q w_q f(ξ_q) det J(ξ_q)</div>
+        <p>Constitutive evaluations happen only at the quadrature points. <a href="hub.html#numerical-integration-gauss-quadrature">Full versus reduced integration</a> on a bilinear quadrilateral.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Mixed methods</div>
+        <h3>Incompressibility</h3>
+        <div class="eq">∫ δp (∇ · u) dV = 0</div>
+        <p>A displacement-only space cannot represent ∇ · u = 0 without <a href="hub.html#mixed-methods-and-locking">locking</a>. Pressure is interpolated independently, and the pair must satisfy an inf-sup condition.</p>
+      </article>
     </div>
 
     <h2 id="numerical">Numerical methods</h2>
-    <p class="deck">Nonlinear problems are reduced to a sequence of linear solves.</p>
+    <p class="deck">Nonlinear problems are reduced to a sequence of linear solves; dynamics add a choice of integrator.</p>
     <div class="eq-grid">
       <article class="eq-card">
         <div class="eq-kicker">Nonlinear solve</div>
         <h3>Newton–Raphson</h3>
         <div class="eq">K<sub>T</sub> Δu = −R(u)</div>
-        <p>A residual R(u) = 0 is linearized at the current guess. The tangent K<sub>T</sub> is the Jacobian of that residual.</p>
+        <p>A residual R(u) = 0 is linearized at the current guess. The tangent K<sub>T</sub> is the Jacobian of that residual. <a href="hub.html#newton-raphson-iteration-in-fem">Consistent linearisation</a> is what makes the convergence quadratic.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Stability</div>
+        <h3>Euler load</h3>
+        <div class="eq">P<sub>cr</sub> = π² EI / L²</div>
+        <p>The linear eigenvalue at which a hinged–hinged column loses uniqueness of the straight solution. Geometric stiffness, not a change in E, is what makes the tangent singular. <a href="column-buckling.html">An imperfect strut</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Path following</div>
+        <h3>Arc-length constraint</h3>
+        <div class="eq">‖Δa‖² + ψ² Δλ² = Δs²</div>
+        <p>The load factor λ is an unknown. The extra equation lets the iteration pass a limit point where load control would stall. <a href="hub.html#path-following-and-arc-length">Riks and Crisfield</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Dynamics</div>
+        <h3>Semi-discrete momentum</h3>
+        <div class="eq">M ä + C ȧ + R(a) = f</div>
+        <p>Mass, damping, and a (possibly nonlinear) internal force. Explicit methods lump M; implicit methods form a tangent at each step.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Dynamics</div>
+        <h3>Newmark</h3>
+        <div class="eq">a_{n+1} = a_n + Δt v_n + Δt² [(½−β) ä_n + β ä_{n+1}]</div>
+        <p>Average acceleration (β = ¼, γ = ½) is unconditionally stable for linear problems. Central difference is the explicit member of the same family.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Contact</div>
+        <h3>Complementarity</h3>
+        <div class="eq">g ≤ 0, &nbsp; p ≥ 0, &nbsp; p g = 0</div>
+        <p>Gap, pressure, and the requirement that one of them vanish. <a href="hub.html#contact-and-friction">Friction</a> adds a tangential law and a nonsymmetric tangent.</p>
       </article>
     </div>
   </main>
