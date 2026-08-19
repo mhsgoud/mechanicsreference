@@ -268,25 +268,90 @@
     </div>
 
     <h2 id="fracture">Fracture</h2>
-    <p class="deck">The energy released when a crack advances, and the same contour used at the tip of a rigid line inclusion.</p>
+    <p class="deck">A sharp crack in a linear solid is singular. A cohesive zone is not. The contour integral extracts the energy release in either case.</p>
     <div class="eq-grid">
+      <article class="eq-card">
+        <div class="eq-kicker">LEFM</div>
+        <h3>Williams field</h3>
+        <div class="eq">σ<sub>ij</sub> = K / √(2π r) · f<sub>ij</sub>(θ)</div>
+        <p>Leading term at a sharp crack. Stress is unbounded as r → 0; energy release is finite. Modes I, II, and III each have their own K. <a href="lefm.html">The ligament stress has slope −½</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">LEFM</div>
+        <h3>Griffith–Irwin</h3>
+        <div class="eq">G = −dΠ / dA = K_I² / E′</div>
+        <p>Energy released per unit area of crack advance. E′ = E in plane stress, E/(1−ν²) in plane strain. Fracture when G reaches G<sub>c</sub>, or K reaches K<sub>c</sub>.</p>
+      </article>
       <article class="eq-card">
         <div class="eq-kicker">Crack</div>
         <h3>J-integral</h3>
         <div class="eq">J = ∮_Γ (w n<sub>x</sub> − t · ∂u/∂x) dΓ</div>
-        <p>Rice’s path-independent integral. w is strain-energy density; t = σ n on the contour. Any path from the lower crack face to the upper that encloses the tip gives the same J. <a href="j-integral.html">Change the contour</a> and the number does not move.</p>
+        <p>Rice’s path-independent integral. Any path from the lower face to the upper that encloses the tip gives the same J. <a href="j-integral.html">Change the contour</a> and the number does not move.</p>
       </article>
       <article class="eq-card">
-        <div class="eq-kicker">Crack</div>
-        <h3>Energy release</h3>
-        <div class="eq">J = −dΠ / dA = K_I² / E′</div>
-        <p>Potential energy released per unit area of crack advance. In linear elasticity this is Griffith’s G, and Irwin’s relation recovers the stress-intensity factor. E′ = E in plane stress, E/(1−ν²) in plane strain.</p>
+        <div class="eq-kicker">Cohesive</div>
+        <h3>Traction–separation</h3>
+        <div class="eq">G_f = ∫ t dδ, &nbsp; ℓ<sub>ch</sub> = E G_f / f_t²</div>
+        <p>Area under the law is the fracture energy; ℓ<sub>ch</sub> is the process-zone size. The tip stress is f<sub>t</sub>, not infinite. <a href="cohesive-crack.html">Change the law</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">LEFM</div>
+        <h3>Max hoop kink</h3>
+        <div class="eq">K_I sin θ_c + K_II (3 cos θ_c − 1) = 0</div>
+        <p>Direction of the next increment under mixed-mode I–II. Equivalently θ<sub>c</sub> = 2 arctan[(K_I − √(K_I² + 8 K_II²))/(4 K_II)].</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Porous</div>
+        <h3>Effective face traction</h3>
+        <div class="eq">t_c = t_d − α p n</div>
+        <p>On a cohesive crack in a saturated solid. Pressure is continuous across the faces; its normal gradient is not, because the fracture exchanges fluid with the intact medium. <a href="cohesive-crack.html">Process zone</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Inclusion</div>
         <h3>Rigid line</h3>
         <div class="eq">J_tip ∝ (cos²θ − ν sin²θ)²</div>
-        <p>The same contour around a rigid-line tip is the configurational force on that tip. It vanishes at θ<sub>n</sub> = arctan(1/√ν), where the far field is unperturbed. <a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fibre neutrality</a> is that statement for a thin elastic fibre.</p>
+        <p>The same contour around a rigid-line tip is the configurational force on that tip. It vanishes at θ<sub>n</sub> = arctan(1/√ν). <a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fibre neutrality</a> is that statement for a thin elastic fibre.</p>
+      </article>
+    </div>
+
+    <h2 id="porous">Porous media</h2>
+    <p class="deck">A mixture of skeleton and fluid. Drainage turns total stress into effective stress; in more than one dimension that coupling is not a heat equation.</p>
+    <div class="eq-grid">
+      <article class="eq-card">
+        <div class="eq-kicker">Biot</div>
+        <h3>Effective stress</h3>
+        <div class="eq">σ′ = σ − α p I</div>
+        <p>What the skeleton constitutive law sees. α = 1 − K/K<sub>s</sub>. Terzaghi’s principle is the saturated soil limit α = 1. <a href="hub.html#multiphase-porous-materials">Phases and Bishop’s unsaturated split</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Fluid</div>
+        <h3>Darcy</h3>
+        <div class="eq">v = −(k/μ) (∇p − ρ g)</div>
+        <p>Relative discharge through the pores. Unsaturated flow replaces k by k(S<sub>w</sub>). Gravity is a body force on both constituents.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Coupling</div>
+        <h3>Storage</h3>
+        <div class="eq">α ∇·u̇ + (1/M) ṗ + ∇·v = 0</div>
+        <p>Mass balance of the fluid. Undrained response is M → ∞ with no flow. That limit is incompressible, and equal-order u–p elements lock.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">1D</div>
+        <h3>Terzaghi</h3>
+        <div class="eq">∂u/∂t = c_v ∂²u/∂z², &nbsp; T_v = c_v t / H²</div>
+        <p>Excess pressure in a column whose total vertical stress is known. Isochrones and U(T<sub>v</sub>) follow. <a href="consolidation.html">Advance the time factor</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Self-weight</div>
+        <h3>Gibson</h3>
+        <div class="eq">u(z,0) = γ′ (H − z), &nbsp; h = m t</div>
+        <p>Triangular initial pressure in a fill; an accreting layer thickens at rate m. Finite-strain consolidation lets k and m<sub>v</sub> depend on void ratio. <a href="consolidation.html#gibson">Self-weight isochrones</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Coupled</div>
+        <h3>Mandel–Cryer</h3>
+        <div class="eq">p<sub>centre</sub>(t) rises, then falls</div>
+        <p>In two or three dimensions the total stress redistributes. Uncoupled Terzaghi is monotonic; Biot coupling overshoots. <a href="consolidation.html#cryer">Cryer’s sphere</a>.</p>
       </article>
     </div>
 

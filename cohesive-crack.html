@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cohesive Cracking — Process Zone — Mechanics Reference</title>
+  <meta name="description" content="A cohesive zone replaces the 1/√r singularity with a traction–separation law. Finite tensile strength, fracture energy Gf, and a process zone of length E Gf / ft²." />
+  <link rel="canonical" href="https://mechanicsreference.com/cohesive-crack.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(280px,1.15fr) 1fr;background:var(--plate)}
+    #stage{position:relative;height:min(48vh,400px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    .plots{display:grid;grid-template-rows:1fr 1fr;background:#fff}
+    .plot-cell{padding:8px 10px 6px;border-left:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+    .plot-cell h3{margin:0 0 4px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;height:100%;min-height:110px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout,#legend{margin:0;font-size:0.82rem}
+    #formula,#readout{font-family:"JetBrains Mono",ui-monospace,monospace}
+    #formula{color:var(--navy);flex-basis:100%}
+    #legend{flex-basis:100%}
+    input[type=range]{width:110px;vertical-align:middle}
+    .modes{display:flex;border:1px solid var(--rule)}
+    .modes button{appearance:none;border:0;background:#fff;color:var(--navy);font:inherit;font-weight:600;font-size:0.84rem;padding:6px 12px;cursor:pointer}
+    .modes button.on{background:var(--navy);color:#fff}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed #legend{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{min-height:0}
+    html.embed .plots .plot-cell:last-child{display:none}
+    html.embed #ui{background:#fff}
+    html.embed #formula{flex-basis:auto}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(42vh,320px)}
+      .plot-cell{border-left:0}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#cohesive-cracking">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#cohesive-cracking">Cohesive cracking</a></p>
+      <h1>A crack that still carries load</h1>
+      <p class="standfirst">In concrete, soil, and other quasi-brittle solids the tip is not a mathematical point. Dugdale, Barenblatt, and Hillerborg replace the singular field with a traction–separation law on a process zone of finite length. The tensile strength <i>f</i><sub>t</sub> is finite; the area under the law is the fracture energy <i>G</i><sub>f</sub>. Linear elasticity is recovered only if that zone is small compared with the crack. In a saturated porous solid the same surface carries an effective traction <i>t</i><sub>c</sub> = <i>t</i><sub>d</sub> − α <i>p</i> <i>n</i>: water pressure is continuous, its normal gradient is not.</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage"><canvas id="plate"></canvas></div>
+        <div class="plots">
+          <div class="plot-cell"><h3>Traction–separation</h3><canvas id="pLaw"></canvas></div>
+          <div class="plot-cell"><h3>Stress along the crack line</h3><canvas id="pSig"></canvas></div>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">G<sub>f</sub> = ∫ t dδ &nbsp; · &nbsp; ℓ<sub>ch</sub> = E G<sub>f</sub> / f<sub>t</sub>²</p>
+        <div class="modes" role="group" aria-label="Cohesive law">
+          <button type="button" id="lin" class="on">Linear</button>
+          <button type="button" id="bi">Bilinear</button>
+          <button type="button" id="exp">Exponential</button>
+        </div>
+        <label>f<sub>t</sub> <input id="ft" type="range" min="15" max="80" value="32" /> <span id="ftV"></span></label>
+        <label>G<sub>f</sub> <input id="gf" type="range" min="8" max="80" value="30" /> <span id="gfV"></span></label>
+        <p id="readout"></p>
+        <p id="legend">Navy is the cohesive traction. Orange is the LEFM 1/√r field with the same far-field K. Lower G<sub>f</sub> shortens the process zone and can produce snap-back under load control. In a saturated porous solid the same law sits on a Heaviside jump in displacement; water pressure is continuous, its normal gradient is not.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="lefm.html">LEFM</a> · <a href="j-integral.html">J-integral</a> · <a href="https://doi.org/10.1016/j.compgeo.2014.09.007">Goudarzi &amp; Mohammadi (2015)</a></span>
+    </div>
+  </footer>
+  <script>
+    const plate = document.getElementById('plate');
+    const E = 1;
+    let law = 'linear';
+    const els = {
+      ft: document.getElementById('ft'),
+      gf: document.getElementById('gf'),
+      readout: document.getElementById('readout')
+    };
+
+    function params() {
+      const ft = +els.ft.value / 10;
+      const Gf = +els.gf.value / 100;
+      return {ft, Gf, wc: 2 * Gf / ft, lch: E * Gf / (ft * ft)};
+    }
+    function traction(delta, p) {
+      const w = Math.max(delta, 0);
+      if (law === 'linear') {
+        if (w >= p.wc) return 0;
+        return p.ft * (1 - w / p.wc);
+      }
+      if (law === 'bilinear') {
+        const w1 = 0.22 * p.wc, t1 = 0.32 * p.ft;
+        if (w >= p.wc) return 0;
+        if (w < w1) return p.ft + (t1 - p.ft) * (w / w1);
+        return t1 * (1 - (w - w1) / (p.wc - w1));
+      }
+      return p.ft * Math.exp(-p.ft * w / p.Gf);
+    }
+    function fitCanvas(c) {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(120, c.clientWidth), h = Math.max(80, c.clientHeight);
+      if (c.width !== Math.round(w*dpr) || c.height !== Math.round(h*dpr)) {
+        c.width = Math.round(w*dpr); c.height = Math.round(h*dpr);
+      }
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return {ctx, w, h};
+    }
+    function chart(canvas, spec) {
+      const {ctx, w, h} = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      const pad = {l: 40, r: 8, t: 8, b: 24};
+      const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+      const x = t => pad.l + (t - spec.xmin) / (spec.xmax - spec.xmin) * iw;
+      const y = v => pad.t + (spec.ymax - v) / (spec.ymax - spec.ymin) * ih;
+      ctx.strokeStyle = '#d8d4cb'; ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ih); ctx.lineTo(pad.l+iw, pad.t+ih); ctx.stroke();
+      ctx.fillStyle = '#5c6574'; ctx.font = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText(spec.ylabel, 4, pad.t + 8);
+      ctx.fillText(spec.xlabel, pad.l + iw - 28, h - 8);
+      (spec.series || []).forEach(s => {
+        ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 1.7;
+        s.pts.forEach((pt, i) => i ? ctx.lineTo(x(pt[0]), y(pt[1])) : ctx.moveTo(x(pt[0]), y(pt[1])));
+        ctx.stroke();
+      });
+      if (spec.vline != null) {
+        ctx.setLineDash([3,3]); ctx.strokeStyle = '#c45c26';
+        ctx.beginPath(); ctx.moveTo(x(spec.vline), pad.t); ctx.lineTo(x(spec.vline), pad.t+ih); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (spec.hline != null) {
+        ctx.setLineDash([3,3]); ctx.strokeStyle = '#8aa3c4';
+        ctx.beginPath(); ctx.moveTo(pad.l, y(spec.hline)); ctx.lineTo(pad.l+iw, y(spec.hline)); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+    function heat(t) {
+      t = Math.max(0, Math.min(1, t));
+      return `rgb(${Math.round(26+t*200)},${Math.round(48+t*90)},${Math.round(78+(1-t)*80)})`;
+    }
+
+    function redraw() {
+      const p = params();
+      const lpz = Math.min(0.55, 0.42 * Math.sqrt(p.lch) * 1.8);
+      document.getElementById('ftV').textContent = p.ft.toFixed(1);
+      document.getElementById('gfV').textContent = p.Gf.toFixed(2);
+      els.readout.textContent = `wc = ${p.wc.toFixed(3)}   ℓch = ${p.lch.toFixed(3)}   process zone ≈ ${lpz.toFixed(2)}   σtip = ft (finite)`;
+
+      const n = 80;
+      const lawPts = [];
+      for (let i = 0; i < n; i++) {
+        const d = (i / (n - 1)) * p.wc * 1.15;
+        lawPts.push([d, traction(d, p)]);
+      }
+      chart(document.getElementById('pLaw'), {
+        xmin: 0, xmax: p.wc * 1.15, ymin: 0, ymax: p.ft * 1.15,
+        xlabel: 'δ', ylabel: 't',
+        series: [{color: '#1e3a5f', pts: lawPts}],
+        hline: 0
+      });
+
+      const KI = p.ft * Math.sqrt(2 * Math.PI * 0.08);
+      const sigPts = [], lefPts = [];
+      for (let i = 0; i < 90; i++) {
+        const x = -0.9 + 1.8 * i / 89;
+        let sig = 0, lef = 0;
+        if (x >= 0) {
+          lef = KI / Math.sqrt(2 * Math.PI * Math.max(x, 1e-4));
+          sig = p.ft * Math.exp(-x / (0.18 + 0.7 * lpz));
+        } else if (x > -lpz) {
+          const d = p.wc * (-x / lpz);
+          sig = traction(d, p);
+          lef = 0;
+        } else {
+          sig = 0; lef = 0;
+        }
+        sigPts.push([x, sig]);
+        lefPts.push([x, Math.min(p.ft * 2.4, lef)]);
+      }
+      chart(document.getElementById('pSig'), {
+        xmin: -0.9, xmax: 0.9, ymin: 0, ymax: p.ft * 2.2,
+        xlabel: 'x', ylabel: 'σ',
+        vline: 0, hline: p.ft,
+        series: [
+          {color: '#1e3a5f', pts: sigPts},
+          {color: '#c45c26', width: 1.2, pts: lefPts}
+        ]
+      });
+
+      const {ctx, w, h} = fitCanvas(plate);
+      ctx.fillStyle = '#1a2740'; ctx.fillRect(0, 0, w, h);
+      const S = Math.min(w, h) * 0.38, cx = w * 0.5, cy = h * 0.52;
+      const toX = x => cx + x * S, toY = y => cy - y * S;
+      const step = 3;
+      for (let j = 0; j < h; j += step) {
+        for (let i = 0; i < w; i += step) {
+          const x = (i - cx) / S, y = (cy - j) / S;
+          if (Math.abs(x) > 1.15 || Math.abs(y) > 0.82) continue;
+          let val = 0.2;
+          if (x >= 0) val = 0.25 + 0.7 * Math.exp(-Math.hypot(x, y) / (0.22 + lpz));
+          else if (x > -lpz) val = 0.35 + 0.4 * traction(p.wc * (-x / lpz), p) / p.ft;
+          else val = 0.12;
+          ctx.fillStyle = heat(val);
+          ctx.fillRect(i, j, step, step);
+        }
+      }
+      ctx.strokeStyle = '#8aa3c4'; ctx.lineWidth = 1.4;
+      ctx.strokeRect(toX(-1.15), toY(0.82), 2.3 * S, 1.64 * S);
+      ctx.strokeStyle = '#f4efe6'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(toX(-1.15), toY(0)); ctx.lineTo(toX(-lpz), toY(0)); ctx.stroke();
+      ctx.strokeStyle = '#f4d27a'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(toX(-lpz), toY(0)); ctx.lineTo(toX(0), toY(0)); ctx.stroke();
+      ctx.fillStyle = '#c45c26';
+      ctx.beginPath(); ctx.arc(toX(0), toY(0), 4, 0, 6.28); ctx.fill();
+      ctx.fillStyle = '#f4d27a'; ctx.font = '13px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText('process zone', toX(-lpz * 0.85), toY(0.18));
+      ctx.fillStyle = '#f4efe6';
+      ctx.fillText('open', toX(-0.95), toY(-0.12));
+    }
+
+    document.getElementById('lin').addEventListener('click', () => { law = 'linear'; setOn('lin'); redraw(); });
+    document.getElementById('bi').addEventListener('click', () => { law = 'bilinear'; setOn('bi'); redraw(); });
+    document.getElementById('exp').addEventListener('click', () => { law = 'exponential'; setOn('exp'); redraw(); });
+    function setOn(id) {
+      ['lin','bi','exp'].forEach(k => document.getElementById(k).classList.toggle('on', k === id));
+    }
+    els.ft.addEventListener('input', redraw);
+    els.gf.addEventListener('input', redraw);
+    new ResizeObserver(redraw).observe(document.getElementById('stage'));
+    window.addEventListener('resize', redraw);
+    redraw();
+  </script>
+</body>
+</html>

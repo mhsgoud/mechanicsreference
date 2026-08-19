@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linear Elastic Fracture Mechanics — Stress Singularity — Mechanics Reference</title>
+  <meta name="description" content="Williams’ 1/√r crack-tip field, stress intensity factors KI, KII, KIII, Griffith’s energy release, and the small-scale-yielding limit of LEFM." />
+  <link rel="canonical" href="https://mechanicsreference.com/lefm.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(280px,1.2fr) 1fr;background:var(--plate)}
+    #stage{position:relative;height:min(52vh,440px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    .plot-cell{background:#fff;padding:10px 12px 8px;border-left:1px solid var(--rule)}
+    .plot-cell h3{margin:0 0 6px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;height:100%;min-height:200px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout,#legend{margin:0;font-size:0.82rem}
+    #formula,#readout{font-family:"JetBrains Mono",ui-monospace,monospace}
+    #formula{color:var(--navy);flex-basis:100%}
+    #legend{flex-basis:100%}
+    input[type=range]{width:110px;vertical-align:middle}
+    .modes{display:flex;border:1px solid var(--rule)}
+    .modes button{appearance:none;border:0;background:#fff;color:var(--navy);font:inherit;font-weight:600;font-size:0.84rem;padding:6px 12px;cursor:pointer}
+    .modes button.on{background:var(--navy);color:#fff}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed #legend{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{min-height:0}
+    html.embed #ui{background:#fff}
+    html.embed #formula{flex-basis:auto}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(46vh,340px)}
+      .plot-cell{border-left:0;border-top:1px solid var(--rule);height:180px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#linear-elastic-fracture-mechanics">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#linear-elastic-fracture-mechanics">LEFM</a></p>
+      <h1>The stress is unbounded, and that is the point</h1>
+      <p class="standfirst">Linear elasticity at a sharp crack gives Williams’ field: stress of order <i>r</i><sup>−½</sup> multiplied by a stress intensity factor <i>K</i>. Mode I opens the faces, mode II slides them in plane, mode III tears them out of plane. The singularity is not a material fact; it is the price of an infinitely sharp tip in a linear solid. Griffith’s energy release <i>G</i> = <i>K</i><sub>I</sub>²/<i>E</i>′ is finite. The theory holds while the process zone is small compared with the crack.</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage"><canvas id="plate"></canvas></div>
+        <div class="plot-cell">
+          <h3>σ along the ligament · log r</h3>
+          <canvas id="plot"></canvas>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">σ<sub>ij</sub> = K / √(2π r) · f<sub>ij</sub>(θ)</p>
+        <div class="modes" role="group" aria-label="Mode">
+          <button type="button" id="mI" class="on">Mode I</button>
+          <button type="button" id="mII">Mode II</button>
+          <button type="button" id="mIII">Mode III</button>
+        </div>
+        <label>K <input id="k" type="range" min="40" max="180" value="100" /> <span id="kV"></span></label>
+        <p id="readout"></p>
+        <p id="legend">Colour is the leading Williams stress: opening, sliding, or antiplane shear. On a log–log plot the ligament stress has slope −½. At r = 0 the linear field is infinite; a cohesive zone or a yield zone cuts that off.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="cohesive-crack.html">Cohesive cracking</a> · <a href="j-integral.html">J-integral</a></span>
+    </div>
+  </footer>
+  <script>
+    const plate = document.getElementById('plate');
+    const plot = document.getElementById('plot');
+    let mode = 'I';
+    const els = {k: document.getElementById('k'), readout: document.getElementById('readout')};
+
+    function williams(r, th, K, m) {
+      const rr = Math.max(r, 1e-8);
+      const f = K / Math.sqrt(2 * Math.PI * rr);
+      const c2 = Math.cos(th/2), s2 = Math.sin(th/2);
+      const c32 = Math.cos(3*th/2), s32 = Math.sin(3*th/2);
+      if (m === 'I') {
+        return {
+          sxx: f * c2 * (1 - s2 * s32),
+          syy: f * c2 * (1 + s2 * s32),
+          sxy: f * s2 * c2 * c32
+        };
+      }
+      if (m === 'II') {
+        return {
+          sxx: -f * s2 * (2 + c2 * c32),
+          syy: f * s2 * c2 * c32,
+          sxy: f * c2 * (1 - s2 * s32)
+        };
+      }
+      return {
+        sxz: -f * s2,
+        syz: f * c2
+      };
+    }
+    function heat(t) {
+      t = Math.max(0, Math.min(1, t));
+      return `rgb(${Math.round(26+t*200)},${Math.round(48+t*90)},${Math.round(78+(1-t)*80)})`;
+    }
+    function fitCanvas(c) {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(120, c.clientWidth), h = Math.max(80, c.clientHeight);
+      if (c.width !== Math.round(w*dpr) || c.height !== Math.round(h*dpr)) {
+        c.width = Math.round(w*dpr); c.height = Math.round(h*dpr);
+      }
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return {ctx, w, h};
+    }
+    function chart(spec) {
+      const {ctx, w, h} = fitCanvas(plot);
+      ctx.clearRect(0, 0, w, h);
+      const pad = {l: 46, r: 10, t: 10, b: 28};
+      const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+      const lx = Math.log(spec.xmin), ly = Math.log(spec.xmax);
+      const lmn = Math.log(spec.ymin), lmx = Math.log(spec.ymax);
+      const x = t => pad.l + (Math.log(t) - lx) / (ly - lx) * iw;
+      const y = v => pad.t + (lmx - Math.log(v)) / (lmx - lmn) * ih;
+      ctx.strokeStyle = '#d8d4cb'; ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t+ih); ctx.lineTo(pad.l+iw, pad.t+ih); ctx.stroke();
+      ctx.fillStyle = '#5c6574'; ctx.font = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText(spec.ylabel, 4, pad.t + 8);
+      ctx.fillText(spec.xlabel, pad.l + iw - 40, h - 8);
+      ctx.beginPath(); ctx.strokeStyle = '#1e3a5f'; ctx.lineWidth = 1.8;
+      spec.pts.forEach((pt, i) => i ? ctx.lineTo(x(pt[0]), y(pt[1])) : ctx.moveTo(x(pt[0]), y(pt[1])));
+      ctx.stroke();
+      ctx.setLineDash([3,3]); ctx.strokeStyle = '#c45c26';
+      const r0 = 0.08, s0 = spec.pts[Math.floor(spec.pts.length/3)][1];
+      ctx.beginPath(); ctx.moveTo(x(r0), y(s0)); ctx.lineTo(x(r0*6), y(s0 / Math.sqrt(6))); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c45c26'; ctx.fillText('r⁻½', x(r0*3), y(s0 / Math.sqrt(3)) - 6);
+    }
+    function redraw() {
+      const K = +els.k.value / 100;
+      document.getElementById('kV').textContent = K.toFixed(2);
+      const G = K * K;
+      els.readout.textContent = `K = ${K.toFixed(2)}   G = K²/E = ${G.toFixed(3)} (plane stress, E = 1)   σ → ∞ as r → 0`;
+      document.getElementById('formula').innerHTML = mode === 'I'
+        ? 'σ<sub>ij</sub> = K<sub>I</sub> / √(2π r) · f<sub>ij</sub>(θ) &nbsp; opening'
+        : mode === 'II'
+        ? 'σ<sub>ij</sub> = K<sub>II</sub> / √(2π r) · g<sub>ij</sub>(θ) &nbsp; in-plane shear'
+        : 'σ<sub>xz</sub>, σ<sub>yz</sub> = K<sub>III</sub> / √(2π r) · h(θ) &nbsp; antiplane tear';
+
+      const {ctx, w, h} = fitCanvas(plate);
+      ctx.fillStyle = '#1a2740'; ctx.fillRect(0, 0, w, h);
+      const S = Math.min(w, h) * 0.38, cx = w * 0.52, cy = h * 0.52;
+      const toX = x => cx + x * S, toY = y => cy - y * S;
+      const step = 3;
+      for (let j = 0; j < h; j += step) {
+        for (let i = 0; i < w; i += step) {
+          const x = (i - cx) / S, y = (cy - j) / S;
+          if (Math.abs(x) > 1.15 || Math.abs(y) > 0.82) continue;
+          const r = Math.hypot(x, y), th = Math.atan2(y, x);
+          const s = williams(r, th, K, mode);
+          const val = mode === 'I' ? s.syy : mode === 'II' ? Math.abs(s.sxy) : Math.hypot(s.sxz, s.syz);
+          ctx.fillStyle = heat(Math.max(0, Math.min(1, val * 0.55)));
+          ctx.fillRect(i, j, step, step);
+        }
+      }
+      ctx.strokeStyle = '#8aa3c4'; ctx.lineWidth = 1.4;
+      ctx.strokeRect(toX(-1.15), toY(0.82), 2.3 * S, 1.64 * S);
+      ctx.strokeStyle = '#f4efe6'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(toX(-1.15), toY(0)); ctx.lineTo(toX(0), toY(0)); ctx.stroke();
+      ctx.fillStyle = '#c45c26';
+      ctx.beginPath(); ctx.arc(toX(0), toY(0), 4, 0, 6.28); ctx.fill();
+      ctx.fillStyle = '#f4efe6'; ctx.font = '13px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText('tip', toX(0.06), toY(-0.1));
+      ctx.fillText(mode === 'I' ? 'opening' : mode === 'II' ? 'sliding' : 'tearing', 16, 28);
+
+      const pts = [];
+      for (let i = 0; i < 40; i++) {
+        const r = 0.02 * Math.pow(40, i / 39);
+        const s = williams(r, 0, K, mode);
+        const lig = mode === 'I' ? s.syy : mode === 'II' ? Math.abs(s.sxy) : Math.abs(s.syz);
+        pts.push([r, Math.max(1e-4, lig)]);
+      }
+      chart({xmin: 0.015, xmax: 1.2, ymin: 0.08, ymax: Math.max(8, pts[0][1]*1.2), xlabel: 'r', ylabel: 'σ', pts});
+    }
+    function setMode(m) {
+      mode = m;
+      ['I','II','III'].forEach(k => document.getElementById('m'+k).classList.toggle('on', k === m));
+      redraw();
+    }
+    document.getElementById('mI').addEventListener('click', () => setMode('I'));
+    document.getElementById('mII').addEventListener('click', () => setMode('II'));
+    document.getElementById('mIII').addEventListener('click', () => setMode('III'));
+    els.k.addEventListener('input', redraw);
+    new ResizeObserver(redraw).observe(document.getElementById('stage'));
+    window.addEventListener('resize', redraw);
+    redraw();
+  </script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Consolidation — Terzaghi, Gibson, Mandel–Cryer — Mechanics Reference</title>
+  <meta name="description" content="One-dimensional Terzaghi consolidation, Gibson self-weight and accretion, and the Mandel–Cryer pore-pressure overshoot of coupled poroelasticity." />
+  <link rel="canonical" href="https://mechanicsreference.com/consolidation.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(280px,1.15fr) 1fr;background:var(--plate)}
+    #stage{position:relative;height:min(52vh,440px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    .plots{display:grid;grid-template-rows:1fr 1fr;background:#fff}
+    .plot-cell{padding:8px 10px 6px;border-left:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+    .plot-cell h3{margin:0 0 4px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;height:100%;min-height:110px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout,#legend{margin:0;font-size:0.82rem}
+    #formula,#readout{font-family:"JetBrains Mono",ui-monospace,monospace}
+    #formula{color:var(--navy);flex-basis:100%}
+    #legend{flex-basis:100%}
+    input[type=range]{width:110px;vertical-align:middle}
+    .modes{display:flex;border:1px solid var(--rule)}
+    .modes button{appearance:none;border:0;background:#fff;color:var(--navy);font:inherit;font-weight:600;font-size:0.84rem;padding:6px 12px;cursor:pointer}
+    .modes button.on{background:var(--navy);color:#fff}
+    .cryer-only{display:none}
+    body.cryer .cryer-only{display:inline}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed #legend{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{min-height:0}
+    html.embed .plots .plot-cell:last-child{display:none}
+    html.embed #ui{background:#fff}
+    html.embed #formula{flex-basis:auto}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(44vh,340px)}
+      .plot-cell{border-left:0}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#one-dimensional-consolidation">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#one-dimensional-consolidation">Consolidation</a></p>
+      <h1>Drainage turns total stress into effective stress</h1>
+      <p class="standfirst">A sudden load on a saturated column is carried first by the pore water. Terzaghi’s one-dimensional theory is a heat equation for that excess pressure: the top drains, the base does not, and settlement follows the average degree of consolidation. Gibson’s self-weight problem starts from a triangular pressure, not a uniform one. In two or three dimensions the total stress is free to redistribute, and Cryer’s sphere shows the Mandel–Cryer rise: the centre pressure climbs above its undrained value before it falls.</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage"><canvas id="plate"></canvas></div>
+        <div class="plots">
+          <div class="plot-cell"><h3 id="p1t">Excess pressure</h3><canvas id="pProf"></canvas></div>
+          <div class="plot-cell"><h3 id="p2t">Degree of consolidation</h3><canvas id="pTime"></canvas></div>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">∂u/∂t = c<sub>v</sub> ∂²u/∂z²</p>
+        <div class="modes" role="group" aria-label="Problem">
+          <button type="button" id="mCol" class="on">Column</button>
+          <button type="button" id="mGib">Gibson</button>
+          <button type="button" id="mCry">Cryer</button>
+        </div>
+        <label>T<sub>v</sub> <input id="tv" type="range" min="1" max="220" value="28" /> <span id="tvV"></span></label>
+        <label class="cryer-only">ν <input id="nu" type="range" min="0" max="49" value="0" /> <span id="nuV"></span></label>
+        <p id="readout"></p>
+        <p id="legend">Colour is excess pore pressure. Orange on the time plot is uncoupled Terzaghi (monotonic). Navy is the coupled Cryer centre pressure, which rises before it falls.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#multiphase-porous-materials">Multiphase porous materials</a> · <a href="cohesive-crack.html">Cohesive cracking</a></span>
+    </div>
+  </footer>
+  <script>
+    const plate = document.getElementById('plate');
+    let mode = 'column';
+    const els = {
+      tv: document.getElementById('tv'),
+      nu: document.getElementById('nu'),
+      readout: document.getElementById('readout')
+    };
+
+    function modeFromHash() {
+      const h = (location.hash || '').replace('#','').toLowerCase();
+      if (h === 'gibson') return 'gibson';
+      if (h === 'cryer' || h === 'mandel' || h === 'mandel-cryer') return 'cryer';
+      return 'column';
+    }
+
+    function M(n) { return Math.PI * (2 * n + 1) / 2; }
+
+    function terzaghiU(zeta, Tv) {
+      let s = 0;
+      for (let n = 0; n < 28; n++) {
+        const m = M(n);
+        s += (2 / m) * Math.sin(m * zeta) * Math.exp(-m * m * Tv);
+      }
+      return Math.max(0, s);
+    }
+    function terzaghiUavg(Tv) {
+      let s = 0;
+      for (let n = 0; n < 28; n++) {
+        const m = M(n);
+        s += (2 / (m * m)) * Math.exp(-m * m * Tv);
+      }
+      return Math.max(0, Math.min(1, 1 - s));
+    }
+    function gibsonU(zeta, Tv) {
+      let s = 0;
+      for (let n = 0; n < 28; n++) {
+        const m = M(n);
+        s += (2 * ((n % 2 === 0) ? 1 : -1) / (m * m)) * Math.sin(m * zeta) * Math.exp(-m * m * Tv);
+      }
+      return Math.max(0, s);
+    }
+    function gibsonUavg(Tv) {
+      let remain = 0;
+      for (let n = 0; n < 28; n++) {
+        const m = M(n);
+        remain += (2 * ((n % 2 === 0) ? 1 : -1) / (m * m * m)) * Math.exp(-m * m * Tv);
+      }
+      return Math.max(0, Math.min(1, 1 - remain / 0.5));
+    }
+    function cryerP(T, nu) {
+      const eta = Math.max(0, (0.49 - nu) / 0.49);
+      const A = 10 * eta;
+      const c = 2.0, d = 7.0;
+      return Math.max(0, Math.exp(-c * T) + A * T * Math.exp(-d * T));
+    }
+    function terzaghiMono(T) {
+      const m = M(0);
+      return Math.exp(-m * m * T);
+    }
+
+    function fitCanvas(c) {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(120, c.clientWidth), h = Math.max(80, c.clientHeight);
+      if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) {
+        c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      }
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return {ctx, w, h};
+    }
+    function chart(canvas, spec) {
+      const {ctx, w, h} = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      const pad = {l: 40, r: 8, t: 8, b: 24};
+      const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+      const x = t => pad.l + (t - spec.xmin) / (spec.xmax - spec.xmin) * iw;
+      const y = v => pad.t + (spec.ymax - v) / (spec.ymax - spec.ymin) * ih;
+      ctx.strokeStyle = '#d8d4cb'; ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ih); ctx.lineTo(pad.l + iw, pad.t + ih); ctx.stroke();
+      ctx.fillStyle = '#5c6574'; ctx.font = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText(spec.ylabel, 4, pad.t + 8);
+      ctx.fillText(spec.xlabel, pad.l + iw - 36, h - 8);
+      (spec.series || []).forEach(s => {
+        ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 1.7;
+        if (s.dash) ctx.setLineDash(s.dash);
+        s.pts.forEach((pt, i) => i ? ctx.lineTo(x(pt[0]), y(pt[1])) : ctx.moveTo(x(pt[0]), y(pt[1])));
+        ctx.stroke(); ctx.setLineDash([]);
+      });
+      if (spec.mark != null) {
+        ctx.fillStyle = '#c45c26';
+        ctx.beginPath(); ctx.arc(x(spec.mark[0]), y(spec.mark[1]), 3.4, 0, 6.28); ctx.fill();
+      }
+    }
+    function heat(t) {
+      t = Math.max(0, Math.min(1, t));
+      return `rgb(${Math.round(26 + t * 200)},${Math.round(48 + t * 90)},${Math.round(78 + (1 - t) * 80)})`;
+    }
+
+    function setMode(m) {
+      mode = m;
+      ['Col','Gib','Cry'].forEach((k, i) => {
+        const id = ['column','gibson','cryer'][i];
+        document.getElementById('m' + k).classList.toggle('on', id === m);
+      });
+      document.body.classList.toggle('cryer', m === 'cryer');
+      redraw();
+    }
+
+    function redraw() {
+      const Tv = Math.max(0.008, +els.tv.value / 100);
+      const nu = +els.nu.value / 100;
+      document.getElementById('tvV').textContent = Tv.toFixed(2);
+      document.getElementById('nuV').textContent = nu.toFixed(2);
+
+      if (mode === 'column') {
+        const U = terzaghiUavg(Tv);
+        document.getElementById('formula').innerHTML = '∂u/∂t = c<sub>v</sub> ∂²u/∂z² &nbsp; · &nbsp; T<sub>v</sub> = c<sub>v</sub> t / H²';
+        els.readout.textContent = `Tv = ${Tv.toFixed(2)}   U = ${U.toFixed(3)}   u/u0 at base = ${terzaghiU(0, Tv).toFixed(3)}`;
+        document.getElementById('p1t').textContent = 'Isochrones  u/u0 vs z/H';
+        document.getElementById('p2t').textContent = 'Degree of consolidation  U(Tv)';
+        document.getElementById('legend').textContent = 'A packed column, drained at the top, impermeable at the base. Colour is excess pore pressure. The load is carried by the water at Tv = 0 and by the skeleton as U → 1.';
+      } else if (mode === 'gibson') {
+        const U = gibsonUavg(Tv);
+        document.getElementById('formula').innerHTML = 'u(z,0) = γ′ (H − z) &nbsp; · &nbsp; then Terzaghi dissipation';
+        els.readout.textContent = `Tv = ${Tv.toFixed(2)}   U = ${U.toFixed(3)}   u/γ′H at base = ${gibsonU(0, Tv).toFixed(3)}`;
+        document.getElementById('p1t').textContent = 'Self-weight isochrones  u/γ′H';
+        document.getElementById('p2t').textContent = 'Degree of consolidation  U(Tv)';
+        document.getElementById('legend').textContent = 'Gibson: the excess pressure is the self-weight of the fill, a triangle, not a uniform oedometer load. An accreting layer (1958) is the same physics with a moving top. Finite-strain consolidation (1967) lets k and mv depend on void ratio.';
+      } else {
+        const pc = cryerP(Tv, nu);
+        const pT = terzaghiMono(Tv);
+        document.getElementById('formula').innerHTML = 'Biot coupling &nbsp; · &nbsp; p<sub>centre</sub> rises, then falls';
+        els.readout.textContent = `T = ${Tv.toFixed(2)}   p_centre/p0 = ${pc.toFixed(3)}   Terzaghi = ${pT.toFixed(3)}   ν = ${nu.toFixed(2)}`;
+        document.getElementById('p1t').textContent = 'Radial excess pressure';
+        document.getElementById('p2t').textContent = 'Centre pressure vs T';
+        document.getElementById('legend').textContent = 'Cryer’s sphere: drained surface, sudden hydrostatic load. Navy is the coupled centre pressure; orange is uncoupled Terzaghi. The overshoot is largest at small drained ν and vanishes as ν → ½. Mandel’s strip is the two-dimensional cousin.';
+      }
+
+      const n = 80;
+      if (mode === 'cryer') {
+        const radPts = [], tPts = [], terPts = [];
+        const pc = cryerP(Tv, nu);
+        for (let i = 0; i < n; i++) {
+          const r = i / (n - 1);
+          const shape = r < 1e-6 ? 1 : Math.sin(Math.PI * r) / (Math.PI * r);
+          radPts.push([r, pc * shape]);
+        }
+        for (let i = 0; i < 90; i++) {
+          const T = 2.2 * i / 89;
+          tPts.push([T, cryerP(T, nu)]);
+          terPts.push([T, terzaghiMono(T)]);
+        }
+        chart(document.getElementById('pProf'), {
+          xmin: 0, xmax: 1, ymin: 0, ymax: 1.45,
+          xlabel: 'r/a', ylabel: 'p/p0',
+          series: [{color: '#1e3a5f', pts: radPts}],
+          mark: [0, pc]
+        });
+        chart(document.getElementById('pTime'), {
+          xmin: 0, xmax: 2.2, ymin: 0, ymax: 1.45,
+          xlabel: 'T', ylabel: 'p',
+          series: [
+            {color: '#1e3a5f', pts: tPts},
+            {color: '#c45c26', width: 1.3, dash: [4, 3], pts: terPts}
+          ],
+          mark: [Tv, pc]
+        });
+      } else {
+        const prof = [], init = [], Upts = [];
+        for (let i = 0; i < n; i++) {
+          const z = i / (n - 1);
+          if (mode === 'column') {
+            prof.push([z, terzaghiU(z, Tv)]);
+            init.push([z, terzaghiU(z, 0.008)]);
+          } else {
+            prof.push([z, gibsonU(z, Tv)]);
+            init.push([z, z]);
+          }
+        }
+        for (let i = 0; i < 90; i++) {
+          const T = 0.004 * Math.pow(500, i / 89);
+          const U = mode === 'column' ? terzaghiUavg(T) : gibsonUavg(T);
+          Upts.push([Math.log10(T), U]);
+        }
+        const logT = Math.log10(Tv);
+        const U = mode === 'column' ? terzaghiUavg(Tv) : gibsonUavg(Tv);
+        chart(document.getElementById('pProf'), {
+          xmin: 0, xmax: 1, ymin: 0, ymax: 1.05,
+          xlabel: 'z/H', ylabel: 'u',
+          series: [
+            {color: '#c5ccd6', width: 1.2, dash: [3, 3], pts: init},
+            {color: '#1e3a5f', pts: prof}
+          ]
+        });
+        chart(document.getElementById('pTime'), {
+          xmin: -2.2, xmax: 0.4, ymin: 0, ymax: 1.05,
+          xlabel: 'log Tv', ylabel: 'U',
+          series: [{color: '#1e3a5f', pts: Upts}],
+          mark: [logT, U]
+        });
+      }
+
+      const {ctx, w, h} = fitCanvas(plate);
+      ctx.fillStyle = '#1a2740'; ctx.fillRect(0, 0, w, h);
+      if (mode === 'cryer') {
+        const R = Math.min(w, h) * 0.36, cx = w * 0.5, cy = h * 0.52;
+        const pc = cryerP(Tv, nu);
+        const step = 3;
+        for (let j = 0; j < h; j += step) {
+          for (let i = 0; i < w; i += step) {
+            const x = (i - cx) / R, y = (cy - j) / R;
+            const r = Math.hypot(x, y);
+            if (r > 1.02) continue;
+            const shape = r < 1e-4 ? 1 : Math.sin(Math.PI * Math.min(r, 1)) / (Math.PI * Math.max(r, 1e-4));
+            ctx.fillStyle = heat(Math.min(1, (pc * shape) / 1.35));
+            ctx.fillRect(i, j, step, step);
+          }
+        }
+        ctx.strokeStyle = '#8aa3c4'; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.28); ctx.stroke();
+        ctx.fillStyle = '#c45c26';
+        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 6.28); ctx.fill();
+        ctx.fillStyle = '#f4efe6'; ctx.font = '13px "Source Sans 3", system-ui, sans-serif';
+        ctx.fillText('centre', cx + 8, cy - 8);
+        ctx.fillText('drained surface', cx - 48, cy - R - 10);
+      } else {
+        const Hdraw = mode === 'gibson' ? 0.55 + 0.35 * (1 - Math.exp(-3 * Tv)) : 0.9;
+        const colW = Math.min(w * 0.28, 110);
+        const colH = Math.min(h * 0.78, 340) * (mode === 'gibson' ? Hdraw : 1);
+        const x0 = (w - colW) / 2, y1 = h * 0.88, y0 = y1 - colH;
+        const step = 3;
+        for (let j = y0; j < y1; j += step) {
+          const zeta = Math.max(0, Math.min(1, (j - y0) / (y1 - y0)));
+          const u = mode === 'column' ? terzaghiU(zeta, Tv) : gibsonU(zeta, Tv);
+          ctx.fillStyle = heat(u);
+          ctx.fillRect(x0, j, colW, step + 1);
+        }
+        ctx.strokeStyle = '#8aa3c4'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(x0, y0, colW, colH);
+        ctx.strokeStyle = '#f4efe6'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x0 - 8, y0); ctx.lineTo(x0 + colW + 8, y0); ctx.stroke();
+        ctx.fillStyle = '#f4efe6'; ctx.font = '13px "Source Sans 3", system-ui, sans-serif';
+        ctx.fillText('drain', x0 + colW + 14, y0 + 5);
+        ctx.fillText('base', x0 + colW + 14, y1 - 2);
+        ctx.fillStyle = '#c45c26';
+        ctx.fillRect(x0, y1 - 3, colW, 4);
+        if (mode === 'column') {
+          ctx.fillStyle = '#f4efe6';
+          ctx.fillText('σ∞', x0 - 36, y0 + 18);
+          ctx.strokeStyle = '#f4d27a'; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.moveTo(x0 - 22, y0 - 18); ctx.lineTo(x0 - 22, y0 + 2);
+          ctx.moveTo(x0 - 28, y0 - 4); ctx.lineTo(x0 - 22, y0 + 2); ctx.lineTo(x0 - 16, y0 - 4);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = '#f4efe6';
+          ctx.fillText('self-weight', x0 - 8, y0 - 12);
+        }
+      }
+    }
+
+    document.getElementById('mCol').addEventListener('click', () => setMode('column'));
+    document.getElementById('mGib').addEventListener('click', () => setMode('gibson'));
+    document.getElementById('mCry').addEventListener('click', () => setMode('cryer'));
+    els.tv.addEventListener('input', redraw);
+    els.nu.addEventListener('input', redraw);
+    window.addEventListener('hashchange', () => setMode(modeFromHash()));
+    new ResizeObserver(redraw).observe(document.getElementById('stage'));
+    window.addEventListener('resize', redraw);
+    setMode(modeFromHash());
+  </script>
+</body>
+</html>
