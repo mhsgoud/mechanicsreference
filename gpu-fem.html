@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GPUs in the FEM Pipeline — Mechanics Reference</title>
+  <meta name="description" content="Which stages of a finite element analysis move to a GPU: constitutive evaluation and explicit forces do; meshing and small direct factorisations do not." />
+  <link rel="canonical" href="https://mechanicsreference.com/gpu-fem.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(300px,1.25fr) 1fr;background:var(--plate)}
+    #stage{position:relative;height:min(58vh,480px)}
+    #stage canvas{display:block;width:100%;height:100%;cursor:pointer}
+    .plot-cell{background:#fff;padding:10px 12px 8px;border-left:1px solid var(--rule)}
+    .plot-cell h3{margin:0 0 6px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;height:100%;min-height:220px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout,#legend{margin:0;font-size:0.82rem}
+    #formula,#readout{font-family:"JetBrains Mono",ui-monospace,monospace}
+    #formula{color:var(--navy);flex-basis:100%}
+    #legend{flex-basis:100%}
+    input[type=range]{width:130px;vertical-align:middle}
+    .modes{display:flex;border:1px solid var(--rule)}
+    .modes button{appearance:none;border:0;background:#fff;color:var(--navy);font:inherit;font-weight:600;font-size:0.84rem;padding:6px 12px;cursor:pointer}
+    .modes button.on{background:var(--navy);color:#fff}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed #legend{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{min-height:0}
+    html.embed #ui{background:#fff}
+    html.embed #formula{flex-basis:auto}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(52vh,400px)}
+      .plot-cell{border-left:0;border-top:1px solid var(--rule);height:200px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#gpus-in-the-fem-pipeline">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#gpus-in-the-fem-pipeline">GPUs in the FEM pipeline</a></p>
+      <h1>Not every stage of FEM wants a GPU</h1>
+      <p class="standfirst">A finite element analysis is a pipeline: mesh, local kinematics, constitutive evaluation, assembly, linear algebra, and postprocessing. A GPU pays when many identical arithmetic operations run with the data already on the device. Element loops, explicit internal forces, and sparse matrix–vector products do. Meshing, small direct factorisations, and a solve that copies the matrix every iteration do not. Click a stage. Switch the analysis type: the bottleneck moves, and so does the case for the device.</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage"><canvas id="plate"></canvas></div>
+        <div class="plot-cell">
+          <h3>Wall time · CPU vs after GPU</h3>
+          <canvas id="plot"></canvas>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">S = 1 / (1 − p + p/s)</p>
+        <div class="modes" role="group" aria-label="Analysis type">
+          <button type="button" id="mLin" class="on">Linear implicit</button>
+          <button type="button" id="mNon">Nonlinear implicit</button>
+          <button type="button" id="mExp">Explicit</button>
+        </div>
+        <label>DOF <input id="dof" type="range" min="3" max="70" value="22" /> <span id="dofV"></span></label>
+        <p id="readout"></p>
+        <p id="legend">Navy is GPU usefulness of the stage. Click a bar. Orange in the time plot is the same analysis after moving the parallel stages, including a transfer tax that dominates at small DOF.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#gpu-programming-for-engineers">GPU programming</a> · <a href="hub.html#sparse-linear-algebra-on-gpus">Sparse kernels</a></span>
+    </div>
+  </footer>
+  <script>
+    const plate = document.getElementById('plate');
+    const plot = document.getElementById('plot');
+    let kind = 'linear';
+    let sel = 2;
+    const els = {dof: document.getElementById('dof'), readout: document.getElementById('readout')};
+
+    const stages = [
+      {id:'mesh', name:'Mesh & I/O', benefit:0.12, blurb:'CAD, connectivity, and disk. Irregular control flow. Leave it on the host.'},
+      {id:'map', name:'Kinematics B, J', benefit:0.62, blurb:'Shape functions and ∇N at Gauss points. Independent per element; cheap relative to a nonlinear constitutive law.'},
+      {id:'mat', name:'Constitutive', benefit:0.92, blurb:'Stress and tangent at each quadrature point. The usual win in plasticity, damage, and coupled materials: no inter-element communication.'},
+      {id:'form', name:'Element Kᵉ, rᵉ', benefit:0.88, blurb:'Bᵀ ℂ B and the residual. One thread block per element. Repeats every Newton iteration.'},
+      {id:'assem', name:'Assembly', benefit:0.58, blurb:'Scatter into a sparse matrix. Needs colouring or atomics. Parallel, but memory-bound and conflict-prone.'},
+      {id:'bc', name:'Constraints', benefit:0.22, blurb:'Essential BCs, tying, and multi-point constraints. Sparse and serial compared with the residual.'},
+      {id:'direct', name:'Direct factor', benefit:0.32, blurb:'Sparse LU or Cholesky. Large supernodal fronts can use the device; moderate 3D problems often stay faster on a tuned CPU.'},
+      {id:'spmv', name:'Iterative SpMV', benefit:0.86, blurb:'y = Ax inside CG or GMRES. The kernel GPUs are built for, if A never returns to the host.'},
+      {id:'prec', name:'Preconditioner', benefit:0.42, blurb:'Jacobi and sparse matvecs in AMG smoothers move. ILU and AMG setup are sequential or host-heavy.'},
+      {id:'expl', name:'Explicit force', benefit:0.96, blurb:'Lumped mass, no global K. Internal force at Gauss points, gather to nodes. The strongest FEM case for a GPU.'},
+      {id:'post', name:'Postprocess', benefit:0.72, blurb:'Derived fields and rendering. The device already exists for this; copying the solution back is the cost.'}
+    ];
+
+    const share = {
+      linear:   [0.10, 0.06, 0.04, 0.10, 0.08, 0.03, 0.48, 0.00, 0.00, 0.00, 0.11],
+      nonlinear:[0.03, 0.06, 0.28, 0.16, 0.10, 0.02, 0.04, 0.18, 0.08, 0.00, 0.05],
+      explicit: [0.04, 0.05, 0.18, 0.00, 0.00, 0.01, 0.00, 0.00, 0.00, 0.62, 0.10]
+    };
+
+    function nDof() {
+      return Math.round(Math.pow(10, 3 + +els.dof.value / 20));
+    }
+    function transferTax(n) {
+      return Math.min(0.72, 18000 / Math.sqrt(n));
+    }
+    function speedup(b, n) {
+      const tax = transferTax(n);
+      const s = 1 + b * 11 * (1 - tax);
+      return Math.max(1, s);
+    }
+
+    function fitCanvas(c) {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(120, c.clientWidth), h = Math.max(80, c.clientHeight);
+      if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) {
+        c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      }
+      const ctx = c.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return {ctx, w, h};
+    }
+
+    function layout(h) {
+      const top = 28, bot = 16;
+      const rowH = (h - top - bot) / stages.length;
+      return {top, rowH};
+    }
+
+    function redraw() {
+      const n = nDof();
+      const tax = transferTax(n);
+      document.getElementById('dofV').textContent = n >= 1e6 ? (n/1e6).toFixed(1) + 'e6' : n >= 1e3 ? (n/1e3).toFixed(n >= 1e5 ? 0 : 1) + 'k' : String(n);
+      const sh = share[kind];
+      let gpu = 0;
+      sh.forEach((w, i) => { gpu += w / speedup(stages[i].benefit, n); });
+      gpu = Math.min(1.2, gpu + 0.22 * tax);
+      const S = 1 / Math.max(0.08, gpu);
+      const st = stages[sel];
+      document.getElementById('formula').innerHTML = 'Amdahl &nbsp; S = 1 / (1 − p + p/s) &nbsp; · &nbsp; keep K on the device';
+      els.readout.textContent = `${st.name}  usefulness ${st.benefit.toFixed(2)}  share ${(100*sh[sel]).toFixed(0)}%   overall ~${S.toFixed(1)}× at ${n} DOF`;
+      document.getElementById('legend').textContent = st.blurb + (tax > 0.35 ? ' At this size the PCIe copy dominates any kernel win.' : ' At this size the arithmetic can hide the copy if the matrix stays on the device.');
+
+      const {ctx, w, h} = fitCanvas(plate);
+      ctx.fillStyle = '#1a2740'; ctx.fillRect(0, 0, w, h);
+      const {top, rowH} = layout(h);
+      const x0 = 118, barW = Math.max(80, w - 150);
+      ctx.fillStyle = '#f4efe6'; ctx.font = '12px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText('GPU usefulness', x0, 18);
+      stages.forEach((s, i) => {
+        const y = top + i * rowH;
+        if (i === sel) {
+          ctx.fillStyle = 'rgba(196,92,38,0.22)';
+          ctx.fillRect(0, y, w, rowH);
+        }
+        ctx.fillStyle = i === sel ? '#f4d27a' : '#c5d0de';
+        ctx.font = '12px "Source Sans 3", system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(s.name, x0 - 10, y + rowH * 0.62);
+        ctx.textAlign = 'left';
+        const bh = Math.max(6, rowH * 0.42);
+        ctx.fillStyle = '#2a3b58';
+        ctx.fillRect(x0, y + (rowH - bh) / 2, barW, bh);
+        ctx.fillStyle = i === sel ? '#c45c26' : '#8aa3c4';
+        ctx.fillRect(x0, y + (rowH - bh) / 2, barW * s.benefit, bh);
+      });
+
+      const pc = fitCanvas(plot);
+      const pctx = pc.ctx, pw = pc.w, ph = pc.h;
+      pctx.clearRect(0, 0, pw, ph);
+      const pad = {l: 44, r: 12, t: 10, b: 36};
+      const iw = pw - pad.l - pad.r, ih = ph - pad.t - pad.b;
+      const colW = iw * 0.28, gap = iw * 0.18;
+      const xCpu = pad.l + iw * 0.12, xGpu = xCpu + colW + gap;
+      function stack(x, weights, useGpu) {
+        let y = pad.t + ih;
+        weights.forEach((w, i) => {
+          const t = useGpu ? w / speedup(stages[i].benefit, n) : w;
+          const hh = t * ih;
+          y -= hh;
+          pctx.fillStyle = i === sel ? '#c45c26' : (i % 2 ? '#1e3a5f' : '#4a6286');
+          pctx.fillRect(x, y, colW, Math.max(0.6, hh));
+        });
+      }
+      stack(xCpu, sh, false);
+      stack(xGpu, sh, true);
+      pctx.strokeStyle = '#d8d4cb';
+      pctx.strokeRect(xCpu, pad.t, colW, ih);
+      pctx.strokeRect(xGpu, pad.t, colW, ih);
+      pctx.fillStyle = '#5c6574';
+      pctx.font = '11px "Source Sans 3", system-ui, sans-serif';
+      pctx.fillText('CPU', xCpu, ph - 12);
+      pctx.fillText('after GPU', xGpu, ph - 12);
+      pctx.fillText('time', 6, pad.t + 10);
+    }
+
+    function hit(ev) {
+      const r = plate.getBoundingClientRect();
+      const y = ev.clientY - r.top;
+      const {top, rowH} = layout(r.height);
+      const i = Math.floor((y - top) / rowH);
+      if (i >= 0 && i < stages.length) { sel = i; redraw(); }
+    }
+
+    plate.addEventListener('click', hit);
+    document.getElementById('mLin').addEventListener('click', () => {
+      kind = 'linear';
+      ['mLin','mNon','mExp'].forEach(id => document.getElementById(id).classList.toggle('on', id === 'mLin'));
+      redraw();
+    });
+    document.getElementById('mNon').addEventListener('click', () => {
+      kind = 'nonlinear';
+      ['mLin','mNon','mExp'].forEach(id => document.getElementById(id).classList.toggle('on', id === 'mNon'));
+      redraw();
+    });
+    document.getElementById('mExp').addEventListener('click', () => {
+      kind = 'explicit';
+      ['mLin','mNon','mExp'].forEach(id => document.getElementById(id).classList.toggle('on', id === 'mExp'));
+      redraw();
+    });
+    els.dof.addEventListener('input', redraw);
+    new ResizeObserver(redraw).observe(document.getElementById('stage'));
+    window.addEventListener('resize', redraw);
+    redraw();
+  </script>
+</body>
+</html>

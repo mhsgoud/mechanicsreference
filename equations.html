@@ -395,6 +395,29 @@
         <p>Uniaxial tension along x, fibres in the xy-plane. The fibre is unstrained at θ<sub>n</sub>(ν); a reduced model then returns E<sub>x</sub><sup>c</sup> = E<sub>m</sub>. <a href="fiber-neutrality.html">Turn the fibres</a> and the composite moduli follow.</p>
       </article>
     </div>
+
+    <h2 id="hpc">GPUs and the FEM pipeline</h2>
+    <p class="deck">A finite element analysis is a sequence of stages. A GPU pays only in those that are data-parallel and that own wall time.</p>
+    <div class="eq-grid">
+      <article class="eq-card">
+        <div class="eq-kicker">Pipeline</div>
+        <h3>Amdahl</h3>
+        <div class="eq">S = 1 / (1 − p + p/s)</div>
+        <p>Overall speedup when a fraction p of the wall time runs s times faster. Meshing cannot save a factorisation, and a faster constitutive kernel cannot save a PCIe copy. <a href="gpu-fem.html">Click the stages</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Element loop</div>
+        <h3>No neighbour data</h3>
+        <div class="eq">Kᵉ = ∫ Bᵀ ℂ B dV</div>
+        <p>Stress and tangent at Gauss points are independent per element. That is the first kernel worth moving, especially in plasticity. Assembly is the first place those threads collide.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Implicit</div>
+        <h3>Sparse matvec</h3>
+        <div class="eq">y = A x</div>
+        <p>The Krylov iteration is a GPU job if A stays on the device. A small sparse factorisation often should not move. Explicit dynamics skip A entirely: the internal force is the kernel.</p>
+      </article>
+    </div>
   </main>
   <footer>
     <div class="wrap">

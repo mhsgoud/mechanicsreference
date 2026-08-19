@@ -77,21 +77,22 @@
         { "@type": "ListItem", "position": 36, "name": "Battery Mechanics – Structural Aspects" },
         { "@type": "ListItem", "position": 37, "name": "Battery FEM – Coupled Electro-Chemo-Mechanics" },
         { "@type": "ListItem", "position": 38, "name": "Fiber-Based Electrodes" },
-        { "@type": "ListItem", "position": 39, "name": "GPU Programming for Engineers" },
-        { "@type": "ListItem", "position": 40, "name": "Sparse Linear Algebra on GPUs" },
-        { "@type": "ListItem", "position": 41, "name": "Performance Comparison: CPU vs GPU in FEM" },
-        { "@type": "ListItem", "position": 42, "name": "Future of FEM: Multiscale & Multiphysics" },
-        { "@type": "ListItem", "position": 43, "name": "Matrix Fundamentals (Dense & Sparse)" },
-        { "@type": "ListItem", "position": 44, "name": "Sparse Formats & Performance" },
-        { "@type": "ListItem", "position": 45, "name": "CPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 46, "name": "GPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 47, "name": "Solvers & Preconditioning" },
-        { "@type": "ListItem", "position": 48, "name": "Matrix Assembly & Graph Reordering" },
-        { "@type": "ListItem", "position": 49, "name": "MATLAB-like Basics for FEM" },
-        { "@type": "ListItem", "position": 50, "name": "Plotting & Postprocessing (MATLAB/Python)" },
-        { "@type": "ListItem", "position": 51, "name": "NumPy/SciPy Equivalents" },
-        { "@type": "ListItem", "position": 52, "name": "Benchmarking & Profiling" },
-        { "@type": "ListItem", "position": 53, "name": "I/O & Interchange Formats" }
+        { "@type": "ListItem", "position": 39, "name": "GPUs in the FEM Pipeline" },
+        { "@type": "ListItem", "position": 40, "name": "GPU Programming for Engineers" },
+        { "@type": "ListItem", "position": 41, "name": "Sparse Linear Algebra on GPUs" },
+        { "@type": "ListItem", "position": 42, "name": "Performance Comparison: CPU vs GPU in FEM" },
+        { "@type": "ListItem", "position": 43, "name": "Future of FEM: Multiscale & Multiphysics" },
+        { "@type": "ListItem", "position": 44, "name": "Matrix Fundamentals (Dense & Sparse)" },
+        { "@type": "ListItem", "position": 45, "name": "Sparse Formats & Performance" },
+        { "@type": "ListItem", "position": 46, "name": "CPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 47, "name": "GPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 48, "name": "Solvers & Preconditioning" },
+        { "@type": "ListItem", "position": 49, "name": "Matrix Assembly & Graph Reordering" },
+        { "@type": "ListItem", "position": 50, "name": "MATLAB-like Basics for FEM" },
+        { "@type": "ListItem", "position": 51, "name": "Plotting & Postprocessing (MATLAB/Python)" },
+        { "@type": "ListItem", "position": 52, "name": "NumPy/SciPy Equivalents" },
+        { "@type": "ListItem", "position": 53, "name": "Benchmarking & Profiling" },
+        { "@type": "ListItem", "position": 54, "name": "I/O & Interchange Formats" }
       ]
     }
   }
@@ -387,6 +388,7 @@
         <li><a href="hub.html#battery-mechanics-structural-aspects">Battery Mechanics – Structural Aspects</a></li>
         <li><a href="hub.html#battery-fem-coupled-electro-chemo-mechanics">Battery FEM – Coupled Electro-Chemo-Mechanics</a></li>
         <li><a href="hub.html#fiber-based-electrodes">Fiber-Based Electrodes</a></li>
+        <li><a href="hub.html#gpus-in-the-fem-pipeline">GPUs in the FEM Pipeline</a></li>
         <li><a href="hub.html#gpu-programming-for-engineers">GPU Programming for Engineers</a></li>
         <li><a href="hub.html#sparse-linear-algebra-on-gpus">Sparse Linear Algebra on GPUs</a></li>
         <li><a href="hub.html#performance-comparison-cpu-vs-gpu-in-fem">Performance Comparison: CPU vs GPU in FEM</a></li>
@@ -781,10 +783,23 @@ const topics = [
   ], tags:["structural battery","fiber electrode","Butler-Volmer","embedded","porous electrode"], illustrations:"fiberElectrode", sources:[{label:"Goudarzi, Discrete fiber models beyond classical applications, TU Delft (2020)", href:"https://doi.org/10.4233/uuid:4741efe6-9a5e-4782-8cef-6d7ed83a3b30"}]},
 
   // Part V – High-Performance Computing
+  {part:"Part V – High-Performance Computing", title:"GPUs in the FEM Pipeline", equations:[
+    {name:"Amdahl", expr:"S = 1 / (1 − p + p/s)", note:"Overall speedup when a fraction p of the wall time runs s times faster. A stage that is 5% of the analysis cannot save the job, however well it maps to CUDA."},
+    {name:"Element independence", expr:"Kᵉ = ∫ Bᵀ ℂ B dV   (no neighbour data)", note:"Constitutive evaluation and the element residual communicate only through assembly. That is why the Gauss-point loop is the first kernel worth moving."}
+  ], bullets:[
+    "A finite element analysis is not one kernel. It is a pipeline, and a GPU is useful only in the stages that expose thousands of identical arithmetic operations on data that already live in device memory. The first question is not how to write CUDA. It is which stage actually dominates, and whether that stage is data-parallel.",
+    "Geometry and mesh generation, file I/O, and most CAD clean-up are irregular and latency-bound. They stay on the host. Local kinematics — shape functions, the Jacobian of the isoparametric map, the strain–displacement matrix B at Gauss points — are independent per element and move easily, but they are cheap. The constitutive law at those same points is not: in plasticity, damage, or a coupled material it is often the majority of a nonlinear residual. No element needs its neighbour’s history variables to compute σ and ℂ. That loop is the usual first win.",
+    "Formation of the element matrix or residual is the same independence. Assembly then scatters those contributions into a global sparse pattern. The scatter is parallel, but it is a memory-bound race: two elements that share a node write the same entry. Graph colouring, atomic adds, or an assembled-on-the-fly matrix-free product are the three standard answers. Essential boundary conditions and multi-point constraints are sparse and serial; they rarely justify a device kernel of their own.",
+    "The linear solve is where the analysis type splits the story. A linear static implicit job is often a single sparse factorisation. Large supernodal fronts can use a GPU; a moderate three-dimensional mesh with a well-ordered CPU factorisation often should not. Nonlinear implicit analysis repeats residual and tangent formation, then an iterative Krylov solve. The sparse matrix–vector product y = Ax is what GPUs do well — provided A is assembled once and left on the device. Copying the tangent every Newton iteration through the host bus can erase the kernel gain. Preconditioners are mixed: a Jacobi scaling or the matvecs inside an AMG smoother move; ILU and the AMG setup tend not to.",
+    "Explicit dynamics drop the global tangent. A lumped mass, an internal force at Gauss points, and a gather to nodes: that is the strongest finite-element case for a GPU, which is why crash and wave codes moved first. Contact search is intermediate — a broad phase parallelises, a narrow phase may not. Postprocessing and rendering already have a device; the cost is sending the solution back.",
+    "Two rules decide whether the pipeline as a whole improves. Amdahl’s: only stages that own wall time can matter. Locality’s: the matrix and the history variables must stay on the device. A small model whose factorisation is faster than the PCIe copy will look worse on a GPU than on a CPU, and that is not a failure of the hardware.",
+    "The figure is the pipeline. Click a stage for why it does or does not move. Switch linear implicit, nonlinear implicit, and explicit: the time stack changes, and so does the case for the device. Raise the degrees of freedom until the copy is no longer the analysis."
+  ], tags:["GPU","FEM pipeline","assembly","SpMV","explicit","Amdahl","CUDA","matrix-free"], scene:"gpuFem", illustrations:"gpuPipeline"},
   {part:"Part V – High-Performance Computing", title:"GPU Programming for Engineers", bullets:[
-    "Graphics processors execute many identical arithmetic operations at once. In mechanics that maps onto assembly of independent elements, sparse matrix–vector products, and explicit updates.",
-    "CUDA is the usual programming model. The engineering question is which parts of a finite element code are worth moving, and which remain latency-bound on the host."
-  ], tags:["GPU","CUDA","parallelism"]},
+    "The previous entry is which stages move. This one is how they are written. Graphics processors execute many identical arithmetic operations at once, in warps, on a memory system that rewards coalesced access and punishes scattered writes.",
+    "CUDA is the usual programming model. Threads are grouped into blocks that share on-chip memory; occupancy and occupancy-limiting resources (registers, shared memory) decide whether the arithmetic units stay busy. An element kernel that diverges on constitutive branches, or that gathers from an unstructured mesh without a colouring, will spend its time waiting rather than computing.",
+    "The engineering question that remains, after the pipeline has been split, is the data layout: structure-of-arrays for history variables, a sparse format that matches the matvec, and a single host–device transfer per step rather than per element."
+  ], tags:["GPU","CUDA","parallelism","warp","occupancy"]},
   {part:"Part V – High-Performance Computing", title:"Sparse Linear Algebra on GPUs", bullets:[
     "Sparse kernels, not dense matrix multiplication, dominate implicit finite element analysis on a GPU. Libraries such as cuSPARSE implement sparse matrix–vector products and sparse triangular solves.",
     "Performance depends on the storage format and on how regular the mesh connectivity is. A well-tuned CPU factorisation can still win on problems of moderate size."
@@ -1125,6 +1140,7 @@ function renderTopicScene(topic){
     consolidation: {src:'consolidation.html', title:'One-dimensional consolidation'},
     consolidationGibson: {src:'consolidation.html#gibson', title:'Gibson consolidation'},
     mandelCryer: {src:'consolidation.html#cryer', title:'Mandel–Cryer effect'},
+    gpuFem: {src:'gpu-fem.html', title:'GPUs in the FEM pipeline'},
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
     fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'}
@@ -1345,6 +1361,44 @@ function renderTopicIllustrations(topic){
         <text x="150" y="108">Terzaghi</text>
       </svg>
       <figcaption><strong>Overshoot.</strong> Uncoupled diffusion is monotonic (dashed). Two-way coupling pumps the core. Mandel’s strip is the same effect in two dimensions.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
+  }
+  if(topic.illustrations === 'gpuPipeline'){
+    return `
+<section class="figure-section" aria-label="FEM stages on a GPU">
+  <h2>Figures</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="16" y="58" width="42" height="36" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="68" y="58" width="42" height="36" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="120" y="58" width="42" height="36" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="172" y="58" width="72" height="36" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <text x="22" y="80" font-size="9">mesh</text>
+        <text x="74" y="80" font-size="9">Kᵉ</text>
+        <text x="124" y="80" font-size="9">K</text>
+        <text x="184" y="80" font-size="9">solve</text>
+        <path class="ink" d="M 58 76 L 66 76"/>
+        <path class="ink" d="M 110 76 L 118 76"/>
+        <path class="ink" d="M 162 76 L 170 76"/>
+        <text x="20" y="128">host</text>
+        <text x="70" y="128">device</text>
+        <text x="176" y="128">depends</text>
+      </svg>
+      <figcaption><strong>Pipeline.</strong> Mesh stays on the host. Element formation and constitutive evaluation move. The solve moves only if it is a matvec or an explicit force, not a small factorisation.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="36" y="30" width="70" height="90" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <rect x="154" y="48" width="70" height="72" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <text x="48" y="78">CPU</text>
+        <text x="166" y="88">GPU</text>
+        <text x="36" y="140">same job, if A stays on the device</text>
+      </svg>
+      <figcaption><strong>Amdahl.</strong> Overall speedup is the parallel fraction of wall time, not the speedup of the favourite kernel. A PCIe copy every Newton step can be that fraction.</figcaption>
     </figure>
   </div>
 </section>`;
@@ -1824,7 +1878,7 @@ window.addEventListener('keydown', (e)=>{
     ok('multiphase porous topic', topics.some(t => t.title === 'Multiphase Porous Materials' && t.illustrations === 'porousOverview'));
     ok('one-d consolidation topic', topics.some(t => t.title === 'One-Dimensional Consolidation' && t.scene === 'consolidation'));
     ok('gibson consolidation topic', topics.some(t => t.title === 'Gibson Consolidation' && t.scene === 'consolidationGibson'));
-    ok('mandel-cryer topic', topics.some(t => /Mandel.Cryer/.test(t.title) && t.scene === 'mandelCryer'));
+    ok('gpu fem pipeline topic', topics.some(t => t.title === 'GPUs in the FEM Pipeline' && t.scene === 'gpuFem'));
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){
