@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Basic Equations of Continuum Mechanics | Mechanics Reference</title>
-  <meta name="description" content="Encyclopedia of mechanics: basic equations of strain, stress, conservation laws, Hooke's law, virtual work, and finite elements." />
+  <title>Library | Mechanics Reference</title>
+  <meta name="description" content="Library of continuum mechanics, finite elements, and numerical methods: kinematics, constitutive theory, discretization, and solvers." />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Mechanics Reference" />
-  <meta name="theme-color" content="#080a12" />
+  <meta name="theme-color" content="#f7f6f2" />
   <link rel="canonical" href="https://mechanicsreference.com/hub.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="logo.png" />
   <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
-  <meta property="og:title" content="Continuum Mechanics, FEM, and Numerical Methods Hub | Mechanics Reference" />
-  <meta property="og:description" content="Searchable reference notes on continuum mechanics, the finite element method, and numerical methods." />
+  <meta property="og:title" content="Library — Mechanics Reference" />
+  <meta property="og:description" content="Entries on continuum mechanics, the finite element method, and numerical methods." />
   <meta property="og:url" content="https://mechanicsreference.com/hub.html" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Continuum Mechanics, FEM, and Numerical Methods Hub | Mechanics Reference" />
-  <meta name="twitter:description" content="Searchable reference notes on continuum mechanics, the finite element method, and numerical methods." />
+  <meta name="twitter:title" content="Library — Mechanics Reference" />
+  <meta name="twitter:description" content="Entries on continuum mechanics, the finite element method, and numerical methods." />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Encyclopedia of Mechanics Hub | Mechanics Reference",
+    "name": "Library | Mechanics Reference",
     "url": "https://mechanicsreference.com/hub.html",
     "isPartOf": { "@type": "WebSite", "name": "Mechanics Reference", "url": "https://mechanicsreference.com/" },
-    "description": "Encyclopedia entries for continuum mechanics, starting from the basic equations, then finite elements and numerical methods.",
+    "description": "Entries on continuum mechanics, finite elements, and numerical methods.",
     "about": [
       { "@type": "Thing", "name": "Continuum mechanics" },
       { "@type": "Thing", "name": "Finite element method" },
@@ -83,460 +83,206 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root{
-      color-scheme: dark;
-
-      /* Base — cool graphite / ink */
-      --bg-deep: #04050a;
-      --bg: #080a12;
-      --surface-1: #0d101e;
-      --surface-2: #12172a;
-      --surface-3: #1a2238;
-
-      /* Typography */
-      --text: #f2f4fd;
-      --text-body: #c8cfec;
-      --muted: #8c96b5;
-
-      /* Primary — periwinkle / indigo (UI chrome, links, focus) */
-      --accent: #9aa6ff;
-      --accent-mid: #7d8cf0;
-      --accent-deep: #5c6bd8;
-      --accent-glow: color-mix(in srgb, var(--accent) 34%, transparent);
-      --accent-faint: color-mix(in srgb, var(--accent) 11%, transparent);
-      --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
-      --accent-line: color-mix(in srgb, var(--accent) 42%, transparent);
-
-      /* Secondary — teal (highlights, active states, “signal”) */
-      --accent-2: #3dd9c4;
-      --accent-2-dim: color-mix(in srgb, var(--accent-2) 13%, transparent);
-
-      /* Strokes */
-      --border: color-mix(in srgb, var(--accent) 15%, transparent);
-      --border-hover: color-mix(in srgb, var(--accent) 26%, transparent);
-      --border-strong: color-mix(in srgb, var(--accent) 34%, transparent);
-      --grid-line: color-mix(in srgb, var(--accent) 4.5%, transparent);
-
-      /* Semantic */
-      --danger: #fb7185;
-      --danger-bg: color-mix(in srgb, var(--danger) 13%, transparent);
-      --danger-border: color-mix(in srgb, var(--danger) 38%, transparent);
-      --success: #4ade80;
-      --success-bg: color-mix(in srgb, var(--success) 11%, transparent);
-      --success-border: color-mix(in srgb, var(--success) 34%, transparent);
-
-      --shadow: 0 4px 8px rgba(0,0,0,.16), 0 26px 56px rgba(0,0,0,.4);
-      --shadow-soft: 0 12px 44px rgba(4, 8, 28, 0.55);
-      --radius: 18px;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-      --transition: 0.2s var(--ease);
+      --paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;
+      --navy:#1e3a5f;--blue:#3a5f8a;--accent:#c45c26;--card:#fff;
+      --muted:#5c6574;--danger:#9b2c2c;--danger-bg:#f8e8e4;--danger-border:#e2b8ae;
+      --success:#2f6b4f;--success-bg:#e7f2ea;--success-border:#b7d4c3;
+      --radius:0;--ease:ease;--transition:0.15s ease;
+      --text:var(--ink);--text-body:var(--ink-soft);
+      --border:var(--rule);--border-hover:#c9c4b8;--border-strong:#b7b1a4;
+      --surface-1:#fff;--surface-2:#f1efe9;--surface-3:#fff;
+      --accent-2:var(--navy);--accent-faint:#f3ece6;--accent-soft:#f7efe8;
+      --accent-2-dim:#eef2f7;--accent-glow:transparent;--accent-line:var(--rule);
+      --accent-mid:var(--blue);--accent-deep:var(--navy);
+      --shadow:none;--shadow-soft:none;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    ::selection{
-      background: color-mix(in srgb, var(--accent) 38%, transparent);
-      color: var(--text);
-    }
+    html{color-scheme:light}
     body{
       margin:0;
-      font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      font-feature-settings: "kern" 1, "liga" 1;
-      color:var(--text);
-      background-color: var(--bg-deep);
-      background-image:
-        radial-gradient(ellipse 120% 85% at 50% -25%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 58%),
-        radial-gradient(ellipse 65% 45% at 100% -5%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 52%),
-        radial-gradient(ellipse 50% 40% at 0% 100%, color-mix(in srgb, var(--accent-mid) 6%, transparent), transparent 55%),
-        linear-gradient(168deg, var(--bg-deep) 0%, var(--bg) 38%, color-mix(in srgb, var(--surface-1) 65%, var(--bg-deep)) 100%);
-      background-attachment: fixed;
+      font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+      color:var(--ink);
+      background:var(--paper);
     }
-    body::before{
-      content:"";
-      position:fixed;inset:0;pointer-events:none;z-index:0;
-      opacity:0.55;
-      background-image:
-        linear-gradient(var(--grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 18%, transparent 78%);
-    }
+    a{color:var(--blue)}
+    a:hover{color:var(--accent)}
     .app{
-      position:relative;z-index:1;
       display:grid;
-      grid-template-columns: minmax(280px, 320px) 1fr;
-      grid-template-rows: auto 1fr;
-      grid-template-areas:
-        "header header"
-        "sidebar content";
+      grid-template-columns:minmax(260px,300px) 1fr;
+      grid-template-rows:auto 1fr;
+      grid-template-areas:"header header" "sidebar content";
       height:100vh;
     }
     header{
       grid-area:header;
       position:sticky;top:0;z-index:20;
       background:#fff;
-      border-bottom:1px solid #e4e8f2;
-      box-shadow: 0 8px 24px rgba(16, 24, 48, 0.06);
+      border-bottom:1px solid var(--rule);
       display:flex;align-items:center;gap:16px;
-      padding:10px 20px;
+      padding:12px 28px;
     }
-    header .brand{
-      display:flex;align-items:center;gap:14px;
-      text-decoration:none;color:inherit;min-width:0;
-    }
-    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px}
+    header .brand{display:flex;align-items:center;text-decoration:none}
     .visually-hidden{
       position:absolute;width:1px;height:1px;padding:0;margin:-1px;
       overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
     }
-    .brand-logo{
-      display:block;
-      height:48px;
-      width:auto;
-      max-width:min(240px, 46vw);
-      object-fit:contain;
-      background:#fff;
-    }
-    .top-nav{
-      display:flex;align-items:center;gap:4px;
-      margin-left:8px;
-    }
+    .brand-logo{display:block;height:52px;width:auto;max-width:min(240px,46vw);object-fit:contain}
+    .top-nav{display:flex;align-items:center;gap:4px;margin-left:8px}
     .top-nav a{
-      color:#3a4668;text-decoration:none;
-      font-size:13px;font-weight:600;
-      padding:8px 12px;border-radius:999px;
-      transition: color var(--transition), background var(--transition);
+      color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;
+      padding:8px 12px;
     }
-    .top-nav a:hover{color:#1c2744;background:#eef1f8}
-    .top-nav a.active{
-      color:#1c2744;
-      background:#e4eaf8;
-    }
-    .top-nav a:focus-visible{outline:2px solid #5c6bd8;outline-offset:2px}
+    .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
     .search{
       margin-left:auto;display:flex;align-items:center;gap:10px;
-      background:#f4f6fb;
-      border:1px solid #d9deea;
-      border-radius:999px;
-      padding:8px 14px;
-      transition: border-color var(--transition), box-shadow var(--transition);
+      background:#fff;border:1px solid var(--rule);padding:8px 12px;
     }
-    .search svg{color:#6b7694;flex-shrink:0;opacity:0.92}
+    .search svg{color:#6b7382;flex-shrink:0}
     .search svg path{fill:currentColor}
-    .search:focus-within{
-      border-color:#9aa6ff;
-      box-shadow: 0 0 0 3px rgba(92, 107, 216, 0.18);
-    }
+    .search:focus-within{border-color:var(--navy)}
     .search input{
-      background:transparent;border:none;outline:none;color:#1c2744;
-      width:min(260px, 42vw);
-      font-family:inherit;font-size:14px;
+      background:transparent;border:none;outline:none;color:var(--ink);
+      width:min(260px,42vw);font-family:inherit;font-size:0.95rem;
     }
     .search input::placeholder{color:#8a93ab}
 
     .sidebar{
       grid-area:sidebar;overflow:auto;scrollbar-gutter:stable;
-      scrollbar-width: thin;
-      scrollbar-color: color-mix(in srgb, var(--accent) 32%, transparent) transparent;
-      border-right:1px solid var(--border);
-      background:linear-gradient(180deg, color-mix(in srgb, var(--surface-1) 96%, transparent), color-mix(in srgb, var(--surface-2) 97%, transparent));
-      padding:18px 14px 24px;
-      box-shadow: 4px 0 24px rgba(0,0,0,.15);
+      border-right:1px solid var(--rule);
+      background:#f1efe9;
+      padding:18px 12px 28px;
     }
     .part{
-      margin:18px 0 10px;padding-left:2px;
-      color:var(--muted);font-size:11px;font-weight:600;
-      text-transform:uppercase;letter-spacing:.14em;
-      display:flex;align-items:center;gap:8px;
+      margin:20px 8px 8px;padding:0;
+      color:var(--accent);font-size:0.72rem;font-weight:600;
+      text-transform:uppercase;letter-spacing:.12em;
     }
-    .part::before{
-      content:"";width:3px;height:3px;border-radius:50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 8px var(--accent-glow);
-    }
-    .tabs{display:flex;flex-direction:column;gap:4px}
+    .part:first-child{margin-top:4px}
+    .tabs{display:flex;flex-direction:column}
     .tab{
-      position:relative;
-      display:flex;align-items:center;gap:10px;
-      padding:11px 14px 11px 16px;border-radius:12px;
-      border:1px solid transparent;cursor:pointer;
-      color:var(--text);text-align:left;background:transparent;
-      font-family:inherit;font-size:13px;
-      transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+      display:block;width:100%;
+      padding:9px 10px 9px 12px;
+      border:none;border-left:2px solid transparent;
+      cursor:pointer;text-align:left;background:transparent;
+      font-family:inherit;font-size:0.92rem;color:var(--navy);
     }
-    .tab::before{
-      content:"";position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);
-      width:3px;height:0;border-radius:0 3px 3px 0;
-      background: linear-gradient(180deg, var(--accent), var(--accent-2));
-      transition: height 0.25s var(--ease), transform 0.25s var(--ease);
-    }
-    .tab:hover{
-      background: var(--accent-faint);
-      border-color: var(--border-hover);
-    }
-    .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .tab:hover{background:#e8e4db}
+    .tab:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
     .tab.active{
-      background:linear-gradient(135deg, var(--accent-soft), var(--accent-2-dim));
-      border-color: var(--border-strong);
-      box-shadow: inset 0 1px 0 color-mix(in srgb, white 6%, transparent);
-    }
-    .tab.active::before{
-      height:60%;transform:translateY(-50%) scaleY(1);
-    }
-    .tab small{color:var(--muted);font-size:11.5px;line-height:1.35;margin-top:2px;display:block;font-weight:400}
-
-    .content{
-      grid-area:content;overflow:auto;padding:28px 24px 40px;
-      scrollbar-width: thin;
-      scrollbar-color: color-mix(in srgb, var(--accent) 28%, transparent) transparent;
-    }
-    .card{
-      position:relative;
-      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      padding:28px 28px 32px;
-      max-width:1100px;margin:0 auto 20px;
-      overflow:hidden;
-    }
-    .card::before{
-      content:"";
-      position:absolute;top:0;left:0;right:0;height:1px;
-      background: linear-gradient(90deg, transparent, var(--accent-line), color-mix(in srgb, var(--accent-2) 38%, transparent), transparent);
-      opacity:0.95;
-    }
-    .card::after{
-      content:"";
-      position:absolute;top:-40%;right:-20%;width:55%;height:80%;
-      background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 70%);
-      pointer-events:none;
-    }
-    .card > *{position:relative;z-index:1}
-    .breadcrumbs{
-      display:flex;flex-wrap:wrap;align-items:center;gap:6px;
-      font-size:12.5px;color:var(--muted);margin-bottom:16px;
-    }
-    .breadcrumbs span{display:inline-flex;align-items:center;gap:6px}
-    .breadcrumbs span::after{
-      content:"";display:inline-block;width:4px;height:4px;border-radius:50%;
-      margin:0 6px;background: color-mix(in srgb, var(--muted) 38%, transparent);
-      vertical-align:middle;
-    }
-    .breadcrumbs span:last-child{color:var(--text);font-weight:600}
-    .breadcrumbs span:last-child::after{display:none}
-
-    h1{
-      margin:.15em 0 .55em 0;
-      font-size:clamp(1.5rem, 2.5vw, 1.85rem);
-      font-weight:700;
-      letter-spacing:-0.03em;
-      line-height:1.2;
-      position:relative;z-index:1;
-    }
-    h2{
-      margin:1.35em 0 .5em;
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:0.1em;
-      color:var(--muted);
+      background:#fff;
+      border-left-color:var(--accent);
       font-weight:600;
     }
-    p{line-height:1.7;color:var(--text-body)}
-    ul{margin:.35em 0 1em 0;padding-left:1.25em}
-    li{margin:.4em 0;padding-left:0.15em}
-    li::marker{color: color-mix(in srgb, var(--accent) 62%, var(--accent-2))}
+    .tab small{color:var(--muted);font-size:0.75rem;line-height:1.35;margin-top:2px;display:block;font-weight:400}
 
-    .badges{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0 1.35em}
-    .badge{
-      font-size:11px;font-weight:500;
-      color: color-mix(in srgb, var(--accent) 45%, var(--text-body));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--surface-3) 85%, transparent), color-mix(in srgb, var(--surface-2) 92%, transparent));
-      border:1px solid var(--border-hover);
-      padding:6px 12px;border-radius:999px;
-      box-shadow: 0 1px 0 color-mix(in srgb, white 5%, transparent) inset;
+    .content{grid-area:content;overflow:auto;padding:36px 40px 64px}
+    .card{
+      background:transparent;border:none;padding:0;
+      max-width:42rem;margin:0 auto;
     }
+    .breadcrumbs{
+      display:flex;flex-wrap:wrap;gap:6px;
+      font-size:0.88rem;color:var(--muted);margin-bottom:14px;
+    }
+    .breadcrumbs span::after{content:" · ";color:var(--rule)}
+    .breadcrumbs span:last-child{color:var(--ink-soft);font-weight:600}
+    .breadcrumbs span:last-child::after{content:none}
+    h1{
+      margin:0 0 22px;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:clamp(1.7rem, 2.6vw, 2.25rem);
+      font-weight:600;letter-spacing:-0.02em;line-height:1.2;color:var(--navy);
+    }
+    h2{
+      margin:1.8em 0 .55em;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.2rem;letter-spacing:0;text-transform:none;
+      color:var(--navy);font-weight:600;
+    }
+    .prose p, .card > p, .content p{line-height:1.7;color:var(--ink-soft);margin:0 0 1em}
+    .prose p:last-child{margin-bottom:0}
+    ul{margin:.35em 0 1em;padding-left:1.2em;color:var(--ink-soft)}
+    li{margin:.35em 0}
 
-    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-    .btn{
-      appearance:none;border:none;cursor:pointer;
-      color: var(--bg-deep);
-      background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, white) 0%, var(--accent-mid) 46%, var(--accent-deep) 100%);
-      padding:11px 18px;border-radius:12px;font-weight:600;font-size:14px;
-      font-family:inherit;
-      box-shadow: 0 2px 0 color-mix(in srgb, white 18%, transparent) inset, 0 8px 28px var(--accent-glow);
-      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
-    }
-    .btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.05) saturate(1.04);
-      box-shadow: 0 2px 0 color-mix(in srgb, white 22%, transparent) inset, 0 14px 36px var(--accent-glow);
-    }
-    .btn:active{transform: translateY(0)}
-    .btn:focus-visible{outline:2px solid var(--accent-2);outline-offset:3px}
-    .btn.secondary{
-      background: color-mix(in srgb, var(--surface-2) 88%, transparent);
-      border:1px solid var(--border);
-      color:var(--text);
-      box-shadow: none;
-    }
-    .btn.secondary:hover{
-      background: var(--accent-faint);
-      border-color: var(--border-strong);
-      filter: none;
-    }
+    .badges,.cta-row,.footer,#test-badge{display:none !important}
+    .badge{display:none}
 
-    .footer{opacity:.85;font-size:12px;color:var(--muted);text-align:center;margin-top:28px}
-    .footer code{
-      font-family:"JetBrains Mono", ui-monospace, monospace;
-      font-size:11px;
-      padding:2px 8px;border-radius:6px;
-      background: color-mix(in srgb, var(--surface-2) 92%, transparent);
-      border:1px solid var(--border);
-      color: color-mix(in srgb, var(--accent) 35%, var(--text-body));
-    }
-
-    /* Topic illustrations (inline SVG) */
-    .figure-section{margin-top:1.5rem}
-    .figure-section > h2{margin-top:0}
+    .figure-section{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
     .figure-grid{
       display:grid;
       grid-template-columns:repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-      gap:14px;
-      margin-top:10px;
+      gap:16px;margin-top:12px;
     }
     .figure-card{
-      margin:0;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-      background: color-mix(in srgb, var(--surface-1) 90%, var(--accent-faint));
+      margin:0;border:1px solid var(--rule);padding:14px;background:#fff;
     }
     .figure-card figcaption{
-      font-size:11.5px;
-      color:var(--muted);
-      margin-top:10px;
-      line-height:1.5;
+      font-size:0.85rem;color:var(--ink-soft);margin-top:10px;line-height:1.5;
     }
     .figure-card .illustration-svg{
-      width:100%;
-      height:auto;
-      max-height:200px;
-      display:block;
-      color: color-mix(in srgb, var(--accent) 55%, var(--text-body));
+      width:100%;height:auto;max-height:200px;display:block;color:var(--navy);
     }
     .figure-card .illustration-svg .ink{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     .figure-card .illustration-svg .ink-thick{stroke-width:3.5}
     .figure-card .illustration-svg .muted-line{stroke:var(--muted);stroke-dasharray:5 4;opacity:0.85}
-    .figure-card .illustration-svg .fill-soft{fill:color-mix(in srgb, var(--accent) 12%, transparent);stroke:none}
+    .figure-card .illustration-svg .fill-soft{fill:#e8e0d4;stroke:none}
     .figure-card .illustration-svg text{
-      fill:var(--muted);
-      font-family:"DM Sans",system-ui,sans-serif;
-      font-size:11px;
-      font-weight:500;
+      fill:var(--muted);font-family:"Source Sans 3",system-ui,sans-serif;font-size:11px;font-weight:500;
     }
-    .figure-card .illustration-svg .label-strong{fill:var(--text-body);font-weight:600}
+    .figure-card .illustration-svg .label-strong{fill:var(--navy);font-weight:600}
 
-    /* Interactive mini-tool */
     .tool{
-      margin-top:20px;
-      border:1px solid var(--border);
-      border-radius:16px;
-      background:linear-gradient(155deg, color-mix(in srgb, var(--surface-2) 94%, transparent), color-mix(in srgb, var(--surface-1) 97%, transparent));
-      padding:18px 18px 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.22), inset 0 1px 0 color-mix(in srgb, white 4%, transparent);
+      margin-top:28px;border:1px solid var(--rule);background:#fff;padding:20px 22px;
     }
     .tool-head{display:flex;align-items:flex-start;gap:14px;justify-content:space-between;flex-wrap:wrap}
-    .tool-title{font-weight:700;font-size:15px;letter-spacing:-0.02em}
-    .tool-sub{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.45}
-    .seg{
-      display:flex;flex-wrap:wrap;gap:8px;
-      margin-top:14px;
+    .tool-title{
+      font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:1.15rem;color:var(--navy);
     }
+    .tool-sub{color:var(--muted);font-size:0.92rem;margin-top:4px;line-height:1.5}
+    .seg{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .chip{
-      border:1px solid var(--border);
-      background: color-mix(in srgb, var(--surface-3) 72%, var(--accent) 8%);
-      color:var(--text);
-      padding:8px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      font-size:12px;font-family:inherit;font-weight:500;
-      user-select:none;
-      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+      border:1px solid var(--rule);background:#f7f6f2;color:var(--navy);
+      padding:7px 12px;cursor:pointer;font-size:0.85rem;font-family:inherit;font-weight:500;
     }
-    .chip:hover{
-      border-color: var(--border-strong);
-      background: var(--accent-faint);
-    }
-    .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-    .chip.active{
-      background:linear-gradient(135deg, var(--accent-soft), var(--accent-2-dim));
-      border-color: var(--border-strong);
-      box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 16%, transparent);
-    }
+    .chip:hover{border-color:var(--navy)}
+    .chip:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+    .chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-    .panel{
-      border:1px solid var(--border);
-      border-radius:14px;
-      background: color-mix(in srgb, var(--surface-1) 78%, var(--accent-faint));
-      padding:14px 14px 16px;
-      transition: border-color var(--transition);
+    .panel{border:1px solid var(--rule);background:#f7f6f2;padding:14px 16px}
+    .panel h3{
+      margin:0 0 10px;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;
+      color:var(--accent);font-weight:600;
     }
-    .panel:hover{border-color: var(--border-hover)}
-    .panel h3{margin:0 0 10px 0;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color: color-mix(in srgb, var(--accent) 58%, var(--text-body));font-weight:600}
     .kv{display:flex;flex-wrap:wrap;gap:8px}
     .pill{
-      font-size:11px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--border-hover);
-      background: color-mix(in srgb, var(--surface-2) 80%, var(--accent) 6%);
-      color: color-mix(in srgb, var(--accent) 40%, var(--text-body));
+      font-size:0.78rem;padding:5px 10px;border:1px solid var(--rule);
+      background:#fff;color:var(--ink-soft);
     }
-    .warn{border-color: var(--danger-border); background: var(--danger-bg); color: color-mix(in srgb, var(--danger) 55%, white)}
-    .ok{border-color: var(--success-border); background: var(--success-bg); color: color-mix(in srgb, var(--success) 45%, white)}
+    .warn{border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger)}
+    .ok{border-color:var(--success-border);background:var(--success-bg);color:var(--success)}
     .muted{color:var(--muted)}
-    .mono{font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:0.92em}
-    .eq-list{display:flex;flex-direction:column;gap:12px;margin:16px 0 8px}
-    .eq-card{
-      background: color-mix(in srgb, var(--surface-2) 80%, transparent);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px 16px 12px;
-    }
-    .eq-card h3{margin:0 0 8px;font-size:0.95rem}
+    .mono{font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;font-size:0.92em}
+    .eq-list{display:flex;flex-direction:column;gap:12px;margin:8px 0 24px}
+    .eq-card{background:#fff;border:1px solid var(--rule);padding:16px 18px 14px}
+    .eq-card h3{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.02rem;color:var(--navy)}
     .eq-card .eq{
       font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:1.02rem;line-height:1.5;
-      color:var(--text);
-      overflow-x:auto;
-      margin:0 0 8px;
+      font-size:0.95rem;line-height:1.5;color:var(--ink);
+      background:#f1efe9;padding:10px 12px;overflow-x:auto;margin:0 0 8px;
     }
-    .eq-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
+    .eq-card p{margin:0;color:var(--muted);font-size:0.92rem;line-height:1.5}
 
-    @media (prefers-reduced-motion: reduce){
-      .tab, .btn, .chip{transition:none}
-      .tab::before{transition:none}
-    }
     @media (max-width: 980px){
       .app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
       .sidebar{display:none}
       .grid2{grid-template-columns:1fr}
-      .search input{width:min(140px, 28vw)}
-      .brand-logo{height:40px}
-      .top-nav a{padding:8px 10px}
-    }
-
-    /* Tiny test badge */
-    #test-badge{
-      position:fixed;right:14px;bottom:14px;z-index:50;
-      background:linear-gradient(135deg, color-mix(in srgb, var(--surface-3) 92%, transparent), color-mix(in srgb, var(--surface-1) 95%, transparent));
-      border:1px solid var(--border);
-      color: color-mix(in srgb, var(--accent) 38%, var(--text-body));
-      padding:8px 14px;border-radius:999px;font-size:11px;font-weight:500;
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(8px);
+      .search input{width:min(140px,28vw)}
+      .brand-logo{height:44px}
+      header,.content{padding-left:18px;padding-right:18px}
     }
   </style>
 </head>
@@ -549,11 +295,12 @@
       <h1 class="visually-hidden">Encyclopedia of mechanics: basic equations, continuum mechanics, finite elements, and numerical methods</h1>
       <nav class="top-nav" aria-label="Site">
         <a href="./">Home</a>
-        <a href="hub.html" class="active" aria-current="page">Hub</a>
+        <a href="equations.html">Equations</a>
+        <a href="hub.html" class="active" aria-current="page">Library</a>
       </nav>
       <div class="search" role="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 6.03-3.03l4 4-1.5 1.5-4-4A7.46 7.46 0 0 1 10.5 18Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"/></svg>
-        <input id="searchInput" placeholder="Search… (e.g. strain, Gauss, Newton)" />
+        <input id="searchInput" placeholder="Search the library" />
       </div>
     </header>
 
@@ -564,7 +311,7 @@
   <noscript>
     <section>
       <h2>All topics</h2>
-      <p>Enable JavaScript to search the hub, or open a topic below.</p>
+      <p>JavaScript is required to search. The entries are listed below.</p>
       <ul>
         <li><a href="hub.html#basic-equations">Basic Equations</a></li>
         <li><a href="hub.html#introduction-to-continuum-mechanics">Introduction to Continuum Mechanics</a></li>
@@ -609,7 +356,7 @@
     </section>
   </noscript>
 
-  <div id="test-badge" aria-live="polite" title="Inline self-tests run on load.">Running tests…</div>
+  <div id="test-badge" hidden></div>
 
 <script>
 'use strict';
@@ -618,7 +365,7 @@
 const topics = [
   // Part I – Fundamentals of Mechanics
   {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
-    "An encyclopedia of mechanics starts from a short list of field equations: how a body deforms, how forces are carried, how mass and momentum are conserved, and how those statements become a discrete system.",
+    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass and momentum are conserved, a constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
     "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ).",
     "Stress: Cauchy traction t = σ n is force per current area. Without couple stresses, angular momentum requires σ = σᵀ.",
     "Balance: local mass conservation is ∂ρ/∂t + ∇·(ρ v) = 0. Linear momentum is ∇·σ + ρ b = ρ a (static: ∇·σ + ρ b = 0).",
@@ -648,163 +395,173 @@ const topics = [
     "When bodies deform finitely, strain must be defined carefully. In 1D, common measures include engineering strain (l − L)/L, logarithmic (natural) strain ln(l/L), Green strain (l² − L²)/(2L²), and Almansi strain (l² − L²)/(2l²). Taylor expansion shows that as l → L, all of these reduce to the small-strain increment ∆l/l over the reference length.",
     "A single truss bar under large displacement illustrates the full pipeline: equilibrium at a joint leads to a residual R(x) = 0 that is highly nonlinear in the position x (because bar length and angle depend on x). Constitutive laws written in terms of different strain measures change the force–stretch relation; work-conjugate stress–strain pairs matter for 3D (preview only in Ch. 1, detailed later).",
     "Directional derivatives and linearization of nonlinear equations are the bridge between continuum theory and Newton–Raphson: each iteration solves a linearized problem until the residual vanishes—prototype for every nonlinear FE increment.",
-    "Schematic figures below: cantilever and column spring models, 1D reference vs stretched bar, inclined truss joint, qualitative equilibrium paths, and one step of Newton–Raphson on a residual.",
-    "Reading anchor: Bonet & Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1 (Introduction)—nonlinearity, motivating examples, strain measures, and the path to weak forms and Newton–Raphson."
+    "The figures below collect the elementary models used to introduce those ideas: a rigid bar on a spring, a column that buckles, one-dimensional strain measures, a truss joint, qualitative equilibrium paths, and a single Newton step.",
+    "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
   ], tags:["continuum","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
   {part:"Part I – Fundamentals of Mechanics", title:"Kinematics of Deformation", bullets:[
-    "Strain tensors, small vs large deformations.",
-    "Visuals: animated stretching, shear."
+    "Deformation is a mapping from a reference placement to the current one. When displacement gradients are small, the symmetric gradient of the displacement is enough to measure strain.",
+    "When they are not, strain is defined from the deformation gradient, and several finite-strain measures are in common use. The distinction is physical: equilibrium written on the undeformed geometry is a different statement from equilibrium on the current one."
   ], tags:["kinematics","deformation","small strain","large strain"]},
   {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", bullets:[
-    "Balance of mass, momentum, energy.",
-    "Visuals: free-body diagrams, animated particles."
+    "Mass, linear momentum, and energy are conserved in every continuum theory. Once a stress and a heat flux are introduced, the local forms of those statements become partial differential equations.",
+    "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Body forces and prescribed tractions appear as data; they do not replace the balance laws."
   ], tags:["balance","momentum","energy","mass"]},
   {part:"Part I – Fundamentals of Mechanics", title:"Constitutive Models", bullets:[
-    "Linear elasticity, viscoelasticity, plasticity, hyperelasticity.",
-    "Visuals: stress–strain curves, material tests."
+    "Balance laws do not determine the stress. A constitutive model relates stress to the history of deformation: Hooke’s law for small elastic strain, hyperelasticity for finite elastic strain, viscoelasticity when rate matters, and plasticity when unloading leaves a permanent set.",
+    "The same momentum equation describes a fluid once Newton’s law of viscosity replaces Hooke’s law. The choice of model is the choice of what the material is allowed to forget."
   ], tags:["elasticity","plasticity","viscoelasticity","hyperelasticity"]},
 
   // Part II – Numerical Methods
   {part:"Part II – Numerical Methods", title:"Finite Element Method (Introduction)", bullets:[
-    "Weak form, discretization, element types."
+    "The finite element method replaces a field problem with a finite system of equations. Trial and test functions are built from shape functions on a mesh, and the strong form of the balance laws is replaced by a weak statement such as virtual work.",
+    "After assembly, the unknown nodal coefficients satisfy a discrete system whose size is the number of unconstrained degrees of freedom. Accuracy then depends on the element, the mesh, and the boundary conditions, not only on the continuum theory."
   ], tags:["FEM","weak form","discretization","elements"]},
 
   // Interactive element chooser topic
   {part:"Part II – Numerical Methods", title:"Element Types & Families (Chooser)", interactive:"elementChooser", bullets:[
-    "Use the chooser below to pick a problem type (solids, incompressible, waves, contact, etc.) and see recommended element families + common failure modes.",
-    "Covers: Lagrangian (C0 nodal), h/p/hp-version, high-order/spectral, mixed u–p, DG, virtual elements (VEM), and practical gotchas (locking/hourglassing/dispersion)."
+    "Not every element is safe for every problem. Low-order displacement elements lock in thin bending and near incompressibility; reduced integration can introduce hourglass modes; wave problems are limited by numerical dispersion.",
+    "The families in common use—C0 Lagrangian elements, high-order and spectral bases, mixed displacement–pressure pairs, discontinuous Galerkin, and virtual elements—exist because each of those failure modes has a standard remedy. Choose a setting below to see which families are appropriate."
   ], tags:["element types","Lagrangian","h-version","p-version","hp-FEM","spectral","mixed","DG","VEM","locking","hourglassing","dispersion"]},
 
   // NEW: Mesh generation + fitted/embedded + finite cell
   {part:"Part II – Numerical Methods", title:"Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)", bullets:[
-    "Mesh generation pipeline: CAD cleanup → sizing fields → surface meshing → volume meshing → quality optimization → boundary layer/inflation (where needed).",
-    "Common meshers: Delaunay, advancing front, octree/voxel-based, hex-dominant; trade-offs in robustness vs element quality.",
-    "Quality metrics & fixing: aspect ratio, skewness, Jacobians, min angle, warpage; smoothing (Laplacian/optimization), edge swaps, slivers removal.",
-    "Sizing fields: curvature + proximity, error indicators, anisotropic metrics (stretch along directions), boundary layer controls.",
-    "Fitted vs unfitted (embedded) approaches: body-fitted meshes vs background meshes with cut cells; pros/cons for moving boundaries, complex CAD, topology changes.",
-    "Finite Cell Method (FCM): fictitious domain + high-order basis; integrate on cut cells with adaptive integration / sub-cells; penalty/Nitsche for boundary conditions.",
-    "Related methods: CutFEM / XFEM, immersed boundary/IB, embedded discontinuities; stabilization for small cut cells; conditioning considerations.",
-    "Practical checklist: when you pay in integration cost, when you pay in conditioning, and how to keep results trustworthy (verification + mesh convergence)."
+    "A body-fitted mesh is still the ordinary route: clean the CAD, set a sizing field, mesh the surface, fill the volume, then improve quality. Delaunay, advancing-front, octree, and hex-dominant algorithms trade robustness against element quality.",
+    "Quality is not cosmetic. Aspect ratio, Jacobian, and minimum angle control both the interpolation error and the condition number of the discrete system. Smoothing, edge swaps, and sliver removal are part of the analysis, not a prelude to it.",
+    "When the geometry moves, or the CAD is too tangled to mesh, unfitted methods keep a background grid and cut the physical domain out of it. The finite cell method combines a fictitious domain with a high-order basis and adaptive integration on cut cells; CutFEM, XFEM, and immersed-boundary methods are close cousins.",
+    "The price of not fitting the mesh is paid in integration, in the conditioning of tiny cut cells, and in how boundary conditions are imposed—by Nitsche, by penalty, or by constraints. Trust still requires a convergence study."
   ], tags:["meshing","mesh generation","Delaunay","advancing front","octree","hex-dominant","quality","sizing field","anisotropic","unfitted","embedded","cut cells","CutFEM","XFEM","FCM","finite cell","Nitsche","penalty"]},
 
   {part:"Part II – Numerical Methods", title:"Shape Functions & Isoparametric Mapping", bullets:[
-    "1D bar → 2D triangles/quads → 3D tetra/hexa.",
-    "Visuals: mesh elements morphing."
+    "Geometry and unknown fields are interpolated from nodal values with shape functions. In the isoparametric construction, the same functions map a parent element—a line, triangle, square, tetrahedron, or cube—onto the element in physical space.",
+    "Continuity of the interpolation, and the polynomial degree, control both accuracy and locking. A linear tetrahedron and a quadratic hexahedron are not interchangeable approximations of the same continuum problem."
   ], tags:["shape functions","isoparametric","tri","quad","tet","hex"]},
   {part:"Part II – Numerical Methods", title:"Numerical Integration & Gauss Quadrature", bullets:[
-    "Why we integrate, Gaussian points.",
-    "Visuals: animated integration points."
+    "Element matrices are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated by Gauss quadrature on the parent element.",
+    "The number of points must be high enough to integrate the chosen polynomial, or deliberately reduced when under-integration is part of the formulation. The locations of the points are not a visualisation; they are the only places the constitutive law is evaluated."
   ], tags:["gauss","integration","quadrature"]},
   {part:"Part II – Numerical Methods", title:"Assembly of the Global Stiffness Matrix", bullets:[
-    "From local element matrices to global system."
+    "Each element contributes a small dense matrix. Assembly scatters those contributions into a global sparse matrix using the map from local to global degrees of freedom.",
+    "Boundary conditions are applied to that global system. The sparsity pattern is the connectivity of the mesh; it is also the graph that a fill-reducing ordering will later try to tame."
   ], tags:["assembly","stiffness","global","matrix"]},
   {part:"Part II – Numerical Methods", title:"Boundary Conditions & Loads", bullets:[
-    "Dirichlet vs Neumann, point loads vs distributed."
+    "Essential, or Dirichlet, conditions prescribe the unknown field on part of the boundary: a fixed displacement, a prescribed temperature. Natural, or Neumann, conditions appear in the weak form as boundary integrals: a traction, a heat flux.",
+    "A concentrated force is a distributional special case of the same idea. Mixing the two inconsistently—prescribing a displacement and a conjugate traction on the same degree of freedom—is a modelling error, not a solver problem."
   ], tags:["boundary","Dirichlet","Neumann","loads"]},
   {part:"Part II – Numerical Methods", title:"Solving Linear Systems", bullets:[
-    "Direct vs iterative solvers, condition number.",
-    "Visuals: CPU vs GPU comparisons."
+    "After assembly the discrete problem is a linear system, or a sequence of them. Direct factorisation is robust at moderate size; iterative methods with preconditioning are required when a dense factor will not fit.",
+    "The condition number, driven by mesh size, material contrast, and constraints, decides how hard the solve is. A formulation that is correct on paper can still be unsolvable if that number is left unattended."
   ], tags:["solver","iterative","direct","condition number","GPU"]},
 
   // Part III – Advanced FEM Concepts
   {part:"Part III – Advanced FEM Concepts", title:"Nonlinear FEM", bullets:[
-    "Geometric nonlinearity, material nonlinearity, contact.",
-    "Visuals: buckling, plastic deformation."
+    "Three sources of nonlinearity appear in practice: a constitutive law that is not linear in strain, geometry that changes enough to alter equilibrium and stiffness, and contact.",
+    "The discrete residual is then a nonlinear function of the nodal unknowns. Each load or time step is a nonlinear solve, and the tangent used in that solve must be consistent with the residual if Newton’s method is to behave."
   ], tags:["nonlinear","contact","buckling","plastic"]},
   {part:"Part III – Advanced FEM Concepts", title:"Newton–Raphson Iteration in FEM", bullets:[
-    "Linearization, convergence criteria.",
-    "Visuals: tangent stiffness illustration."
+    "Newton–Raphson linearises the residual at the current guess and solves for a correction. The coefficient matrix is the consistent tangent: the derivative of internal force with respect to the unknowns.",
+    "Near the root the convergence is quadratic when that tangent is exact. Line search and arc-length methods keep the iteration from stalling at snap-through and limit points, where the tangent itself becomes singular."
   ], tags:["Newton-Raphson","linearization","tangent stiffness"]},
   {part:"Part III – Advanced FEM Concepts", title:"Static Condensation & Schur Complement", bullets:[
-    "Eliminating internal DOFs, hierarchical condensation.",
-    "Visuals: block-matrix elimination animations."
+    "Internal degrees of freedom that do not couple to neighbouring elements can be eliminated at the element level. The resulting Schur complement is the stiffness seen by the retained unknowns.",
+    "The same block elimination appears in domain decomposition, mixed methods, and the condensation of hierarchical bases. It reduces the global system; it does not change the underlying approximation."
   ], tags:["Schur","condensation","hierarchical","GPU"]},
   {part:"Part III – Advanced FEM Concepts", title:"Time-Dependent Problems", bullets:[
-    "Dynamic FEM: implicit vs explicit.",
-    "Applications in wave propagation, crash simulations."
+    "When inertia or rate-dependent constitutive response matters, the discrete system is a set of ordinary differential equations in time. Implicit integrators solve a coupled system at each step; explicit integrators update from the previous step and are limited by a CFL condition.",
+    "Wave propagation and crash analysis often take the explicit route with a lumped mass. Quasi-static evolution, implicit dynamics, and viscoelasticity usually do not."
   ], tags:["dynamics","implicit","explicit","wave","crash"]},
 
   // Part IV – Applications in Engineering
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
-    "Stress intensity factors, crack propagation, Griffith theory."
+    "A crack concentrates stress. Linear elastic fracture mechanics characterises the tip field by stress intensity factors; Griffith’s energy argument relates the advance of the crack to the release of potential energy.",
+    "Nonlinear and cohesive models are used when the process zone is not small compared with the body. Numerically, the crack may be fitted, enriched (XFEM), or represented by a damage field; each choice changes what the mesh is required to resolve."
   ], tags:["fracture","SIF","Griffith","crack"]},
   {part:"Part IV – Applications in Engineering", title:"Composite Materials – Effective Properties", bullets:[
-    "Homogenization, rule of mixtures."
+    "A composite is a continuum at the scale of a structure and a microstructure at the scale of fibres or grains. Effective stiffness is estimated by rules of mixtures, by bounds, or by homogenisation of a representative volume.",
+    "Those effective properties are what a macroscopic finite element analysis actually uses. The quality of the estimate is the quality of the scale separation assumed in making it."
   ], tags:["composites","homogenization","rule of mixtures"]},
   {part:"Part IV – Applications in Engineering", title:"Composite Materials – Failure Modes", bullets:[
-    "Fiber breakage, matrix cracking, delamination."
+    "Failure is rarely a single event. Fibres break, the matrix cracks, and plies separate. Each mode has its own criterion, and the sequence depends on stacking sequence, notches, and the loading path.",
+    "Continuum damage and cohesive interfaces are the usual numerical representations. A single equivalent-stress criterion on a homogenised ply is often too coarse to see delamination coming."
   ], tags:["failure","delamination","matrix","fiber"]},
   {part:"Part IV – Applications in Engineering", title:"Soil & Geomechanics: Consolidation Theory", bullets:[
-    "Terzaghi’s theory, settlement."
+    "Terzaghi’s consolidation theory couples the flow of pore fluid to the deformation of the soil skeleton. Settlement in time is the visible consequence: excess pore pressure dissipates, effective stress rises, and the soil compresses.",
+    "Finite element analyses of the same physics use coupled displacement–pressure formulations. Drainage boundaries and the permeability of the skeleton are as important as the stiffness of the grains."
   ], tags:["consolidation","Terzaghi","settlement","soil"]},
   {part:"Part IV – Applications in Engineering", title:"Heat Transfer & Multiphysics FEM", bullets:[
-    "Coupling temperature with stress analysis."
+    "Temperature changes strain through thermal expansion, and deformation can generate heat. A thermo-mechanical analysis therefore solves a heat equation together with momentum balance, with constitutive laws that may themselves depend on temperature.",
+    "The coupling may be staggered or monolithic. Strong coupling and disparate time scales are what make multiphysics harder than the sum of its parts."
   ], tags:["heat","multiphysics","thermo-mechanical"]},
   {part:"Part IV – Applications in Engineering", title:"Battery Mechanics – Structural Aspects", bullets:[
-    "Electrode stresses, casing, thermal runaway risks."
+    "A cell is a mechanical object: electrodes swell, the separator is thin, and the casing carries constraint. Stresses from intercalation, thermal expansion, and abuse loading affect both performance and safety.",
+    "Structural models of modules and packs sit on top of those local mechanisms. The casing that looks like a boundary condition to the cell is a deformable body to the pack."
   ], tags:["battery","mechanics","safety"]},
   {part:"Part IV – Applications in Engineering", title:"Battery FEM – Coupled Electro-Chemo-Mechanics", bullets:[
-    "Multiphysics modeling of Li-ion cells."
+    "Inside a lithium-ion cell, electrochemistry, diffusion, heat, and stress interact. A coupled electro-chemo-mechanical model tracks lithium concentration, electric potential, temperature, and deformation together.",
+    "The numerical difficulty is the disparity of time scales and the sensitivity of the chemistry to mechanical constraint. A purely thermal or purely structural model will miss the mechanisms that actually limit the cell."
   ], tags:["battery","FEM","electro-chemo-mechanics"]},
 
   // Part V – High-Performance Computing
   {part:"Part V – High-Performance Computing", title:"GPU Programming for Engineers", bullets:[
-    "Basics of CUDA, parallelism."
+    "Graphics processors execute many identical arithmetic operations at once. In mechanics that maps onto assembly of independent elements, sparse matrix–vector products, and explicit updates.",
+    "CUDA is the usual programming model. The engineering question is which parts of a finite element code are worth moving, and which remain latency-bound on the host."
   ], tags:["GPU","CUDA","parallelism"]},
   {part:"Part V – High-Performance Computing", title:"Sparse Linear Algebra on GPUs", bullets:[
-    "cuBLAS, cuSPARSE, SpMM. (directly connect to your software)"
+    "Sparse kernels, not dense matrix multiplication, dominate implicit finite element analysis on a GPU. Libraries such as cuSPARSE implement sparse matrix–vector products and sparse triangular solves.",
+    "Performance depends on the storage format and on how regular the mesh connectivity is. A well-tuned CPU factorisation can still win on problems of moderate size."
   ], tags:["cuBLAS","cuSPARSE","SpMM","sparse"]},
   {part:"Part V – High-Performance Computing", title:"Performance Comparison: CPU vs GPU in FEM", bullets:[
-    "Benchmarks, scalability."
+    "Whether a GPU is faster depends on the operation, the matrix size, and the cost of moving data. Explicit dynamics and large iterative solves tend to favour the device; small, poorly parallel factorisations do not.",
+    "A useful benchmark reports the whole analysis, including assembly and input, not only the kernel that looks best on a slide."
   ], tags:["benchmark","scalability","CPU vs GPU"]},
   {part:"Part V – High-Performance Computing", title:"Future of FEM: Multiscale & Multiphysics", bullets:[
-    "RVE modeling, homogenization, machine learning accelerators."
+    "Multiscale methods pass information between a macroscopic mesh and a representative volume. Multiphysics methods couple several fields on the same, or overlapping, meshes.",
+    "Learned surrogates are being used to replace expensive constitutive evaluations. They remain useful only while they respect conservation and dissipation, which a generic interpolant will not do on its own."
   ], tags:["multiscale","RVE","ML","accelerators"]},
 
   // Part VI – Linear Algebra & Tools
   {part:"Part VI – Linear Algebra & Tools", title:"Matrix Fundamentals (Dense & Sparse)", bullets:[
-    "Row/column operations, factorizations (LU/Cholesky/QR/SVD).",
-    "Data layouts: row-major vs column-major; cache-friendly access."
+    "Finite element systems are linear algebra. Dense factorisations—LU, Cholesky, QR, SVD—explain the structure of the solve; sparse storage explains why a three-dimensional mesh of any size is even tractable.",
+    "Layout in memory, row-major or column-major, blocked or not, decides whether the arithmetic meets the cache. The algorithm that looks shortest on paper is not always the one that runs."
   ], tags:["dense","sparse","factorization","layout"]},
   {part:"Part VI – Linear Algebra & Tools", title:"Sparse Formats & Performance", bullets:[
-    "COO/CSR/CSC, block formats (BSR), hybrid (HYB).",
-    "When each format is best; memory footprint & bandwidth."
+    "Coordinate lists are convenient for assembly. Compressed sparse row is the usual format for a matrix–vector product; compressed sparse column favours column-oriented factorisation.",
+    "Block formats pay when degrees of freedom cluster, as they do in vector problems. The right choice is the one that matches the kernel that is called most often."
   ], tags:["CSR","CSC","COO","BSR","HYB"]},
   {part:"Part VI – Linear Algebra & Tools", title:"CPU Linear Algebra Libraries", bullets:[
-    "BLAS/LAPACK, Eigen, Intel MKL, OpenBLAS.",
-    "Threading (OpenMP/TBB), vectorization (SSE/AVX)."
+    "BLAS and LAPACK are the substrate. Eigen, Intel MKL, and OpenBLAS are the practical interfaces, with threading through OpenMP or TBB and vectorisation through AVX.",
+    "A finite element code that calls these well will outperform one that writes its own inner loops. Most of the arithmetic in an implicit analysis never touches an element routine."
   ], tags:["BLAS","LAPACK","MKL","Eigen","OpenBLAS"]},
   {part:"Part VI – Linear Algebra & Tools", title:"GPU Linear Algebra Libraries", bullets:[
-    "cuBLAS, cuSPARSE, cuSOLVER, MAGMA; batched ops.",
-    "Kernels for SpMV/SpMM, preconditioners on GPU."
+    "cuBLAS, cuSPARSE, cuSOLVER, and MAGMA provide dense and sparse kernels on the device, including batched operations for many small systems.",
+    "Preconditioners are the weaker part of the stack. An algebraic multigrid cycle that is excellent on a CPU may be memory-bound, or awkward to implement, on a GPU."
   ], tags:["cuBLAS","cuSPARSE","cuSOLVER","MAGMA","SpMM"]},
   {part:"Part VI – Linear Algebra & Tools", title:"Solvers & Preconditioning", bullets:[
-    "Direct (LU/Cholesky) vs Iterative (CG/GMRES/BiCGStab).",
-    "Preconditioners: Jacobi, ILU, IC, AMG; choosing strategies."
+    "Direct solvers factor the matrix once and are insensitive to conditioning within the limits of roundoff. Krylov methods—conjugate gradients, GMRES, BiCGStab—iterate, and they need a preconditioner whose quality decides the iteration count.",
+    "Jacobi, incomplete factorisations, and algebraic multigrid are the usual choices. Indefinite and constrained systems need methods that respect the block structure; a black-box positive-definite solver will not."
   ], tags:["CG","GMRES","ILU","AMG","preconditioner"]},
   {part:"Part VI – Linear Algebra & Tools", title:"Matrix Assembly & Graph Reordering", bullets:[
-    "Triplets → CSR, avoiding duplicates; assembly on CPU/GPU.",
-    "Fill-reducing orderings: RCM, AMD, METIS."
+    "Assembly builds a sparse matrix from element contributions, typically through a triplet list that is then converted to compressed sparse row. Duplicate entries must be summed, not overwritten.",
+    "Fill-reducing orderings—reverse Cuthill–McKee, approximate minimum degree, nested dissection—are applied before factorisation so that the factor remains sparse. The ordering that is cheap to compute is not always the one that minimises fill."
   ], tags:["assembly","CSR","RCM","AMD","METIS"]},
   {part:"Part VI – Linear Algebra & Tools", title:"MATLAB-like Basics for FEM", bullets:[
-    "Indexing, slicing, vectorization, broadcasting.",
-    "Sparse constructors (spdiags, kron), logical masks."
+    "Most finite element prototypes are written in array notation: index, slice, and vectorise rather than loop over degrees of freedom by hand. Sparse diagonal constructors and Kronecker products build discrete operators compactly.",
+    "The same habits transfer to NumPy, with different indexing conventions. Clarity in the residual is worth more than a clever one-liner when the tangent has to be derived from it."
   ], tags:["MATLAB","vectorization","sparse","spdiags","kron"]},
   {part:"Part VI – Linear Algebra & Tools", title:"Plotting & Postprocessing (MATLAB/Python)", bullets:[
-    "Quick plots, semilogy/loglog, surface/contour.",
-    "Matplotlib/PGFPlots for publication-quality figures."
+    "Postprocessing is part of the analysis: deformed shapes, contours of stress, and residual histories on a logarithmic axis. Matplotlib and PGFPlots are enough for publication figures.",
+    "Specialised viewers take over when the mesh is large. A contour that is not tied to the quadrature points at which the stress was computed is a picture, not a result."
   ], tags:["plot","matplotlib","pgfplots","contour"]},
   {part:"Part VI – Linear Algebra & Tools", title:"NumPy/SciPy Equivalents", bullets:[
-    "ndarray basics, SciPy sparse (csr_matrix, coo_matrix).",
-    "linalg.spsolve, cg/gmres; interop with PyTorch/JAX for autograd."
+    "SciPy’s sparse matrices and sparse solvers are the Python equivalent of MATLAB’s sparse suite. Direct sparse solves, conjugate gradients, and GMRES cover the usual cases.",
+    "Automatic differentiation through PyTorch or JAX is useful when a residual is easier to write than a tangent. The resulting Jacobian is only as correct as the residual it differentiates."
   ], tags:["NumPy","SciPy","csr_matrix","autograd"]},
   {part:"Part VI – Linear Algebra & Tools", title:"Benchmarking & Profiling", bullets:[
-    "Timing (wall vs CPU), flops, roofline basics.",
-    "Profilers: perf/nsys/nvprof; reproducible runs & seeding."
+    "Wall-clock time, not a flop count, is what decides whether an analysis is usable. Roofline analysis says whether a kernel is limited by arithmetic or by memory bandwidth.",
+    "Profilers show where the time actually goes. An unreproducible timing is not a measurement, and a kernel benchmark is not a model of the whole code."
   ], tags:["profiling","nsys","nvprof","roofline","benchmark"]},
   {part:"Part VI – Linear Algebra & Tools", title:"I/O & Interchange Formats", bullets:[
-    "Matrix Market, HDF5, VTK; binary vs text trade-offs.",
-    "Pipelines to load/save meshes, matrices, and results."
+    "Meshes, matrices, and results move between codes through formats such as Matrix Market, HDF5, and VTK. Text is portable and slow; binary is the reverse.",
+    "A pipeline that cannot write a mesh the visualiser can read is not finished. The same is true of a solver that cannot reread its own checkpoint."
   ], tags:["MatrixMarket","HDF5","VTK","I/O"]}
 ];
 
@@ -1001,10 +758,10 @@ function renderElementChooserWidget(){
     <div class="tool" id="${toolId}">
       <div class="tool-head">
         <div>
-          <div class="tool-title">Element Chooser</div>
-          <div class="tool-sub">Pick a problem type → see recommended element families + failure modes to watch.</div>
+          <div class="tool-title">Element families</div>
+          <div class="tool-sub">Recommended interpolations depend on the problem. Choose a setting.</div>
         </div>
-        <div class="tool-sub muted">Tip: try <span class="mono">incompressible</span>, <span class="mono">waves</span>, <span class="mono">complex CAD</span>.</div>
+        <div class="tool-sub muted">Near incompressibility, waves, and unfitted geometry are the cases that most often punish a default solid element.</div>
       </div>
 
       <div class="seg" role="tablist" aria-label="Problem type">
@@ -1044,12 +801,11 @@ function mountElementChooser(){
         ${note}
       </div>
       <div class="panel">
-        <h3>Watch-outs</h3>
+        <h3>Failure modes</h3>
         <ul>${avoid}</ul>
         <div class="kv" style="margin-top:10px">
           ${modes}
         </div>
-        <p class="muted" style="margin:.6em 0 0 0">Hover the pills for quick explanations.</p>
       </div>
     `;
   }
@@ -1073,7 +829,7 @@ function renderTopicIllustrations(topic){
   return `
 <section class="figure-section" aria-label="Schematic figures for introduction">
   <h2>Figures</h2>
-  <p class="muted" style="margin:0 0 10px;font-size:13px;line-height:1.55">Inline SVG schematics (Bonet &amp; Wood Ch.1–style): rigid-bar spring models, 1D strain, truss joint, equilibrium paths, and Newton–Raphson.</p>
+  <p>Elementary models that introduce geometric nonlinearity, strain measures, and Newton iteration.</p>
   <div class="figure-grid">
     <figure class="figure-card">
       <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1174,8 +930,7 @@ function renderTopicIllustrations(topic){
 }
 
 function renderContent(topic){
-  const bullets = (topic.bullets||[]).map(x => `<li>${escHtml(x)}</li>`).join('');
-  const badges = (topic.tags||[]).map(t=>`<span class="badge">${escHtml(t)}</span>`).join('');
+  const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
 
   const interactiveBlock =
     topic.interactive === "elementChooser"
@@ -1185,7 +940,7 @@ function renderContent(topic){
   const illustrationsBlock = renderTopicIllustrations(topic);
 
   const eqBlock = (topic.equations && topic.equations.length)
-    ? `<h2>Basic equations</h2>
+    ? `<h2>Field equations</h2>
       <div class="eq-list">${topic.equations.map(eq => `
         <article class="eq-card">
           <h3>${escHtml(eq.name)}</h3>
@@ -1195,26 +950,14 @@ function renderContent(topic){
     : "";
 
   content.innerHTML = `
-    <div class="card" role="article">
+    <article class="card">
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
       <h1>${escHtml(topic.title)}</h1>
-      <div class="badges">${badges}</div>
       ${eqBlock}
-      <h2>Overview</h2>
-      <ul>${bullets}</ul>
-
+      <div class="prose">${prose}</div>
       ${illustrationsBlock}
-
       ${interactiveBlock}
-
-      <h2>What you will learn</h2>
-      <p>Key definitions, worked examples, and how this connects to real FEM workflows. Each tab in this site can later embed Manim/Blender/ParaView clips and link into your software demos.</p>
-      <div class="cta-row">
-        <button class="btn" onclick="alert('Placeholder: Link this to your YouTube video or demo scene.')">Watch lesson</button>
-        <button class="btn secondary" onclick="alert('Placeholder: Open sample files / notebook.')">Open resources</button>
-      </div>
-    </div>
-    <div class="footer">Tip: Share direct links like <code>#${slug(topic.title)}</code> to open this tab.</div>
+    </article>
   `;
 
   // Update active state
@@ -1292,13 +1035,7 @@ window.addEventListener('keydown', (e)=>{
     ok('contains Part VI – Linear Algebra & Tools', parts.includes('Part VI – Linear Algebra & Tools'));
     const gpuHits = topics.filter(t => (t.title+" "+(t.tags||[]).join(' ')).toLowerCase().includes('gpu'));
     ok('searchable GPU topics present', gpuHits.length >= 1);
-
-    // deep link/select test
-    const initial = initFromHash();
-    selectTopic('Element Types & Families (Chooser)');
-    ok('selectTopic changes hash to element chooser', location.hash.includes(slug('Element Types & Families (Chooser)')));
-    selectTopic(initial.title);
-    ok('restored initial topic after test', location.hash.includes(slug(initial.title)));
+    ok('element chooser slug', slug('Element Types & Families (Chooser)') === 'element-types-families-chooser');
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){

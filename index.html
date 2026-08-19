@@ -3,641 +3,285 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods</title>
-  <meta name="description" content="An encyclopedia of continuum mechanics, the finite element method, and numerical methods. Browse subjects first; governing equations live one layer down." />
+  <title>Mechanics Reference — An Encyclopedia of Continuum Mechanics and Finite Elements</title>
+  <meta name="description" content="An encyclopedia of continuum mechanics, finite element analysis, and numerical methods: kinematics, stress, constitutive theory, discretization, and solvers." />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="author" content="Mechanics Reference" />
-  <meta name="theme-color" content="#080a12" />
+  <meta name="theme-color" content="#f7f6f2" />
   <link rel="canonical" href="https://mechanicsreference.com/" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="logo.png" />
   <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
-  <meta property="og:title" content="Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods" />
-  <meta property="og:description" content="An encyclopedia of continuum mechanics, finite elements, and numerical methods. Governing equations live one layer down." />
+  <meta property="og:title" content="Mechanics Reference — An Encyclopedia of Continuum Mechanics and Finite Elements" />
+  <meta property="og:description" content="Kinematics, constitutive theory, finite elements, and the numerical methods used to compute them." />
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods" />
+  <meta name="twitter:title" content="Mechanics Reference" />
   <meta name="twitter:description" content="An encyclopedia of continuum mechanics, finite elements, and numerical methods." />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://mechanicsreference.com/#website",
-        "url": "https://mechanicsreference.com/",
-        "name": "Mechanics Reference",
-        "alternateName": ["mechanicsreference.com", "Encyclopedia of mechanics"],
-        "description": "An encyclopedia of continuum mechanics, the finite element method, and numerical methods.",
-        "inLanguage": "en",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Mechanics Reference",
-          "url": "https://mechanicsreference.com/",
-          "logo": "https://mechanicsreference.com/logo.png"
-        }
-      },
-      {
-        "@type": "WebPage",
-        "@id": "https://mechanicsreference.com/#webpage",
-        "url": "https://mechanicsreference.com/",
-        "name": "Encyclopedia of Mechanics | Continuum, FEM, and Numerical Methods",
-        "isPartOf": { "@id": "https://mechanicsreference.com/#website" },
-        "description": "Overview of an encyclopedia of continuum mechanics, finite elements, and numerical methods. Governing equations are one layer down.",
-        "about": [
-          { "@type": "Thing", "name": "Encyclopedia of mechanics" },
-          { "@type": "Thing", "name": "Continuum mechanics" },
-          { "@type": "Thing", "name": "Finite element method" },
-          { "@type": "Thing", "name": "Numerical methods" }
-        ]
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://mechanicsreference.com/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "How is this encyclopedia organized?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The homepage maps the subjects. The hub holds topic entries. Governing equations sit one layer down, on the equations page and inside the continuum and FEM entries."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What is continuum mechanics?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Continuum mechanics models solids and fluids as continuous media. It combines kinematics, conservation of mass, momentum, and energy, and constitutive laws that relate stress to deformation or deformation rate."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What is the finite element method?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The finite element method (FEM) approximates a continuum problem by dividing the domain into elements, introducing shape functions, and replacing the strong form of the governing equations with a weak integral statement that yields a discrete algebraic system."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What numerical methods does this reference cover?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "The hub covers discretization, Gauss quadrature, assembly, linear and nonlinear solvers, Newton–Raphson iteration, condensation, sparse linear algebra, and related tools used to compute finite element solutions."
-            }
-          }
-        ]
-      }
-    ]
+    "@type": "WebSite",
+    "name": "Mechanics Reference",
+    "url": "https://mechanicsreference.com/",
+    "description": "An encyclopedia of continuum mechanics, the finite element method, and numerical methods.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mechanics Reference",
+      "logo": "https://mechanicsreference.com/logo.png"
+    }
   }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     :root{
-      color-scheme: dark;
-      --bg-deep: #04050a;
-      --bg: #080a12;
-      --surface-1: #0d101e;
-      --surface-2: #12172a;
-      --surface-3: #1a2238;
-      --text: #f2f4fd;
-      --text-body: #c8cfec;
-      --muted: #8c96b5;
-      --accent: #9aa6ff;
-      --accent-mid: #7d8cf0;
-      --accent-deep: #5c6bd8;
-      --accent-glow: color-mix(in srgb, var(--accent) 34%, transparent);
-      --accent-faint: color-mix(in srgb, var(--accent) 11%, transparent);
-      --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
-      --accent-line: color-mix(in srgb, var(--accent) 42%, transparent);
-      --accent-2: #3dd9c4;
-      --accent-2-dim: color-mix(in srgb, var(--accent-2) 13%, transparent);
-      --border: color-mix(in srgb, var(--accent) 15%, transparent);
-      --border-hover: color-mix(in srgb, var(--accent) 26%, transparent);
-      --border-strong: color-mix(in srgb, var(--accent) 34%, transparent);
-      --grid-line: color-mix(in srgb, var(--accent) 4.5%, transparent);
-      --shadow: 0 4px 8px rgba(0,0,0,.16), 0 26px 56px rgba(0,0,0,.4);
-      --shadow-soft: 0 12px 44px rgba(4, 8, 28, 0.55);
-      --radius: 18px;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-      --transition: 0.2s var(--ease);
+      --paper: #f7f6f2;
+      --ink: #1c2430;
+      --ink-soft: #3d4756;
+      --rule: #d8d4cb;
+      --navy: #1e3a5f;
+      --blue: #3a5f8a;
+      --accent: #c45c26;
+      --card: #fff;
     }
     *{box-sizing:border-box}
-    html,body{min-height:100%}
     html{scroll-behavior:smooth}
-    ::selection{
-      background: color-mix(in srgb, var(--accent) 38%, transparent);
-      color: var(--text);
-    }
     body{
       margin:0;
-      font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      font-feature-settings: "kern" 1, "liga" 1;
-      color:var(--text);
-      background-color: var(--bg-deep);
-      background-image:
-        radial-gradient(ellipse 120% 85% at 50% -25%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 58%),
-        radial-gradient(ellipse 65% 45% at 100% -5%, color-mix(in srgb, var(--accent-2) 9%, transparent), transparent 52%),
-        radial-gradient(ellipse 50% 40% at 0% 100%, color-mix(in srgb, var(--accent-mid) 6%, transparent), transparent 55%),
-        linear-gradient(168deg, var(--bg-deep) 0%, var(--bg) 38%, color-mix(in srgb, var(--surface-1) 65%, var(--bg-deep)) 100%);
-      background-attachment: fixed;
+      color:var(--ink);
+      background:var(--paper);
+      font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+      font-size:18px;
+      line-height:1.6;
     }
-    body::before{
-      content:"";
-      position:fixed;inset:0;pointer-events:none;z-index:0;
-      opacity:0.55;
-      background-image:
-        linear-gradient(var(--grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 18%, transparent 78%);
-    }
-    .page{position:relative;z-index:1}
-
+    a{color:var(--blue)}
+    a:hover{color:var(--accent)}
     header{
       position:sticky;top:0;z-index:20;
       background:#fff;
-      border-bottom:1px solid #e4e8f2;
-      box-shadow: 0 8px 24px rgba(16, 24, 48, 0.06);
-      display:flex;align-items:center;gap:16px;
-      padding:10px 24px;
+      border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;
+      padding:12px 28px;
     }
-    header .brand{
-      display:flex;align-items:center;gap:14px;
-      text-decoration:none;color:inherit;min-width:0;
-    }
-    header .brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:12px}
-    .brand-logo{
-      display:block;
-      height:48px;
-      width:auto;
-      max-width:min(280px, 52vw);
-      object-fit:contain;
-      background:#fff;
-    }
-    .top-nav{
-      display:flex;align-items:center;gap:4px;
-      margin-left:auto;
-    }
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
     .top-nav a{
-      color:#3a4668;text-decoration:none;
-      font-size:13px;font-weight:600;
-      padding:8px 12px;border-radius:999px;
-      transition: color var(--transition), background var(--transition);
+      color:var(--navy);text-decoration:none;
+      font-size:0.92rem;font-weight:600;
+      padding:8px 12px;
     }
-    .top-nav a:hover{color:#1c2744;background:#eef1f8}
-    .top-nav a.active{
-      color:#1c2744;
-      background:#e4eaf8;
-    }
-    .top-nav a:focus-visible{outline:2px solid #5c6bd8;outline-offset:2px}
+    .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
+    .wrap{max-width:980px;margin:0 auto;padding:0 28px}
 
-    main{padding:0 24px 72px}
-    .wrap{max-width:1100px;margin:0 auto}
-
-    .hero{
-      padding:72px 0 28px;
-      display:grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap:36px;
-      align-items:center;
+    .masthead{
+      padding:72px 0 48px;
+      border-bottom:1px solid var(--rule);
     }
-    .eyebrow{
-      display:inline-flex;align-items:center;gap:8px;
-      color:var(--accent-2);
-      font-size:12px;font-weight:600;
-      letter-spacing:.14em;text-transform:uppercase;
-      margin-bottom:16px;
-    }
-    .eyebrow::before{
-      content:"";width:18px;height:1px;
-      background: linear-gradient(90deg, var(--accent-2), transparent);
+    .masthead p.kicker{
+      margin:0 0 18px;
+      font-size:0.78rem;font-weight:600;
+      letter-spacing:.16em;text-transform:uppercase;
+      color:var(--accent);
     }
     h1{
-      margin:0 0 16px;
-      font-size:clamp(2rem, 4.4vw, 3.35rem);
-      line-height:1.12;
-      letter-spacing:-0.035em;
-      font-weight:700;
-    }
-    .lede{
-      margin:0 0 28px;
-      max-width:46ch;
-      color:var(--text-body);
-      font-size:1.08rem;
-      line-height:1.65;
-    }
-    .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .btn{
-      display:inline-flex;align-items:center;gap:8px;
-      text-decoration:none;font-weight:600;font-size:14px;
-      padding:12px 18px;border-radius:999px;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), border-color var(--transition);
-    }
-    .btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-    .btn-primary{
-      color:#081018;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 140%);
-      box-shadow: 0 8px 28px var(--accent-glow);
-    }
-    .btn-primary:hover{transform:translateY(-1px);box-shadow: 0 12px 34px var(--accent-glow)}
-    .btn-ghost{
-      color:var(--text);
-      border:1px solid var(--border-strong);
-      background: var(--accent-faint);
-    }
-    .btn-ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
-
-    .hero-panel{
-      position:relative;
-      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      padding:22px 22px 18px;
-      overflow:hidden;
-    }
-    .hero-panel::before{
-      content:"";
-      position:absolute;top:0;left:0;right:0;height:1px;
-      background: linear-gradient(90deg, transparent, var(--accent-line), color-mix(in srgb, var(--accent-2) 38%, transparent), transparent);
-    }
-    .panel-kicker{
-      font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:11px;color:var(--muted);letter-spacing:.04em;
-      margin-bottom:14px;
-    }
-    .stack{display:flex;flex-direction:column;gap:8px}
-    .stack-row{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 12px;border-radius:12px;
-      border:1px solid transparent;
-      background: color-mix(in srgb, var(--surface-2) 70%, transparent);
-    }
-    .stack-row strong{font-size:13px;font-weight:600}
-    .stack-row span{font-size:12px;color:var(--muted);white-space:nowrap}
-    .stack-row:nth-child(2){
-      border-color: var(--border-strong);
-      background:linear-gradient(135deg, var(--accent-soft), var(--accent-2-dim));
-    }
-
-    .section{padding:28px 0 8px}
-    .section h2{
-      margin:0 0 8px;
-      font-size:1.35rem;
-      letter-spacing:-0.02em;
-    }
-    .section-lead{
       margin:0 0 22px;
-      color:var(--muted);
-      max-width:62ch;
-      line-height:1.6;
-    }
-
-    .tracks{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:14px;
-    }
-    .track{
-      position:relative;
-      display:flex;flex-direction:column;gap:10px;
-      text-decoration:none;color:inherit;
-      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:20px 18px 18px;
-      min-height:168px;
-      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
-    }
-    .track:hover{
-      border-color: var(--border-strong);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-soft);
-    }
-    .track:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-    .track-index{
-      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:11px;color:var(--accent);letter-spacing:.08em;
-    }
-    .track h3{margin:0;font-size:1.02rem;letter-spacing:-0.015em}
-    .track p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5;flex:1}
-    .track .go{margin-top:4px;font-size:12.5px;font-weight:600;color:var(--accent)}
-
-    .split{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:14px;
-    }
-    .primer{
-      position:relative;
-      background:linear-gradient(165deg, color-mix(in srgb, var(--surface-3) 88%, transparent) 0%, color-mix(in srgb, var(--surface-1) 94%, transparent) 100%);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:24px 22px 22px;
-      overflow:hidden;
-    }
-    .primer::before{
-      content:"";
-      position:absolute;top:0;left:0;right:0;height:1px;
-      background: linear-gradient(90deg, transparent, var(--accent-line), color-mix(in srgb, var(--accent-2) 38%, transparent), transparent);
-    }
-    .primer h3{margin:0 0 10px;font-size:1.12rem;letter-spacing:-0.015em}
-    .primer p{
-      margin:0 0 12px;
-      color:var(--text-body);
-      font-size:14.5px;
-      line-height:1.65;
-    }
-    .primer p:last-of-type{margin-bottom:14px}
-    .primer ul{
-      margin:0;padding:0;
-      list-style:none;
-      display:flex;flex-direction:column;gap:8px;
-    }
-    .primer li{
-      color:var(--muted);
-      font-size:13.5px;
-      line-height:1.5;
-      padding-left:14px;
-      position:relative;
-    }
-    .primer li::before{
-      content:"";
-      position:absolute;left:0;top:0.55em;
-      width:6px;height:6px;border-radius:50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    }
-    .primer li a{color:var(--accent);text-decoration:none}
-    .primer li a:hover{text-decoration:underline}
-    .bridge{
-      margin-top:14px;
-      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px 20px;
-    }
-    .bridge p{
-      margin:0;
-      color:var(--text-body);
-      font-size:14.5px;
-      line-height:1.65;
-    }
-    .bridge a{color:var(--accent);text-decoration:none}
-    .bridge a:hover{text-decoration:underline}
-
-    .steps{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:14px;
-    }
-    .step{
-      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:18px 18px 16px;
-    }
-    .step b{
-      display:block;
-      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:11px;color:var(--accent-2);
-      margin-bottom:8px;
-    }
-    .step p{margin:0;color:var(--text-body);font-size:14px;line-height:1.55}
-
-    .faq{display:flex;flex-direction:column;gap:10px}
-    .faq details{
-      background: color-mix(in srgb, var(--surface-2) 82%, transparent);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:4px 18px 4px;
-    }
-    .faq summary{
-      cursor:pointer;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:clamp(2.4rem, 5.4vw, 3.6rem);
       font-weight:600;
-      padding:14px 0;
-      list-style:none;
+      line-height:1.15;
+      letter-spacing:-0.02em;
+      color:var(--navy);
     }
-    .faq summary::-webkit-details-marker{display:none}
-    .faq summary::after{
-      content:"+" ;
-      float:right;
-      color:var(--accent);
-      font-weight:500;
+    .standfirst{
+      margin:0;
+      max-width:38em;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.22rem;
+      font-weight:400;
+      line-height:1.55;
+      color:var(--ink-soft);
     }
-    .faq details[open] summary::after{content:"–"}
-    .faq details p{
-      margin:0 0 16px;
-      color:var(--text-body);
-      font-size:14.5px;
-      line-height:1.65;
+
+    section{padding:56px 0 8px}
+    h2{
+      margin:0 0 8px;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.7rem;font-weight:600;
+      color:var(--navy);
+    }
+    .deck{
+      margin:0 0 28px;
+      max-width:40em;
+      color:var(--ink-soft);
+    }
+
+    .contents{
+      list-style:none;margin:0;padding:0;
+      border-top:1px solid var(--rule);
+    }
+    .contents li{border-bottom:1px solid var(--rule)}
+    .contents a{
+      display:grid;
+      grid-template-columns: 4.5rem 1fr auto;
+      gap:16px;align-items:baseline;
+      padding:18px 4px;
+      text-decoration:none;color:inherit;
+    }
+    .contents a:hover .t{color:var(--accent)}
+    .contents .n{
+      font-variant-numeric:lining-nums;
+      font-size:0.85rem;font-weight:600;color:var(--accent);
+      letter-spacing:.04em;
+    }
+    .contents .t{
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.2rem;font-weight:600;color:var(--navy);
+    }
+    .contents .s{color:var(--ink-soft);font-size:0.95rem}
+
+    .essays{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:28px;
+    }
+    article h3{
+      margin:0 0 12px;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.28rem;font-weight:600;color:var(--navy);
+    }
+    article p{margin:0 0 12px;color:var(--ink-soft)}
+    article p:last-child{margin:0}
+    article .more{
+      display:inline-block;margin-top:10px;
+      font-size:0.92rem;font-weight:600;text-decoration:none;
     }
 
     footer{
-      border-top:1px solid var(--border);
-      padding:22px 24px 32px;
-      color:var(--muted);
-      font-size:13px;
+      margin-top:64px;
+      border-top:1px solid var(--rule);
+      padding:22px 28px 36px;
+      font-size:0.9rem;color:var(--ink-soft);
     }
-    footer .wrap{
-      display:flex;flex-wrap:wrap;gap:10px 18px;
-      justify-content:space-between;align-items:center;
-    }
-    footer a{color:var(--accent);text-decoration:none}
-    footer a:hover{text-decoration:underline}
+    footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0}
 
-    @media (max-width: 900px){
-      .hero, .tracks, .steps, .split{grid-template-columns:1fr}
-      .hero{padding-top:44px}
-      header{padding:14px 16px}
-      main{padding:0 16px 56px}
-      .brand-logo{height:40px}
+    @media (max-width: 800px){
+      .essays{grid-template-columns:1fr}
+      .contents a{grid-template-columns:3.2rem 1fr;gap:10px}
+      .contents .s{grid-column:2}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .masthead{padding-top:48px}
+      .brand-logo{height:44px}
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <a class="brand" href="./" aria-label="Mechanics Reference home">
-        <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="220" height="74" />
-      </a>
-      <nav class="top-nav" aria-label="Site">
-        <a href="./" class="active" aria-current="page">Home</a>
-        <a href="#topics">Topics</a>
-        <a href="hub.html">Hub</a>
-      </nav>
-    </header>
+  <header>
+    <a href="./" aria-label="Mechanics Reference home">
+      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+    </a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./" class="active" aria-current="page">Home</a>
+      <a href="#contents">Contents</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html">Library</a>
+    </nav>
+  </header>
 
-    <main>
-      <div class="wrap">
-        <section class="hero">
-          <div>
-            <div class="eyebrow">Encyclopedia of mechanics</div>
-            <h1>A map of continuum mechanics, finite elements, and numerical methods.</h1>
-            <p class="lede">This page is the overview. Topic entries live in the hub. Governing equations sit one layer down, inside continuum mechanics and FEM—not on the front door.</p>
-            <div class="actions">
-              <a class="btn btn-primary" href="hub.html">Open the encyclopedia hub</a>
-              <a class="btn btn-ghost" href="#topics">Browse subjects</a>
-            </div>
-          </div>
-          <aside class="hero-panel" aria-label="Encyclopedia layers">
-            <div class="panel-kicker">layers</div>
-            <div class="stack">
-              <div class="stack-row"><strong>Overview</strong><span>this page · subjects</span></div>
-              <div class="stack-row"><strong>Topics</strong><span>hub entries</span></div>
-              <div class="stack-row"><strong>Equations</strong><span>inside each subject</span></div>
-              <div class="stack-row"><strong>Methods</strong><span>discretization · solvers</span></div>
-            </div>
-          </aside>
-        </section>
+  <main>
+    <div class="wrap">
+      <section class="masthead">
+        <p class="kicker">A reference for engineers and students</p>
+        <h1>Continuum mechanics, written so you can look it up.</h1>
+        <p class="standfirst">This encyclopedia collects the ideas used to describe how solids deform and fluids flow, and the finite element methods used to compute those descriptions. It is meant to be consulted, not read cover to cover: kinematics, constitutive theory, discretization, and the linear algebra that makes large analyses possible.</p>
+      </section>
 
-        <section class="section" id="topics">
-          <h2>What this encyclopedia covers</h2>
-          <p class="section-lead">Three subjects sit on one pipeline. Continuum mechanics writes the field problem. The finite element method turns it into a discrete system. Numerical methods assemble, integrate, and solve that system. The identities themselves are a click further in.</p>
-          <div class="split">
-            <article class="primer" id="continuum">
-              <h3>Continuum mechanics</h3>
-              <p>Continuum mechanics treats solids and fluids as continuous media rather than collections of atoms. The same structure appears in both: kinematics (how deformation is measured), conservation of mass, momentum, and energy, and a constitutive model that closes the system.</p>
-              <p>In solids, a body can carry shear at rest. Strain, stress, elasticity, plasticity, and finite-deformation measures such as Green and logarithmic strain belong here. In fluids, shear is resisted only while the material deforms; Newton’s law of viscosity and the Navier–Stokes equations are the Newtonian case.</p>
-              <ul>
-                <li>Kinematics: small strain vs finite strain; deformation gradient</li>
-                <li>Balance laws: mass, linear momentum, angular momentum, energy</li>
-                <li>Constitutive models for solids and fluids</li>
-                <li><a href="equations.html">Governing equations for this subject →</a></li>
-              </ul>
-            </article>
-            <article class="primer" id="fem">
-              <h3>Finite element method</h3>
-              <p>The finite element method (FEM) approximates a continuum problem on a mesh. The domain is split into elements, unknown fields are interpolated with shape functions, and the strong form is replaced by a weak integral statement—virtual work or a Galerkin projection.</p>
-              <p>That step produces element matrices, which assemble into a global residual (and, for Newton methods, a tangent stiffness). Element choice, mesh quality, locking, hourglassing, and boundary conditions decide whether the discrete problem is a faithful model of the continuum one.</p>
-              <ul>
-                <li>Weak form, Galerkin method, and isoparametric mapping</li>
-                <li>Element families: tets, hexes, mixed, high-order, and unfitted methods</li>
-                <li>Mesh generation, quadrature, and global assembly</li>
-                <li><a href="equations.html#fem">Weak form and K a = f →</a></li>
-              </ul>
-            </article>
-            <article class="primer" id="numerical">
-              <h3>Numerical methods</h3>
-              <p>Once the continuum problem is discrete, the remaining work is numerical: integrating weak forms, solving linear and nonlinear algebraic systems, and controlling error. Gauss quadrature evaluates element integrals. Newton–Raphson linearizes nonlinear residuals. Direct and iterative solvers, with preconditioners, invert or reduce the resulting sparse matrices.</p>
-              <p>The same toolkit appears in time integration (implicit vs explicit), eigenvalue problems for buckling, and high-performance implementations on CPUs and GPUs. Linear algebra—sparse formats, fill-reducing orderings, and libraries such as BLAS, MKL, and cuSPARSE—is part of the method, not an afterthought.</p>
-              <ul>
-                <li>Numerical integration and Gauss points</li>
-                <li>Newton–Raphson, consistent tangents, and convergence tests</li>
-                <li>Linear solvers, preconditioning, and sparse formats</li>
-                <li><a href="equations.html#numerical">Newton linearization →</a></li>
-              </ul>
-            </article>
-          </div>
-          <div class="bridge">
-            <p>The hub holds the topic entries. Governing equations are one layer down: open a subject, then the identities for kinematics, balance, constitutive response, and discretization. <a href="equations.html">Open the equations layer →</a></p>
-          </div>
-        </section>
+      <section id="contents">
+        <h2>Contents</h2>
+        <p class="deck">Six parts, from the continuum setting to the solvers that turn it into numbers.</p>
+        <ol class="contents">
+          <li>
+            <a href="hub.html#introduction-to-continuum-mechanics">
+              <span class="n">I</span>
+              <span class="t">Continuum mechanics</span>
+              <span class="s">Kinematics, balance laws, and constitutive models</span>
+            </a>
+          </li>
+          <li>
+            <a href="hub.html#finite-element-method-introduction">
+              <span class="n">II</span>
+              <span class="t">Finite elements</span>
+              <span class="s">Weak forms, elements, meshes, and assembly</span>
+            </a>
+          </li>
+          <li>
+            <a href="hub.html#nonlinear-fem">
+              <span class="n">III</span>
+              <span class="t">Nonlinear analysis</span>
+              <span class="s">Newton iteration, contact, and dynamics</span>
+            </a>
+          </li>
+          <li>
+            <a href="hub.html#fracture-mechanics">
+              <span class="n">IV</span>
+              <span class="t">Applications</span>
+              <span class="s">Fracture, composites, soils, heat, and batteries</span>
+            </a>
+          </li>
+          <li>
+            <a href="hub.html#gpu-programming-for-engineers">
+              <span class="n">V</span>
+              <span class="t">Scientific computing</span>
+              <span class="s">Sparse algebra and performance on CPU and GPU</span>
+            </a>
+          </li>
+          <li>
+            <a href="hub.html#matrix-fundamentals-dense-sparse">
+              <span class="n">VI</span>
+              <span class="t">Linear algebra</span>
+              <span class="s">Formats, libraries, preconditioners, and tools</span>
+            </a>
+          </li>
+        </ol>
+      </section>
 
-        <section class="section" id="tracks">
-          <h2>Open a track in the encyclopedia</h2>
-          <p class="section-lead">Each card is a subject in the hub. Basic field equations are nested under continuum mechanics and FEM, not listed as the front page.</p>
-          <div class="tracks">
-            <a class="track" href="hub.html#introduction-to-continuum-mechanics">
-              <div class="track-index">Part I</div>
-              <h3>Continuum mechanics</h3>
-              <p>Kinematics, balance laws, and constitutive models from small strain to finite deformation.</p>
-              <span class="go">Open track →</span>
-            </a>
-            <a class="track" href="hub.html#finite-element-method-introduction">
-              <div class="track-index">Part II</div>
-              <h3>Finite elements &amp; numerical methods</h3>
-              <p>Weak forms, element families, mesh generation, quadrature, assembly, and linear solvers.</p>
-              <span class="go">Open track →</span>
-            </a>
-            <a class="track" href="hub.html#nonlinear-fem">
-              <div class="track-index">Part III</div>
-              <h3>Nonlinear FEM</h3>
-              <p>Geometric and material nonlinearity, Newton–Raphson, condensation, and dynamics.</p>
-              <span class="go">Open track →</span>
-            </a>
-            <a class="track" href="hub.html#fracture-mechanics">
-              <div class="track-index">Part IV</div>
-              <h3>Engineering Applications</h3>
-              <p>Fracture, composites, geomechanics, heat transfer, and coupled battery models.</p>
-              <span class="go">Open track →</span>
-            </a>
-            <a class="track" href="hub.html#gpu-programming-for-engineers">
-              <div class="track-index">Part V</div>
-              <h3>High-Performance Computing</h3>
-              <p>CUDA for engineers, sparse linear algebra on GPUs, and CPU vs GPU trade-offs.</p>
-              <span class="go">Open track →</span>
-            </a>
-            <a class="track" href="hub.html#matrix-fundamentals-dense-sparse">
-              <div class="track-index">Part VI</div>
-              <h3>Linear Algebra &amp; Tools</h3>
-              <p>Sparse formats, libraries, preconditioners, MATLAB/NumPy notes, and I/O formats.</p>
-              <span class="go">Open track →</span>
-            </a>
-          </div>
-        </section>
+      <section>
+        <h2>Three foundations</h2>
+        <p class="deck">The same three questions run through the whole work: how a body is described, how that description is discretized, and how the discrete system is solved.</p>
+        <div class="essays">
+          <article>
+            <h3>Continuum mechanics</h3>
+            <p>A solid or a fluid is treated as a continuous medium. Motion is measured by strain; internal forces by stress. Conservation of mass and momentum must hold, and a constitutive model says how stress depends on deformation or on the rate of deformation.</p>
+            <p>That is enough to distinguish elasticity from plasticity, and a viscous fluid from an elastic solid, without yet choosing a numerical method.</p>
+            <a class="more" href="equations.html">Read the governing equations</a>
+          </article>
+          <article>
+            <h3>Finite elements</h3>
+            <p>The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
+            <p>Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
+            <a class="more" href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
+          </article>
+          <article>
+            <h3>Numerical methods</h3>
+            <p>Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
+            <p>Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
+            <a class="more" href="hub.html#solving-linear-systems">Linear systems and Newton iteration</a>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
 
-        <section class="section">
-          <h2>How to use the hub</h2>
-          <p class="section-lead">The hub is the searchable notebook behind this reference. Direct links keep a continuum, FEM, or numerical-methods topic open.</p>
-          <div class="steps">
-            <div class="step">
-              <b>01 — Search</b>
-              <p>Type a keyword such as strain, locking, Gauss, or Newton. Matching topics stay in the sidebar.</p>
-            </div>
-            <div class="step">
-              <b>02 — Read</b>
-              <p>Each topic is a compact brief: definitions, method choices, and failure modes where they matter.</p>
-            </div>
-            <div class="step">
-              <b>03 — Link</b>
-              <p>The URL hash follows the active topic, so a shared link opens the same page.</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="faq">
-          <h2>Frequently asked questions</h2>
-          <p class="section-lead">Short answers for the three subjects this site is built around.</p>
-          <div class="faq">
-            <details>
-              <summary>How is this encyclopedia organized?</summary>
-              <p>This page is the map of subjects. The hub holds searchable topic entries. Governing equations live one layer down, on the equations page and inside continuum and FEM entries.</p>
-            </details>
-            <details>
-              <summary>What is continuum mechanics?</summary>
-              <p>Continuum mechanics models solids and fluids as continuous media. It combines kinematics, conservation of mass, momentum, and energy, and constitutive laws that relate stress to deformation or deformation rate. This reference starts there, before discretization.</p>
-            </details>
-            <details>
-              <summary>What is the finite element method?</summary>
-              <p>The finite element method (FEM) approximates a continuum problem by dividing the domain into elements, introducing shape functions, and replacing the strong form with a weak integral statement. The result is a discrete algebraic system whose solution approximates the continuum fields.</p>
-            </details>
-            <details>
-              <summary>What numerical methods are covered?</summary>
-              <p>The hub covers Gauss quadrature, assembly, linear and nonlinear solvers, Newton–Raphson iteration, static condensation, time integration, sparse linear algebra, and the libraries used to compute large finite element systems.</p>
-            </details>
-            <details>
-              <summary>Who is this reference for?</summary>
-              <p>Students, researchers, and engineers who need a compact map of continuum mechanics, FEM, and the numerical methods used to solve them—not a substitute for a textbook, but a place to look up the pipeline and the usual failure modes.</p>
-            </details>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <footer>
-      <div class="wrap">
-        <span>Encyclopedia of mechanics</span>
-        <span><a href="hub.html">Open the hub</a> · <a href="https://github.com/mhsgoud/mechanicsreference">GitHub</a></span>
-      </div>
-    </footer>
-  </div>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html">Library</a> · <a href="equations.html">Equations</a></span>
+    </div>
+  </footer>
 </body>
 </html>
