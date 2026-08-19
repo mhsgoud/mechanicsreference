@@ -61,27 +61,28 @@
         { "@type": "ListItem", "position": 20, "name": "Time-Dependent Problems" },
         { "@type": "ListItem", "position": 21, "name": "Contact and Friction" },
         { "@type": "ListItem", "position": 22, "name": "Fracture Mechanics" },
-        { "@type": "ListItem", "position": 23, "name": "Composite Materials – Effective Properties" },
-        { "@type": "ListItem", "position": 24, "name": "Composite Materials – Failure Modes" },
-        { "@type": "ListItem", "position": 25, "name": "Soil & Geomechanics: Consolidation Theory" },
-        { "@type": "ListItem", "position": 26, "name": "Heat Transfer & Multiphysics FEM" },
-        { "@type": "ListItem", "position": 27, "name": "Battery Mechanics – Structural Aspects" },
-        { "@type": "ListItem", "position": 28, "name": "Battery FEM – Coupled Electro-Chemo-Mechanics" },
-        { "@type": "ListItem", "position": 29, "name": "GPU Programming for Engineers" },
-        { "@type": "ListItem", "position": 30, "name": "Sparse Linear Algebra on GPUs" },
-        { "@type": "ListItem", "position": 31, "name": "Performance Comparison: CPU vs GPU in FEM" },
-        { "@type": "ListItem", "position": 32, "name": "Future of FEM: Multiscale & Multiphysics" },
-        { "@type": "ListItem", "position": 33, "name": "Matrix Fundamentals (Dense & Sparse)" },
-        { "@type": "ListItem", "position": 34, "name": "Sparse Formats & Performance" },
-        { "@type": "ListItem", "position": 35, "name": "CPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 36, "name": "GPU Linear Algebra Libraries" },
-        { "@type": "ListItem", "position": 37, "name": "Solvers & Preconditioning" },
-        { "@type": "ListItem", "position": 38, "name": "Matrix Assembly & Graph Reordering" },
-        { "@type": "ListItem", "position": 39, "name": "MATLAB-like Basics for FEM" },
-        { "@type": "ListItem", "position": 40, "name": "Plotting & Postprocessing (MATLAB/Python)" },
-        { "@type": "ListItem", "position": 41, "name": "NumPy/SciPy Equivalents" },
-        { "@type": "ListItem", "position": 42, "name": "Benchmarking & Profiling" },
-        { "@type": "ListItem", "position": 43, "name": "I/O & Interchange Formats" }
+        { "@type": "ListItem", "position": 23, "name": "Fiber-Reinforced Composites" },
+        { "@type": "ListItem", "position": 24, "name": "Composite Materials – Effective Properties" },
+        { "@type": "ListItem", "position": 25, "name": "Composite Materials – Failure Modes" },
+        { "@type": "ListItem", "position": 26, "name": "Soil & Geomechanics: Consolidation Theory" },
+        { "@type": "ListItem", "position": 27, "name": "Heat Transfer & Multiphysics FEM" },
+        { "@type": "ListItem", "position": 28, "name": "Battery Mechanics – Structural Aspects" },
+        { "@type": "ListItem", "position": 29, "name": "Battery FEM – Coupled Electro-Chemo-Mechanics" },
+        { "@type": "ListItem", "position": 30, "name": "GPU Programming for Engineers" },
+        { "@type": "ListItem", "position": 31, "name": "Sparse Linear Algebra on GPUs" },
+        { "@type": "ListItem", "position": 32, "name": "Performance Comparison: CPU vs GPU in FEM" },
+        { "@type": "ListItem", "position": 33, "name": "Future of FEM: Multiscale & Multiphysics" },
+        { "@type": "ListItem", "position": 34, "name": "Matrix Fundamentals (Dense & Sparse)" },
+        { "@type": "ListItem", "position": 35, "name": "Sparse Formats & Performance" },
+        { "@type": "ListItem", "position": 36, "name": "CPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 37, "name": "GPU Linear Algebra Libraries" },
+        { "@type": "ListItem", "position": 38, "name": "Solvers & Preconditioning" },
+        { "@type": "ListItem", "position": 39, "name": "Matrix Assembly & Graph Reordering" },
+        { "@type": "ListItem", "position": 40, "name": "MATLAB-like Basics for FEM" },
+        { "@type": "ListItem", "position": 41, "name": "Plotting & Postprocessing (MATLAB/Python)" },
+        { "@type": "ListItem", "position": 42, "name": "NumPy/SciPy Equivalents" },
+        { "@type": "ListItem", "position": 43, "name": "Benchmarking & Profiling" },
+        { "@type": "ListItem", "position": 44, "name": "I/O & Interchange Formats" }
       ]
     }
   }
@@ -361,6 +362,7 @@
         <li><a href="hub.html#time-dependent-problems">Time-Dependent Problems</a></li>
         <li><a href="hub.html#contact-and-friction">Contact and Friction</a></li>
         <li><a href="hub.html#fracture-mechanics">Fracture Mechanics</a></li>
+        <li><a href="hub.html#fiber-reinforced-composites">Fiber-Reinforced Composites</a></li>
         <li><a href="hub.html#composite-materials-effective-properties">Composite Materials – Effective Properties</a></li>
         <li><a href="hub.html#composite-materials-failure-modes">Composite Materials – Failure Modes</a></li>
         <li><a href="hub.html#soil-geomechanics-consolidation-theory">Soil &amp; Geomechanics: Consolidation Theory</a></li>
@@ -631,12 +633,20 @@ const topics = [
     "When the plastic zone is not small compared with the crack, LEFM ceases to apply. Cohesive-zone models put a traction–separation law on the prospective crack surface; continuum damage smears the same idea over a band whose width is a material length.",
     "Numerically the crack may be fitted to the mesh, enriched (XFEM), or represented by a phase-field. Each choice changes what the mesh is required to resolve: a fitted mesh must be remeshed; XFEM must integrate discontinuous fields; a phase-field must resolve the length scale."
   ], tags:["fracture","SIF","Griffith","crack","J-integral","XFEM"]},
+  {part:"Part IV – Applications in Engineering", title:"Fiber-Reinforced Composites", bullets:[
+    "A unidirectional ply is a transversely isotropic solid. The fibre direction is the 1-axis; the plane of isotropy is 2–3. Five independent constants remain: E₁, E₂, ν₁₂, G₁₂, G₂₃. The reduced stiffness Q relating in-plane stress to in-plane strain is the 3×3 matrix used in classical lamination theory.",
+    "Off-axis, the same ply is anisotropic in the plate axes. The transformed stiffness Q̄(θ) is Q rotated with the fibre angle. Longitudinal stiffness falls rapidly as θ leaves 0°; at 45° shear coupling is large. A single off-axis ply under uniaxial load therefore shears.",
+    "A laminate is a stack of such plies. Classical lamination theory assumes Kirchhoff kinematics through the thickness and integrates Q̄ of each ply into the ABD matrix: N = A ε₀ + B κ, M = B ε₀ + D κ. Membrane–bending coupling B vanishes for a symmetric stack. An unsymmetric stack bends when pulled.",
+    "CLT does not see interlaminar stress. Free-edge peel and shear, and the traction between plies that drives delamination, live outside that plane-stress model. Shell elements with a section integration of the stack are the usual structural discretisation; a three-dimensional ply-by-ply mesh is used when an edge or a hole has to be resolved.",
+    "The figure turns the fibres of one ply. The stack on the right is a laminate of four orientations."
+  ], tags:["composites","lamina","laminate","CLT","ABD","fibre angle","transversely isotropic"], scene:"fiberComposites", illustrations:"laminateCLT"},
   {part:"Part IV – Applications in Engineering", title:"Composite Materials – Effective Properties", bullets:[
-    "A composite is a continuum at the scale of a structure and a microstructure at the scale of fibres or grains. Effective stiffness is estimated by rules of mixtures, by Voigt and Reuss bounds, or by homogenisation of a representative volume whose boundary data realise the Hill–Mandel condition.",
-    "Those effective properties are what a macroscopic finite element analysis actually uses. The quality of the estimate is the quality of the scale separation assumed in making it: if the RVE is not small compared with the structural gradient, a first-order homogenisation is already the wrong model."
-  ], tags:["composites","homogenization","rule of mixtures"]},
+    "A composite is a continuum at the scale of a structure and a microstructure at the scale of fibres or grains. For a unidirectional ply the first estimates are the rule of mixtures for E₁ and a series or Halpin–Tsai estimate for E₂. Those ply constants are what classical lamination theory then rotates and stacks.",
+    "At the next scale, effective stiffness of a woven, chopped, or particulate composite is estimated by Voigt and Reuss bounds, or by homogenisation of a representative volume whose boundary data realise the Hill–Mandel condition. Those effective properties are what a macroscopic finite element analysis actually uses.",
+    "The quality of the estimate is the quality of the scale separation assumed in making it: if the RVE is not small compared with the structural gradient, a first-order homogenisation is already the wrong model."
+  ], tags:["composites","homogenization","rule of mixtures","Halpin-Tsai"]},
   {part:"Part IV – Applications in Engineering", title:"Composite Materials – Failure Modes", bullets:[
-    "Failure is rarely a single event. Fibres break, the matrix cracks, and plies separate. Hashin, Puck, and LaRC-type criteria distinguish those modes; the sequence depends on stacking sequence, notches, and the loading path.",
+    "Failure is rarely a single event. Fibres break, the matrix cracks, and plies separate. Hashin, Puck, and LaRC-type criteria distinguish those modes on a ply; the sequence depends on stacking sequence, notches, and the loading path.",
     "Continuum damage and cohesive interfaces are the usual numerical representations. A single equivalent-stress criterion on a homogenised ply is often too coarse to see delamination coming, because the interlaminar traction never appears as a degree of freedom."
   ], tags:["failure","delamination","matrix","fiber"]},
   {part:"Part IV – Applications in Engineering", title:"Soil & Geomechanics: Consolidation Theory", bullets:[
@@ -994,7 +1004,8 @@ function renderTopicScene(topic){
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction'},
     objectiveRates: {src:'objective-rates.html', title:'Objective rates'},
-    columnBuckling: {src:'column-buckling.html', title:'Euler buckling'}
+    columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
+    fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'}
   };
   const page = pages[topic.scene];
   if(!page) return '';
@@ -1072,6 +1083,64 @@ function renderTopicIllustrations(topic){
         <text x="44" y="156">1-point, reduced</text>
       </svg>
       <figcaption><strong>Reduced integration.</strong> One point at the centre. The volumetric (or shear) term is under-integrated to relieve locking; hourglass modes must then be controlled.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
+  if(topic.illustrations === 'laminateCLT'){
+    return `
+<section class="figure-section" aria-label="Classical lamination theory">
+  <h2>Laminate kinematics</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="36" y="28" width="150" height="96" class="fill-soft" stroke="currentColor" stroke-width="1.6"/>
+        <line class="ink" x1="48" y1="108" x2="168" y2="44"/>
+        <line class="ink" x1="56" y1="116" x2="176" y2="52"/>
+        <line class="ink" x1="64" y1="124" x2="184" y2="60"/>
+        <line class="ink" x1="36" y1="76" x2="96" y2="76"/>
+        <polygon points="96,76 88,72 88,80" fill="currentColor"/>
+        <text x="100" y="72" class="label-strong">1</text>
+        <line class="ink" x1="36" y1="76" x2="36" y2="40"/>
+        <polygon points="36,40 32,48 40,48" fill="currentColor"/>
+        <text x="18" y="56" class="label-strong">2</text>
+        <text x="194" y="80">θ</text>
+      </svg>
+      <figcaption><strong>Unidirectional ply.</strong> Fibre axis 1, transverse axis 2. Off-axis the reduced stiffness is the rotated matrix <span class="mono">Q̄(θ)</span>.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="48" y="24" width="140" height="18" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <text x="196" y="38">0°</text>
+        <rect x="48" y="48" width="140" height="18" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <text x="196" y="62">90°</text>
+        <rect x="48" y="72" width="140" height="18" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <text x="196" y="86">+45°</text>
+        <rect x="48" y="96" width="140" height="18" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <text x="196" y="110">−45°</text>
+        <line class="ink" x1="40" y1="22" x2="40" y2="118"/>
+        <text x="22" y="28">z</text>
+      </svg>
+      <figcaption><strong>Stacking sequence.</strong> Each ply contributes <span class="mono">Q̄(θ_k)</span> on its interval of z. A symmetric stack about midplane makes <span class="mono">B = 0</span>.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="28" y="36" width="44" height="68" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+        <text x="36" y="68" class="label-strong">N</text>
+        <text x="36" y="86" class="label-strong">M</text>
+        <text x="84" y="74">=</text>
+        <rect x="108" y="28" width="72" height="84" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+        <line class="muted-line" x1="144" y1="28" x2="144" y2="112"/>
+        <line class="muted-line" x1="108" y1="70" x2="180" y2="70"/>
+        <text x="114" y="54" class="label-strong">A</text>
+        <text x="152" y="54" class="label-strong">B</text>
+        <text x="114" y="94" class="label-strong">B</text>
+        <text x="152" y="94" class="label-strong">D</text>
+        <rect x="196" y="36" width="44" height="68" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+        <text x="204" y="68" class="label-strong">ε₀</text>
+        <text x="206" y="88" class="label-strong">κ</text>
+      </svg>
+      <figcaption><strong>ABD relation.</strong> Resultant force and moment on the midplane. <span class="mono">A</span> is membrane stiffness, <span class="mono">D</span> bending, <span class="mono">B</span> the coupling that a symmetric laminate removes.</figcaption>
     </figure>
   </div>
 </section>`;
@@ -1294,6 +1363,7 @@ window.addEventListener('keydown', (e)=>{
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction'));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
+    ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){

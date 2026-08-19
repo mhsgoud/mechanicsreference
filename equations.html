@@ -266,6 +266,35 @@
         <p>Gap, pressure, and the requirement that one of them vanish. <a href="hub.html#contact-and-friction">Friction</a> adds a tangential law and a nonsymmetric tangent.</p>
       </article>
     </div>
+
+    <h2 id="composites">Fiber-reinforced composites</h2>
+    <p class="deck">A unidirectional ply is transversely isotropic. A laminate of such plies is integrated through the thickness by classical lamination theory.</p>
+    <div class="eq-grid">
+      <article class="eq-card">
+        <div class="eq-kicker">Ply</div>
+        <h3>Rule of mixtures</h3>
+        <div class="eq">E₁ = V_f E_f + V_m E_m</div>
+        <p>Longitudinal modulus of a unidirectional ply. The transverse modulus is closer to a series estimate, or to Halpin–Tsai. Five independent constants remain for transverse isotropy.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Ply</div>
+        <h3>Reduced stiffness</h3>
+        <div class="eq">Q₁₁ = E₁ / (1 − ν₁₂ ν₂₁)</div>
+        <p>Plane-stress stiffness of the ply in material axes. The remaining entries of the 3×3 matrix Q follow from E₂, G₁₂, and the Poisson ratios. <a href="fiber-composites.html">Rotate the fibres</a> and this matrix is transformed to Q̄(θ).</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Off-axis</div>
+        <h3>Engineering modulus</h3>
+        <div class="eq">1/Ē_x = c⁴/E₁ + s⁴/E₂ + c²s² (1/G₁₂ − 2ν₁₂/E₁)</div>
+        <p>Uniaxial stiffness along x for a ply whose fibres sit at θ to x, with c = cos θ and s = sin θ. At 45° the shear coupling is largest.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Laminate</div>
+        <h3>Classical lamination theory</h3>
+        <div class="eq">N = A ε₀ + B κ, &nbsp; M = B ε₀ + D κ</div>
+        <p>Force and moment resultants on the midplane. A is membrane stiffness, D bending, B the coupling that a symmetric stack removes. <a href="hub.html#fiber-reinforced-composites">The ABD matrix</a> is the section law a shell element actually uses.</p>
+      </article>
+    </div>
   </main>
   <footer>
     <div class="wrap">
