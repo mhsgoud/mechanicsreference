@@ -438,23 +438,27 @@ const topics = [
   {part:"Part I – Fundamentals of Mechanics", title:"Finite Strain Measures", bullets:[
     "Change of squared length is the invariant that strain must capture. Green–Lagrange strain E = ½(C − I) = ½(FᵀF − I) lives on the reference placement. Almansi strain e = ½(I − b⁻¹) lives on the current placement. Both vanish in a rigid motion.",
     "In one dimension the same stretch λ = l/L gives engineering strain λ − 1, Green strain ½(λ² − 1), Almansi ½(1 − 1/λ²), and logarithmic (true) strain ln λ. They agree to first order as λ → 1 and disagree as soon as the stretch is finite.",
-    "In terms of displacement, Green strain keeps the quadratic terms in ∇u written with respect to X; Almansi keeps them with respect to x. Dropping those products recovers the infinitesimal strain ε."
-  ], tags:["Green-Lagrange","Almansi","logarithmic strain","engineering strain","stretch"]},
+    "In terms of displacement, Green strain keeps the quadratic terms in ∇u written with respect to X; Almansi keeps them with respect to x. Dropping those products recovers the infinitesimal strain ε.",
+    "The figure applies a pure rotation to both squares. Green strain stays zero. Drawing I + ε for the same motion shrinks the left square: infinitesimal strain has mistaken a rotation for stretch."
+  ], tags:["Green-Lagrange","Almansi","logarithmic strain","engineering strain","stretch"], scene:"rotationStrain"},
   {part:"Part I – Fundamentals of Mechanics", title:"Principal Stretches and Invariants", bullets:[
     "The eigenvalues of U are the principal stretches λᵢ. The invariants of C (or of b) are I₁ = tr C, I₂ = ½[(tr C)² − tr(C²)], I₃ = det C = J². Isotropic hyperelastic laws are functions of those three numbers.",
     "Hydrostatic, or volumetric, strain is the part that changes volume; the deviator is the rest, which changes shape at constant volume. In the small-strain limit the split is ε = (tr ε/3) I + ε′. The same split on stress is the path to von Mises.",
-    "A pure rotation leaves every invariant of C equal to that of I. A computation that reports strain after a large rotation but a small stretch has usually used a measure that still contains R."
-  ], tags:["invariants","principal stretch","hydrostatic","deviatoric","J"]},
+    "A pure rotation leaves every invariant of C equal to that of I. A computation that reports strain after a large rotation but a small stretch has usually used a measure that still contains R.",
+    "The two blocks split that idea: the left changes volume and keeps its shape; the right changes shape and keeps its volume."
+  ], tags:["invariants","principal stretch","hydrostatic","deviatoric","J"], scene:"hydroDeviator"},
   {part:"Part I – Fundamentals of Mechanics", title:"Velocity Gradient and Material Derivative", bullets:[
     "The spatial velocity gradient is L = ∇v = Ḟ F⁻¹. Its symmetric part D = ½(L + Lᵀ) is the rate of deformation; its skew part W = ½(L − Lᵀ) is the spin. Stretching lives in D; rigid spin lives in W.",
     "From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ. The second term is pure spin. The first is the stretching, rotated into the current placement.",
-    "The material derivative of a spatial field is D(·)/Dt = ∂(·)/∂t + v · ∇(·). It is the rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it."
-  ], tags:["velocity gradient","rate of deformation","spin","material derivative"]},
+    "The material derivative of a spatial field is D(·)/Dt = ∂(·)/∂t + v · ∇(·). It is the rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it.",
+    "The three crosses are D, W, and L = D + W. Stretching, spin, and simple shear."
+  ], tags:["velocity gradient","rate of deformation","spin","material derivative"], scene:"velocityGradient"},
   {part:"Part I – Fundamentals of Mechanics", title:"Cauchy Stress and Traction", bullets:[
     "The traction t on a surface with outward unit normal n is force per current area. Cauchy’s theorem says it is linear in n: t = σ n. The tensor σ is the Cauchy stress.",
     "The normal component is n · σ n; the shear component is the remainder, t − (n · σ n) n. Both are scalars or vectors on that cut, not a replacement for the full tensor.",
-    "Because t is defined on the current surface, the arrows move when the body deforms. Stresses pulled back to the reference placement are different tensors, used when the weak form is written on the undeformed mesh."
-  ], tags:["traction","Cauchy stress","normal stress","shear"]},
+    "Because t is defined on the current surface, the arrows move when the body deforms. Stresses pulled back to the reference placement are different tensors, used when the weak form is written on the undeformed mesh.",
+    "Turn the cut in the figure. The stress tensor is fixed; the traction, and its split into normal and shear, are not."
+  ], tags:["traction","Cauchy stress","normal stress","shear"], scene:"tractionCut"},
   {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", bullets:[
     "Mass, linear momentum, and energy are conserved in every continuum theory. Once a stress and a heat flux are introduced, the local forms of those statements become partial differential equations.",
     "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Part of the boundary is supported, with prescribed displacement and an unknown reaction. Applied tractions act on the free surface and move with it. The acceleration a is that of the material points.",
@@ -467,13 +471,15 @@ const topics = [
   {part:"Part I – Fundamentals of Mechanics", title:"Work-Conjugate Stresses", bullets:[
     "Power per reference volume can be written in several equivalent ways. Cauchy stress is conjugate to the rate of deformation D, up to the factor J: τ : D with Kirchhoff stress τ = J σ. The first Piola–Kirchhoff stress P = J σ F⁻ᵀ is conjugate to Ḟ. The second Piola–Kirchhoff stress S = F⁻¹ P is conjugate to Ė.",
     "Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain, or an unrotated rate of σ with D, produces spurious dissipation in a rigid rotation.",
-    "When stretches and rotations are both small, P, S, and σ coincide to first order. The distinction matters as soon as either is finite."
-  ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"]},
+    "When stretches and rotations are both small, P, S, and σ coincide to first order. The distinction matters as soon as either is finite.",
+    "The figure keeps the force on a face fixed. The Piola arrow is drawn on the reference square; the Cauchy arrow on the stretched square."
+  ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"], scene:"workConjugates"},
   {part:"Part I – Fundamentals of Mechanics", title:"Principal Stresses and von Mises", bullets:[
     "The principal stresses are the eigenvalues of σ. The hydrostatic part is the mean (tr σ)/3; the deviator is σ′ = σ − (tr σ/3) I. Plasticity in metals is, to a first approximation, independent of the hydrostatic part.",
     "The von Mises equivalent stress is √(3/2 σ′ : σ′), the magnitude of the deviator scaled so that it equals |σ| in uniaxial tension. In principal-stress space the yield condition σ_vm = σ_y is a cylinder along the hydrostatic axis.",
-    "The same split on strain separates change of volume from change of shape. In isotropic linear elasticity the deviators are related by ε′ = σ′ / (2G) and the spherical parts by the bulk modulus."
-  ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"]},
+    "The same split on strain separates change of volume from change of shape. In isotropic linear elasticity the deviators are related by ε′ = σ′ / (2G) and the spherical parts by the bulk modulus.",
+    "The cylinder in the figure is that yield surface. A path along the diagonal never hits it; a path with enough shear does."
+  ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"], scene:"vonMises"},
   {part:"Part I – Fundamentals of Mechanics", title:"Objective Rates", bullets:[
     "A constitutive law written in rate form must not invent stress when the body only rotates. The material derivative of Cauchy stress does invent such a stress, because the components change with the spinning basis.",
     "An objective rate subtracts that spin. The Jaumann rate uses W from the velocity gradient; Green–Naghdi uses Ṙ Rᵀ from the polar rotation. They agree at small stretch and differ in large shear.",
@@ -487,8 +493,9 @@ const topics = [
   {part:"Part I – Fundamentals of Mechanics", title:"Hyperelasticity", bullets:[
     "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
     "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
-    "The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser."
-  ], tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility"]},
+    "The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser.",
+    "The block is pulled in one direction and contracts in the other two so that J stays one — the kinematics every incompressible hyperelastic law has to live with."
+  ], tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility"], scene:"principalStretches"},
   {part:"Part I – Fundamentals of Mechanics", title:"Metal Plasticity", bullets:[
     "Below a yield stress the response is elastic. Beyond it, metals flow at nearly constant volume. The elastic strain is recoverable; the plastic strain is a history, not a state derived from the current stretch alone.",
     "J₂ plasticity yields when the von Mises stress reaches σ_y. The flow direction is the normal to that surface—associated flow. Isotropic hardening expands the cylinder; kinematic hardening translates it (the Bauschinger effect) by a backstress α.",
@@ -927,7 +934,14 @@ function renderTopicScene(topic){
   const pages = {
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
     linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
-    polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'}
+    polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},
+    tractionCut: {src:'traction-cut.html', title:'Traction on a cut'},
+    rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
+    hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Hydrostatic and deviatoric strain'},
+    velocityGradient: {src:'velocity-gradient.html', title:'Rate of deformation and spin'},
+    vonMises: {src:'von-mises.html', title:'von Mises yield surface'},
+    workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
+    principalStretches: {src:'principal-stretches.html', title:'Principal stretches'}
   };
   const page = pages[topic.scene];
   if(!page) return '';

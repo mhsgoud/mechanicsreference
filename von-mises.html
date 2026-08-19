@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>von Mises Yield Surface — Mechanics Reference</title>
+  <meta name="description" content="In principal-stress space the von Mises condition is a cylinder about the hydrostatic axis. Plasticity begins when a load path reaches that cylinder." />
+  <link rel="canonical" href="https://mechanicsreference.com/von-mises.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#phase{margin:0}
+    #formula{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--navy)}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed #stage{flex:1;height:auto}
+    html.embed #ui{background:#fff}
+    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#principal-stresses-and-von-mises">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#principal-stresses-and-von-mises">von Mises</a></p>
+      <h1>The yield cylinder</h1>
+      <p class="standfirst">In principal-stress space the hydrostatic axis is the diagonal (1,1,1). von Mises yield is a cylinder about that axis: adding pressure does not move a point toward the wall. The moving sphere is a load path. It turns when it reaches yield.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <div id="ui">
+        <p id="formula">σ_vm = √(3/2 σ′ : σ′) = σ_y</p>
+        <p id="phase"></p>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#principal-stresses-and-von-mises">von Mises</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const stage = document.getElementById('stage');
+    const phase = document.getElementById('phase');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
+    camera.position.set(5.5, 3.8, 5.8);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+    stage.appendChild(labels.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    scene.add(new THREE.HemisphereLight(0xc9d6ee, 0x1a2740, 1.5));
+    const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(4,6,3); scene.add(key);
+
+    scene.add(new THREE.AxesHelper(2.6));
+    const hydro = new THREE.Vector3(1,1,1).normalize();
+    const axis = new THREE.ArrowHelper(hydro, new THREE.Vector3(-1.6,-1.6,-1.6), 5.2, 0x7eabdc, 0.14, 0.08);
+    scene.add(axis);
+
+    const sy = 1.35;
+    const radius = Math.sqrt(2/3) * sy;
+    const cyl = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius, radius, 4.6, 48, 1, true),
+      new THREE.MeshStandardMaterial({color:0xe39a4a, transparent:true, opacity:0.28, side:THREE.DoubleSide, roughness:0.6})
+    );
+    cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), hydro);
+    scene.add(cyl);
+    const cylEdge = new THREE.LineSegments(new THREE.WireframeGeometry(cyl.geometry), new THREE.LineBasicMaterial({color:0xe39a4a, transparent:true, opacity:0.35}));
+    cylEdge.quaternion.copy(cyl.quaternion);
+    scene.add(cylEdge);
+
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), new THREE.MeshStandardMaterial({color:0x6dcc9c, roughness:0.4}));
+    scene.add(dot);
+
+    function tag(text, pos) {
+      const d=document.createElement('div'); d.className='label'; d.textContent=text;
+      const o=new CSS2DObject(d); o.position.copy(pos); scene.add(o);
+    }
+    tag('σ1', new THREE.Vector3(2.8, 0, 0));
+    tag('σ2', new THREE.Vector3(0, 2.8, 0));
+    tag('σ3', new THREE.Vector3(0, 0, 2.8));
+    tag('hydrostatic', new THREE.Vector3(1.7, 1.9, 1.7));
+
+    function vm(p) {
+      const m = (p.x+p.y+p.z)/3;
+      const d = new THREE.Vector3(p.x-m, p.y-m, p.z-m);
+      return Math.sqrt(1.5 * d.lengthSq());
+    }
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = new THREE.Clock();
+    let running = !reduce;
+    document.addEventListener('visibilitychange', ()=>{ running = !document.hidden && !reduce; });
+
+    function frame(t) {
+      const s = 0.5 + 0.5*Math.sin(t*0.65);
+      const path = new THREE.Vector3(0.15, 0.08, 0.05).add(new THREE.Vector3(1.55, -0.35, -0.25).multiplyScalar(s * 1.35));
+      const eq = vm(path);
+      const scale = eq > sy ? sy / eq : 1;
+      path.multiplyScalar(scale);
+      dot.position.copy(path);
+      const yielded = Math.abs(vm(path) - sy) < 0.04 || scale < 1;
+      dot.material.color.set(yielded ? 0xef4444 : 0x6dcc9c);
+      phase.textContent = yielded ? 'On the cylinder: σ_vm = σ_y. Pressure along the axis would not yield it.' : `Elastic.  σ_vm / σ_y = ${(vm(path)/sy).toFixed(2)}`;
+    }
+    function resize(){ const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); labels.setSize(w,h); }
+    new ResizeObserver(resize).observe(stage); resize();
+    frame(reduce ? 2 : 0);
+    (function loop(){ requestAnimationFrame(loop); if(running) frame(clock.getElapsedTime()); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+  </script>
+</body>
+</html>

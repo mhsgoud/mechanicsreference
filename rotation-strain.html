@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Green Strain versus Infinitesimal Strain — Mechanics Reference</title>
+  <meta name="description" content="A pure rotation produces no Green strain. The infinitesimal strain of the same motion is not zero: it invents stretch." />
+  <link rel="canonical" href="https://mechanicsreference.com/rotation-strain.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
+    *{box-sizing:border-box} html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.84rem;color:var(--navy)}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed #stage{flex:1;height:auto}
+    html.embed #ui{background:#fff}
+    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#finite-strain-measures">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#finite-strain-measures">Finite strain</a></p>
+      <h1>A rotation is not a strain</h1>
+      <p class="standfirst">Both squares undergo the same rigid rotation <i>F</i> = <i>R</i>. The right square is drawn with that rotation: Green strain is zero. The left square is drawn with <i>I</i> + <i>ε</i>, where <i>ε</i> is the infinitesimal strain of the same <i>R</i>. It changes shape. That error is why finite strain exists.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <div id="ui">
+        <p id="formula">F = R &nbsp;  E = ½(FᵀF − I) = 0</p>
+        <p id="readout"></p>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#finite-strain-measures">Finite strain</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const stage = document.getElementById('stage');
+    const readout = document.getElementById('readout');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+    camera.position.set(0, 0, 11);
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+    stage.appendChild(labels.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+
+    const N = 8, size = 2.3;
+    const pts = [];
+    for (let j=0;j<=N;j++) for (let i=0;i<=N;i++) pts.push(new THREE.Vector3(-size/2+size*i/N, -size/2+size*j/N, 0));
+
+    function makeGrid(color, op) {
+      const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity:op});
+      const lines = [];
+      for (let k=0;k<2*(N+1);k++) { const L = new THREE.Line(new THREE.BufferGeometry(), mat); scene.add(L); lines.push(L); }
+      return lines;
+    }
+    function setLine(line, arr) {
+      const a = new Float32Array(arr.length*3);
+      arr.forEach((p,i)=>{ a[3*i]=p.x; a[3*i+1]=p.y; a[3*i+2]=p.z; });
+      line.geometry.setAttribute('position', new THREE.BufferAttribute(a,3));
+      line.geometry.computeBoundingSphere();
+    }
+    function applyGrid(lines, origin, F) {
+      for (let j=0;j<=N;j++) {
+        const row=[]; for (let i=0;i<=N;i++) row.push(pts[j*(N+1)+i].clone().applyMatrix3(F).add(origin));
+        setLine(lines[j], row);
+      }
+      for (let i=0;i<=N;i++) {
+        const col=[]; for (let j=0;j<=N;j++) col.push(pts[j*(N+1)+i].clone().applyMatrix3(F).add(origin));
+        setLine(lines[N+1+i], col);
+      }
+    }
+    const leftO = new THREE.Vector3(-2.8,0,0), rightO = new THREE.Vector3(2.8,0,0);
+    const leftRef = makeGrid(0x7eabdc, 0.3), rightRef = makeGrid(0x7eabdc, 0.3);
+    const leftDef = makeGrid(0xef4444, 0.95), rightDef = makeGrid(0xe39a4a, 0.95);
+    applyGrid(leftRef, leftO, new THREE.Matrix3().identity());
+    applyGrid(rightRef, rightO, new THREE.Matrix3().identity());
+
+    function tag(text, pos) {
+      const d=document.createElement('div'); d.className='label'; d.textContent=text;
+      const o=new CSS2DObject(d); o.position.copy(pos); scene.add(o);
+    }
+    tag('I + ε  (wrong)', new THREE.Vector3(-2.8, 2.3, 0));
+    tag('F = R  (Green = 0)', new THREE.Vector3(2.8, 2.3, 0));
+
+    function rot(a){ const c=Math.cos(a),s=Math.sin(a); return new THREE.Matrix3().set(c,-s,0, s,c,0, 0,0,1); }
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = new THREE.Clock();
+    let running = !reduce;
+    document.addEventListener('visibilitychange', ()=>{ running = !document.hidden && !reduce; });
+
+    function frame(t) {
+      const θ = 0.85 * (0.5 + 0.5*Math.sin(t*0.7));
+      const R = rot(θ);
+      const H = new THREE.Matrix3().set(R.elements[0]-1, R.elements[3], 0, R.elements[1], R.elements[4]-1, 0, 0,0,1);
+      const e11 = H.elements[0], e21 = H.elements[1], e12 = H.elements[3], e22 = H.elements[4];
+      const eps = new THREE.Matrix3().set(
+        e11, 0.5*(e12+e21), 0,
+        0.5*(e12+e21), e22, 0,
+        0,0,1
+      );
+      const Ieps = new THREE.Matrix3().set(1+eps.elements[0], eps.elements[3], 0, eps.elements[1], 1+eps.elements[4], 0, 0,0,1);
+      applyGrid(leftDef, leftO, Ieps);
+      applyGrid(rightDef, rightO, R);
+      const exy = 0.5*(e12+e21);
+      readout.textContent = `θ = ${(θ*180/Math.PI).toFixed(0)}°    εxy = ${exy.toFixed(2)}    E = 0`;
+    }
+
+    function resize(){ const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); labels.setSize(w,h); }
+    new ResizeObserver(resize).observe(stage); resize();
+    frame(reduce ? 2.2 : 0);
+    (function loop(){ requestAnimationFrame(loop); if(running) frame(clock.getElapsedTime()); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+  </script>
+</body>
+</html>
