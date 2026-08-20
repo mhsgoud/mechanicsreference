@@ -225,6 +225,8 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        if ('outputEncoding' in renderer) renderer.outputEncoding = THREE.sRGBEncoding;
+        if ('physicallyCorrectLights' in renderer) renderer.physicallyCorrectLights = true;
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -238,26 +240,34 @@
         scene.add(ambientContour);
         scene.add(keyContour);
 
-        // Material-mode lighting (cheap: 2 lights only)
-        const ambientMat = new THREE.AmbientLight(0xffffff, 0.4);
-        const keyMat = new THREE.DirectionalLight(0xffffff, 0.95);
-        keyMat.position.set(35, 60, 40);
-        ambientMat.visible = false;
-        keyMat.visible = false;
-        scene.add(ambientMat);
-        scene.add(keyMat);
+        // Material-mode lighting: low ambient + raking key so bump reads on vertical faces
+        const ambientMat = new THREE.AmbientLight(0xe8e4dc, 0.16);
+        const hemiMat = new THREE.HemisphereLight(0xf4f7fb, 0x7a7468, 0.42);
+        const keyMat = new THREE.DirectionalLight(0xfff3e4, 1.35);
+        keyMat.position.set(70, 55, 25);
+        const fillMat = new THREE.DirectionalLight(0xc5d4e8, 0.55);
+        fillMat.position.set(-55, 20, -35);
+        const rimMat = new THREE.DirectionalLight(0xeef2f7, 0.4);
+        rimMat.position.set(-10, 35, 90);
+        const kickMat = new THREE.DirectionalLight(0xd8cfc0, 0.28);
+        kickMat.position.set(10, -25, 40);
+        [ambientMat, hemiMat, keyMat, fillMat, rimMat, kickMat].forEach((l) => {
+            l.visible = false;
+            scene.add(l);
+        });
+        const matLights = [ambientMat, hemiMat, keyMat, fillMat, rimMat, kickMat];
 
         // Named materials — MeshStandard only (no clearcoat / env / custom shaders)
         const MATS = {
             concrete: {
                 label: 'Concrete',
                 slave: new THREE.MeshStandardMaterial({
-                    color: 0xd8d4ce, metalness: 0.05, roughness: 0.92, side: THREE.DoubleSide, flatShading: false
+                    color: 0xb9b4ac, metalness: 0, roughness: 0.9, side: THREE.FrontSide, flatShading: false
                 }),
                 master: new THREE.MeshStandardMaterial({
-                    color: 0xc4c0b8, metalness: 0.05, roughness: 0.94, side: THREE.DoubleSide, flatShading: false
+                    color: 0xa8a39b, metalness: 0, roughness: 0.92, side: THREE.FrontSide, flatShading: false
                 }),
-                bg: 0xe8e6e1,
+                bg: 0xe4e1db,
                 edge: 0x5c6574
             },
             steel: {
@@ -287,10 +297,24 @@
         function applyConcreteMaps(tex) {
             tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
             tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+            if ('encoding' in tex) tex.encoding = THREE.sRGBEncoding;
+            tex.needsUpdate = true;
+
+            // Separate bump copy in linear space so baked photo shading is not treated as height twice
+            const bump = tex.clone();
+            bump.wrapS = bump.wrapT = THREE.RepeatWrapping;
+            if ('encoding' in bump) bump.encoding = THREE.LinearEncoding;
+            bump.needsUpdate = true;
+
             [MATS.concrete.slave, MATS.concrete.master].forEach((mat, i) => {
                 mat.map = tex;
-                mat.bumpMap = tex;
-                mat.bumpScale = i === 0 ? 0.42 : 0.38;
+                mat.bumpMap = bump;
+                // Mild bump: side faces get their relief from raking light, not exaggerated height
+                mat.bumpScale = i === 0 ? 0.22 : 0.2;
+                mat.roughness = i === 0 ? 0.9 : 0.93;
+                mat.metalness = 0;
+                // Mute the map so baked photo light does not fight scene lights on vertical faces
+                mat.color.set(i === 0 ? 0xb2ada5 : 0xa29d95);
                 mat.needsUpdate = true;
             });
         }
@@ -421,19 +445,35 @@
         }
 
         function pushBoxUv(uvs, x, y, z, nx, ny, nz) {
-            const s = 0.055;
+            // Anisotropic tiling: more repeats along beam length, denser along height so sides are not stretched
+            const sx = 0.048, sy = 0.11, sz = 0.05;
             const ax = Math.abs(nx), ay = Math.abs(ny), az = Math.abs(nz);
-            if (ay >= ax && ay >= az) uvs.push(x * s, z * s);
-            else if (ax >= az) uvs.push(z * s, y * s);
-            else uvs.push(x * s, y * s);
+            if (ay >= ax && ay >= az) uvs.push(x * sx, z * sz);
+            else if (ax >= az) uvs.push(z * sz, y * sy);
+            else uvs.push(x * sx, y * sy);
         }
 
         function setLightingMode(mode) {
             const matMode = isMaterialMode(mode);
             ambientContour.visible = !matMode;
             keyContour.visible = !matMode;
-            ambientMat.visible = matMode;
-            keyMat.visible = matMode;
+            matLights.forEach((l) => { l.visible = matMode; });
+            // Concrete needs stronger side fill; metals can stay a bit softer
+            if (matMode && mode === 'concrete') {
+                ambientMat.intensity = 0.14;
+                hemiMat.intensity = 0.48;
+                keyMat.intensity = 1.4;
+                fillMat.intensity = 0.62;
+                rimMat.intensity = 0.45;
+                kickMat.intensity = 0.32;
+            } else if (matMode) {
+                ambientMat.intensity = 0.28;
+                hemiMat.intensity = 0.35;
+                keyMat.intensity = 1.05;
+                fillMat.intensity = 0.4;
+                rimMat.intensity = 0.25;
+                kickMat.intensity = 0.15;
+            }
             scene.background = new THREE.Color(matMode ? MATS[mode].bg : 0xf3f4f6);
             document.getElementById('colorbar').classList.toggle('hidden', matMode);
             document.getElementById('fieldSelect').disabled = matMode;
