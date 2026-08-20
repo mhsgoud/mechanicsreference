@@ -679,7 +679,7 @@ const topics = [
     "Griffith required that the energy released by an increment of crack area pay the surface energy. Irwin identified that release rate with K²/E′. Toughness is then a critical Kc or a critical Gc. The J-integral evaluates the same G from a contour that need not sit in the singular zone.",
     "The unbounded stress is an artefact of the linear model. Cut it off with a yield stress and a plastic zone appears; cut it off with a tensile strength and a cohesive zone appears. If that zone is small, the outer K-field is unchanged and LEFM still sets the load at fracture. If it is not, the next entry is the right model.",
     "The figure is a plate with an edge crack. Switch mode I and mode II. The colour is the Williams stress; the log–log plot of ligament stress has slope −1/2."
-  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding"], scene:"lefm", illustrations:"lefm"},
+  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding"], scenes:["lefm","lefmCenterCrack"], illustrations:"lefm"},
   {part:"Part IV – Applications in Engineering", title:"Cohesive Cracking", equations:[
     {name:"Traction–separation", expr:"t = t(δ),   G_f = ∫_0^{w_c} t dδ", note:"The area under the law is the fracture energy. Linear, bilinear, and exponential shapes are the usual choices. The tensile strength ft is the peak traction."},
     {name:"Hillerborg length", expr:"ℓ_ch = E G_f / f_t²", note:"Characteristic size of the process zone. LEFM is recovered when ℓ_ch is small compared with the crack and the specimen."},
@@ -690,7 +690,7 @@ const topics = [
     "The same surface can be fitted with interface elements, enriched so that a Heaviside jump lives in the displacement (XFEM, or an enriched mesh-free approximation such as element-free Galerkin), or smeared as a band. Enrichment avoids remeshing as the crack grows. Propagation is a tensile-strength check at the tip; the next segment follows the maximum hoop-stress direction written in K_I and K_II.",
     "In a saturated porous solid the mechanical jump is not the whole story. Biot’s split still holds: total stress is effective stress minus α p. Water pressure is continuous across a cohesive crack; its normal gradient is not, because fluid is exchanged between the fracture and the intact medium — a distance enrichment of the pressure field represents that jump in flux. The effective traction on the faces is the cohesive traction minus the pore pressure. Mass exchange along the crack raises the load-bearing capacity relative to a dry analysis of the same geometry. That two-scale hydro-mechanical coupling is the setting of Goudarzi and Mohammadi (2015).",
     "The figure is a process zone on a crack line. Change the law, the tensile strength, and G_f. Navy is the cohesive traction; orange is the LEFM 1/√r field with the same far-field K. The LEFM curve is unbounded at the tip; the cohesive curve is not."
-  ], tags:["cohesive zone","Barenblatt","Dugdale","Hillerborg","traction-separation","process zone","porous media","XFEM"], scene:"cohesiveCrack", illustrations:"cohesive", sources:[{label:"Goudarzi & Mohammadi, Analysis of cohesive cracking in saturated porous media using an extrinsically enriched EFG method, Comput. Geotech. 63 (2015)", href:"https://doi.org/10.1016/j.compgeo.2014.09.007"}]},
+  ], tags:["cohesive zone","Barenblatt","Dugdale","Hillerborg","traction-separation","process zone","porous media","XFEM"], scenes:["cohesiveCrack","dcbCohesive"], illustrations:"cohesive", sources:[{label:"Goudarzi & Mohammadi, Analysis of cohesive cracking in saturated porous media using an extrinsically enriched EFG method, Comput. Geotech. 63 (2015)", href:"https://doi.org/10.1016/j.compgeo.2014.09.007"}]},
   {part:"Part IV – Applications in Engineering", title:"The J-Integral", equations:[
     {name:"Contour form", expr:"J = ∮_Γ (w n_1 − t · ∂u/∂x_1) dΓ", note:"Any path from the lower face to the upper that encloses the tip and no other singularity. w is the strain-energy density, t = σ n the traction on Γ."},
     {name:"Potential energy", expr:"J = −dΠ / dA", note:"Energy released per unit area of crack advance. For a nonlinear elastic solid this is Griffith’s G. Unloading, inertia, and thermal strain take the identity away."},
@@ -718,7 +718,7 @@ const topics = [
     "A weak-discontinuity enrichment of the matrix (sdERS) restores the strain jump and reduces those oscillations, at the cost of a background integration mesh that dense RVEs cannot afford. Raising the polynomial order or the regularity of the slip approximation is the cheaper cousin. Condensing the fibre degrees of freedom during assembly leaves a global system the size of the intact matrix, independent of how many fibres are added — the route to RVEs with millions of discrete fibres.",
     "The range of reliability is a set of dimensionless groups: fibre diameter over domain size, modulus contrast, and interface stiffness. Outside that range the reduced model should be checked against a fully resolved mesh on both effective moduli and slip, not on stiffness alone.",
     "The figure is an RVE of discrete fibres in a matrix cube. Orbit it, redistribute the packing, pull the orientation from random toward aligned, and click a fibre. None of them share nodes with the background grid."
-  ], tags:["embedded reinforcement","ERS","slip","high aspect ratio","sdERS","condensation","discrete fibre"], illustrations:"embeddedFibers", scene:"randomFibers", sources:[{label:"Goudarzi, Discrete fiber models beyond classical applications, TU Delft (2020)", href:"https://doi.org/10.4233/uuid:4741efe6-9a5e-4782-8cef-6d7ed83a3b30"}]},
+  ], tags:["embedded reinforcement","ERS","slip","high aspect ratio","sdERS","condensation","discrete fibre"], illustrations:"embeddedFibers", scenes:["randomFibers","fiberInterface"], sources:[{label:"Goudarzi, Discrete fiber models beyond classical applications, TU Delft (2020)", href:"https://doi.org/10.4233/uuid:4741efe6-9a5e-4782-8cef-6d7ed83a3b30"}]},
   {part:"Part IV – Applications in Engineering", title:"Fiber Neutrality and Rigid Line Inclusions", bullets:[
     "A stiff fibre does not always stiffen the composite. Wang et al. showed that a zero-thickness rigid line inclusion in plane stress or plane strain is mechanically neutral at an orientation that depends only on the Poisson ratio of the matrix: the remote uniform stress is unperturbed. Goudarzi and Simone (2019) showed that the same neutrality holds for linear elastic thin fibres in three dimensions, with a perfect or an imperfect interface, once the fibre diameter is small compared with the domain (df/L ≲ 0.01).",
     "In a reduced (one-dimensional) fibre model the fibre is unstrained at θn = arctan(1/√ν) under uniaxial tension. That is the plane-stress angle of Wang et al.; a three-dimensional reduced fibre matches it. The effective Young’s modulus then equals that of the matrix. Fibres aligned with the load stiffen; fibres at 90° can still stiffen slightly through Poisson contraction; fibres at θn contribute nothing. The common claim that adding fibres always improves the elastic moduli is therefore false. Mean-field and rule-of-mixtures estimates cannot see that orientation.",
@@ -1158,7 +1158,10 @@ function renderTopicScene(topic){
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
     fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
     hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'},
-    beamContact: {src:'contact-beam.html', title:'Double-cantilever ContactFEA', tall:true}
+    beamContact: {src:'contact-beam.html', title:'Double-cantilever ContactFEA', tall:true},
+    lefmCenterCrack: {src:'lefm-center-crack.html', title:'Center crack and tip singularity', tall:true},
+    dcbCohesive: {src:'dcb-cohesive.html', title:'DCB cohesive crack', tall:true},
+    fiberInterface: {src:'fiber-interface.html', title:'Inclined fiber interface debonding', tall:true}
   };
   const keys = topic.scenes || (topic.scene ? [topic.scene] : []);
   if(!keys.length) return '';
@@ -1889,11 +1892,11 @@ window.addEventListener('keydown', (e)=>{
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));
-    ok('lefm topic', topics.some(t => t.title === 'Linear Elastic Fracture Mechanics' && t.scene === 'lefm'));
-    ok('cohesive cracking topic', topics.some(t => t.title === 'Cohesive Cracking' && t.scene === 'cohesiveCrack'));
+    ok('lefm topic', topics.some(t => t.title === 'Linear Elastic Fracture Mechanics' && Array.isArray(t.scenes) && t.scenes.includes('lefm') && t.scenes.includes('lefmCenterCrack')));
+    ok('cohesive cracking topic', topics.some(t => t.title === 'Cohesive Cracking' && Array.isArray(t.scenes) && t.scenes.includes('cohesiveCrack') && t.scenes.includes('dcbCohesive')));
     ok('j-integral topic', topics.some(t => t.title === 'The J-Integral' && t.scene === 'jIntegral'));
     ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));
-    ok('embedded fiber models topic', topics.some(t => t.title === 'Embedded Fiber Models'));
+    ok('embedded fiber models topic', topics.some(t => t.title === 'Embedded Fiber Models' && Array.isArray(t.scenes) && t.scenes.includes('fiberInterface')));
     ok('fiber neutrality topic', topics.some(t => t.title === 'Fiber Neutrality and Rigid Line Inclusions'));
     ok('fiber neutrality scene wired', topics.some(t => t.scene === 'fiberNeutrality3d'));
     ok('multiphase porous topic', topics.some(t => t.title === 'Multiphase Porous Materials' && t.illustrations === 'porousOverview'));

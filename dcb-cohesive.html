@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Double cantilever cohesive crack — Mechanics Reference</title>
+  <meta name="description" content="Displacement-controlled DCB specimen with a cohesive crack: load-displacement response from elastic opening through peak load to softening." />
+  <link rel="canonical" href="https://mechanicsreference.com/dcb-cohesive.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f}
+    body{margin:0;font-family:"Source Sans 3",system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+    .site-header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .page-intro{max-width:1180px;margin:0 auto;padding:28px 28px 8px}
+    .crumb{font-size:0.92rem;color:var(--ink-soft);margin:0 0 8px}
+    .page-intro h1{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 8px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--ink-soft)}
+    .related{margin:0 0 12px;font-size:0.9rem;color:var(--ink-soft)}
+    .related a{color:#3a5f8a}
+    .demo-root{background:#0f172a;color:#e2e8f0;padding-bottom:48px}
+    .site-footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft);background:var(--paper)}
+    .site-footer .wrap{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between}
+    html.embed,html.embed body{height:100%;background:#0f172a}
+    html.embed .site-header,html.embed .page-intro,html.embed .site-footer{display:none}
+    html.embed .demo-root{min-height:100%;padding:0} html.embed .demo-root > header{display:none}
+    html.embed .demo-root > .max-w-6xl{max-width:none;margin:0;padding:8px;height:100%}
+    @media (max-width:800px){.site-header,.page-intro,.site-footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="./#figures">Figures</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#cohesive-cracking">Library</a>
+    </nav>
+  </header>
+  <div class="page-intro">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#cohesive-cracking">Cohesive cracking</a></p>
+    <h1>Double cantilever cohesive crack</h1>
+    <p class="standfirst">A classic DCB under opening displacement. The interface follows a cohesive law: linear response, then a process zone, then softening. The chart is the load-displacement path of a refined XEFG solution.</p>
+    <p class="related"><a href="cohesive-crack.html">Cohesive zone figure</a> · <a href="lefm-center-crack.html">LEFM center crack</a> · <a href="j-integral.html">J-integral</a></p>
+  </div>
+  <div class="demo-root">
+
+
+    
+
+    <main class="max-w-6xl mx-auto px-6 pb-12 space-y-6">
+        <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                <div class="lg:col-span-3 relative w-full h-[420px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+                    <div id="threejs-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
+                        <strong>Drag</strong> to rotate | <strong>Scroll</strong> to zoom
+                    </div>
+                    <div id="stageBadge" class="absolute top-3 right-3 bg-emerald-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-emerald-300 border border-emerald-700">
+                        Stage: Elastic
+                    </div>
+                    <div id="dispOverlay" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-2 rounded text-xs text-slate-300 border border-slate-700 font-mono leading-relaxed">
+                        Left-node δ = 0.000 mm<br>
+                        Top +δ · Bottom −δ<br>
+                        <span class="text-amber-400/90">view ×150 (true scale invisible)</span>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-xs font-semibold text-slate-300">Load–Displacement (refined XEFG)</div>
+                        <label class="text-[10px] text-slate-400 flex items-center gap-1.5 cursor-pointer">
+                            <input id="trueScaleToggle" type="checkbox" class="accent-indigo-500">
+                            True scale
+                        </label>
+                    </div>
+                    <canvas id="ldChart" class="w-full flex-1 min-h-[280px]"></canvas>
+                    <div class="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-400">
+                        <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-slate-200 inline-block"></span> Spline</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 bg-indigo-400 inline-block rounded-full"></span> Current</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 border border-slate-300 inline-block"></span> (I)(II)(III)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+                <div class="md:col-span-2 bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                    <div class="flex items-center gap-3 mb-1">
+                        <button id="playBtn" type="button"
+                            class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400/40">
+                            ▶ Play
+                        </button>
+                        <button id="resetBtn" type="button"
+                            class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-500/40">
+                            Reset
+                        </button>
+                        <label for="dispSlider" class="block text-xs font-semibold text-slate-300 flex-1">
+                            Left load-node displacement $\delta$ (upper $+\delta$, lower $-\delta$):
+                            <span id="dispValue" class="text-indigo-400 font-mono">0.000</span> mm
+                        </label>
+                    </div>
+                    <input id="dispSlider" type="range" min="0" max="0.45" step="0.0005" value="0"
+                           class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-1 px-0.5">
+                        <span>0</span>
+                        <span>(I) 0.140</span>
+                        <span>(II) 0.270</span>
+                        <span>(III) 0.320</span>
+                        <span>0.450</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-1.5 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Load ($F$):</span>
+                        <span id="loadVal" class="font-mono text-indigo-400">0.00 kN</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Upper-left $u_y$:</span>
+                        <span id="topNodeVal" class="font-mono text-sky-400">+0.000 mm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Lower-left $u_y$:</span>
+                        <span id="botNodeVal" class="font-mono text-sky-400">−0.000 mm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Crack length ($a$):</span>
+                        <span id="crackVal" class="font-mono text-rose-400">120 mm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Peak traction:</span>
+                        <span id="tracMaxVal" class="font-mono text-emerald-400">0.00 MPa</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Tip traction:</span>
+                        <span id="tracTipVal" class="font-mono text-amber-400">0.00 MPa</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">State:</span>
+                        <span id="stateVal" class="font-semibold text-emerald-400">Elastic</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cohesive traction charts -->
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Cohesive traction along ligament $\sigma(x)$</div>
+                    <canvas id="tracProfileChart" class="w-full h-[160px]"></canvas>
+                    <div class="mt-1 text-[10px] text-slate-500">Ahead of crack tip — green elastic · amber softening · gap = broken</div>
+                </div>
+                <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Traction–separation law $\sigma(\delta_n)$</div>
+                    <canvas id="tslChart" class="w-full h-[160px]"></canvas>
+                    <div class="mt-1 text-[10px] text-slate-500">Points = active cohesive stations (current openings)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 text-sm space-y-2">
+                <h3 class="font-bold text-white text-base">Specimen &amp; Kinematics</h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                    <li><strong>Length / height:</strong> 400 mm × 200 mm</li>
+                    <li><strong>Initial notch $a_0$:</strong> 120 mm</li>
+                    <li><strong>$\delta$ on the curve:</strong> vertical displacement of the <em>upper/lower left load nodes</em> (not CMOD)</li>
+                    <li><strong>Motion:</strong> upper-left node $u_y=+\delta$, lower-left $u_y=-\delta$; arms meet at crack tip $x=a$</li>
+                    <li><strong>Support:</strong> pinned at right midplane</li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 text-sm space-y-2">
+                <h3 class="font-bold text-white text-base">Cohesive Zone Traction Law</h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                    <li><strong>$\sigma_c$:</strong> 10 MPa peak cohesive strength</li>
+                    <li><strong>$\delta_0$:</strong> 0.02 mm damage initiation</li>
+                    <li><strong>$\delta_f$:</strong> 0.08 mm complete separation</li>
+                    <li>Purple arrows on the midplane = local cohesive tractions (length ∝ $\sigma$)</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dense digitized control points from left XEFG curve (δ mm, F kN)
+        const LD_CTRL = [
+            { d: 0.000, F: 0.0 },
+            { d: 0.015, F: 6.5 },
+            { d: 0.030, F: 13.0 },
+            { d: 0.045, F: 19.5 },
+            { d: 0.060, F: 26.0 },
+            { d: 0.075, F: 32.5 },
+            { d: 0.090, F: 38.5 },
+            { d: 0.105, F: 44.5 },
+            { d: 0.120, F: 50.5 },
+            { d: 0.130, F: 54.0 },
+            { d: 0.140, F: 57.0 }, // (I) peak
+            { d: 0.150, F: 55.8 },
+            { d: 0.160, F: 54.2 },
+            { d: 0.175, F: 52.0 },
+            { d: 0.190, F: 49.5 },
+            { d: 0.205, F: 47.0 },
+            { d: 0.220, F: 44.5 },
+            { d: 0.235, F: 42.2 },
+            { d: 0.250, F: 40.5 },
+            { d: 0.270, F: 39.0 }, // (II)
+            { d: 0.285, F: 36.0 },
+            { d: 0.295, F: 31.5 },
+            { d: 0.305, F: 24.0 },
+            { d: 0.312, F: 17.5 },
+            { d: 0.320, F: 12.0 }, // (III) steep drop
+            { d: 0.330, F: 7.5 },
+            { d: 0.345, F: 4.8 },
+            { d: 0.365, F: 3.2 },
+            { d: 0.390, F: 2.2 },
+            { d: 0.420, F: 1.4 },
+            { d: 0.450, F: 0.9 }
+        ];
+
+        const MARKERS = [
+            { id: 'I',   d: 0.140, F: 57.0 },
+            { id: 'II',  d: 0.270, F: 39.0 },
+            { id: 'III', d: 0.320, F: 12.0 }
+        ];
+
+        // Catmull–Rom → cubic Hermite segment (uniform)
+        function catmullRom(p0, p1, p2, p3, t) {
+            const t2 = t * t, t3 = t2 * t;
+            return 0.5 * (
+                (2 * p1) +
+                (-p0 + p2) * t +
+                (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+                (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+            );
+        }
+
+        function buildSplineSamples(ctrl, samplesPerSeg) {
+            const out = [];
+            const n = ctrl.length;
+            for (let i = 0; i < n - 1; i++) {
+                const c0 = ctrl[Math.max(0, i - 1)];
+                const c1 = ctrl[i];
+                const c2 = ctrl[i + 1];
+                const c3 = ctrl[Math.min(n - 1, i + 2)];
+                const segs = i === n - 2 ? samplesPerSeg : samplesPerSeg;
+                for (let s = 0; s < segs; s++) {
+                    const t = s / segs;
+                    out.push({
+                        d: catmullRom(c0.d, c1.d, c2.d, c3.d, t),
+                        F: Math.max(0, catmullRom(c0.F, c1.F, c2.F, c3.F, t))
+                    });
+                }
+            }
+            out.push({ d: ctrl[n - 1].d, F: ctrl[n - 1].F });
+            // Ensure strictly increasing d (numerical guard)
+            for (let i = 1; i < out.length; i++) {
+                if (out[i].d <= out[i - 1].d) out[i].d = out[i - 1].d + 1e-6;
+            }
+            return out;
+        }
+
+        const LD_SPLINE = buildSplineSamples(LD_CTRL, 12);
+
+        function loadFromDisplacement(delta) {
+            const pts = LD_SPLINE;
+            if (delta <= pts[0].d) return pts[0].F;
+            if (delta >= pts[pts.length - 1].d) return pts[pts.length - 1].F;
+            // Binary search
+            let lo = 0, hi = pts.length - 1;
+            while (hi - lo > 1) {
+                const mid = (lo + hi) >> 1;
+                if (pts[mid].d <= delta) lo = mid; else hi = mid;
+            }
+            const a = pts[lo], b = pts[hi];
+            const t = (delta - a.d) / (b.d - a.d);
+            return a.F + t * (b.F - a.F);
+        }
+
+        function crackLengthFromDisplacement(delta) {
+            const dI = 0.140, dII = 0.270, dIII = 0.320;
+            if (delta <= dI) return a0;
+            if (delta <= dII) {
+                const t = (delta - dI) / (dII - dI);
+                // Slow early growth after initiation
+                return a0 + Math.pow(t, 1.4) * (0.45 * (L - a0));
+            }
+            if (delta <= dIII) {
+                const t = (delta - dII) / (dIII - dII);
+                // Rapid advance through snap-down
+                const aII = a0 + 0.45 * (L - a0);
+                return aII + Math.pow(t, 0.7) * (0.50 * (L - a0));
+            }
+            const t = Math.min(1, (delta - dIII) / (0.450 - dIII));
+            const aIII = a0 + 0.95 * (L - a0);
+            return aIII + t * (L - aIII);
+        }
+
+        function stageFromDisplacement(delta) {
+            if (delta < 0.140) return { label: 'Elastic → Peak', badge: 'Stage: Elastic', key: 'elastic' };
+            if (delta < 0.270) return { label: '(I)→(II) Softening', badge: 'Stage: (I)→(II)', key: 'softening' };
+            if (delta < 0.320) return { label: '(II)→(III) Snap-down', badge: 'Stage: (II)→(III)', key: 'drop' };
+            return { label: 'Post-(III) Residual', badge: 'Stage: Post-(III)', key: 'residual' };
+        }
+
+        // --- Scene ---
+        const container = document.getElementById('threejs-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0f1d);
+
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 1, 2000);
+        camera.position.set(0, 40, 620);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+        dirLight.position.set(100, 300, 200);
+        scene.add(dirLight);
+
+        const L = 400;
+        const H_half = 100;
+        const a0 = 120;
+        const numSegsX = 80;
+        const numSegsY = 14;
+
+        // Engineering δ ≤ 0.45 mm is invisible on a 400 mm specimen → amplify for teaching view
+        const VISUAL_AMPLIFY = 150;
+        let useTrueScale = false;
+
+        function visualOpen(delta) {
+            return useTrueScale ? delta : delta * VISUAL_AMPLIFY;
+        }
+
+        function createArmGeometry(isTop) {
+            const geom = new THREE.PlaneGeometry(L, H_half, numSegsX, numSegsY);
+            geom.translate(0, (isTop ? 1 : -1) * (H_half / 2), 0);
+            return geom;
+        }
+
+        function storeOriginalPositions(geometry) {
+            const pos = geometry.attributes.position;
+            const origX = new Float32Array(pos.count);
+            const origY = new Float32Array(pos.count);
+            for (let i = 0; i < pos.count; i++) {
+                origX[i] = pos.getX(i);
+                origY[i] = pos.getY(i);
+            }
+            geometry.userData.origX = origX;
+            geometry.userData.origY = origY;
+        }
+
+        const baseMat = new THREE.MeshStandardMaterial({
+            color: 0x38bdf8,
+            side: THREE.DoubleSide,
+            roughness: 0.35,
+            metalness: 0.05
+        });
+
+        const topArm = new THREE.Mesh(createArmGeometry(true), baseMat.clone());
+        const bottomArm = new THREE.Mesh(createArmGeometry(false), baseMat.clone());
+        storeOriginalPositions(topArm.geometry);
+        storeOriginalPositions(bottomArm.geometry);
+
+        const specimenGroup = new THREE.Group();
+        specimenGroup.add(topArm);
+        specimenGroup.add(bottomArm);
+        scene.add(specimenGroup);
+
+        // --- Bilinear cohesive zone model (engineering units) ---
+        const SIGMA_C = 10.0;   // MPa peak traction
+        const DELTA_0 = 0.02;   // mm initiation opening
+        const DELTA_F = 0.08;   // mm failure opening
+        const K_COH = SIGMA_C / DELTA_0;
+
+        function cohesiveTraction(sepEng) {
+            const dn = Math.max(0, sepEng);
+            if (dn <= 1e-9) return { sigma: 0, state: 'closed' };
+            if (dn <= DELTA_0) return { sigma: K_COH * dn, state: 'elastic' };
+            if (dn < DELTA_F) {
+                const s = SIGMA_C * (DELTA_F - dn) / (DELTA_F - DELTA_0);
+                return { sigma: s, state: 'softening' };
+            }
+            return { sigma: 0, state: 'broken' };
+        }
+
+        function tractionColor(state, sigma) {
+            if (state === 'elastic') return new THREE.Color(0x10b981);
+            if (state === 'softening') {
+                // amber → rose as traction drops
+                const t = 1 - sigma / SIGMA_C;
+                return new THREE.Color().setRGB(0.96, 0.62 - 0.3 * t, 0.04 + 0.3 * t);
+            }
+            return new THREE.Color(0x64748b);
+        }
+
+        const cohesiveStations = [];
+        const bondCount = 36;
+
+        function createTractionArrowPair() {
+            const group = new THREE.Group();
+            const mat = new THREE.MeshBasicMaterial({ color: 0xa78bfa });
+            // Attractive tractions: arrows on crack faces pointing toward midplane
+            const upShaft = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1, 8), mat.clone());
+            const upHead = new THREE.Mesh(new THREE.ConeGeometry(3.2, 7, 10), mat.clone());
+            const dnShaft = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1, 8), mat.clone());
+            const dnHead = new THREE.Mesh(new THREE.ConeGeometry(3.2, 7, 10), mat.clone());
+            const bar = new THREE.Mesh(
+                new THREE.BoxGeometry(2.2, 1, 2.2),
+                new THREE.MeshBasicMaterial({ color: 0x10b981 })
+            );
+            group.add(upShaft, upHead, dnShaft, dnHead, bar);
+            group.userData = { upShaft, upHead, dnShaft, dnHead, bar };
+            return group;
+        }
+
+        function layoutTractionArrows(group, halfSepVis, sigma) {
+            const { upShaft, upHead, dnShaft, dnHead, bar } = group.userData;
+            const maxLen = 28;
+            const len = Math.max(3, (sigma / SIGMA_C) * maxLen);
+            const headLen = Math.min(7, len * 0.45);
+            const shaftLen = Math.max(2, len - headLen);
+            // Place arrow tips near faces; shafts grow toward midplane (closing sense)
+            const faceY = Math.max(1.5, halfSepVis * 0.5);
+            // Upper face arrow points down (−Y)
+            upShaft.scale.set(1, shaftLen, 1);
+            upShaft.position.set(0, faceY - shaftLen / 2, 3);
+            upHead.rotation.set(Math.PI, 0, 0);
+            upHead.position.set(0, faceY - shaftLen - headLen / 2, 3);
+            // Lower face arrow points up (+Y)
+            dnShaft.scale.set(1, shaftLen, 1);
+            dnShaft.position.set(0, -faceY + shaftLen / 2, 3);
+            dnHead.rotation.set(0, 0, 0);
+            dnHead.position.set(0, -faceY + shaftLen + headLen / 2, 3);
+            bar.scale.set(1, Math.max(1, halfSepVis), 1);
+            bar.position.set(0, 0, 2);
+        }
+
+        for (let i = 0; i < bondCount; i++) {
+            const xPos = a0 + (i / (bondCount - 1)) * (L - a0);
+            const group = createTractionArrowPair();
+            group.position.set(xPos - L / 2, 0, 0);
+            specimenGroup.add(group);
+            cohesiveStations.push({ group, x: xPos, sep: 0, sigma: 0, state: 'closed' });
+        }
+
+        const pathPts = [];
+        for (let i = 0; i <= 50; i++) {
+            pathPts.push(new THREE.Vector3(-L / 2 + a0 + (i / 50) * (L - a0), 0, -0.5));
+        }
+        const pathLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(pathPts),
+            new THREE.LineDashedMaterial({ color: 0x64748b, dashSize: 6, gapSize: 4 })
+        );
+        pathLine.computeLineDistances();
+        specimenGroup.add(pathLine);
+
+        function createForceArrow(pointingUp) {
+            const group = new THREE.Group();
+            const mat = new THREE.MeshBasicMaterial({ color: 0xef4444, depthTest: true });
+            const shaft = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.2, 1, 10), mat);
+            const head = new THREE.Mesh(new THREE.ConeGeometry(6.5, 16, 14), mat);
+            group.add(shaft);
+            group.add(head);
+
+            // Canvas "F" label
+            const cv = document.createElement('canvas');
+            cv.width = 64;
+            cv.height = 64;
+            const ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, 64, 64);
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('F', 32, 34);
+            const tex = new THREE.CanvasTexture(cv);
+            const label = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: tex,
+                transparent: true,
+                depthTest: false
+            }));
+            label.scale.set(22, 22, 1);
+            group.add(label);
+
+            group.userData.shaft = shaft;
+            group.userData.head = head;
+            group.userData.label = label;
+            group.userData.pointingUp = pointingUp;
+            return group;
+        }
+
+        function layoutForceArrow(group, totalLen) {
+            const headLen = 16;
+            const shaftLen = Math.max(20, totalLen - headLen);
+            const shaft = group.userData.shaft;
+            const head = group.userData.head;
+            const label = group.userData.label;
+            const up = group.userData.pointingUp;
+
+            shaft.scale.set(1, shaftLen, 1);
+            // Arrow grows outward from the load point
+            if (up) {
+                shaft.position.set(0, shaftLen / 2, 0);
+                head.position.set(0, shaftLen + headLen / 2, 0);
+                head.rotation.set(0, 0, 0);
+                label.position.set(18, shaftLen + headLen + 6, 0);
+            } else {
+                shaft.position.set(0, -shaftLen / 2, 0);
+                head.position.set(0, -(shaftLen + headLen / 2), 0);
+                head.rotation.set(Math.PI, 0, 0);
+                label.position.set(18, -(shaftLen + headLen + 6), 0);
+            }
+        }
+
+        const topArrow = createForceArrow(true);
+        const botArrow = createForceArrow(false);
+        specimenGroup.add(topArrow);
+        specimenGroup.add(botArrow);
+        layoutForceArrow(topArrow, 55);
+        layoutForceArrow(botArrow, 55);
+
+        const pinMesh = new THREE.Mesh(
+            new THREE.ConeGeometry(12, 20, 4),
+            new THREE.MeshBasicMaterial({ color: 0x94a3b8, wireframe: true })
+        );
+        pinMesh.rotation.z = Math.PI / 2;
+        pinMesh.position.set(L / 2, 0, 0);
+        specimenGroup.add(pinMesh);
+
+        // Initial notch
+        specimenGroup.add(new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-L / 2, 0, 1),
+                new THREE.Vector3(-L / 2 + a0, 0, 1)
+            ]),
+            new THREE.LineBasicMaterial({ color: 0xef4444 })
+        ));
+
+        const crackLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-L / 2 + a0, 0, 1.5),
+                new THREE.Vector3(-L / 2 + a0, 0, 1.5)
+            ]),
+            new THREE.LineBasicMaterial({ color: 0xf43f5e })
+        );
+        specimenGroup.add(crackLine);
+
+        // Undeformed load-node markers (reference) + δ displacement rulers
+        const refMat = new THREE.MeshBasicMaterial({ color: 0x64748b });
+        const topRefNode = new THREE.Mesh(new THREE.SphereGeometry(4, 12, 12), refMat);
+        const botRefNode = new THREE.Mesh(new THREE.SphereGeometry(4, 12, 12), refMat.clone());
+        topRefNode.position.set(-L / 2, H_half, 5);
+        botRefNode.position.set(-L / 2, -H_half, 5);
+        specimenGroup.add(topRefNode);
+        specimenGroup.add(botRefNode);
+
+        const topDefNode = new THREE.Mesh(
+            new THREE.SphereGeometry(5, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+        );
+        const botDefNode = new THREE.Mesh(
+            new THREE.SphereGeometry(5, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+        );
+        specimenGroup.add(topDefNode);
+        specimenGroup.add(botDefNode);
+
+        const topDispLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+            new THREE.LineBasicMaterial({ color: 0xfbbf24 })
+        );
+        const botDispLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+            new THREE.LineBasicMaterial({ color: 0xfbbf24 })
+        );
+        specimenGroup.add(topDispLine);
+        specimenGroup.add(botDispLine);
+
+        function makeDeltaSprite() {
+            const cv = document.createElement('canvas');
+            cv.width = 128;
+            cv.height = 64;
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 40px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('δ', 64, 32);
+            const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: new THREE.CanvasTexture(cv),
+                transparent: true,
+                depthTest: false
+            }));
+            spr.scale.set(28, 14, 1);
+            return spr;
+        }
+        const topDeltaLabel = makeDeltaSprite();
+        const botDeltaLabel = makeDeltaSprite();
+        specimenGroup.add(topDeltaLabel);
+        specimenGroup.add(botDeltaLabel);
+
+        // Mouth-opening dimension (visual δ between tips) — removed; δ is nodal u_y
+        const dimGeo = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-L / 2 - 8, 0, 2),
+            new THREE.Vector3(-L / 2 - 8, 0, 2)
+        ]);
+        const dimLine = new THREE.Line(dimGeo, new THREE.LineBasicMaterial({ color: 0xfbbf24 }));
+        dimLine.visible = false;
+        specimenGroup.add(dimLine);
+
+        // --- Chart ---
+        const chartCanvas = document.getElementById('ldChart');
+        const chartCtx = chartCanvas.getContext('2d');
+
+        function resizeChart() {
+            const rect = chartCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            chartCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            chartCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function drawChart(delta, load) {
+            const w = chartCanvas.clientWidth;
+            const h = chartCanvas.clientHeight;
+            if (w < 10 || h < 10) return;
+
+            const pad = { l: 44, r: 12, t: 14, b: 34 };
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+            const dMax = 0.45, FMax = 60;
+            const xOf = (d) => pad.l + (d / dMax) * plotW;
+            const yOf = (F) => pad.t + plotH - (F / FMax) * plotH;
+
+            chartCtx.clearRect(0, 0, w, h);
+
+            chartCtx.strokeStyle = '#1e293b';
+            chartCtx.lineWidth = 1;
+            for (let i = 0; i <= 6; i++) {
+                const y = pad.t + (plotH * i) / 6;
+                chartCtx.beginPath();
+                chartCtx.moveTo(pad.l, y);
+                chartCtx.lineTo(pad.l + plotW, y);
+                chartCtx.stroke();
+            }
+            for (let i = 0; i <= 9; i++) {
+                const x = pad.l + (plotW * i) / 9;
+                chartCtx.beginPath();
+                chartCtx.moveTo(x, pad.t);
+                chartCtx.lineTo(x, pad.t + plotH);
+                chartCtx.stroke();
+            }
+
+            chartCtx.strokeStyle = '#64748b';
+            chartCtx.beginPath();
+            chartCtx.moveTo(pad.l, pad.t);
+            chartCtx.lineTo(pad.l, pad.t + plotH);
+            chartCtx.lineTo(pad.l + plotW, pad.t + plotH);
+            chartCtx.stroke();
+
+            chartCtx.fillStyle = '#94a3b8';
+            chartCtx.font = '10px sans-serif';
+            chartCtx.textAlign = 'center';
+            chartCtx.fillText('Left-node δ (mm)', pad.l + plotW / 2, h - 6);
+            chartCtx.save();
+            chartCtx.translate(11, pad.t + plotH / 2);
+            chartCtx.rotate(-Math.PI / 2);
+            chartCtx.fillText('Load F (kN)', 0, 0);
+            chartCtx.restore();
+
+            chartCtx.textAlign = 'center';
+            chartCtx.textBaseline = 'top';
+            [0, 0.1, 0.2, 0.3, 0.4].forEach(d => {
+                chartCtx.fillText(d.toFixed(1), xOf(d), pad.t + plotH + 4);
+            });
+            chartCtx.textAlign = 'right';
+            chartCtx.textBaseline = 'middle';
+            [0, 10, 20, 30, 40, 50, 60].forEach(F => {
+                chartCtx.fillText(String(F), pad.l - 5, yOf(F));
+            });
+
+            // Refined spline stroke
+            chartCtx.strokeStyle = '#f1f5f9';
+            chartCtx.lineWidth = 2.25;
+            chartCtx.lineJoin = 'round';
+            chartCtx.beginPath();
+            LD_SPLINE.forEach((p, i) => {
+                const x = xOf(p.d), y = yOf(p.F);
+                if (i === 0) chartCtx.moveTo(x, y);
+                else chartCtx.lineTo(x, y);
+            });
+            chartCtx.stroke();
+
+            // Soft fill under curve up to current δ
+            chartCtx.beginPath();
+            chartCtx.moveTo(xOf(0), yOf(0));
+            for (const p of LD_SPLINE) {
+                if (p.d > delta) break;
+                chartCtx.lineTo(xOf(p.d), yOf(p.F));
+            }
+            chartCtx.lineTo(xOf(delta), yOf(load));
+            chartCtx.lineTo(xOf(delta), yOf(0));
+            chartCtx.closePath();
+            chartCtx.fillStyle = 'rgba(99, 102, 241, 0.12)';
+            chartCtx.fill();
+
+            MARKERS.forEach(m => {
+                const x = xOf(m.d), y = yOf(m.F);
+                chartCtx.strokeStyle = '#e2e8f0';
+                chartCtx.lineWidth = 1.5;
+                chartCtx.strokeRect(x - 4, y - 4, 8, 8);
+                chartCtx.fillStyle = '#94a3b8';
+                chartCtx.font = '9px sans-serif';
+                chartCtx.textAlign = 'left';
+                chartCtx.textBaseline = 'bottom';
+                chartCtx.fillText('(' + m.id + ')', x + 6, y - 3);
+            });
+
+            const cx = xOf(delta), cy = yOf(load);
+            chartCtx.setLineDash([3, 3]);
+            chartCtx.strokeStyle = '#475569';
+            chartCtx.beginPath();
+            chartCtx.moveTo(cx, cy);
+            chartCtx.lineTo(cx, pad.t + plotH);
+            chartCtx.moveTo(cx, cy);
+            chartCtx.lineTo(pad.l, cy);
+            chartCtx.stroke();
+            chartCtx.setLineDash([]);
+
+            chartCtx.fillStyle = '#818cf8';
+            chartCtx.beginPath();
+            chartCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+            chartCtx.fill();
+            chartCtx.strokeStyle = '#c7d2fe';
+            chartCtx.lineWidth = 1.5;
+            chartCtx.stroke();
+
+            // Current readout
+            chartCtx.fillStyle = '#c7d2fe';
+            chartCtx.font = '10px monospace';
+            chartCtx.textAlign = 'left';
+            chartCtx.textBaseline = 'top';
+            chartCtx.fillText('δ=' + delta.toFixed(3) + '  F=' + load.toFixed(1), pad.l + 6, pad.t + 4);
+        }
+
+        // --- Cohesive traction charts ---
+        const profileCanvas = document.getElementById('tracProfileChart');
+        const profileCtx = profileCanvas.getContext('2d');
+        const tslCanvas = document.getElementById('tslChart');
+        const tslCtx = tslCanvas.getContext('2d');
+
+        function resizeNamedChart(canvas, ctx) {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function drawTractionProfile(stations, a) {
+            const w = profileCanvas.clientWidth;
+            const h = profileCanvas.clientHeight;
+            if (w < 10 || h < 10) return;
+            const pad = { l: 40, r: 10, t: 10, b: 28 };
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+            const xMin = a0, xMax = L, sMax = SIGMA_C * 1.05;
+            const xOf = (x) => pad.l + ((x - xMin) / (xMax - xMin)) * plotW;
+            const yOf = (s) => pad.t + plotH - (s / sMax) * plotH;
+
+            profileCtx.clearRect(0, 0, w, h);
+            profileCtx.strokeStyle = '#1e293b';
+            profileCtx.beginPath();
+            profileCtx.moveTo(pad.l, pad.t);
+            profileCtx.lineTo(pad.l, pad.t + plotH);
+            profileCtx.lineTo(pad.l + plotW, pad.t + plotH);
+            profileCtx.stroke();
+
+            profileCtx.fillStyle = '#94a3b8';
+            profileCtx.font = '9px sans-serif';
+            profileCtx.textAlign = 'center';
+            profileCtx.fillText('x (mm)', pad.l + plotW / 2, h - 4);
+            profileCtx.save();
+            profileCtx.translate(11, pad.t + plotH / 2);
+            profileCtx.rotate(-Math.PI / 2);
+            profileCtx.fillText('σ (MPa)', 0, 0);
+            profileCtx.restore();
+
+            // Crack tip marker
+            profileCtx.strokeStyle = '#f43f5e';
+            profileCtx.setLineDash([3, 3]);
+            profileCtx.beginPath();
+            profileCtx.moveTo(xOf(a), pad.t);
+            profileCtx.lineTo(xOf(a), pad.t + plotH);
+            profileCtx.stroke();
+            profileCtx.setLineDash([]);
+            profileCtx.fillStyle = '#f43f5e';
+            profileCtx.textAlign = 'left';
+            profileCtx.fillText('tip', xOf(a) + 3, pad.t + 10);
+
+            // Bars / line
+            profileCtx.lineWidth = 2;
+            profileCtx.beginPath();
+            let started = false;
+            stations.forEach(st => {
+                if (st.x < a || st.state === 'broken' || st.state === 'closed') return;
+                const x = xOf(st.x), y = yOf(st.sigma);
+                if (!started) { profileCtx.moveTo(x, y); started = true; }
+                else profileCtx.lineTo(x, y);
+            });
+            profileCtx.strokeStyle = '#c4b5fd';
+            profileCtx.stroke();
+
+            stations.forEach(st => {
+                if (st.x < a || st.state === 'broken') return;
+                const col = st.state === 'elastic' ? '#34d399' : st.state === 'softening' ? '#fbbf24' : '#64748b';
+                profileCtx.fillStyle = col;
+                profileCtx.fillRect(xOf(st.x) - 2, yOf(st.sigma) - 2, 4, 4);
+                // stem to axis
+                profileCtx.strokeStyle = col;
+                profileCtx.lineWidth = 1;
+                profileCtx.beginPath();
+                profileCtx.moveTo(xOf(st.x), yOf(0));
+                profileCtx.lineTo(xOf(st.x), yOf(st.sigma));
+                profileCtx.stroke();
+            });
+        }
+
+        function drawTSL(stations) {
+            const w = tslCanvas.clientWidth;
+            const h = tslCanvas.clientHeight;
+            if (w < 10 || h < 10) return;
+            const pad = { l: 40, r: 10, t: 10, b: 28 };
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+            const dMax = DELTA_F * 1.15, sMax = SIGMA_C * 1.1;
+            const xOf = (d) => pad.l + (d / dMax) * plotW;
+            const yOf = (s) => pad.t + plotH - (s / sMax) * plotH;
+
+            tslCtx.clearRect(0, 0, w, h);
+            tslCtx.strokeStyle = '#64748b';
+            tslCtx.beginPath();
+            tslCtx.moveTo(pad.l, pad.t);
+            tslCtx.lineTo(pad.l, pad.t + plotH);
+            tslCtx.lineTo(pad.l + plotW, pad.t + plotH);
+            tslCtx.stroke();
+
+            tslCtx.fillStyle = '#94a3b8';
+            tslCtx.font = '9px sans-serif';
+            tslCtx.textAlign = 'center';
+            tslCtx.fillText('δₙ opening (mm)', pad.l + plotW / 2, h - 4);
+            tslCtx.save();
+            tslCtx.translate(11, pad.t + plotH / 2);
+            tslCtx.rotate(-Math.PI / 2);
+            tslCtx.fillText('σ (MPa)', 0, 0);
+            tslCtx.restore();
+
+            // Law polyline
+            tslCtx.strokeStyle = '#e2e8f0';
+            tslCtx.lineWidth = 2;
+            tslCtx.beginPath();
+            tslCtx.moveTo(xOf(0), yOf(0));
+            tslCtx.lineTo(xOf(DELTA_0), yOf(SIGMA_C));
+            tslCtx.lineTo(xOf(DELTA_F), yOf(0));
+            tslCtx.lineTo(xOf(dMax), yOf(0));
+            tslCtx.stroke();
+
+            // Markers at δ0, δf
+            tslCtx.fillStyle = '#94a3b8';
+            tslCtx.textAlign = 'center';
+            tslCtx.fillText('δ₀', xOf(DELTA_0), pad.t + plotH + 12);
+            tslCtx.fillText('δ_f', xOf(DELTA_F), pad.t + plotH + 12);
+
+            stations.forEach(st => {
+                if (st.state === 'broken' || st.state === 'closed' || st.sep <= 0) return;
+                const col = st.state === 'elastic' ? '#34d399' : '#fbbf24';
+                tslCtx.fillStyle = col;
+                tslCtx.beginPath();
+                tslCtx.arc(xOf(Math.min(st.sep, dMax)), yOf(st.sigma), 3.5, 0, Math.PI * 2);
+                tslCtx.fill();
+            });
+        }
+
+        /**
+         * Euler–Bernoulli cantilever built-in at the crack tip (x = a), free at the left end (x = 0).
+         * tipDefl = vertical displacement of the left load node (curve x-axis δ), NOT CMOD/2.
+         * End-force shape: w(ξ)/δ = ξ²(3 − ξ)/2 with ξ = (a − x)/a
+         */
+        function cantileverState(xAbs, a, tipDefl) {
+            if (a <= 1e-6 || tipDefl === 0) return { w: 0, theta: 0 };
+
+            if (xAbs >= a) {
+                const zone = Math.max(18, 0.12 * Math.max(a, a0));
+                const s = xAbs - a;
+                if (s >= zone) return { w: 0, theta: 0 };
+                const t = 1 - s / zone;
+                return { w: tipDefl * 0.015 * t * t, theta: 0 };
+            }
+
+            const xi = (a - xAbs) / a;
+            const phi = 0.5 * xi * xi * (3 - xi);
+            const w = tipDefl * phi;
+            const dphi_dxi = 3 * xi - 1.5 * xi * xi;
+            const theta = tipDefl * dphi_dxi * (-1 / a);
+            return { w, theta };
+        }
+
+        function deformArm(geometry, yNA, sign, a, tipDefl) {
+            const pos = geometry.attributes.position;
+            const origX = geometry.userData.origX;
+            const origY = geometry.userData.origY;
+
+            for (let i = 0; i < pos.count; i++) {
+                const x0 = origX[i];
+                const y0 = origY[i];
+                const xAbs = x0 + L / 2;
+                const { w, theta } = cantileverState(xAbs, a, tipDefl);
+                const wArm = sign * w;
+                const th = sign * theta;
+                const yLocal = y0 - yNA;
+
+                const c = Math.cos(th);
+                const s = Math.sin(th);
+                pos.setX(i, x0 - yLocal * s);
+                pos.setY(i, yNA + wArm + yLocal * c);
+            }
+
+            pos.needsUpdate = true;
+            geometry.computeVertexNormals();
+        }
+
+        function interfaceOpening(xAbs, a, tipDefl) {
+            return 2 * cantileverState(xAbs, a, tipDefl).w;
+        }
+
+        /**
+         * Engineering normal opening δₙ along the cohesive process zone ahead of the
+         * traction-free crack tip (x = a). Beam built-in kinematics alone give δₙ≈0
+         * at the tip, so we impose a decaying CZM opening profile for tractions.
+         */
+        function cohesiveOpeningEng(xAbs, a, deltaNode) {
+            if (deltaNode <= 0.001) return 0;
+            if (xAbs < a) return DELTA_F + 0.01;
+
+            const loadFrac = Math.min(1, deltaNode / 0.14);
+            let tipOpen;
+            if (deltaNode <= 0.14) {
+                tipOpen = DELTA_0 * loadFrac; // elastic → initiation
+            } else if (deltaNode <= 0.27) {
+                const t = (deltaNode - 0.14) / (0.27 - 0.14);
+                tipOpen = DELTA_0 + (0.55 * (DELTA_F - DELTA_0)) * t;
+            } else if (deltaNode <= 0.32) {
+                const t = (deltaNode - 0.27) / (0.32 - 0.27);
+                tipOpen = DELTA_0 + (0.55 + 0.45 * t) * (DELTA_F - DELTA_0);
+            } else {
+                tipOpen = DELTA_F * 1.05; // fully failed at tip
+            }
+
+            const lcz = 28 + 90 * Math.max(0, (deltaNode - 0.05) / 0.27);
+            const zone = Math.min(L - a, lcz);
+            const s = xAbs - a;
+            if (s >= zone || zone < 1e-6) return 0;
+            const xi = 1 - s / zone;
+            return tipOpen * xi * xi;
+        }
+
+        // Solve NA tip deflection so the OUTER left load-node u_y equals target δ
+        function tipDeflForLoadNode(a, targetUy) {
+            if (Math.abs(targetUy) < 1e-12) return 0;
+            const aEff = Math.max(a, a0);
+            let tipDefl = targetUy;
+            for (let k = 0; k < 8; k++) {
+                const st = cantileverState(0, aEff, tipDefl);
+                const uy = st.w - (H_half / 2) * (1 - Math.cos(st.theta));
+                if (Math.abs(uy) < 1e-9) break;
+                tipDefl *= targetUy / uy;
+            }
+            return tipDefl;
+        }
+
+        function updateFromDisplacement(delta) {
+            const load = loadFromDisplacement(delta);
+            const a = crackLengthFromDisplacement(delta);
+            const stage = stageFromDisplacement(delta);
+
+            // Curve δ = |u_y| of upper/lower left load nodes
+            const nodeUy = visualOpen(delta);
+            const tipDefl = tipDeflForLoadNode(a, nodeUy);
+
+            deformArm(topArm.geometry, H_half / 2, +1, a, tipDefl);
+            deformArm(bottomArm.geometry, -H_half / 2, -1, a, tipDefl);
+
+            const stressTint = Math.min(1, load / 57);
+            topArm.material.color.setRGB(
+                0.22 + 0.55 * stressTint,
+                0.74 - 0.35 * stressTint,
+                0.97 - 0.65 * stressTint
+            );
+            bottomArm.material.color.copy(topArm.material.color);
+
+            // Left load-node positions (outer corners) — these define curve δ
+            const tip = cantileverState(0, Math.max(a, a0), tipDefl);
+            const thTop = tip.theta;
+            const thBot = -tip.theta;
+            const yLocalOuter = H_half / 2;
+            const topTipX = -L / 2 - yLocalOuter * Math.sin(thTop);
+            const topTipY = H_half / 2 + tip.w + yLocalOuter * Math.cos(thTop);
+            const botTipX = -L / 2 - (-yLocalOuter) * Math.sin(thBot);
+            const botTipY = -H_half / 2 - tip.w + (-yLocalOuter) * Math.cos(thBot);
+
+            // Measured nodal δ on the deformed figure (should match slider)
+            const measuredTop = topTipY - H_half;
+            const measuredBot = -H_half - botTipY; // positive magnitude downward
+
+            // Show δ on the figure: reference (gray) → deformed (gold) left nodes
+            topDefNode.position.set(topTipX, topTipY, 6);
+            botDefNode.position.set(botTipX, botTipY, 6);
+            const topDispAttr = topDispLine.geometry.attributes.position;
+            topDispAttr.setXYZ(0, -L / 2, H_half, 5);
+            topDispAttr.setXYZ(1, topTipX, topTipY, 5);
+            topDispAttr.needsUpdate = true;
+            const botDispAttr = botDispLine.geometry.attributes.position;
+            botDispAttr.setXYZ(0, -L / 2, -H_half, 5);
+            botDispAttr.setXYZ(1, botTipX, botTipY, 5);
+            botDispAttr.needsUpdate = true;
+            topDispLine.visible = botDispLine.visible = delta > 0.002;
+            topDeltaLabel.position.set(topTipX - 22, (H_half + topTipY) / 2, 8);
+            botDeltaLabel.position.set(botTipX - 22, (-H_half + botTipY) / 2, 8);
+            topDeltaLabel.visible = botDeltaLabel.visible = delta > 0.002;
+
+            const arrowLen = 40 + 50 * Math.max(0.15, load / 57);
+            topArrow.position.set(topTipX, topTipY, 4);
+            botArrow.position.set(botTipX, botTipY, 4);
+            topArrow.visible = true;
+            botArrow.visible = true;
+            layoutForceArrow(topArrow, arrowLen);
+            layoutForceArrow(botArrow, arrowLen);
+
+            const crackPos = crackLine.geometry.attributes.position;
+            crackPos.setXYZ(0, -L / 2 + a0, 0, 1.5);
+            crackPos.setXYZ(1, -L / 2 + a, 0, 1.5);
+            crackPos.needsUpdate = true;
+            crackLine.visible = a > a0 + 0.5;
+
+            // Engineering openings for CZM tractions; visual half-gap for drawing
+            let maxSigma = 0;
+            let tipSigma = 0;
+            let tipSep = 0;
+
+            cohesiveStations.forEach(st => {
+                const g = st.group;
+                if (st.x < a - 0.5) {
+                    g.visible = false;
+                    st.sep = 0; st.sigma = 0; st.state = 'broken';
+                    return;
+                }
+
+                const sepEng = cohesiveOpeningEng(st.x, a, delta);
+                const halfSepVis = useTrueScale
+                    ? sepEng / 2
+                    : (sepEng * VISUAL_AMPLIFY) / 2;
+                const { sigma, state } = cohesiveTraction(sepEng);
+                st.sep = sepEng;
+                st.sigma = sigma;
+                st.state = state;
+
+                if (state === 'broken' || sepEng <= 1e-6) {
+                    g.visible = state !== 'broken' && st.x < a + 50 && delta > 0.01;
+                    if (g.visible && sigma < 1e-6) {
+                        // Intact far field — tiny green tick
+                        layoutTractionArrows(g, 1.2, 0.15);
+                        const col = tractionColor('closed', 0);
+                        const ud = g.userData;
+                        [ud.upShaft, ud.upHead, ud.dnShaft, ud.dnHead, ud.bar].forEach(m => {
+                            m.material.color.copy(col);
+                        });
+                        ud.bar.visible = false;
+                    } else {
+                        g.visible = false;
+                    }
+                    return;
+                }
+
+                g.visible = delta > 0.005;
+                layoutTractionArrows(g, Math.max(1.5, halfSepVis), sigma);
+                const col = tractionColor(state, sigma);
+                const { upShaft, upHead, dnShaft, dnHead, bar } = g.userData;
+                upShaft.material.color.copy(col);
+                upHead.material.color.copy(col);
+                dnShaft.material.color.copy(col);
+                dnHead.material.color.copy(col);
+                bar.material.color.copy(col);
+                bar.visible = halfSepVis > 0.5;
+
+                maxSigma = Math.max(maxSigma, sigma);
+            });
+
+            const tipSt = cohesiveStations.find(st => st.x >= a && st.state !== 'broken' && st.sep > 0);
+            if (tipSt) { tipSigma = tipSt.sigma; tipSep = tipSt.sep; }
+
+            document.getElementById('dispValue').textContent = delta.toFixed(3);
+            document.getElementById('loadVal').textContent = load.toFixed(2) + ' kN';
+            document.getElementById('topNodeVal').textContent = '+' + delta.toFixed(3) + ' mm';
+            document.getElementById('botNodeVal').textContent = '−' + delta.toFixed(3) + ' mm';
+            document.getElementById('crackVal').textContent = a.toFixed(1) + ' mm';
+            document.getElementById('tracMaxVal').textContent = maxSigma.toFixed(2) + ' MPa';
+            document.getElementById('tracTipVal').textContent = tipSigma.toFixed(2) + ' MPa';
+
+            const scaleNote = useTrueScale
+                ? '<span class="text-emerald-400/90">true scale (1:1)</span>'
+                : '<span class="text-amber-400/90">view ×' + VISUAL_AMPLIFY + ' (true δ invisible)</span>';
+            const visTop = useTrueScale ? measuredTop : measuredTop / VISUAL_AMPLIFY;
+            document.getElementById('dispOverlay').innerHTML =
+                'Curve δ (left nodes) = ' + delta.toFixed(3) + ' mm<br>' +
+                'σ<sub>max</sub> = ' + maxSigma.toFixed(2) + ' MPa · tip σ = ' + tipSigma.toFixed(2) + '<br>' +
+                'tip δ<sub>n</sub> = ' + tipSep.toFixed(4) + ' mm<br>' +
+                scaleNote;
+
+            const stateEl = document.getElementById('stateVal');
+            stateEl.textContent = stage.label;
+            const badge = document.getElementById('stageBadge');
+            badge.textContent = stage.badge;
+
+            const colors = {
+                elastic: 'font-semibold text-emerald-400',
+                softening: 'font-semibold text-amber-400',
+                drop: 'font-semibold text-rose-400',
+                residual: 'font-semibold text-slate-400'
+            };
+            const badgeColors = {
+                elastic: 'absolute top-3 right-3 bg-emerald-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-emerald-300 border border-emerald-700',
+                softening: 'absolute top-3 right-3 bg-amber-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-amber-300 border border-amber-700',
+                drop: 'absolute top-3 right-3 bg-rose-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-rose-300 border border-rose-700',
+                residual: 'absolute top-3 right-3 bg-slate-800/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-slate-300 border border-slate-600'
+            };
+            stateEl.className = colors[stage.key];
+            badge.className = badgeColors[stage.key];
+
+            drawChart(delta, load);
+            drawTractionProfile(cohesiveStations, a);
+            drawTSL(cohesiveStations);
+        }
+
+        function refresh() {
+            updateFromDisplacement(parseFloat(document.getElementById('dispSlider').value));
+        }
+
+        const dispSlider = document.getElementById('dispSlider');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const DELTA_MAX_PLAY = parseFloat(dispSlider.max);
+        const PLAY_SPEED = 0.045; // mm / s
+        let playing = false;
+        let playRaf = 0;
+        let playLast = 0;
+
+        function setPlayUi(on) {
+            playing = on;
+            playBtn.textContent = on ? '⏸ Pause' : '▶ Play';
+            playBtn.classList.toggle('bg-indigo-600', !on);
+            playBtn.classList.toggle('hover:bg-indigo-500', !on);
+            playBtn.classList.toggle('bg-amber-600', on);
+            playBtn.classList.toggle('hover:bg-amber-500', on);
+        }
+
+        function stopPlay() {
+            playing = false;
+            if (playRaf) cancelAnimationFrame(playRaf);
+            playRaf = 0;
+            setPlayUi(false);
+        }
+
+        function playLoop(t) {
+            if (!playing) return;
+            const dt = Math.min(0.05, (t - playLast) / 1000);
+            playLast = t;
+            let v = parseFloat(dispSlider.value) + PLAY_SPEED * dt;
+            if (v >= DELTA_MAX_PLAY) {
+                dispSlider.value = String(DELTA_MAX_PLAY);
+                refresh();
+                stopPlay();
+                return;
+            }
+            dispSlider.value = String(v);
+            refresh();
+            playRaf = requestAnimationFrame(playLoop);
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (playing) {
+                stopPlay();
+                return;
+            }
+            if (parseFloat(dispSlider.value) >= DELTA_MAX_PLAY - 1e-6) {
+                dispSlider.value = '0';
+                refresh();
+            }
+            setPlayUi(true);
+            playLast = performance.now();
+            playRaf = requestAnimationFrame(playLoop);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            stopPlay();
+            dispSlider.value = '0';
+            refresh();
+        });
+
+        dispSlider.addEventListener('input', () => {
+            if (playing) stopPlay();
+            refresh();
+        });
+
+        document.getElementById('trueScaleToggle').addEventListener('change', (e) => {
+            useTrueScale = e.target.checked;
+            refresh();
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            resizeChart();
+            resizeNamedChart(profileCanvas, profileCtx);
+            resizeNamedChart(tslCanvas, tslCtx);
+            refresh();
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        resizeChart();
+        resizeNamedChart(profileCanvas, profileCtx);
+        resizeNamedChart(tslCanvas, tslCtx);
+        refresh();
+        animate();
+    </script>
+
+  </div>
+  <footer class="site-footer"><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#cohesive-cracking">Cohesive cracking</a></span></div></footer>
+</body>
+</html>

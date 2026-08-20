@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Center crack and the tip field — Mechanics Reference</title>
+  <meta name="description" content="Mode I center crack under remote tension: near-tip Williams field, stress intensity KI, and the r to the minus one-half singularity." />
+  <link rel="canonical" href="https://mechanicsreference.com/lefm-center-crack.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f}
+    body{margin:0;font-family:"Source Sans 3",system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+    .site-header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .page-intro{max-width:1180px;margin:0 auto;padding:28px 28px 8px}
+    .crumb{font-size:0.92rem;color:var(--ink-soft);margin:0 0 8px}
+    .page-intro h1{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 8px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--ink-soft)}
+    .related{margin:0 0 12px;font-size:0.9rem;color:var(--ink-soft)}
+    .related a{color:#3a5f8a}
+    .demo-root{background:#0f172a;color:#e2e8f0;padding-bottom:48px}
+    .site-footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft);background:var(--paper)}
+    .site-footer .wrap{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between}
+    html.embed,html.embed body{height:100%;background:#0f172a}
+    html.embed .site-header,html.embed .page-intro,html.embed .site-footer{display:none}
+    html.embed .demo-root{min-height:100%;padding:0} html.embed .demo-root > header{display:none}
+    html.embed .demo-root > .max-w-6xl{max-width:none;margin:0;padding:8px;height:100%}
+    @media (max-width:800px){.site-header,.page-intro,.site-footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="./#figures">Figures</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#linear-elastic-fracture-mechanics">Library</a>
+    </nav>
+  </header>
+  <div class="page-intro">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#linear-elastic-fracture-mechanics">LEFM</a></p>
+    <h1>Center crack and the tip field</h1>
+    <p class="standfirst">A finite plate with a center crack under remote tension. The near-tip stress follows Williams: order r to the minus one-half times KI. Open the faces and watch the singular field concentrate at the tip.</p>
+    <p class="related"><a href="lefm.html">Williams plate</a> · <a href="dcb-cohesive.html">DCB cohesive</a> · <a href="cohesive-crack.html">Cohesive zone</a></p>
+  </div>
+  <div class="demo-root">
+
+
+    
+
+    <main class="max-w-6xl mx-auto px-6 pb-12 space-y-6">
+        <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                <div class="lg:col-span-3 relative w-full h-[460px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+                    <div id="threejs-container" class="w-full h-full"></div>
+                    <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
+                        <strong>Drag</strong> to rotate | <strong>Scroll</strong> to zoom
+                    </div>
+                    <div id="stageBadge" class="absolute top-3 right-3 bg-sky-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-sky-300 border border-sky-700">
+                        LEFM — singular tip field
+                    </div>
+                    <div id="dispOverlay" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-2 rounded text-xs text-slate-300 border border-slate-700 font-mono leading-relaxed">
+                        K<sub>I</sub> = 0
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Near-tip stress $\sigma_{\theta\theta}(r)$ along the ligament</div>
+                    <canvas id="singChart" class="w-full flex-1 min-h-[300px]"></canvas>
+                    <div class="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-400">
+                        <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-sky-300 inline-block"></span> $K_I/\sqrt{2\pi r}$</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-amber-400/80 inline-block border-dashed"></span> Finite-plate (bounded)</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 bg-rose-400 inline-block rounded-full"></span> Probe</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+                <div class="md:col-span-2 bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <button id="playBtn" type="button"
+                            class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white border border-sky-400/40">
+                            ▶ Play
+                        </button>
+                        <button id="resetBtn" type="button"
+                            class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-500/40">
+                            Reset
+                        </button>
+                        <label for="loadSlider" class="block text-xs font-semibold text-slate-300 flex-1">
+                            Remote tension $\bar{\sigma}_{yy}$:
+                            <span id="stressValue" class="text-sky-400 font-mono">0.0</span> MPa
+                        </label>
+                    </div>
+                    <input id="loadSlider" type="range" min="0" max="50" step="0.1" value="0"
+                           class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500">
+
+                    <div>
+                        <label for="crackSlider" class="block text-xs font-semibold text-slate-300 mb-1">
+                            Half-crack length $a$:
+                            <span id="crackValue" class="text-amber-400 font-mono">20</span> mm
+                            <span class="text-slate-500 font-normal">(full crack $2a$)</span>
+                        </label>
+                        <input id="crackSlider" type="range" min="8" max="35" step="0.5" value="20"
+                               class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    </div>
+
+                    <div>
+                        <label for="probeSlider" class="block text-xs font-semibold text-slate-300 mb-1">
+                            Probe distance from tip $r$:
+                            <span id="probeValue" class="text-rose-400 font-mono">2.0</span> mm
+                        </label>
+                        <input id="probeSlider" type="range" min="0.15" max="25" step="0.05" value="2"
+                               class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-1.5 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">$K_I$:</span>
+                        <span id="kiVal" class="font-mono text-sky-400">0.0 MPa√mm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">$\sigma_{\mathrm{tip}}(r)$:</span>
+                        <span id="sigTipVal" class="font-mono text-rose-400">0.0 MPa</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Amplification $\sigma/\bar{\sigma}$:</span>
+                        <span id="ampVal" class="font-mono text-amber-400">—</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Crack $2a$:</span>
+                        <span id="crackLenVal" class="font-mono text-slate-300">40 mm</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Concept:</span>
+                        <span id="stateVal" class="font-semibold text-sky-400">σ → ∞ as r → 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Log–log check: $\log\sigma$ vs $\log r$ (slope $\approx -1/2$)</div>
+                    <canvas id="logChart" class="w-full h-[160px]"></canvas>
+                </div>
+                <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Williams Mode I idea</div>
+                    <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                        <p>
+                            Ahead of the tip on the crack plane ($\theta=0$):
+                        </p>
+                        <div class="bg-slate-900 rounded p-2 text-center border border-slate-700 font-mono text-[11px] text-sky-200">
+                            $$\sigma_{yy}(r,0)=\frac{K_I}{\sqrt{2\pi r}}+\mathcal{O}(1)$$
+                        </div>
+                        <p class="text-slate-400">
+                            As $r\to 0$, stress unbounded — the LEFM <em>singularity</em>.
+                            $K_I=\bar{\sigma}\sqrt{\pi a}\,Y(a/W)$ sets intensity; geometry factor $Y$ ≈ 1 for small $a/W$.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 text-sm space-y-2">
+                <h3 class="font-bold text-white text-base">Specimen</h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                    <li><strong>Plate:</strong> square side $W=L=100$ mm</li>
+                    <li><strong>Crack:</strong> centered, length $2a$, Mode I opening</li>
+                    <li><strong>BCs:</strong> bottom supported · top remote $\bar{\sigma}_{yy}$</li>
+                    <li>Heat colors = local $\sigma_{yy}$ intensity (dark → hot near tips)</li>
+                </ul>
+            </div>
+            <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 text-sm space-y-2">
+                <h3 class="font-bold text-white text-base">What to notice</h3>
+                <ul class="list-disc list-inside space-y-1 text-slate-300">
+                    <li>Move the <strong>probe</strong> toward the tip — stress rises without bound in LEFM</li>
+                    <li>Log–log plot stays near slope <strong>−½</strong> in the K-dominant zone</li>
+                    <li>Larger $a$ or $\bar{\sigma}$ raises $K_I$ and the whole near-tip field</li>
+                    <li>Real materials cut off the singularity with a process / plastic zone</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const W = 100;           // plate width = height (mm)
+        const SIG_MAX = 50;      // MPa
+        const E_VIS = 200000;    // fictitious modulus for tiny opening viz (MPa)
+        const NU = 0.3;
+
+        function geometryFactor(a) {
+            // Feddersen-like finite-width correction for center crack
+            const aw = Math.min(0.7, a / (W / 2));
+            return 1 / Math.sqrt(Math.cos(Math.PI * a / W));
+        }
+
+        function stressIntensity(sigma, a) {
+            return sigma * Math.sqrt(Math.PI * a) * geometryFactor(a);
+        }
+
+        // Singular + bounded far-field blending on ligament ahead of right tip
+        function sigmaLigament(r, KI, sigmaInf, a) {
+            if (r < 1e-6) return 1e6;
+            const sing = KI / Math.sqrt(2 * Math.PI * r);
+            // Soft blend toward remote stress away from tip
+            const blend = 1 - Math.exp(-r / (0.35 * a));
+            return sing * (1 - 0.55 * blend) + sigmaInf * blend;
+        }
+
+        // --- Scene ---
+        const container = document.getElementById('threejs-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b1220);
+
+        const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 1, 800);
+        camera.position.set(0, 8, 210);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.target.set(0, 0, 0);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+        const key = new THREE.DirectionalLight(0xffffff, 0.8);
+        key.position.set(30, 70, 120);
+        scene.add(key);
+
+        const root = new THREE.Group();
+        scene.add(root);
+
+        const plateT = 3.5;
+
+        // Plate mesh with vertex colors for σ field
+        const nX = 80, nY = 80;
+        const plateGeo = new THREE.PlaneGeometry(W, W, nX, nY);
+        plateGeo.translate(0, 0, 0);
+        const colors = new Float32Array((nX + 1) * (nY + 1) * 3);
+        plateGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        const plateMat = new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            metalness: 0.05,
+            roughness: 0.55,
+            side: THREE.DoubleSide
+        });
+        const plate = new THREE.Mesh(plateGeo, plateMat);
+        plate.position.z = 0;
+        root.add(plate);
+
+        const plateEdges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(W, W, plateT)),
+            new THREE.LineBasicMaterial({ color: 0x475569 })
+        );
+        plateEdges.position.z = -plateT / 2;
+        root.add(plateEdges);
+
+        // Crack faces (two half-planes opening)
+        const crackHalfGeo = () => new THREE.PlaneGeometry(1, 0.8, 20, 1);
+        const crackMat = new THREE.MeshBasicMaterial({
+            color: 0x0f172a,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.9
+        });
+        const crackTop = new THREE.Mesh(crackHalfGeo(), crackMat.clone());
+        const crackBot = new THREE.Mesh(crackHalfGeo(), crackMat.clone());
+        root.add(crackTop);
+        root.add(crackBot);
+
+        // Tip markers
+        const tipGeo = new THREE.SphereGeometry(1.4, 12, 12);
+        const tipMat = new THREE.MeshBasicMaterial({ color: 0xf43f5e });
+        const tipL = new THREE.Mesh(tipGeo, tipMat);
+        const tipR = new THREE.Mesh(tipGeo, tipMat.clone());
+        root.add(tipL);
+        root.add(tipR);
+
+        // Probe marker on ligament
+        const probe = new THREE.Mesh(
+            new THREE.SphereGeometry(1.6, 12, 12),
+            new THREE.MeshBasicMaterial({ color: 0xfb7185 })
+        );
+        root.add(probe);
+        const probeLine = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+            new THREE.LineBasicMaterial({ color: 0xfb7185 })
+        );
+        root.add(probeLine);
+
+        // K-field sampling rings around right tip (visual)
+        const ringGroup = new THREE.Group();
+        root.add(ringGroup);
+        const rings = [];
+        [2, 5, 10, 18].forEach((rad, i) => {
+            const curve = new THREE.EllipseCurve(0, 0, rad, rad, -Math.PI * 0.65, Math.PI * 0.65, false, 0);
+            const pts = curve.getPoints(40).map(p => new THREE.Vector3(p.x, p.y, 1.2));
+            const line = new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints(pts),
+                new THREE.LineBasicMaterial({
+                    color: 0x38bdf8,
+                    transparent: true,
+                    opacity: 0.35 - i * 0.05
+                })
+            );
+            ringGroup.add(line);
+            rings.push({ line, rad });
+        });
+
+        // Bottom supports
+        [-0.35, 0, 0.35].forEach(fx => {
+            const g = new THREE.Group();
+            const tri = new THREE.Mesh(
+                new THREE.ConeGeometry(3.2, 5, 3),
+                new THREE.MeshBasicMaterial({ color: 0x475569 })
+            );
+            tri.rotation.z = Math.PI;
+            tri.position.y = -2.5;
+            g.add(tri);
+            const base = new THREE.Mesh(
+                new THREE.BoxGeometry(10, 0.6, 6),
+                new THREE.MeshBasicMaterial({ color: 0x334155 })
+            );
+            base.position.y = -5.2;
+            g.add(base);
+            for (let i = -2; i <= 2; i++) {
+                const h = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.4, 0.25, 7),
+                    new THREE.MeshBasicMaterial({ color: 0x64748b })
+                );
+                h.position.set(i * 1.6, -5.8, 0);
+                h.rotation.y = 0.5;
+                g.add(h);
+            }
+            g.position.set(fx * W, -W / 2, 0);
+            root.add(g);
+        });
+
+        // Top load arrows
+        const loadArrows = [];
+        for (let i = 0; i < 7; i++) {
+            const x = -W / 2 + ((i + 0.5) / 7) * W;
+            const ah = new THREE.ArrowHelper(
+                new THREE.Vector3(0, 1, 0),
+                new THREE.Vector3(x, W / 2, 1),
+                14, 0xe2e8f0, 4, 2.5
+            );
+            root.add(ah);
+            loadArrows.push(ah);
+        }
+
+        function makeTextSprite(text, color) {
+            const cv = document.createElement('canvas');
+            cv.width = 128; cv.height = 64;
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = color;
+            ctx.font = 'bold 36px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 64, 32);
+            const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: new THREE.CanvasTexture(cv), transparent: true, depthTest: false
+            }));
+            spr.scale.set(14, 7, 1);
+            return spr;
+        }
+        const sigLab = makeTextSprite('σyy', '#e2e8f0');
+        sigLab.position.set(W / 2 + 14, W / 2 + 16, 2);
+        root.add(sigLab);
+        const aLab = makeTextSprite('2a', '#f87171');
+        aLab.position.set(0, -8, 3);
+        root.add(aLab);
+
+        // Heat map: blue → cyan → yellow → red
+        function heatColor(t, out) {
+            t = Math.max(0, Math.min(1, t));
+            let r, g, b;
+            if (t < 0.25) {
+                const u = t / 0.25;
+                r = 0.12; g = 0.25 + 0.4 * u; b = 0.55 + 0.35 * u;
+            } else if (t < 0.5) {
+                const u = (t - 0.25) / 0.25;
+                r = 0.12 + 0.5 * u; g = 0.65 + 0.2 * u; b = 0.9 - 0.5 * u;
+            } else if (t < 0.75) {
+                const u = (t - 0.5) / 0.25;
+                r = 0.62 + 0.35 * u; g = 0.85 - 0.25 * u; b = 0.4 - 0.35 * u;
+            } else {
+                const u = (t - 0.75) / 0.25;
+                r = 0.97; g = 0.6 - 0.45 * u; b = 0.05;
+            }
+            out.setRGB(r, g, b);
+        }
+
+        const _c = new THREE.Color();
+
+        function polarFromTip(x, y, tipX) {
+            const dx = x - tipX;
+            const dy = y;
+            const r = Math.hypot(dx, dy);
+            const theta = Math.atan2(dy, dx); // tip local: +x along ligament for right tip
+            return { r, theta };
+        }
+
+        // Approximate Mode I σ_yy in tip coordinates (right tip); mirror for left
+        function sigmaYyField(x, y, a, KI, sigmaInf) {
+            // Inside crack faces gap: low stress
+            if (Math.abs(y) < 0.6 && Math.abs(x) < a - 0.2) return sigmaInf * 0.05;
+
+            const useRight = x >= 0;
+            const tipX = useRight ? a : -a;
+            let { r, theta } = polarFromTip(x, y, tipX);
+            if (!useRight) {
+                // Left tip: flip x so ligament is +local-x outward
+                const dx = tipX - x;
+                const dy = y;
+                r = Math.hypot(dx, dy);
+                theta = Math.atan2(dy, dx);
+            }
+            r = Math.max(r, 0.12);
+            // Westergaard / Williams leading term for σ_yy
+            const c = Math.cos(theta / 2);
+            const s = Math.sin(theta / 2);
+            const sing = (KI / Math.sqrt(2 * Math.PI * r)) * c * (1 + s * Math.abs(Math.sin(1.5 * theta)));
+            const far = sigmaInf * (0.55 + 0.45 * Math.min(1, r / (0.5 * a)));
+            const w = Math.exp(-r / (0.55 * a));
+            return sing * w + far * (1 - 0.75 * w);
+        }
+
+        function updatePlateColors(a, KI, sigmaInf) {
+            const pos = plateGeo.attributes.position;
+            const col = plateGeo.attributes.color;
+            const sRef = Math.max(sigmaInf * 8, KI / Math.sqrt(2 * Math.PI * 0.5), 1);
+            for (let i = 0; i < pos.count; i++) {
+                const x = pos.getX(i);
+                const y = pos.getY(i);
+                const sig = sigmaYyField(x, y, a, KI, sigmaInf);
+                const t = Math.log1p(sig) / Math.log1p(sRef * 1.8);
+                heatColor(t, _c);
+                col.setXYZ(i, _c.r, _c.g, _c.b);
+            }
+            col.needsUpdate = true;
+        }
+
+        function updateCrackOpening(a, KI) {
+            // Visual COD ~ K sqrt(a^2 - x^2) / E style
+            const scale = (KI / Math.max(E_VIS * 0.0008, 1e-6)) * 35;
+            crackTop.scale.set(2 * a, 1, 1);
+            crackBot.scale.set(2 * a, 1, 1);
+            crackTop.position.set(0, 0.35 + Math.min(6, scale * 0.5), 1.1);
+            crackBot.position.set(0, -(0.35 + Math.min(6, scale * 0.5)), 1.1);
+            tipL.position.set(-a, 0, 1.5);
+            tipR.position.set(a, 0, 1.5);
+            aLab.position.set(0, -Math.min(10, 4 + scale), 3);
+            ringGroup.position.set(a, 0, 0);
+        }
+
+        // --- Charts ---
+        const singCanvas = document.getElementById('singChart');
+        const singCtx = singCanvas.getContext('2d');
+        const logCanvas = document.getElementById('logChart');
+        const logCtx = logCanvas.getContext('2d');
+
+        function resizeCanvas(canvas, ctx) {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function drawSingularityChart(a, KI, sigmaInf, rProbe, sigProbe) {
+            const w = singCanvas.clientWidth, h = singCanvas.clientHeight;
+            if (w < 10) return;
+            const pad = { l: 48, r: 12, t: 14, b: 34 };
+            const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+            const rMax = Math.min(30, (W / 2 - a) * 0.95);
+            const sMax = Math.max(sigmaInf * 6, KI / Math.sqrt(2 * Math.PI * 0.4), 10);
+            const xOf = (r) => pad.l + (r / rMax) * plotW;
+            const yOf = (s) => pad.t + plotH - (Math.min(s, sMax * 1.05) / sMax) * plotH;
+
+            singCtx.clearRect(0, 0, w, h);
+            singCtx.strokeStyle = '#1e293b';
+            for (let i = 0; i <= 5; i++) {
+                const y = pad.t + (plotH * i) / 5;
+                singCtx.beginPath(); singCtx.moveTo(pad.l, y); singCtx.lineTo(pad.l + plotW, y); singCtx.stroke();
+            }
+            singCtx.strokeStyle = '#64748b';
+            singCtx.beginPath();
+            singCtx.moveTo(pad.l, pad.t); singCtx.lineTo(pad.l, pad.t + plotH); singCtx.lineTo(pad.l + plotW, pad.t + plotH);
+            singCtx.stroke();
+
+            singCtx.fillStyle = '#94a3b8';
+            singCtx.font = '10px sans-serif';
+            singCtx.textAlign = 'center';
+            singCtx.fillText('r from tip (mm)', pad.l + plotW / 2, h - 6);
+            singCtx.save();
+            singCtx.translate(12, pad.t + plotH / 2);
+            singCtx.rotate(-Math.PI / 2);
+            singCtx.fillText('σyy (MPa)', 0, 0);
+            singCtx.restore();
+
+            // Pure singular asymptote
+            singCtx.strokeStyle = '#7dd3fc';
+            singCtx.lineWidth = 2.25;
+            singCtx.beginPath();
+            let started = false;
+            for (let i = 0; i <= 80; i++) {
+                const r = 0.2 + (i / 80) * (rMax - 0.2);
+                const s = KI / Math.sqrt(2 * Math.PI * r);
+                const x = xOf(r), y = yOf(s);
+                if (!started) { singCtx.moveTo(x, y); started = true; }
+                else singCtx.lineTo(x, y);
+            }
+            singCtx.stroke();
+
+            // Blended finite-plate field
+            singCtx.setLineDash([5, 4]);
+            singCtx.strokeStyle = '#fbbf24';
+            singCtx.lineWidth = 1.75;
+            singCtx.beginPath();
+            started = false;
+            for (let i = 0; i <= 80; i++) {
+                const r = 0.2 + (i / 80) * (rMax - 0.2);
+                const s = sigmaLigament(r, KI, sigmaInf, a);
+                const x = xOf(r), y = yOf(s);
+                if (!started) { singCtx.moveTo(x, y); started = true; }
+                else singCtx.lineTo(x, y);
+            }
+            singCtx.stroke();
+            singCtx.setLineDash([]);
+
+            // Probe
+            const rp = Math.min(rProbe, rMax);
+            singCtx.fillStyle = '#fb7185';
+            singCtx.beginPath();
+            singCtx.arc(xOf(rp), yOf(sigProbe), 5, 0, Math.PI * 2);
+            singCtx.fill();
+
+            singCtx.fillStyle = '#bae6fd';
+            singCtx.font = '10px monospace';
+            singCtx.textAlign = 'left';
+            singCtx.fillText('KI=' + KI.toFixed(1) + '  σ(r)=' + sigProbe.toFixed(1), pad.l + 6, pad.t + 4);
+        }
+
+        function drawLogChart(a, KI, sigmaInf, rProbe, sigProbe) {
+            const w = logCanvas.clientWidth, h = logCanvas.clientHeight;
+            if (w < 10) return;
+            const pad = { l: 44, r: 10, t: 12, b: 28 };
+            const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+            const logR0 = Math.log10(0.2), logR1 = Math.log10(20);
+            const s0 = KI / Math.sqrt(2 * Math.PI * 20);
+            const s1 = KI / Math.sqrt(2 * Math.PI * 0.2);
+            const logS0 = Math.log10(Math.max(s0, 1e-3));
+            const logS1 = Math.log10(Math.max(s1, 1e-2));
+            const xOf = (lr) => pad.l + ((lr - logR0) / (logR1 - logR0)) * plotW;
+            const yOf = (ls) => pad.t + plotH - ((ls - logS0) / (logS1 - logS0)) * plotH;
+
+            logCtx.clearRect(0, 0, w, h);
+            logCtx.strokeStyle = '#64748b';
+            logCtx.beginPath();
+            logCtx.moveTo(pad.l, pad.t); logCtx.lineTo(pad.l, pad.t + plotH); logCtx.lineTo(pad.l + plotW, pad.t + plotH);
+            logCtx.stroke();
+
+            logCtx.fillStyle = '#94a3b8';
+            logCtx.font = '9px sans-serif';
+            logCtx.textAlign = 'center';
+            logCtx.fillText('log10(r)', pad.l + plotW / 2, h - 4);
+
+            // Reference slope -1/2 through a mid point
+            logCtx.strokeStyle = '#38bdf8';
+            logCtx.lineWidth = 2;
+            logCtx.beginPath();
+            let started = false;
+            for (let i = 0; i <= 60; i++) {
+                const r = Math.pow(10, logR0 + (i / 60) * (logR1 - logR0));
+                const s = KI / Math.sqrt(2 * Math.PI * r);
+                const x = xOf(Math.log10(r));
+                const y = yOf(Math.log10(s));
+                if (!started) { logCtx.moveTo(x, y); started = true; }
+                else logCtx.lineTo(x, y);
+            }
+            logCtx.stroke();
+
+            // Slope guide annotation
+            logCtx.fillStyle = '#7dd3fc';
+            logCtx.font = '10px sans-serif';
+            logCtx.textAlign = 'left';
+            logCtx.fillText('slope ≈ −1/2', pad.l + 8, pad.t + 14);
+
+            if (rProbe > 0.2 && sigProbe > 0) {
+                logCtx.fillStyle = '#fb7185';
+                logCtx.beginPath();
+                logCtx.arc(
+                    xOf(Math.log10(Math.min(20, Math.max(0.2, rProbe)))),
+                    yOf(Math.log10(Math.max(sigProbe, 1e-3))),
+                    4, 0, Math.PI * 2
+                );
+                logCtx.fill();
+            }
+        }
+
+        function update(sigma, a, rProbe) {
+            const KI = stressIntensity(sigma, a);
+            const sigProbe = sigma < 1e-6 ? 0 : sigmaLigament(rProbe, KI, sigma, a);
+            const amp = sigma > 1e-6 ? sigProbe / sigma : 0;
+
+            updatePlateColors(a, KI, Math.max(sigma, 1e-3));
+            updateCrackOpening(a, KI);
+
+            const arrowLen = 8 + 16 * (sigma / SIG_MAX);
+            loadArrows.forEach(ar => ar.setLength(arrowLen, 4, 2.5));
+
+            // Probe on ligament ahead of right tip
+            const rMaxLig = Math.max(0.2, W / 2 - a - 1);
+            const r = Math.min(rProbe, rMaxLig);
+            probe.position.set(a + r, 0, 2.2);
+            const pl = probeLine.geometry.attributes.position;
+            pl.setXYZ(0, a, 0, 2);
+            pl.setXYZ(1, a + r, 0, 2);
+            pl.needsUpdate = true;
+            probeLine.visible = probe.visible = sigma > 0.2;
+
+            document.getElementById('stressValue').textContent = sigma.toFixed(1);
+            document.getElementById('crackValue').textContent = a.toFixed(1);
+            document.getElementById('probeValue').textContent = rProbe.toFixed(2);
+            document.getElementById('kiVal').textContent = KI.toFixed(1) + ' MPa√mm';
+            document.getElementById('sigTipVal').textContent = sigProbe.toFixed(1) + ' MPa';
+            document.getElementById('ampVal').textContent = sigma > 0.2 ? amp.toFixed(2) + '×' : '—';
+            document.getElementById('crackLenVal').textContent = (2 * a).toFixed(1) + ' mm';
+
+            document.getElementById('dispOverlay').innerHTML =
+                'K<sub>I</sub> = ' + KI.toFixed(1) + ' MPa√mm<br>' +
+                'σ̄<sub>yy</sub> = ' + sigma.toFixed(1) + ' MPa · a = ' + a.toFixed(1) + ' mm<br>' +
+                '<span class="text-rose-300">probe r = ' + r.toFixed(2) + ' → σ = ' + sigProbe.toFixed(1) + ' MPa</span>';
+
+            const tipHint = rProbe < 1.5
+                ? 'Deep in K-field — singularity dominates'
+                : rProbe < 8
+                    ? 'K-dominant zone'
+                    : 'Leaving near-tip zone → remote stress';
+            document.getElementById('stateVal').textContent = tipHint;
+
+            drawSingularityChart(a, KI, sigma, r, sigProbe);
+            drawLogChart(a, KI, sigma, r, sigProbe);
+        }
+
+        function refresh() {
+            update(
+                parseFloat(document.getElementById('loadSlider').value),
+                parseFloat(document.getElementById('crackSlider').value),
+                parseFloat(document.getElementById('probeSlider').value)
+            );
+        }
+
+        const loadSlider = document.getElementById('loadSlider');
+        const crackSlider = document.getElementById('crackSlider');
+        const probeSlider = document.getElementById('probeSlider');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const PLAY_SPEED = 8;
+        let playing = false;
+        let playRaf = 0;
+        let playLast = 0;
+
+        function setPlayUi(on) {
+            playing = on;
+            playBtn.textContent = on ? '⏸ Pause' : '▶ Play';
+            playBtn.classList.toggle('bg-sky-600', !on);
+            playBtn.classList.toggle('hover:bg-sky-500', !on);
+            playBtn.classList.toggle('bg-amber-600', on);
+            playBtn.classList.toggle('hover:bg-amber-500', on);
+        }
+
+        function stopPlay() {
+            playing = false;
+            if (playRaf) cancelAnimationFrame(playRaf);
+            playRaf = 0;
+            setPlayUi(false);
+        }
+
+        function playLoop(t) {
+            if (!playing) return;
+            const dt = Math.min(0.05, (t - playLast) / 1000);
+            playLast = t;
+            let v = parseFloat(loadSlider.value) + PLAY_SPEED * dt;
+            if (v >= SIG_MAX) {
+                loadSlider.value = String(SIG_MAX);
+                refresh();
+                stopPlay();
+                return;
+            }
+            loadSlider.value = String(v);
+            refresh();
+            playRaf = requestAnimationFrame(playLoop);
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (playing) { stopPlay(); return; }
+            if (parseFloat(loadSlider.value) >= SIG_MAX - 1e-6) {
+                loadSlider.value = '0';
+                refresh();
+            }
+            setPlayUi(true);
+            playLast = performance.now();
+            playRaf = requestAnimationFrame(playLoop);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            stopPlay();
+            loadSlider.value = '0';
+            refresh();
+        });
+
+        loadSlider.addEventListener('input', () => { if (playing) stopPlay(); refresh(); });
+        crackSlider.addEventListener('input', refresh);
+        probeSlider.addEventListener('input', refresh);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            resizeCanvas(singCanvas, singCtx);
+            resizeCanvas(logCanvas, logCtx);
+            refresh();
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        resizeCanvas(singCanvas, singCtx);
+        resizeCanvas(logCanvas, logCtx);
+        refresh();
+        animate();
+    </script>
+
+  </div>
+  <footer class="site-footer"><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#linear-elastic-fracture-mechanics">LEFM</a></span></div></footer>
+</body>
+</html>
