@@ -111,7 +111,8 @@
           <div>
             <label for="viewMode">View mode</label>
             <select id="viewMode">
-              <option value="steel" selected>Structural steel</option>
+              <option value="concrete" selected>Concrete</option>
+              <option value="steel">Structural steel</option>
               <option value="aluminum">Aluminum</option>
               <option value="contour">FEA contour</option>
             </select>
@@ -248,6 +249,17 @@
 
         // Named materials — MeshStandard only (no clearcoat / env / custom shaders)
         const MATS = {
+            concrete: {
+                label: 'Concrete',
+                slave: new THREE.MeshStandardMaterial({
+                    color: 0xd8d4ce, metalness: 0.05, roughness: 0.92, side: THREE.DoubleSide, flatShading: false
+                }),
+                master: new THREE.MeshStandardMaterial({
+                    color: 0xc4c0b8, metalness: 0.05, roughness: 0.94, side: THREE.DoubleSide, flatShading: false
+                }),
+                bg: 0xe8e6e1,
+                edge: 0x5c6574
+            },
             steel: {
                 label: 'Structural steel',
                 slave: new THREE.MeshStandardMaterial({
@@ -271,6 +283,22 @@
                 edge: 0x475569
             }
         };
+
+        function applyConcreteMaps(tex) {
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+            [MATS.concrete.slave, MATS.concrete.master].forEach((mat, i) => {
+                mat.map = tex;
+                mat.bumpMap = tex;
+                mat.bumpScale = i === 0 ? 0.42 : 0.38;
+                mat.needsUpdate = true;
+            });
+        }
+
+        new THREE.TextureLoader().load('textures/concrete-slab.png', (tex) => {
+            applyConcreteMaps(tex);
+            if (meshData) rebuild();
+        });
 
         const root = new THREE.Group();
         scene.add(root);
@@ -389,7 +417,15 @@
         }
 
         function isMaterialMode(mode) {
-            return mode === 'steel' || mode === 'aluminum';
+            return mode === 'concrete' || mode === 'steel' || mode === 'aluminum';
+        }
+
+        function pushBoxUv(uvs, x, y, z, nx, ny, nz) {
+            const s = 0.055;
+            const ax = Math.abs(nx), ay = Math.abs(ny), az = Math.abs(nz);
+            if (ay >= ax && ay >= az) uvs.push(x * s, z * s);
+            else if (ax >= az) uvs.push(z * s, y * s);
+            else uvs.push(x * s, y * s);
         }
 
         function setLightingMode(mode) {
@@ -410,7 +446,7 @@
             const elems = data.elems;
             const positions = [];
             const colors = [];
-            const normalsAccum = null;
+            const uvs = [];
             const edgePos = [];
             const split = document.getElementById('splitToggle').checked;
             const slaveEnd = data.slaveElems[1];
@@ -446,11 +482,17 @@
 
                 for (const face of HEX_FACES) {
                     const q = face.map(k => corners[k]);
+                    const ax = q[1][0] - q[0][0], ay = q[1][1] - q[0][1], az = q[1][2] - q[0][2];
+                    const bx = q[2][0] - q[0][0], by = q[2][1] - q[0][1], bz = q[2][2] - q[0][2];
+                    let nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx;
+                    const nLen = Math.hypot(nx, ny, nz) || 1;
+                    nx /= nLen; ny /= nLen; nz /= nLen;
                     const tris = [[0, 1, 2], [0, 2, 3]];
                     for (const tri of tris) {
                         for (const t of tri) {
                             const p = q[t];
                             positions.push(p[0], p[1], p[2]);
+                            if (!contour) pushBoxUv(uvs, p[0], p[1], p[2], nx, ny, nz);
                             if (contour) {
                                 if (ghost) {
                                     colors.push(0.7, 0.7, 0.75);
@@ -478,6 +520,7 @@
             const geo = new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             if (contour) geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            else geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geo.computeVertexNormals();
 
             let edgeGeo = null;
