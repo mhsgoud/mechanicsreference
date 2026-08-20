@@ -294,10 +294,10 @@
     .eq-card{background:#fff;border:1px solid var(--rule);padding:16px 18px 14px}
     .eq-card h3{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.02rem;color:var(--navy)}
     .eq-card .eq{
-      font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size:0.95rem;line-height:1.5;color:var(--ink);
-      background:#f1efe9;padding:10px 12px;overflow-x:auto;margin:0 0 8px;
+      background:#f1efe9;padding:12px 14px;overflow-x:auto;margin:0 0 8px;
+      text-align:center;line-height:1.4;color:var(--ink);
     }
+    .eq-card .eq .katex{font-size:1.08em}
     .eq-card p{margin:0;color:var(--muted);font-size:0.92rem;line-height:1.5}
 
     @media (max-width: 980px){
@@ -308,6 +308,9 @@
       header,.content{padding-left:18px;padding-right:18px}
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -435,20 +438,20 @@ const topics = [
     "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV (inertia adds ∫ ρ a · δu when dynamics matter). FEM replaces u and δu with shape functions on a mesh, yielding K a = f in linear elasticity, or R(u) = 0 solved by Newton–Raphson with tangent K_T.",
     "The figure is linear momentum on a supported body: reactions on the support and tractions on the free surface close the global balance while ∇·σ + ρ b = ρ a holds inside."
   ], equations:[
-    {name:"Deformation gradient", expr:"F = ∂x / ∂X", note:"Maps a material line element from the reference placement X to the current placement x. J = det F is local volume change."},
-    {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
-    {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
-    {name:"Cauchy traction", expr:"t = σ n", note:"Force per current area on a surface with outward normal n. Angular momentum without couples requires σ = σᵀ."},
-    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", note:"Nominal stress: current force per reference area. Work-conjugate to Ḟ."},
-    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Local mass balance. Referential form: ρ₀ = ρ J. Incompressibility is ∇ · v = 0."},
-    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. Static problems set a = 0. Integral statement: ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV."},
-    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", note:"Same balance on the reference placement. Total Lagrangian FEM discretizes this form."},
-    {name:"Angular momentum", expr:"σ = σᵀ", note:"Cauchy’s second law in the absence of couple stresses — an algebraic restriction, not a PDE."},
-    {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", note:"First law: internal energy rate equals stress power, minus heat efflux, plus heat supply r."},
-    {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
-    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", note:"Weak form of momentum (quasi-static). Dynamics adds ∫ ρ a · δu on the left or right by convention."},
-    {name:"Discrete linear system", expr:"K a = f", note:"Assembled stiffness times nodal unknowns equals the load vector."},
-    {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
+    {name:"Deformation gradient", expr:"F = ∂x / ∂X", tex:"F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Maps a material line element from the reference placement X to the current placement x. J = det F is local volume change."},
+    {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
+    {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
+    {name:"Cauchy traction", expr:"t = σ n", tex:"\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}", note:"Force per current area on a surface with outward normal n. Angular momentum without couples requires σ = σᵀ."},
+    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Nominal stress: current force per reference area. Work-conjugate to Ḟ."},
+    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Local mass balance. Referential form: ρ₀ = ρ J. Incompressibility is ∇ · v = 0."},
+    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}", note:"Cauchy’s first law. Static problems set a = 0. Integral statement: ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV."},
+    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}", note:"Same balance on the reference placement. Total Lagrangian FEM discretizes this form."},
+    {name:"Angular momentum", expr:"σ = σᵀ", tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}", note:"Cauchy’s second law in the absence of couple stresses — an algebraic restriction, not a PDE."},
+    {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"First law: internal energy rate equals stress power, minus heat efflux, plus heat supply r."},
+    {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
+    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", tex:"\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V", note:"Weak form of momentum (quasi-static). Dynamics adds ∫ ρ a · δu on the left or right by convention."},
+    {name:"Discrete linear system", expr:"K a = f", tex:"\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}", note:"Assembled stiffness times nodal unknowns equals the load vector."},
+    {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", tex:"\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
   ], tags:["basic equations","continuum","strain","stress","conservation","momentum","Hooke","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum"},
   {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
@@ -505,12 +508,12 @@ const topics = [
     "Turn the cut in the figure. The stress tensor is fixed; the traction, and its split into normal and shear, are not."
   ], tags:["traction","Cauchy stress","normal stress","shear"], scene:"tractionCut"},
   {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", equations:[
-    {name:"Mass (spatial)", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Continuity. Referential: ρ₀ = ρ J."},
-    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."},
-    {name:"Linear momentum (integral)", expr:"∫_∂Ω t dA + ∫_Ω ρ b dV = d/dt ∫_Ω ρ v dV", note:"Global statement on any part Ω. Localization plus the divergence theorem recovers the PDE."},
-    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", note:"Same physics on the reference placement; used by Total Lagrangian FEM."},
-    {name:"Angular momentum", expr:"σ = σᵀ", note:"No couple stresses. Equivalently P Fᵀ = F Pᵀ."},
-    {name:"Energy", expr:"ρ ė = σ : D − ∇ · q + ρ r", note:"Internal energy, stress power, heat flux, and supply."}
+    {name:"Mass (spatial)", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Continuity. Referential: ρ₀ = ρ J."},
+    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}", note:"Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."},
+    {name:"Linear momentum (integral)", expr:"∫_∂Ω t dA + ∫_Ω ρ b dV = d/dt ∫_Ω ρ v dV", tex:"\\displaystyle\\int_{\\partial\\Omega}\\mathbf{t}\\,\\mathrm{d}A + \\int_{\\Omega}\\rho\\mathbf{b}\\,\\mathrm{d}V = \\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\Omega}\\rho\\mathbf{v}\\,\\mathrm{d}V", note:"Global statement on any part Ω. Localization plus the divergence theorem recovers the PDE."},
+    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}", note:"Same physics on the reference placement; used by Total Lagrangian FEM."},
+    {name:"Angular momentum", expr:"σ = σᵀ", tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}", note:"No couple stresses. Equivalently P Fᵀ = F Pᵀ."},
+    {name:"Energy", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"Internal energy, stress power, heat flux, and supply."}
   ], bullets:[
     "Mass, linear momentum, angular momentum, and energy are conserved in every continuum theory — or balanced, once heat flux and external power are admitted. Once a stress (and a heat flux) are introduced, the local forms of those statements become partial differential equations.",
     "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Globally, the resultant of tractions and body forces equals the rate of change of linear momentum of that part. The divergence theorem turns the surface term into ∇·σ and yields the PDE.",
@@ -665,10 +668,10 @@ const topics = [
     "Wave propagation and crash analysis often take the explicit route. Quasi-static evolution, implicit dynamics, and viscoelasticity usually do not. Numerical dissipation in the integrator is a modelling choice, not a free parameter for hiding an unstable constitutive rate."
   ], tags:["dynamics","implicit","explicit","wave","crash","Newmark"]},
   {part:"Part III – Advanced FEM Concepts", title:"Contact and Friction", equations:[
-    {name:"Frictionless KKT", expr:"g ≤ 0,   p ≥ 0,   p g = 0", note:"Gap g, contact pressure p, and complementarity: either the surfaces are open (p = 0) or they press with g = 0. Never both open and pressing."},
-    {name:"Hertz pressure", expr:"p(x) = p₀ √(1 − (x/a)²)", note:"Smooth elliptic profile on a contact patch of half-width a. Peak at the centre, zero at the edges — no crack-tip singularity."},
-    {name:"Effective modulus", expr:"1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂", note:"Two dissimilar elastic bodies collapse to a single modulus E* and an equivalent radius R*."},
-    {name:"Coulomb friction", expr:"|t_τ| ≤ μ p,   slip ∥ −t_τ", note:"Stick when the tangential traction lies inside the cone; slide when it saturates. The tangent becomes nonsymmetric."}
+    {name:"Frictionless KKT", expr:"g ≤ 0,   p ≥ 0,   p g = 0", tex:"g \\le 0,\\quad p \\ge 0,\\quad p\\,g = 0", note:"Gap g, contact pressure p, and complementarity: either the surfaces are open (p = 0) or they press with g = 0. Never both open and pressing."},
+    {name:"Hertz pressure", expr:"p(x) = p₀ √(1 − (x/a)²)", tex:"p(x) = p_0\\sqrt{1-(x/a)^2}", note:"Smooth elliptic profile on a contact patch of half-width a. Peak at the centre, zero at the edges — no crack-tip singularity."},
+    {name:"Effective modulus", expr:"1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂", tex:"\\dfrac{1}{E^*} = \\dfrac{1-\\nu_1^2}{E_1} + \\dfrac{1-\\nu_2^2}{E_2}", note:"Two dissimilar elastic bodies collapse to a single modulus E* and an equivalent radius R*."},
+    {name:"Coulomb friction", expr:"|t_τ| ≤ μ p,   slip ∥ −t_τ", tex:"|\\mathbf{t}_\\tau| \\le \\mu p,\\quad \\text{slip}\\parallel -\\mathbf{t}_\\tau", note:"Stick when the tangential traction lies inside the cone; slide when it saturates. The tangent becomes nonsymmetric."}
   ], bullets:[
     "When two bodies, or a body and a rigid obstacle, would otherwise occupy the same point, a contact constraint forbids penetration and a friction law limits the tangential traction. The Karush–Kuhn–Tucker conditions for frictionless contact are g ≤ 0, p ≥ 0, p g = 0: a gap, a pressure, and complementarity.",
     "Classical Hertz theory is the smooth closed-form limit for small patches of linearly elastic bodies. An approach δ closes the gap; the contact half-width a and the peak pressure p₀ then follow from E* and R*. The pressure is elliptic — finite, smooth, and zero at the edge of the patch. That is the opposite of Williams’ 1/√r crack-tip field.",
@@ -686,10 +689,10 @@ const topics = [
     "The next three entries are the singular field, the cohesive process zone, and the contour integral that extracts G."
   ], tags:["fracture","LEFM","SIF","Griffith","Williams","singularity","cohesive","XFEM"], illustrations:"fractureOverview"},
   {part:"Part IV – Applications in Engineering", title:"Linear Elastic Fracture Mechanics", equations:[
-    {name:"Williams field", expr:"σ_ij = K / √(2π r) · f_ij(θ)", note:"Leading term at a sharp crack in a linear elastic solid. The angular functions f depend on the mode. Stress is unbounded as r → 0; energy release is finite."},
-    {name:"Irwin", expr:"G = K_I² / E′", note:"E′ = E in plane stress and E/(1−ν²) in plane strain. Mixed-mode energy release adds K_II² and K_III² / (2μ) terms."},
-    {name:"Small-scale yielding", expr:"r_p ∼ (1/2π) (K / σ_y)²", note:"Estimate of the plastic-zone size. LEFM holds while r_p is small compared with crack length and ligament."},
-    {name:"Max hoop kink", expr:"K_I sin θ_c + K_II (3 cos θ_c − 1) = 0", note:"Direction of the next increment under mixed-mode I–II. Equivalently θ_c = 2 arctan[(K_I − √(K_I² + 8 K_II²))/(4 K_II)]."}
+    {name:"Williams field", expr:"σ_ij = K / √(2π r) · f_ij(θ)", tex:"\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)", note:"Leading term at a sharp crack in a linear elastic solid. The angular functions f depend on the mode. Stress is unbounded as r → 0; energy release is finite."},
+    {name:"Irwin", expr:"G = K_I² / E′", tex:"G = \\dfrac{K_I^2}{E'}", note:"E′ = E in plane stress and E/(1−ν²) in plane strain. Mixed-mode energy release adds K_II² and K_III² / (2μ) terms."},
+    {name:"Small-scale yielding", expr:"r_p ∼ (1/2π) (K / σ_y)²", tex:"r_p \\sim \\dfrac{1}{2\\pi}\\Bigl(\\dfrac{K}{\\sigma_y}\\Bigr)^2", note:"Estimate of the plastic-zone size. LEFM holds while r_p is small compared with crack length and ligament."},
+    {name:"Max hoop kink", expr:"K_I sin θ_c + K_II (3 cos θ_c − 1) = 0", tex:"K_I\\sin\\theta_c + K_{II}(3\\cos\\theta_c - 1) = 0", note:"Direction of the next increment under mixed-mode I–II. Equivalently θ_c = 2 arctan[(K_I − √(K_I² + 8 K_II²))/(4 K_II)]."}
   ], bullets:[
     "Williams constructed the eigenfields of a traction-free crack in an isotropic linear solid. The strongest admissible term that still gives finite energy is r^{-1/2}. All of the geometry and the remote load collapse into three scalars K_I, K_II, K_III, the stress intensity factors. Two bodies with the same K have the same near-tip field, which is why K is a characterizing parameter.",
     "Mode I is opening: σ_yy on the ligament is K_I / √(2π r). Mode II is in-plane shear; mode III is antiplane tearing. A mixed-mode tip kinks; the direction of maximum hoop stress, written in terms of K_I and K_II, is the usual criterion for the next increment of a brittle crack. Those intensities are extracted from a contour or domain integral — J itself, or an interaction integral that isolates each mode.",
@@ -698,9 +701,9 @@ const topics = [
     "The figure is a plate with an edge crack. Switch mode I and mode II. The colour is the Williams stress; the log–log plot of ligament stress has slope −1/2."
   ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding"], scenes:["lefm","lefmCenterCrack"], illustrations:"lefm"},
   {part:"Part IV – Applications in Engineering", title:"Cohesive Cracking", equations:[
-    {name:"Traction–separation", expr:"t = t(δ),   G_f = ∫_0^{w_c} t dδ", note:"The area under the law is the fracture energy. Linear, bilinear, and exponential shapes are the usual choices. The tensile strength ft is the peak traction."},
-    {name:"Hillerborg length", expr:"ℓ_ch = E G_f / f_t²", note:"Characteristic size of the process zone. LEFM is recovered when ℓ_ch is small compared with the crack and the specimen."},
-    {name:"Effective face traction", expr:"t_c = t_d − α p n", note:"On a cohesive crack in a saturated porous solid. t_d is the dry cohesive traction, α the Biot coefficient, p the pore pressure, n the face normal. Mass exchange q_wd is an additional flux on the same surface."}
+    {name:"Traction–separation", expr:"t = t(δ),   G_f = ∫_0^{w_c} t dδ", tex:"t = t(\\delta),\\quad G_f = \\displaystyle\\int_0^{w_c} t\\,\\mathrm{d}\\delta", note:"The area under the law is the fracture energy. Linear, bilinear, and exponential shapes are the usual choices. The tensile strength ft is the peak traction."},
+    {name:"Hillerborg length", expr:"ℓ_ch = E G_f / f_t²", tex:"\\ell_{\\mathrm{ch}} = \\dfrac{E G_f}{f_t^2}", note:"Characteristic size of the process zone. LEFM is recovered when ℓ_ch is small compared with the crack and the specimen."},
+    {name:"Effective face traction", expr:"t_c = t_d − α p n", tex:"\\mathbf{t}_c = \\mathbf{t}_d - \\alpha p\\,\\mathbf{n}", note:"On a cohesive crack in a saturated porous solid. t_d is the dry cohesive traction, α the Biot coefficient, p the pore pressure, n the face normal. Mass exchange q_wd is an additional flux on the same surface."}
   ], bullets:[
     "Quasi-brittle materials — concrete, rock, saturated soil — do not fail at a mathematical tip. Dugdale and Barenblatt, and later Hillerborg, replace the singular field with a process zone on which a traction–separation law still transmits load. The faces are not traction-free until the opening exceeds a critical value w_c. The peak traction is the tensile strength f_t; the area under the law is the fracture energy G_f. Linear, bilinear, and exponential shapes are the usual choices.",
     "While the opening is less than w_c the crack still carries load, so the stress at the mathematical tip is finite. Along the crack line the traction rises to f_t, then falls according to the law, then vanishes on the open faces. Lower G_f shortens the zone. Under load or displacement control a small G_f produces snap-back: the load–deflection curve turns back on itself, and a continuation method is required.",
@@ -709,10 +712,10 @@ const topics = [
     "The figure is a process zone on a crack line. Change the law, the tensile strength, and G_f. Navy is the cohesive traction; orange is the LEFM 1/√r field with the same far-field K. The LEFM curve is unbounded at the tip; the cohesive curve is not."
   ], tags:["cohesive zone","Barenblatt","Dugdale","Hillerborg","traction-separation","process zone","porous media","XFEM"], scenes:["cohesiveCrack","dcbCohesive"], illustrations:"cohesive", sources:[{label:"Goudarzi & Mohammadi, Analysis of cohesive cracking in saturated porous media using an extrinsically enriched EFG method, Comput. Geotech. 63 (2015)", href:"https://doi.org/10.1016/j.compgeo.2014.09.007"}]},
   {part:"Part IV – Applications in Engineering", title:"The J-Integral", equations:[
-    {name:"Contour form", expr:"J = ∮_Γ (w n_1 − t · ∂u/∂x_1) dΓ", note:"Any path from the lower face to the upper that encloses the tip and no other singularity. w is the strain-energy density, t = σ n the traction on Γ."},
-    {name:"Potential energy", expr:"J = −dΠ / dA", note:"Energy released per unit area of crack advance. For a nonlinear elastic solid this is Griffith’s G. Unloading, inertia, and thermal strain take the identity away."},
-    {name:"Irwin", expr:"J = K_I² / E′", note:"Linear elasticity recovers the stress-intensity factor. E′ = E in plane stress and E/(1−ν²) in plane strain."},
-    {name:"Rigid line inclusion", expr:"J_tip ∝ (cos²θ − ν sin²θ)²", note:"The same contour around an inclusion tip measures the configurational force on that tip. It vanishes at the mechanically neutral orientation θn(ν)."}
+    {name:"Contour form", expr:"J = ∮_Γ (w n_1 − t · ∂u/∂x_1) dΓ", tex:"J = \\oint_{\\Gamma}\\bigl(w n_1 - \\mathbf{t}\\cdot\\partial_{x_1}\\mathbf{u}\\bigr)\\,\\mathrm{d}\\Gamma", note:"Any path from the lower face to the upper that encloses the tip and no other singularity. w is the strain-energy density, t = σ n the traction on Γ."},
+    {name:"Potential energy", expr:"J = −dΠ / dA", tex:"J = -\\dfrac{\\mathrm{d}\\Pi}{\\mathrm{d}A}", note:"Energy released per unit area of crack advance. For a nonlinear elastic solid this is Griffith’s G. Unloading, inertia, and thermal strain take the identity away."},
+    {name:"Irwin", expr:"J = K_I² / E′", tex:"J = \\dfrac{K_I^2}{E'}", note:"Linear elasticity recovers the stress-intensity factor. E′ = E in plane stress and E/(1−ν²) in plane strain."},
+    {name:"Rigid line inclusion", expr:"J_tip ∝ (cos²θ − ν sin²θ)²", tex:"J_{\\mathrm{tip}} \\propto \\bigl(\\cos^2\\theta - \\nu\\sin^2\\theta\\bigr)^2", note:"The same contour around an inclusion tip measures the configurational force on that tip. It vanishes at the mechanically neutral orientation θn(ν)."}
   ], bullets:[
     "Rice’s J is the energy released per unit area of crack advance. For a hyperelastic solid it equals −dΠ/dA. In linear elastic fracture mechanics it recovers Griffith’s G and Irwin’s K_I²/E′. The contour form is a line integral of strain-energy density and traction-work around the tip: any path from the lower crack face to the upper that encloses the tip, and no other singularity, gives the same number.",
     "Path independence is the divergence theorem plus equilibrium. Two contours differ by an annular region in which the integrand is a divergence that integrates to zero, provided the material is hyperelastic (or deformation-theory plastic), the crack faces are traction-free, and there are no body forces. Unloading, heat, and inertia all break that identity. Then J is defined on a small contour about the process zone, or converted to a domain integral with a weighting function q that is 1 near the tip and 0 outside — the form finite-element codes actually compute.",
@@ -753,9 +756,9 @@ const topics = [
     "Continuum damage and cohesive interfaces are the usual numerical representations. A single equivalent-stress criterion on a homogenised ply is often too coarse to see delamination coming, because the interlaminar traction never appears as a degree of freedom."
   ], tags:["failure","delamination","matrix","fiber"]},
   {part:"Part IV – Applications in Engineering", title:"Multiphase Porous Materials", equations:[
-    {name:"Effective stress", expr:"σ′ = σ − α p I", note:"Biot’s split. α = 1 − K/Ks is 1 for a soil whose grains are incompressible compared with the skeleton. Terzaghi’s principle is the same statement with α = 1."},
-    {name:"Darcy", expr:"v = −(k/μ) (∇p − ρ g)", note:"Relative discharge of the wetting fluid through the pores. Unsaturated flow replaces k by k(S_w)."},
-    {name:"Storage", expr:"α ∇·u̇ + (1/M) ṗ + ∇·v = 0", note:"Mass balance of the fluid. M is Biot’s modulus. Instantaneous undrained response is the limit M → ∞ with ∇·v = 0."}
+    {name:"Effective stress", expr:"σ′ = σ − α p I", tex:"\\boldsymbol{\\sigma}' = \\boldsymbol{\\sigma} - \\alpha p\\,\\mathbf{I}", note:"Biot’s split. α = 1 − K/Ks is 1 for a soil whose grains are incompressible compared with the skeleton. Terzaghi’s principle is the same statement with α = 1."},
+    {name:"Darcy", expr:"v = −(k/μ) (∇p − ρ g)", tex:"\\mathbf{v} = -\\dfrac{k}{\\mu}\\bigl(\\nabla p - \\rho\\mathbf{g}\\bigr)", note:"Relative discharge of the wetting fluid through the pores. Unsaturated flow replaces k by k(S_w)."},
+    {name:"Storage", expr:"α ∇·u̇ + (1/M) ṗ + ∇·v = 0", tex:"\\alpha\\,\\nabla\\cdot\\dot{\\mathbf{u}} + \\dfrac{1}{M}\\dot{p} + \\nabla\\cdot\\mathbf{v} = 0", note:"Mass balance of the fluid. M is Biot’s modulus. Instantaneous undrained response is the limit M → ∞ with ∇·v = 0."}
   ], bullets:[
     "A porous solid is a mixture: a deformable skeleton and one or more pore fluids. The volume fractions are the porosity n of the void space and, when more than one fluid is present, the saturations S_w, S_g with S_w + S_g = 1. The partial densities are n S_α ρ_α. Mixture theory writes a mass balance and a momentum balance for each constituent; Biot’s poroelasticity is the linear two-phase case that geomechanics actually computes.",
     "The stress that compresses the skeleton is not the total Cauchy stress. Biot’s effective stress σ′ = σ − α p I is what enters the constitutive law of the solid. In a saturated soil with stiff grains, α = 1 and this is Terzaghi’s principle. An unsaturated soil needs two pressures: Bishop’s form σ′ = σ − χ p_w − (1−χ) p_g interpolates with a factor χ that is often taken as S_w, and the difference p_g − p_w is the capillary pressure, a function of saturation.",
@@ -764,9 +767,9 @@ const topics = [
     "A crack in a saturated porous solid is still this mixture, with a jump in displacement and a continuous pressure whose gradient is not. That is the cohesive entry. The figures below are the phases and the effective-stress split."
   ], tags:["porous media","Biot","Terzaghi","Darcy","effective stress","unsaturated","mixture theory"], illustrations:"porousOverview", sources:[{label:"Biot, General theory of three-dimensional consolidation, J. Appl. Phys. 12 (1941)", href:"https://doi.org/10.1063/1.1712886"}]},
   {part:"Part IV – Applications in Engineering", title:"One-Dimensional Consolidation", equations:[
-    {name:"Terzaghi", expr:"∂u/∂t = c_v ∂²u/∂z²", note:"Excess pore pressure u in a column whose total vertical stress is known from equilibrium. c_v = k / (μ m_v) with m_v the oedometric compressibility."},
-    {name:"Time factor", expr:"T_v = c_v t / H²", note:"H is the length of the longest drainage path. Isochrones and the average degree of consolidation U depend only on T_v."},
-    {name:"Degree of consolidation", expr:"U = 1 − Σ 2/M² exp(−M² T_v)", note:"M = π/2, 3π/2, … for a single drain. Settlement is U times the final oedometer compression."}
+    {name:"Terzaghi", expr:"∂u/∂t = c_v ∂²u/∂z²", tex:"\\partial_t u = c_v \\partial_z^2 u", note:"Excess pore pressure u in a column whose total vertical stress is known from equilibrium. c_v = k / (μ m_v) with m_v the oedometric compressibility."},
+    {name:"Time factor", expr:"T_v = c_v t / H²", tex:"T_v = \\dfrac{c_v t}{H^2}", note:"H is the length of the longest drainage path. Isochrones and the average degree of consolidation U depend only on T_v."},
+    {name:"Degree of consolidation", expr:"U = 1 − Σ 2/M² exp(−M² T_v)", tex:"U = 1 - \\sum \\dfrac{2}{M^2}\\exp(-M^2 T_v)", note:"M = π/2, 3π/2, … for a single drain. Settlement is U times the final oedometer compression."}
   ], bullets:[
     "A packed column, or an oedometer, is the one-dimensional problem. A sudden vertical load is carried at once by the pore water: the excess pressure equals the applied stress and the effective stress has not yet risen. The top of the column can drain; the base cannot. The excess pressure then obeys a heat equation. Because equilibrium in one dimension fixes the total vertical stress, there is no back-coupling from strain onto the load, and the pressure at every depth falls monotonically.",
     "The solution is a Fourier series in the drainage eigenfunctions. On a plot of u against depth the isochrones start as a rectangle, collapse first near the drain, and end at zero. The average of those isochrones is the degree of consolidation U(T_v). Settlement of the top is U times the final compression m_v σ H. Casagrande and Taylor constructions on a laboratory curve are ways of reading c_v from U(t), not different theories.",
@@ -774,8 +777,8 @@ const topics = [
     "The figure is that column. Advance T_v. Colour is excess pressure; the log plot is U."
   ], tags:["consolidation","Terzaghi","oedometer","isochrone","degree of consolidation","cv"], scene:"consolidation", illustrations:"terzaghi"},
   {part:"Part IV – Applications in Engineering", title:"Gibson Consolidation", equations:[
-    {name:"Self-weight", expr:"u(z,0) = γ′ (H − z)", note:"Triangular excess pressure in a freshly placed layer. The top is a free drain; the base is impermeable. Dissipation is still Terzaghi’s series, with different Fourier coefficients."},
-    {name:"Accretion", expr:"h = m t", note:"Gibson (1958): a clay layer that thickens at a constant rate. The boundary moves. Excess pressure is the weight of the fill itself, not a surcharge applied to a finished layer."}
+    {name:"Self-weight", expr:"u(z,0) = γ′ (H − z)", tex:"u(z,0) = \\gamma'(H - z)", note:"Triangular excess pressure in a freshly placed layer. The top is a free drain; the base is impermeable. Dissipation is still Terzaghi’s series, with different Fourier coefficients."},
+    {name:"Accretion", expr:"h = m t", tex:"h = m t", note:"Gibson (1958): a clay layer that thickens at a constant rate. The boundary moves. Excess pressure is the weight of the fill itself, not a surcharge applied to a finished layer."}
   ], bullets:[
     "A fill, a sediment, or a tailings deposit is not an oedometer. The load is the self-weight of the material, so the initial excess pressure is a triangle: zero at the drained surface, γ′H at the impermeable base. The eigenfunctions are the same as Terzaghi’s; the coefficients are not. Isochrones start as that triangle and flatten from the top down.",
     "Gibson (1958) let the layer grow. Thickness h = m t, with m the deposition rate. New material arrives already charged with its own weight, and the top boundary moves. The dimensionless group is m h / c_v: fast filling or a thick deposit leaves more excess pressure at the end of construction than a slow fill of the same height. Hydraulic fill and sedimentation are this problem.",
@@ -784,8 +787,8 @@ const topics = [
     "The figure is the self-weight column. The isochrones are the triangle decaying in time. An accreting layer is the same plot with a rising top."
   ], tags:["Gibson","self-weight","accretion","finite strain","void ratio","tailings"], scene:"consolidationGibson", illustrations:"gibson", sources:[{label:"Gibson, The progress of consolidation in a clay layer increasing in thickness with time, Géotechnique 8 (1958)", href:"https://doi.org/10.1680/geot.1958.8.4.171"}]},
   {part:"Part IV – Applications in Engineering", title:"Mandel–Cryer Effect", equations:[
-    {name:"Skempton", expr:"Δp = B Δσ_m", note:"Undrained pore-pressure increment. B = 1 for a saturated soil with incompressible grains. The subsequent coupled evolution is not a statement about B."},
-    {name:"Cryer", expr:"p_centre(t)  rises, then falls", note:"A saturated sphere, sudden surface pressure, drained surface. Uncoupled Terzaghi is monotonic. Biot coupling produces the overshoot. The rise is largest at small drained Poisson ratio and vanishes as ν → 1/2."}
+    {name:"Skempton", expr:"Δp = B Δσ_m", tex:"\\Delta p = B\\,\\Delta\\sigma_m", note:"Undrained pore-pressure increment. B = 1 for a saturated soil with incompressible grains. The subsequent coupled evolution is not a statement about B."},
+    {name:"Cryer", expr:"p_centre(t)  rises, then falls", tex:"p_{\\mathrm{centre}}(t)\\ \\text{rises, then falls}", note:"A saturated sphere, sudden surface pressure, drained surface. Uncoupled Terzaghi is monotonic. Biot coupling produces the overshoot. The rise is largest at small drained Poisson ratio and vanishes as ν → 1/2."}
   ], bullets:[
     "In one dimension the total vertical stress is known, so excess pressure can only fall. In two or three dimensions it is not. As the drained boundary consolidates it becomes stiffer in effective stress and takes more of the load. The still-undrained interior is then compressed further, and its pore pressure rises above the undrained value before drainage finally catches up. That non-monotonic centre pressure is the Mandel–Cryer effect: the signature that the solid and the fluid are coupled both ways.",
     "Mandel (1953) posed it on a laterally confined strip that drains from the sides. Cryer (1963) posed it on a sphere with a sudden hydrostatic surface pressure. Both compared Biot’s theory with Terzaghi’s uncoupled diffusion. Only Biot produces the rise. Uncoupled codes, and one-dimensional columns, cannot.",
@@ -814,8 +817,8 @@ const topics = [
 
   // Part V – High-Performance Computing
   {part:"Part V – High-Performance Computing", title:"GPUs in the FEM Pipeline", equations:[
-    {name:"Amdahl", expr:"S = 1 / (1 − p + p/s)", note:"Overall speedup when a fraction p of the wall time runs s times faster. A stage that is 5% of the analysis cannot save the job, however well it maps to CUDA."},
-    {name:"Element independence", expr:"Kᵉ = ∫ Bᵀ ℂ B dV   (no neighbour data)", note:"Constitutive evaluation and the element residual communicate only through assembly. That is why the Gauss-point loop is the first kernel worth moving."}
+    {name:"Amdahl", expr:"S = 1 / (1 − p + p/s)", tex:"S = \\dfrac{1}{1 - p + p/s}", note:"Overall speedup when a fraction p of the wall time runs s times faster. A stage that is 5% of the analysis cannot save the job, however well it maps to CUDA."},
+    {name:"Element independence", expr:"Kᵉ = ∫ Bᵀ ℂ B dV   (no neighbour data)", tex:"\\mathbf{K}^{e} = \\displaystyle\\int \\mathbf{B}^{\\mathsf{T}}\\mathbb{C}\\,\\mathbf{B}\\,\\mathrm{d}V \\quad (\\text{no neighbour data})", note:"Constitutive evaluation and the element residual communicate only through assembly. That is why the Gauss-point loop is the first kernel worth moving."}
   ], bullets:[
     "A finite element analysis is not one kernel. It is a pipeline, and a GPU is useful only in the stages that expose thousands of identical arithmetic operations on data that already live in device memory. The first question is not how to write CUDA. It is which stage actually dominates, and whether that stage is data-parallel.",
     "Geometry and mesh generation, file I/O, and most CAD clean-up are irregular and latency-bound. They stay on the host. Local kinematics — shape functions, the Jacobian of the isoparametric map, the strain–displacement matrix B at Gauss points — are independent per element and move easily, but they are cheap. The constitutive law at those same points is not: in plasticity, damage, or a coupled material it is often the majority of a nonlinear residual. No element needs its neighbour’s history variables to compute σ and ℂ. That loop is the usual first win.",
@@ -1809,7 +1812,7 @@ function renderContent(topic){
       <div class="eq-list">${topic.equations.map(eq => `
         <article class="eq-card">
           <h3>${escHtml(eq.name)}</h3>
-          <div class="eq">${escHtml(eq.expr)}</div>
+          <div class="eq">\\[${eq.tex || escHtml(eq.expr)}\\]</div>
           <p>${escHtml(eq.note)}</p>
         </article>`).join('')}</div>`
     : "";
@@ -1835,6 +1838,22 @@ function renderContent(topic){
   // Mount interactive widgets AFTER DOM update
   if(topic.interactive === "elementChooser"){
     mountElementChooser();
+  }
+  typesetMath(content);
+}
+
+function typesetMath(root){
+  if (!root) return;
+  if (window.renderMathInElement) {
+    renderMathInElement(root, {
+      delimiters: [
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  } else {
+    setTimeout(function(){ typesetMath(root); }, 40);
   }
 }
 

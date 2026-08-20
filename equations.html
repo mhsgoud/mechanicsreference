@@ -45,7 +45,7 @@
     .eq-card{background:var(--card);border:1px solid var(--rule);padding:20px 20px 16px}
     .eq-kicker{font-size:0.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
     .eq-card h3{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--navy)}
-    .eq{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.95rem;background:#f1efe9;padding:12px 14px;margin:0 0 12px;overflow-x:auto}
+    .eq{background:#f1efe9;padding:14px 16px;margin:0 0 12px;overflow-x:auto;text-align:center;line-height:1.4}.eq .katex{font-size:1.12em;color:var(--ink)}
     .eq-card p{margin:0;font-size:0.95rem;color:var(--ink-soft)}
     footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:980px}
@@ -55,6 +55,24 @@
       .brand-logo{height:44px}
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      function go() {
+        if (!window.renderMathInElement) { setTimeout(go, 30); return; }
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      go();
+    });
+  </script>
 </head>
 <body>
   <header>
@@ -80,127 +98,127 @@
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Deformation gradient</h3>
-        <div class="eq">F = ∂x / ∂X</div>
+        <div class="eq">\[F = \dfrac{\partial \mathbf{x}}{\partial \mathbf{X}}\]</div>
         <p>A material line element in the reference placement is mapped to the current placement. Finite-strain measures are built from this tensor. <a href="deformation-gradient.html">Translation, rotation, stretch, and shear</a> are shown as a homogeneous motion of a grid.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Jacobian</h3>
-        <div class="eq">J = det F = dv / dV</div>
+        <div class="eq">\[J = \det\mathbf{F} = \dfrac{\mathrm{d}v}{\mathrm{d}V}\]</div>
         <p>Local volume change. Mass balance in the reference placement is ρ₀ = ρ J. Incompressibility is J = 1, which is the constraint on the <a href="principal-stretches.html">principal stretches</a> of rubber.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Green–Lagrange strain</h3>
-        <div class="eq">E = ½ (Fᵀ F − I)</div>
+        <div class="eq">\[\mathbf{E} = \tfrac{1}{2}\bigl(\mathbf{F}^{\mathsf{T}}\mathbf{F} - \mathbf{I}\bigr)\]</div>
         <p>Strain on the reference configuration. When displacement gradients are small, it reduces to the infinitesimal strain. A <a href="rotation-strain.html">pure rotation</a> leaves E at zero and does not leave ε at zero.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Infinitesimal strain</h3>
-        <div class="eq">ε = ½ (∇u + (∇u)ᵀ)</div>
+        <div class="eq">\[\boldsymbol{\varepsilon} = \tfrac{1}{2}\bigl(\nabla\mathbf{u} + (\nabla\mathbf{u})^{\mathsf{T}}\bigr)\]</div>
         <p>The symmetric gradient of displacement. This is the strain used in linear elasticity and in most introductory finite element courses.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Polar decomposition</h3>
-        <div class="eq">F = R U = V R</div>
+        <div class="eq">\[\mathbf{F} = \mathbf{R}\mathbf{U} = \mathbf{V}\mathbf{R}\]</div>
         <p>A unique rotation R and symmetric stretches U, V. Strain is built from U or from C = U², so a rigid rotation does not count as stretch. <a href="polar-decomposition.html">Stretch then rotate, or rotate then stretch</a> — the two paths meet.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Almansi strain</h3>
-        <div class="eq">e = ½ (I − b⁻¹)</div>
+        <div class="eq">\[\mathbf{e} = \tfrac{1}{2}\bigl(\mathbf{I} - \mathbf{b}^{-1}\bigr)\]</div>
         <p>Finite strain on the current placement, with b = F Fᵀ. Like Green–Lagrange, it vanishes in a rigid motion.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
         <h3>Velocity gradient</h3>
-        <div class="eq">L = Ḟ F⁻¹ = D + W</div>
+        <div class="eq">\[\mathbf{L} = \dot{\mathbf{F}}\mathbf{F}^{-1} = \mathbf{D} + \mathbf{W}\]</div>
         <p>The symmetric part D is stretching; the skew part W is spin. This is the rate that is conjugate to Kirchhoff stress. <a href="velocity-gradient.html">D, W, and L</a> on a material cross.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
         <h3>First Piola–Kirchhoff</h3>
-        <div class="eq">P = J σ F⁻ᵀ</div>
+        <div class="eq">\[\mathbf{P} = J\,\boldsymbol{\sigma}\,\mathbf{F}^{-\mathsf{T}}\]</div>
         <p>Nominal stress: force on a current area, measured per reference area. Work-conjugate to Ḟ. <a href="work-conjugates.html">The same force on two areas</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
         <h3>Second Piola–Kirchhoff</h3>
-        <div class="eq">S = J F⁻¹ σ F⁻ᵀ</div>
+        <div class="eq">\[\mathbf{S} = J\,\mathbf{F}^{-1}\boldsymbol{\sigma}\,\mathbf{F}^{-\mathsf{T}}\]</div>
         <p>Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are usually written as S = ∂W/∂E.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
         <h3>von Mises equivalent</h3>
-        <div class="eq">σ_vm = √(3/2 σ′ : σ′)</div>
+        <div class="eq">\[\sigma_{\mathrm{vm}} = \sqrt{\tfrac{3}{2}\,\boldsymbol{\sigma}' : \boldsymbol{\sigma}'}\]</div>
         <p>Magnitude of the stress deviator, scaled to match uniaxial tension. J₂ plasticity yields when this reaches the current yield stress. <a href="von-mises.html">The cylinder in principal-stress space</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stress</div>
         <h3>Cauchy traction</h3>
-        <div class="eq">t = σ n</div>
+        <div class="eq">\[\mathbf{t} = \boldsymbol{\sigma}\,\mathbf{n}\]</div>
         <p>Force per current area on a surface with outward normal n. Without couple stresses, σ is symmetric. On a <a href="linear-momentum.html">deforming body</a> that traction rides with the current surface. <a href="traction-cut.html">Turn the cut</a> and the same σ produces a different t.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Conservation of mass</h3>
-        <div class="eq">∂ρ/∂t + ∇ · (ρ v) = 0</div>
+        <div class="eq">\[\dfrac{\partial\rho}{\partial t} + \nabla\cdot(\rho\mathbf{v}) = 0\]</div>
         <p>Local mass balance. Referential form: ρ₀ = ρ J. If the motion is incompressible, this is equivalent to ∇ · v = 0.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Linear momentum (spatial)</h3>
-        <div class="eq">∇ · σ + ρ b = ρ a</div>
+        <div class="eq">\[\nabla\cdot\boldsymbol{\sigma} + \rho\mathbf{b} = \rho\mathbf{a}\]</div>
         <p>Cauchy’s first law: divergence of stress and body force balance inertia. Static problems set a = 0. On a <a href="linear-momentum.html">supported body</a> the reactions on the support close the global balance.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Linear momentum (integral)</h3>
-        <div class="eq">∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV</div>
+        <div class="eq">\[\displaystyle\int \mathbf{t}\,\mathrm{d}A + \int \rho\mathbf{b}\,\mathrm{d}V = \dfrac{\mathrm{d}}{\mathrm{d}t}\int \rho\mathbf{v}\,\mathrm{d}V\]</div>
         <p>Global statement on any part of the body. The divergence theorem plus localization recovers ∇ · σ + ρ b = ρ a. Essential and natural boundary data partition the surface into support and loaded faces.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Linear momentum (referential)</h3>
-        <div class="eq">Div P + ρ₀ B = ρ₀ A</div>
+        <div class="eq">\[\mathrm{Div}\,\mathbf{P} + \rho_0\mathbf{B} = \rho_0\mathbf{A}\]</div>
         <p>The same physics on the undeformed placement, with P = J σ F⁻ᵀ. Total Lagrangian finite elements discretize this form; Updated Lagrangian rewrites it on the current mesh. <a href="hub.html#basic-equations">Basic equations</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Angular momentum</h3>
-        <div class="eq">σ = σᵀ</div>
+        <div class="eq">\[\boldsymbol{\sigma} = \boldsymbol{\sigma}^{\mathsf{T}}\]</div>
         <p>Without couple stresses, Cauchy’s second law is symmetry of σ. Equivalently P Fᵀ = F Pᵀ. It is an algebraic restriction, not a differential one.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
         <h3>Energy</h3>
-        <div class="eq">ρ ė = σ : D − ∇ · q + ρ r</div>
+        <div class="eq">\[\rho\,\dot{e} = \boldsymbol{\sigma} : \mathbf{D} - \nabla\cdot\mathbf{q} + \rho r\]</div>
         <p>First law: internal energy rate equals stress power, heat efflux (−∇ · q), and supply r. Fourier’s law q = −k ∇θ closes conduction in the usual thermal problems.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Constitutive</div>
         <h3>Isotropic Hooke’s law</h3>
-        <div class="eq">σ = λ tr(ε) I + 2μ ε</div>
+        <div class="eq">\[\boldsymbol{\sigma} = \lambda\,\mathrm{tr}(\boldsymbol{\varepsilon})\,\mathbf{I} + 2\mu\,\boldsymbol{\varepsilon}\]</div>
         <p>Linear elasticity in the isotropic case, written with the Lamé parameters. The compact form is σ = ℂ : ε. <a href="hooke-poisson.html">Uniaxial tension</a> produces lateral strain −ν ε.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Constitutive</div>
         <h3>Neo-Hookean stored energy</h3>
-        <div class="eq">W = (μ/2)(I₁ − 3) − μ ln J + (λ/2)(ln J)²</div>
+        <div class="eq">\[W = \dfrac{\mu}{2}(I_1 - 3) - \mu\ln J + \dfrac{\lambda}{2}(\ln J)^2\]</div>
         <p>The simplest isotropic hyperelastic law. Incompressibility drops the volumetric terms and enforces J = 1 with a pressure. <a href="principal-stretches.html">Principal stretches at J = 1</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Rates</div>
         <h3>Jaumann rate</h3>
-        <div class="eq">∇σ = σ̇ − Wσ + σW</div>
+        <div class="eq">\[\overset{\nabla}{\boldsymbol{\sigma}} = \dot{\boldsymbol{\sigma}} - \mathbf{W}\boldsymbol{\sigma} + \boldsymbol{\sigma}\mathbf{W}\]</div>
         <p>An objective rate of Cauchy stress. A <a href="objective-rates.html">pure rotation of a constant uniaxial stress</a> changes the laboratory components and leaves ∇σ at zero.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Fluids</div>
         <h3>Incompressible Navier–Stokes</h3>
-        <div class="eq">ρ (∂v/∂t + v · ∇v) = −∇p + μ ∇²v + ρ b</div>
+        <div class="eq">\[\rho\bigl(\partial_t\mathbf{v} + \mathbf{v}\cdot\nabla\mathbf{v}\bigr) = -\nabla p + \mu\nabla^2\mathbf{v} + \rho\mathbf{b}\]</div>
         <p>The same momentum balance, closed by Newton’s law of viscosity, together with ∇ · v = 0.</p>
       </article>
     </div>
@@ -211,37 +229,37 @@
       <article class="eq-card">
         <div class="eq-kicker">Weak form</div>
         <h3>Principle of virtual work</h3>
-        <div class="eq">∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV</div>
+        <div class="eq">\[\displaystyle\int \boldsymbol{\sigma} : \nabla\delta\mathbf{u}\,\mathrm{d}V = \int \mathbf{t}\cdot\delta\mathbf{u}\,\mathrm{d}A + \int \rho\mathbf{b}\cdot\delta\mathbf{u}\,\mathrm{d}V\]</div>
         <p>A weak statement of linear momentum. Finite elements replace the trial and test displacements with shape-function expansions. <a href="hub.html#variational-principles">Stationarity of the potential</a> is the same statement when a stored energy exists.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Interpolation</div>
         <h3>Isoparametric map</h3>
-        <div class="eq">x(ξ) = Σ N_a(ξ) x_a, &nbsp; u(ξ) = Σ N_a(ξ) a_a</div>
+        <div class="eq">\[\mathbf{x}(\boldsymbol{\xi}) = \sum_a N_a(\boldsymbol{\xi})\,\mathbf{x}_a,\quad \mathbf{u}(\boldsymbol{\xi}) = \sum_a N_a(\boldsymbol{\xi})\,\mathbf{a}_a\]</div>
         <p>The same shape functions describe geometry and the unknown field. Derivatives in physical space use J = ∂x/∂ξ. <a href="hub.html#shape-functions-isoparametric-mapping">Parent square to warped quad</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Discrete system</div>
         <h3>Element stiffness</h3>
-        <div class="eq">Kᵉ = ∫ Bᵀ ℂ B dV</div>
+        <div class="eq">\[\mathbf{K}^{e} = \displaystyle\int \mathbf{B}^{\mathsf{T}}\mathbb{C}\,\mathbf{B}\,\mathrm{d}V\]</div>
         <p>The strain–displacement matrix B holds the symmetric gradients of the shape functions. Assembly scatters Kᵉ into the global sparse matrix.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Discrete system</div>
         <h3>Linear elasticity on a mesh</h3>
-        <div class="eq">K a = f</div>
+        <div class="eq">\[\mathbf{K}\,\mathbf{a} = \mathbf{f}\]</div>
         <p>After interpolation and assembly, the unknown nodal coefficients satisfy a stiffness system whose right-hand side carries the applied loads.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Quadrature</div>
         <h3>Gauss rule</h3>
-        <div class="eq">∫ f dV ≈ Σ_q w_q f(ξ_q) det J(ξ_q)</div>
+        <div class="eq">\[\displaystyle\int f\,\mathrm{d}V \approx \sum_q w_q\, f(\boldsymbol{\xi}_q)\,\det\mathbf{J}(\boldsymbol{\xi}_q)\]</div>
         <p>Constitutive evaluations happen only at the quadrature points. <a href="hub.html#numerical-integration-gauss-quadrature">Full versus reduced integration</a> on a bilinear quadrilateral.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Mixed methods</div>
         <h3>Incompressibility</h3>
-        <div class="eq">∫ δp (∇ · u) dV = 0</div>
+        <div class="eq">\[\displaystyle\int \delta p\,(\nabla\cdot\mathbf{u})\,\mathrm{d}V = 0\]</div>
         <p>A displacement-only space cannot represent ∇ · u = 0 without <a href="hub.html#mixed-methods-and-locking">locking</a>. Pressure is interpolated independently, and the pair must satisfy an inf-sup condition.</p>
       </article>
     </div>
@@ -252,43 +270,43 @@
       <article class="eq-card">
         <div class="eq-kicker">Nonlinear solve</div>
         <h3>Newton–Raphson</h3>
-        <div class="eq">K<sub>T</sub> Δu = −R(u)</div>
+        <div class="eq">\[\mathbf{K}_{T}\,\Delta\mathbf{u} = -\mathbf{R}(\mathbf{u})\]</div>
         <p>A residual R(u) = 0 is linearized at the current guess. The tangent K<sub>T</sub> is the Jacobian of that residual. <a href="hub.html#newton-raphson-iteration-in-fem">Consistent linearisation</a> is what makes the convergence quadratic.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stability</div>
         <h3>Euler load</h3>
-        <div class="eq">P<sub>cr</sub> = π² EI / L²</div>
+        <div class="eq">\[P_{\mathrm{cr}} = \dfrac{\pi^2 EI}{L^2}\]</div>
         <p>The linear eigenvalue at which a hinged–hinged column loses uniqueness of the straight solution. Geometric stiffness, not a change in E, is what makes the tangent singular. <a href="column-buckling.html">An imperfect strut</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Path following</div>
         <h3>Arc-length constraint</h3>
-        <div class="eq">‖Δa‖² + ψ² Δλ² = Δs²</div>
+        <div class="eq">\[\|\Delta\mathbf{a}\|^2 + \psi^2\Delta\lambda^2 = \Delta s^2\]</div>
         <p>The load factor λ is an unknown. The extra equation lets the iteration pass a limit point where load control would stall. <a href="hub.html#path-following-and-arc-length">Riks and Crisfield</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Dynamics</div>
         <h3>Semi-discrete momentum</h3>
-        <div class="eq">M ä + C ȧ + R(a) = f</div>
+        <div class="eq">\[\mathbf{M}\ddot{\mathbf{a}} + \mathbf{C}\dot{\mathbf{a}} + \mathbf{R}(\mathbf{a}) = \mathbf{f}\]</div>
         <p>Mass, damping, and a (possibly nonlinear) internal force. Explicit methods lump M; implicit methods form a tangent at each step.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Dynamics</div>
         <h3>Newmark</h3>
-        <div class="eq">a_{n+1} = a_n + Δt v_n + Δt² [(½−β) ä_n + β ä_{n+1}]</div>
+        <div class="eq">\[\mathbf{a}_{n+1} = \mathbf{a}_n + \Delta t\,\mathbf{v}_n + \Delta t^2\bigl[(\tfrac{1}{2}-\beta)\ddot{\mathbf{a}}_n + \beta\ddot{\mathbf{a}}_{n+1}\bigr]\]</div>
         <p>Average acceleration (β = ¼, γ = ½) is unconditionally stable for linear problems. Central difference is the explicit member of the same family.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Contact</div>
         <h3>Complementarity</h3>
-        <div class="eq">g ≤ 0, &nbsp; p ≥ 0, &nbsp; p g = 0</div>
+        <div class="eq">\[g \le 0,\quad p \ge 0,\quad p\,g = 0\]</div>
         <p>Gap, pressure, and the requirement that one of them vanish. <a href="hub.html#contact-and-friction">Friction</a> adds a tangential law and a nonsymmetric tangent.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Contact</div>
         <h3>Hertz pressure</h3>
-        <div class="eq">p(x) = p₀ √(1 − (x/a)²)</div>
+        <div class="eq">\[p(x) = p_0\sqrt{1-(x/a)^2}\]</div>
         <p>Elliptic profile on a patch of half-width <i>a</i>. Peak at the centre, zero at the edges. <a href="contact.html">Increase the approach and watch the patch grow</a>. For a discrete ContactFEA mesh of two cantilevers, see the <a href="contact-beam.html">beam contact figure</a>.</p>
       </article>
     </div>
@@ -299,43 +317,43 @@
       <article class="eq-card">
         <div class="eq-kicker">LEFM</div>
         <h3>Williams field</h3>
-        <div class="eq">σ<sub>ij</sub> = K / √(2π r) · f<sub>ij</sub>(θ)</div>
+        <div class="eq">\[\sigma_{ij} = \dfrac{K}{\sqrt{2\pi r}}\,f_{ij}(\theta)\]</div>
         <p>Leading term at a sharp crack. Stress is unbounded as r → 0; energy release is finite. Modes I, II, and III each have their own K. <a href="lefm.html">The ligament stress has slope −½</a>. A finite plate with a center crack is in the <a href="lefm-center-crack.html">center-crack figure</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">LEFM</div>
         <h3>Griffith–Irwin</h3>
-        <div class="eq">G = −dΠ / dA = K_I² / E′</div>
+        <div class="eq">\[G = -\dfrac{\mathrm{d}\Pi}{\mathrm{d}A} = \dfrac{K_I^2}{E'}\]</div>
         <p>Energy released per unit area of crack advance. E′ = E in plane stress, E/(1−ν²) in plane strain. Fracture when G reaches G<sub>c</sub>, or K reaches K<sub>c</sub>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Crack</div>
         <h3>J-integral</h3>
-        <div class="eq">J = ∮_Γ (w n<sub>x</sub> − t · ∂u/∂x) dΓ</div>
+        <div class="eq">\[J = \oint_{\Gamma}\bigl(w n_x - \mathbf{t}\cdot\partial_x\mathbf{u}\bigr)\,\mathrm{d}\Gamma\]</div>
         <p>Rice’s path-independent integral. Any path from the lower face to the upper that encloses the tip gives the same J. <a href="j-integral.html">Change the contour</a> and the number does not move.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Cohesive</div>
         <h3>Traction–separation</h3>
-        <div class="eq">G_f = ∫ t dδ, &nbsp; ℓ<sub>ch</sub> = E G_f / f_t²</div>
+        <div class="eq">\[G_f = \displaystyle\int t\,\mathrm{d}\delta,\quad \ell_{\mathrm{ch}} = \dfrac{E G_f}{f_t^2}\]</div>
         <p>Area under the law is the fracture energy; ℓ<sub>ch</sub> is the process-zone size. The tip stress is f<sub>t</sub>, not infinite. <a href="cohesive-crack.html">Change the law</a>. A displacement-controlled DCB path is in the <a href="dcb-cohesive.html">DCB cohesive figure</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">LEFM</div>
         <h3>Max hoop kink</h3>
-        <div class="eq">K_I sin θ_c + K_II (3 cos θ_c − 1) = 0</div>
+        <div class="eq">\[K_I\sin\theta_c + K_{II}(3\cos\theta_c - 1) = 0\]</div>
         <p>Direction of the next increment under mixed-mode I–II. Equivalently θ<sub>c</sub> = 2 arctan[(K_I − √(K_I² + 8 K_II²))/(4 K_II)].</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Porous</div>
         <h3>Effective face traction</h3>
-        <div class="eq">t_c = t_d − α p n</div>
+        <div class="eq">\[\mathbf{t}_c = \mathbf{t}_d - \alpha p\,\mathbf{n}\]</div>
         <p>On a cohesive crack in a saturated solid. Pressure is continuous across the faces; its normal gradient is not, because the fracture exchanges fluid with the intact medium. <a href="cohesive-crack.html">Process zone</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Inclusion</div>
         <h3>Rigid line</h3>
-        <div class="eq">J_tip ∝ (cos²θ − ν sin²θ)²</div>
+        <div class="eq">\[J_{\mathrm{tip}} \propto \bigl(\cos^2\theta - \nu\sin^2\theta\bigr)^2\]</div>
         <p>The same contour around a rigid-line tip is the configurational force on that tip. It vanishes at θ<sub>n</sub> = arctan(1/√ν). <a href="hub.html#fiber-neutrality-and-rigid-line-inclusions">Fibre neutrality</a> is that statement for a thin elastic fibre.</p>
       </article>
     </div>
@@ -346,37 +364,37 @@
       <article class="eq-card">
         <div class="eq-kicker">Biot</div>
         <h3>Effective stress</h3>
-        <div class="eq">σ′ = σ − α p I</div>
+        <div class="eq">\[\boldsymbol{\sigma}' = \boldsymbol{\sigma} - \alpha p\,\mathbf{I}\]</div>
         <p>What the skeleton constitutive law sees. α = 1 − K/K<sub>s</sub>. Terzaghi’s principle is the saturated soil limit α = 1. <a href="hub.html#multiphase-porous-materials">Phases and Bishop’s unsaturated split</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Fluid</div>
         <h3>Darcy</h3>
-        <div class="eq">v = −(k/μ) (∇p − ρ g)</div>
+        <div class="eq">\[\mathbf{v} = -\dfrac{k}{\mu}\bigl(\nabla p - \rho\mathbf{g}\bigr)\]</div>
         <p>Relative discharge through the pores. Unsaturated flow replaces k by k(S<sub>w</sub>). Gravity is a body force on both constituents.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Coupling</div>
         <h3>Storage</h3>
-        <div class="eq">α ∇·u̇ + (1/M) ṗ + ∇·v = 0</div>
+        <div class="eq">\[\alpha\,\nabla\cdot\dot{\mathbf{u}} + \dfrac{1}{M}\dot{p} + \nabla\cdot\mathbf{v} = 0\]</div>
         <p>Mass balance of the fluid. Undrained response is M → ∞ with no flow. That limit is incompressible, and equal-order u–p elements lock.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">1D</div>
         <h3>Terzaghi</h3>
-        <div class="eq">∂u/∂t = c_v ∂²u/∂z², &nbsp; T_v = c_v t / H²</div>
+        <div class="eq">\[\partial_t u = c_v\partial_z^2 u,\quad T_v = \dfrac{c_v t}{H^2}\]</div>
         <p>Excess pressure in a column whose total vertical stress is known. Isochrones and U(T<sub>v</sub>) follow. <a href="consolidation.html">Advance the time factor</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Self-weight</div>
         <h3>Gibson</h3>
-        <div class="eq">u(z,0) = γ′ (H − z), &nbsp; h = m t</div>
+        <div class="eq">\[u(z,0) = \gamma'(H - z),\quad h = m t\]</div>
         <p>Triangular initial pressure in a fill; an accreting layer thickens at rate m. Finite-strain consolidation lets k and m<sub>v</sub> depend on void ratio. <a href="consolidation.html#gibson">Self-weight isochrones</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Coupled</div>
         <h3>Mandel–Cryer</h3>
-        <div class="eq">p<sub>centre</sub>(t) rises, then falls</div>
+        <div class="eq">\[p_{\mathrm{centre}}(t)\ \text{rises, then falls}\]</div>
         <p>In two or three dimensions the total stress redistributes. Uncoupled Terzaghi is monotonic; Biot coupling overshoots. <a href="consolidation.html#cryer">Cryer’s sphere</a>.</p>
       </article>
     </div>
@@ -387,37 +405,37 @@
       <article class="eq-card">
         <div class="eq-kicker">Ply</div>
         <h3>Rule of mixtures</h3>
-        <div class="eq">E₁ = V_f E_f + V_m E_m</div>
+        <div class="eq">\[E_1 = V_f E_f + V_m E_m\]</div>
         <p>Longitudinal modulus of a unidirectional ply. The transverse modulus is closer to a series estimate, or to Halpin–Tsai. Five independent constants remain for transverse isotropy.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Ply</div>
         <h3>Reduced stiffness</h3>
-        <div class="eq">Q₁₁ = E₁ / (1 − ν₁₂ ν₂₁)</div>
+        <div class="eq">\[Q_{11} = \dfrac{E_1}{1 - \nu_{12}\nu_{21}}\]</div>
         <p>Plane-stress stiffness of the ply in material axes. The remaining entries of the 3×3 matrix Q follow from E₂, G₁₂, and the Poisson ratios. <a href="fiber-composites.html">Rotate the fibres</a> and this matrix is transformed to Q̄(θ).</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Off-axis</div>
         <h3>Engineering modulus</h3>
-        <div class="eq">1/Ē_x = c⁴/E₁ + s⁴/E₂ + c²s² (1/G₁₂ − 2ν₁₂/E₁)</div>
+        <div class="eq">\[\dfrac{1}{\bar{E}_x} = \dfrac{c^4}{E_1} + \dfrac{s^4}{E_2} + c^2 s^2\Bigl(\dfrac{1}{G_{12}} - \dfrac{2\nu_{12}}{E_1}\Bigr)\]</div>
         <p>Uniaxial stiffness along x for a ply whose fibres sit at θ to x, with c = cos θ and s = sin θ. At 45° the shear coupling is largest.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Laminate</div>
         <h3>Classical lamination theory</h3>
-        <div class="eq">N = A ε₀ + B κ, &nbsp; M = B ε₀ + D κ</div>
+        <div class="eq">\[\mathbf{N} = \mathbf{A}\boldsymbol{\varepsilon}_0 + \mathbf{B}\boldsymbol{\kappa},\quad \mathbf{M} = \mathbf{B}\boldsymbol{\varepsilon}_0 + \mathbf{D}\boldsymbol{\kappa}\]</div>
         <p>Force and moment resultants on the midplane. A is membrane stiffness, D bending, B the coupling that a symmetric stack removes. <a href="hub.html#fiber-reinforced-composites">The ABD matrix</a> is the section law a shell element actually uses.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Discrete fibres</div>
         <h3>Embedded virtual work</h3>
-        <div class="eq">∫_m σ : ∇δu dV + ∫_f σ_f : ∇δu_f dV + ∫_Γ t_c · δw dΓ = 0</div>
+        <div class="eq">\[\displaystyle\int_m \boldsymbol{\sigma} : \nabla\delta\mathbf{u}\,\mathrm{d}V + \int_f \boldsymbol{\sigma}_f : \nabla\delta\mathbf{u}_f\,\mathrm{d}V + \int_\Gamma \mathbf{t}_c\cdot\delta\mathbf{w}\,\mathrm{d}\Gamma = 0\]</div>
         <p>Matrix, fibre, and interface. The slip is w = u_f − u_m. The fibre is a line that does not share nodes with the matrix mesh. An <a href="random-fibers.html">RVE of random fibres</a> is the geometry; <a href="hub.html#embedded-fiber-models">ERS and its enrichments</a> are the discrete model.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Discrete fibres</div>
         <h3>Neutral orientation</h3>
-        <div class="eq">θ<sub>n</sub> = arctan(1/√ν), &nbsp; ε<sub>f</sub>/ε<sub>x</sub> = cos²θ − ν sin²θ</div>
+        <div class="eq">\[\theta_n = \arctan(1/\sqrt{\nu}),\quad \dfrac{\varepsilon_f}{\varepsilon_x} = \cos^2\theta - \nu\sin^2\theta\]</div>
         <p>Uniaxial tension along x, fibres in the xy-plane. The fibre is unstrained at θ<sub>n</sub>(ν); a reduced model then returns E<sub>x</sub><sup>c</sup> = E<sub>m</sub>. <a href="fiber-neutrality.html">Turn the fibres</a> and the composite moduli follow.</p>
       </article>
     </div>
@@ -428,19 +446,19 @@
       <article class="eq-card">
         <div class="eq-kicker">Pipeline</div>
         <h3>Amdahl</h3>
-        <div class="eq">S = 1 / (1 − p + p/s)</div>
+        <div class="eq">\[S = \dfrac{1}{1 - p + p/s}\]</div>
         <p>Overall speedup when a fraction p of the wall time runs s times faster. Meshing cannot save a factorisation, and a faster constitutive kernel cannot save a PCIe copy. <a href="gpu-fem.html">Click the stages</a>.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Element loop</div>
         <h3>No neighbour data</h3>
-        <div class="eq">Kᵉ = ∫ Bᵀ ℂ B dV</div>
+        <div class="eq">\[\mathbf{K}^{e} = \displaystyle\int \mathbf{B}^{\mathsf{T}}\mathbb{C}\,\mathbf{B}\,\mathrm{d}V\]</div>
         <p>Stress and tangent at Gauss points are independent per element. That is the first kernel worth moving, especially in plasticity. Assembly is the first place those threads collide.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Implicit</div>
         <h3>Sparse matvec</h3>
-        <div class="eq">y = A x</div>
+        <div class="eq">\[\mathbf{y} = \mathbf{A}\mathbf{x}\]</div>
         <p>The Krylov iteration is a GPU job if A stays on the device. A small sparse factorisation often should not move. Explicit dynamics skip A entirely: the internal force is the kernel.</p>
       </article>
     </div>
