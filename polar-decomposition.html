@@ -19,7 +19,7 @@
       --navy:#1e3a5f;--blue:#3a5f8a;--plate:#1a2740;
     }
     *{box-sizing:border-box}
-    html,body{margin:0}
+    html,body{margin:0} html{scrollbar-gutter:stable}
     body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
     a{color:var(--blue)}
     header{
@@ -68,8 +68,10 @@
     <a href="./" aria-label="Mechanics Reference home">
       <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
     </a>
-    <nav class="top-nav">
+    <nav class="top-nav" aria-label="Site">
       <a href="./">Home</a>
+      <a href="./#contents">Contents</a>
+      <a href="./#figures">Figures</a>
       <a href="equations.html">Equations</a>
       <a href="hub.html#polar-decomposition">Library</a>
     </nav>

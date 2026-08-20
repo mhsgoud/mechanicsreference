@@ -13,7 +13,7 @@
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
     :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
-    *{box-sizing:border-box} html,body{margin:0}
+    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
     body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
@@ -67,7 +67,13 @@
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav"><a href="./">Home</a><a href="equations.html">Equations</a><a href="hub.html#one-dimensional-consolidation">Library</a></nav>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="./#contents">Contents</a>
+      <a href="./#figures">Figures</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#one-dimensional-consolidation">Library</a>
+    </nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
