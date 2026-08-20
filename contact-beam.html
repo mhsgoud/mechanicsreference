@@ -240,34 +240,81 @@
         scene.add(ambientContour);
         scene.add(keyContour);
 
-        // Material-mode lighting: low ambient + raking key so bump reads on vertical faces
-        const ambientMat = new THREE.AmbientLight(0xe8e4dc, 0.16);
-        const hemiMat = new THREE.HemisphereLight(0xf4f7fb, 0x7a7468, 0.42);
-        const keyMat = new THREE.DirectionalLight(0xfff3e4, 1.35);
-        keyMat.position.set(70, 55, 25);
-        const fillMat = new THREE.DirectionalLight(0xc5d4e8, 0.55);
-        fillMat.position.set(-55, 20, -35);
-        const rimMat = new THREE.DirectionalLight(0xeef2f7, 0.4);
-        rimMat.position.set(-10, 35, 90);
-        const kickMat = new THREE.DirectionalLight(0xd8cfc0, 0.28);
-        kickMat.position.set(10, -25, 40);
-        [ambientMat, hemiMat, keyMat, fillMat, rimMat, kickMat].forEach((l) => {
-            l.visible = false;
-            scene.add(l);
-        });
-        const matLights = [ambientMat, hemiMat, keyMat, fillMat, rimMat, kickMat];
+        // Material lighting — same simple IBL-like trio Three.js demos use (hemi + key + soft fill)
+        const ambientMat = new THREE.AmbientLight(0xffffff, 0.15);
+        const hemiMat = new THREE.HemisphereLight(0xffffff, 0xb1b1b1, 0.65);
+        const keyMat = new THREE.DirectionalLight(0xffffff, 0.85);
+        keyMat.position.set(50, 80, 40);
+        const fillMat = new THREE.DirectionalLight(0xffffff, 0.35);
+        fillMat.position.set(-40, 20, -30);
+        const matLights = [ambientMat, hemiMat, keyMat, fillMat];
+        matLights.forEach((l) => { l.visible = false; scene.add(l); });
 
-        // Named materials — MeshStandard only (no clearcoat / env / custom shaders)
+        /**
+         * World-space triplanar albedo (Three.js node materials expose this as triplanarTexture).
+         * Needed for FEA meshes with no authored UVs — avoids stretched side faces.
+         */
+        function makeTriplanarStandard(map, color, roughness) {
+            const mat = new THREE.MeshStandardMaterial({
+                color,
+                map,
+                metalness: 0,
+                roughness,
+                side: THREE.DoubleSide,
+                flatShading: false
+            });
+            const scale = 0.085;
+            mat.onBeforeCompile = (shader) => {
+                shader.uniforms.triScale = { value: scale };
+                shader.vertexShader = shader.vertexShader
+                    .replace(
+                        '#include <common>',
+                        `#include <common>
+                        varying vec3 vTriPos;
+                        varying vec3 vTriNor;`
+                    )
+                    .replace(
+                        '#include <begin_vertex>',
+                        `#include <begin_vertex>
+                        vTriPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
+                        vTriNor = normalize(mat3(modelMatrix) * objectNormal);`
+                    );
+                shader.fragmentShader = shader.fragmentShader
+                    .replace(
+                        '#include <common>',
+                        `#include <common>
+                        uniform float triScale;
+                        varying vec3 vTriPos;
+                        varying vec3 vTriNor;`
+                    )
+                    .replace(
+                        '#include <map_fragment>',
+                        `#ifdef USE_MAP
+                        {
+                            vec3 blend = abs(normalize(vTriNor));
+                            blend = pow(blend, vec3(4.0));
+                            blend /= dot(blend, vec3(1.0)) + 1e-5;
+                            vec3 p = vTriPos * triScale;
+                            vec4 cx = texture2D(map, p.yz);
+                            vec4 cy = texture2D(map, p.xz);
+                            vec4 cz = texture2D(map, p.xy);
+                            vec4 texelColor = cx * blend.x + cy * blend.y + cz * blend.z;
+                            texelColor = mapTexelToLinear(texelColor);
+                            diffuseColor *= texelColor;
+                        }
+                        #endif`
+                    );
+            };
+            mat.customProgramCacheKey = () => 'triplanar-concrete-v1';
+            return mat;
+        }
+
         const MATS = {
             concrete: {
                 label: 'Concrete',
-                slave: new THREE.MeshStandardMaterial({
-                    color: 0xb9b4ac, metalness: 0, roughness: 0.9, side: THREE.FrontSide, flatShading: false
-                }),
-                master: new THREE.MeshStandardMaterial({
-                    color: 0xa8a39b, metalness: 0, roughness: 0.92, side: THREE.FrontSide, flatShading: false
-                }),
-                bg: 0xe4e1db,
+                slave: new THREE.MeshStandardMaterial({ color: 0xc8c4bc, metalness: 0, roughness: 0.88, side: THREE.DoubleSide }),
+                master: new THREE.MeshStandardMaterial({ color: 0xb8b4ac, metalness: 0, roughness: 0.9, side: THREE.DoubleSide }),
+                bg: 0xe8e6e1,
                 edge: 0x5c6574
             },
             steel: {
@@ -294,33 +341,14 @@
             }
         };
 
-        function applyConcreteMaps(tex) {
+        new THREE.TextureLoader().load('textures/concrete-slab.png', (tex) => {
             tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
             tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
             if ('encoding' in tex) tex.encoding = THREE.sRGBEncoding;
             tex.needsUpdate = true;
-
-            // Separate bump copy in linear space so baked photo shading is not treated as height twice
-            const bump = tex.clone();
-            bump.wrapS = bump.wrapT = THREE.RepeatWrapping;
-            if ('encoding' in bump) bump.encoding = THREE.LinearEncoding;
-            bump.needsUpdate = true;
-
-            [MATS.concrete.slave, MATS.concrete.master].forEach((mat, i) => {
-                mat.map = tex;
-                mat.bumpMap = bump;
-                // Mild bump: side faces get their relief from raking light, not exaggerated height
-                mat.bumpScale = i === 0 ? 0.22 : 0.2;
-                mat.roughness = i === 0 ? 0.9 : 0.93;
-                mat.metalness = 0;
-                // Mute the map so baked photo light does not fight scene lights on vertical faces
-                mat.color.set(i === 0 ? 0xb2ada5 : 0xa29d95);
-                mat.needsUpdate = true;
-            });
-        }
-
-        new THREE.TextureLoader().load('textures/concrete-slab.png', (tex) => {
-            applyConcreteMaps(tex);
+            // Albedo only — no bump from a lit photo (that fights real lighting on sides)
+            MATS.concrete.slave = makeTriplanarStandard(tex, 0xd2cec6, 0.86);
+            MATS.concrete.master = makeTriplanarStandard(tex, 0xc4c0b8, 0.9);
             if (meshData) rebuild();
         });
 
@@ -444,36 +472,11 @@
             return mode === 'concrete' || mode === 'steel' || mode === 'aluminum';
         }
 
-        function pushBoxUv(uvs, x, y, z, nx, ny, nz) {
-            // Anisotropic tiling: more repeats along beam length, denser along height so sides are not stretched
-            const sx = 0.048, sy = 0.11, sz = 0.05;
-            const ax = Math.abs(nx), ay = Math.abs(ny), az = Math.abs(nz);
-            if (ay >= ax && ay >= az) uvs.push(x * sx, z * sz);
-            else if (ax >= az) uvs.push(z * sz, y * sy);
-            else uvs.push(x * sx, y * sy);
-        }
-
         function setLightingMode(mode) {
             const matMode = isMaterialMode(mode);
             ambientContour.visible = !matMode;
             keyContour.visible = !matMode;
             matLights.forEach((l) => { l.visible = matMode; });
-            // Concrete needs stronger side fill; metals can stay a bit softer
-            if (matMode && mode === 'concrete') {
-                ambientMat.intensity = 0.14;
-                hemiMat.intensity = 0.48;
-                keyMat.intensity = 1.4;
-                fillMat.intensity = 0.62;
-                rimMat.intensity = 0.45;
-                kickMat.intensity = 0.32;
-            } else if (matMode) {
-                ambientMat.intensity = 0.28;
-                hemiMat.intensity = 0.35;
-                keyMat.intensity = 1.05;
-                fillMat.intensity = 0.4;
-                rimMat.intensity = 0.25;
-                kickMat.intensity = 0.15;
-            }
             scene.background = new THREE.Color(matMode ? MATS[mode].bg : 0xf3f4f6);
             document.getElementById('colorbar').classList.toggle('hidden', matMode);
             document.getElementById('fieldSelect').disabled = matMode;
@@ -486,7 +489,6 @@
             const elems = data.elems;
             const positions = [];
             const colors = [];
-            const uvs = [];
             const edgePos = [];
             const split = document.getElementById('splitToggle').checked;
             const slaveEnd = data.slaveElems[1];
@@ -522,17 +524,11 @@
 
                 for (const face of HEX_FACES) {
                     const q = face.map(k => corners[k]);
-                    const ax = q[1][0] - q[0][0], ay = q[1][1] - q[0][1], az = q[1][2] - q[0][2];
-                    const bx = q[2][0] - q[0][0], by = q[2][1] - q[0][1], bz = q[2][2] - q[0][2];
-                    let nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx;
-                    const nLen = Math.hypot(nx, ny, nz) || 1;
-                    nx /= nLen; ny /= nLen; nz /= nLen;
                     const tris = [[0, 1, 2], [0, 2, 3]];
                     for (const tri of tris) {
                         for (const t of tri) {
                             const p = q[t];
                             positions.push(p[0], p[1], p[2]);
-                            if (!contour) pushBoxUv(uvs, p[0], p[1], p[2], nx, ny, nz);
                             if (contour) {
                                 if (ghost) {
                                     colors.push(0.7, 0.7, 0.75);
@@ -560,7 +556,6 @@
             const geo = new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             if (contour) geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-            else geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geo.computeVertexNormals();
 
             let edgeGeo = null;
