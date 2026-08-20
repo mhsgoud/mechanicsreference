@@ -645,11 +645,18 @@ const topics = [
     "Newmark’s method is the usual implicit family, with average acceleration (β = 1/4, γ = 1/2) unconditionally stable for linear problems. Explicit central difference with a lumped mass is the usual explicit member; it never forms a tangent.",
     "Wave propagation and crash analysis often take the explicit route. Quasi-static evolution, implicit dynamics, and viscoelasticity usually do not. Numerical dissipation in the integrator is a modelling choice, not a free parameter for hiding an unstable constitutive rate."
   ], tags:["dynamics","implicit","explicit","wave","crash","Newmark"]},
-  {part:"Part III – Advanced FEM Concepts", title:"Contact and Friction", bullets:[
+  {part:"Part III – Advanced FEM Concepts", title:"Contact and Friction", equations:[
+    {name:"Frictionless KKT", expr:"g ≤ 0,   p ≥ 0,   p g = 0", note:"Gap g, contact pressure p, and complementarity: either the surfaces are open (p = 0) or they press with g = 0. Never both open and pressing."},
+    {name:"Hertz pressure", expr:"p(x) = p₀ √(1 − (x/a)²)", note:"Smooth elliptic profile on a contact patch of half-width a. Peak at the centre, zero at the edges — no crack-tip singularity."},
+    {name:"Effective modulus", expr:"1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂", note:"Two dissimilar elastic bodies collapse to a single modulus E* and an equivalent radius R*."},
+    {name:"Coulomb friction", expr:"|t_τ| ≤ μ p,   slip ∥ −t_τ", note:"Stick when the tangential traction lies inside the cone; slide when it saturates. The tangent becomes nonsymmetric."}
+  ], bullets:[
     "When two bodies, or a body and a rigid obstacle, would otherwise occupy the same point, a contact constraint forbids penetration and a friction law limits the tangential traction. The Karush–Kuhn–Tucker conditions for frictionless contact are g ≤ 0, p ≥ 0, p g = 0: a gap, a pressure, and complementarity.",
-    "The discrete problem is a variational inequality. Penalty, Lagrange multipliers, and augmented Lagrangian methods are the three standard realisations; mortar and node-to-segment pairings decide which points are checked against which faces.",
-    "Friction, even Coulomb, makes the tangent nonsymmetric and the path dependent. Contact is a geometric nonlinearity even when the material is linear. A consistent linearisation of the gap and of the sliding direction is required if Newton’s method is to be more than a heuristic."
-  ], tags:["contact","friction","KKT","mortar","penalty"]},
+    "Classical Hertz theory is the smooth closed-form limit for small patches of linearly elastic bodies. An approach δ closes the gap; the contact half-width a and the peak pressure p₀ then follow from E* and R*. The pressure is elliptic — finite, smooth, and zero at the edge of the patch. That is the opposite of Williams’ 1/√r crack-tip field.",
+    "The discrete FEM problem is a variational inequality. Penalty, Lagrange multipliers, and augmented Lagrangian methods are the three standard realisations; mortar and node-to-segment pairings decide which points are checked against which faces. Penalty is simple but stiffens the tangent; multipliers enforce the gap exactly but enlarge the system; augmentation combines both.",
+    "Friction, even Coulomb, makes the tangent nonsymmetric and the path dependent. Contact is a geometric nonlinearity even when the material is linear. A consistent linearisation of the gap and of the sliding direction is required if Newton’s method is to be more than a heuristic.",
+    "The figure is Hertz contact of two elastic bodies. Increase the approach δ, switch cylinder–cylinder, sphere–flat, or sphere–sphere, and watch the elliptic pressure grow with the patch."
+  ], tags:["contact","friction","KKT","mortar","penalty","Hertz"], scene:"hertzContact"},
 
   // Part IV – Applications in Engineering
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
@@ -1147,7 +1154,8 @@ function renderTopicScene(topic){
     gpuFem: {src:'gpu-fem.html', title:'GPUs in the FEM pipeline'},
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
-    fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'}
+    fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
+    hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'}
   };
   const page = pages[topic.scene];
   if(!page) return '';
@@ -1867,7 +1875,7 @@ window.addEventListener('keydown', (e)=>{
     ok('element chooser slug', slug('Element Types & Families (Chooser)') === 'element-types-families-chooser');
     ok('variational principles topic', topics.some(t => t.title === 'Variational Principles'));
     ok('mixed methods topic', topics.some(t => t.title === 'Mixed Methods and Locking'));
-    ok('contact topic', topics.some(t => t.title === 'Contact and Friction'));
+    ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && t.scene === 'hertzContact'));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));

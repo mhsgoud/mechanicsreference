@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Mechanics — Hertz Pressure — Mechanics Reference</title>
+  <meta name="description" content="Hertz contact of two elastic bodies: gap closure, contact half-width a, elliptic pressure p(x), and the FEM complementarity conditions g ≤ 0, p ≥ 0, p g = 0." />
+  <link rel="canonical" href="https://mechanicsreference.com/contact.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
+    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .stage-row{display:grid;grid-template-columns:minmax(280px,1.25fr) minmax(220px,0.9fr);background:var(--plate)}
+    #stage{position:relative;height:min(52vh,440px)}
+    #stage canvas{display:block;width:100%;height:100%}
+    .hud{position:absolute;left:10px;bottom:10px;padding:8px 10px;background:rgba(26,39,64,.88);color:#e8e4dc;font:500 0.72rem/1.45 "JetBrains Mono",ui-monospace,monospace;pointer-events:none}
+    .badge{position:absolute;top:10px;right:10px;padding:6px 10px;background:rgba(26,39,64,.88);color:#e8e4dc;font-size:0.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;pointer-events:none}
+    .badge.init{color:#f0c674}.badge.load{color:#e8a46a}
+    .plot-cell{background:#fff;padding:10px 12px 8px;border-left:1px solid var(--rule);display:flex;flex-direction:column;min-height:0}
+    .plot-cell h3{margin:0 0 6px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .plot-cell canvas{display:block;width:100%;flex:1;min-height:200px}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #formula,#readout{margin:0;font-size:0.82rem}
+    #formula,#readout{font-family:"JetBrains Mono",ui-monospace,monospace}
+    #formula{color:var(--navy);flex-basis:100%}
+    input[type=range]{width:140px;vertical-align:middle}
+    select,button{font:inherit;font-size:0.84rem;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--rule);padding:6px 10px;cursor:pointer}
+    button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .notes{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+    .notes h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.05rem;color:var(--navy)}
+    .notes p,.notes ul{margin:0;font-size:0.95rem;color:var(--ink-soft)}
+    .notes ul{padding-left:1.15em}
+    .notes li{margin:0.35em 0}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed .notes{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .stage-row{flex:1;min-height:0}
+    html.embed #stage{height:auto}
+    html.embed .plot-cell canvas{min-height:0}
+    html.embed #ui{background:#fff}
+    html.embed #formula{flex-basis:auto}
+    @media (max-width:900px){
+      .stage-row{grid-template-columns:1fr}
+      #stage{height:min(46vh,340px)}
+      .plot-cell{border-left:0;border-top:1px solid var(--rule);height:180px}
+      .notes{grid-template-columns:1fr}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="./#contents">Contents</a>
+      <a href="./#figures">Figures</a>
+      <a href="equations.html">Equations</a>
+      <a href="hub.html#contact-and-friction">Library</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#contact-and-friction">Contact and Friction</a></p>
+      <h1>Two bodies, one gap, an elliptic pressure</h1>
+      <p class="standfirst">Increase the approach δ until the gap closes. Hertz then gives a finite contact half-width <i>a</i> and a smooth pressure that peaks at the centre and vanishes at the edges. Unlike a sharp crack tip there is no stress singularity — only complementarity: either a positive gap or a positive pressure, never both.</p>
+    </div>
+    <div class="figure-shell">
+      <div class="stage-row">
+        <div id="stage">
+          <div id="badge" class="badge">Separated</div>
+          <div id="hud" class="hud">δ = 0</div>
+        </div>
+        <div class="plot-cell">
+          <h3>Contact pressure p(x)</h3>
+          <canvas id="press"></canvas>
+        </div>
+      </div>
+      <div id="ui">
+        <p id="formula">p(x) = p₀ √(1 − (x/a)²) ····· g ≤ 0, p ≥ 0, p g = 0</p>
+        <button type="button" id="play" class="primary">Play</button>
+        <button type="button" id="reset">Reset</button>
+        <label>δ <input id="delta" type="range" min="0" max="0.08" step="0.0005" value="0" /> <span id="deltaV">0.000</span> mm</label>
+        <label>Config
+          <select id="mode">
+            <option value="cyl">Cylinder on cylinder</option>
+            <option value="sphere">Sphere on flat</option>
+            <option value="sphere2">Sphere on sphere</option>
+          </select>
+        </label>
+        <p id="readout"></p>
+      </div>
+    </div>
+    <div class="notes page-copy">
+      <div>
+        <h2>What the figure shows</h2>
+        <ul>
+          <li>Controlled approach δ closes the gap between two elastic bodies.</li>
+          <li>Gold bars sketch the Hertz pressure profile in the patch.</li>
+          <li>The side plot is the elliptic law p(x) = p₀ √(1 − (x/a)²).</li>
+        </ul>
+      </div>
+      <div>
+        <h2>What to notice</h2>
+        <ul>
+          <li>Separated: gap open, a = 0, pressure zero.</li>
+          <li>In contact: pressure peaks at the centre and is zero at x = ±a.</li>
+          <li>Line contact: a ∝ √P′; sphere: F ∝ δ<sup>3/2</sup>.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#contact-and-friction">Contact and Friction</a></span>
+    </div>
+  </footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const E1 = 210000, nu1 = 0.3;
+    const E2 = 70000, nu2 = 0.33;
+    const R1 = 40, R2_cyl = 55, R2_sph = 50;
+    const DELTA_MAX = 0.08;
+    const DELTA_VIS = 120;
+
+    function Estar() {
+      return 1 / ((1 - nu1 * nu1) / E1 + (1 - nu2 * nu2) / E2);
+    }
+    function Rstar(mode) {
+      if (mode === 'cyl') return 1 / (1 / R1 + 1 / R2_cyl);
+      if (mode === 'sphere') return R1;
+      return 1 / (1 / R1 + 1 / R2_sph);
+    }
+    function hertzLine(delta, Es, Rs) {
+      if (delta <= 1e-9) return { a: 0, p0: 0, load: 0, loadLabel: '0 N/mm' };
+      const a = Math.sqrt(Rs * delta);
+      const Pp = (Math.PI * Es * a * a) / (4 * Rs);
+      const p0 = (2 * Pp) / (Math.PI * a);
+      return { a, p0, load: Pp, loadLabel: Pp.toFixed(1) + ' N/mm' };
+    }
+    function hertzSphere(delta, Es, Rs) {
+      if (delta <= 1e-9) return { a: 0, p0: 0, load: 0, loadLabel: '0 N' };
+      const a = Math.sqrt(Rs * delta);
+      const F = (4 / 3) * Es * Math.sqrt(Rs) * Math.pow(delta, 1.5);
+      const p0 = (3 * F) / (2 * Math.PI * a * a);
+      return { a, p0, load: F, loadLabel: F.toFixed(1) + ' N' };
+    }
+    function hertzState(delta, mode) {
+      const Es = Estar(), Rs = Rstar(mode);
+      const base = mode === 'cyl' ? hertzLine(delta, Es, Rs) : hertzSphere(delta, Es, Rs);
+      return { ...base, Es, Rs };
+    }
+    function pressureAt(x, a, p0) {
+      if (a <= 1e-9 || Math.abs(x) >= a) return 0;
+      return p0 * Math.sqrt(Math.max(0, 1 - (x / a) * (x / a)));
+    }
+
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.5, 500);
+    camera.position.set(70, 35, 95);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 8, 0);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const key = new THREE.DirectionalLight(0xffffff, 1.1);
+    key.position.set(40, 80, 50);
+    scene.add(key);
+
+    const root = new THREE.Group();
+    scene.add(root);
+    const bodyMatA = new THREE.MeshStandardMaterial({ color: 0x6ea8d8, roughness: 0.4, metalness: 0.2 });
+    const bodyMatB = new THREE.MeshStandardMaterial({ color: 0xd89b54, roughness: 0.45, metalness: 0.12 });
+
+    let bodyA = null, bodyB = null, mode = 'cyl';
+    function clearBodies() {
+      if (bodyA) { root.remove(bodyA); bodyA.geometry.dispose(); }
+      if (bodyB) { root.remove(bodyB); bodyB.geometry.dispose(); }
+      bodyA = bodyB = null;
+    }
+    function buildBodies(m) {
+      clearBodies();
+      mode = m;
+      if (m === 'cyl') {
+        bodyA = new THREE.Mesh(new THREE.CylinderGeometry(R1 * 0.55, R1 * 0.55, 70, 64), bodyMatA);
+        bodyA.rotation.z = Math.PI / 2;
+        bodyB = new THREE.Mesh(new THREE.CylinderGeometry(R2_cyl * 0.55, R2_cyl * 0.55, 70, 64), bodyMatB);
+        bodyB.rotation.z = Math.PI / 2;
+        bodyA.userData.rVis = R1 * 0.55;
+        bodyB.userData.rVis = R2_cyl * 0.55;
+        bodyB.userData.y0 = bodyB.userData.rVis;
+        bodyA.userData.y0 = bodyB.userData.y0 + bodyB.userData.rVis + bodyA.userData.rVis;
+      } else if (m === 'sphere') {
+        const flatH = 10;
+        bodyB = new THREE.Mesh(new THREE.BoxGeometry(90, flatH, 50), bodyMatB);
+        bodyA = new THREE.Mesh(new THREE.SphereGeometry(R1 * 0.55, 48, 32), bodyMatA);
+        bodyA.userData.rVis = R1 * 0.55;
+        bodyB.userData.flatH = flatH;
+        bodyB.userData.y0 = flatH / 2;
+        bodyA.userData.y0 = flatH + bodyA.userData.rVis;
+      } else {
+        bodyA = new THREE.Mesh(new THREE.SphereGeometry(R1 * 0.5, 48, 32), bodyMatA);
+        bodyB = new THREE.Mesh(new THREE.SphereGeometry(R2_sph * 0.5, 48, 32), bodyMatB);
+        bodyA.userData.rVis = R1 * 0.5;
+        bodyB.userData.rVis = R2_sph * 0.5;
+        bodyB.userData.y0 = bodyB.userData.rVis;
+        bodyA.userData.y0 = bodyB.userData.y0 + bodyB.userData.rVis + bodyA.userData.rVis;
+      }
+      root.add(bodyA, bodyB);
+      bodyA.position.set(0, bodyA.userData.y0, 0);
+      bodyB.position.set(0, bodyB.userData.y0, 0);
+    }
+
+    const nBars = 41;
+    const pressBars = [];
+    const barGeo = new THREE.BoxGeometry(1, 1, 1);
+    for (let i = 0; i < nBars; i++) {
+      const bar = new THREE.Mesh(barGeo, new THREE.MeshBasicMaterial({ color: 0xe8a46a, transparent: true, opacity: 0.92 }));
+      bar.visible = false;
+      root.add(bar);
+      pressBars.push(bar);
+    }
+    const contactPatch = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 0.4, 12),
+      new THREE.MeshBasicMaterial({ color: 0xc45c26, transparent: true, opacity: 0.55 })
+    );
+    contactPatch.visible = false;
+    root.add(contactPatch);
+    const loadArrow = new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 50, 0), 18, 0xc45c26, 5, 3);
+    root.add(loadArrow);
+    buildBodies('cyl');
+
+    const pressCanvas = document.getElementById('press');
+    const pressCtx = pressCanvas.getContext('2d');
+    function resizePress() {
+      const rect = pressCanvas.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      pressCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      pressCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      pressCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function drawPressure(a, p0) {
+      const w = pressCanvas.clientWidth, h = pressCanvas.clientHeight;
+      if (w < 10) return;
+      const pad = { l: 42, r: 10, t: 12, b: 28 };
+      const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+      const xMax = Math.max(1.5, a * 1.4);
+      const pMax = Math.max(50, p0 * 1.15);
+      const xOf = (x) => pad.l + ((x + xMax) / (2 * xMax)) * plotW;
+      const yOf = (p) => pad.t + plotH - (p / pMax) * plotH;
+      pressCtx.clearRect(0, 0, w, h);
+      pressCtx.strokeStyle = '#e6e2d8';
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (plotH * i) / 4;
+        pressCtx.beginPath(); pressCtx.moveTo(pad.l, y); pressCtx.lineTo(pad.l + plotW, y); pressCtx.stroke();
+      }
+      pressCtx.strokeStyle = '#9aa3b0';
+      pressCtx.beginPath();
+      pressCtx.moveTo(pad.l, pad.t); pressCtx.lineTo(pad.l, pad.t + plotH); pressCtx.lineTo(pad.l + plotW, pad.t + plotH);
+      pressCtx.stroke();
+      pressCtx.fillStyle = '#5c6574';
+      pressCtx.font = '10px "Source Sans 3", sans-serif';
+      pressCtx.textAlign = 'center';
+      pressCtx.fillText('x (mm)', pad.l + plotW / 2, h - 6);
+      if (a > 1e-6 && p0 > 0) {
+        pressCtx.beginPath();
+        pressCtx.moveTo(xOf(-a), yOf(0));
+        for (let i = 0; i <= 80; i++) {
+          const x = -a + (i / 80) * 2 * a;
+          pressCtx.lineTo(xOf(x), yOf(pressureAt(x, a, p0)));
+        }
+        pressCtx.lineTo(xOf(a), yOf(0));
+        pressCtx.closePath();
+        pressCtx.fillStyle = 'rgba(196, 92, 38, 0.16)';
+        pressCtx.fill();
+        pressCtx.strokeStyle = '#c45c26';
+        pressCtx.lineWidth = 2;
+        pressCtx.beginPath();
+        for (let i = 0; i <= 80; i++) {
+          const x = -a + (i / 80) * 2 * a;
+          const X = xOf(x), Y = yOf(pressureAt(x, a, p0));
+          if (i === 0) pressCtx.moveTo(X, Y); else pressCtx.lineTo(X, Y);
+        }
+        pressCtx.stroke();
+        pressCtx.fillStyle = '#c45c26';
+        pressCtx.beginPath();
+        pressCtx.arc(xOf(0), yOf(p0), 4, 0, Math.PI * 2);
+        pressCtx.fill();
+      } else {
+        pressCtx.fillStyle = '#8a93a0';
+        pressCtx.font = '12px "Source Sans 3", sans-serif';
+        pressCtx.fillText('No contact — p = 0', pad.l + plotW / 2, pad.t + plotH / 2);
+      }
+    }
+
+    const deltaEl = document.getElementById('delta');
+    const modeEl = document.getElementById('mode');
+    const playBtn = document.getElementById('play');
+    const resetBtn = document.getElementById('reset');
+    const badge = document.getElementById('badge');
+    const hud = document.getElementById('hud');
+    const readout = document.getElementById('readout');
+    const deltaV = document.getElementById('deltaV');
+    let playing = false, playRaf = 0, playLast = 0;
+
+    function update(delta) {
+      const st = hertzState(delta, mode);
+      const { a, p0, loadLabel, Es } = st;
+      const dEff = Math.max(0, delta);
+      const dVis = dEff * DELTA_VIS;
+      bodyB.position.y = bodyB.userData.y0;
+      bodyA.position.y = bodyA.userData.y0 - dVis;
+
+      let yContact;
+      if (mode === 'sphere') yContact = bodyB.userData.flatH;
+      else yContact = bodyB.position.y + bodyB.userData.rVis;
+      const aVis = Math.max(0.01, a * (mode === 'cyl' ? 18 : 16));
+      contactPatch.visible = dEff > 1e-4;
+      contactPatch.position.set(0, yContact, 0);
+      contactPatch.scale.set(aVis * 2, 1, mode === 'cyl' ? 1 : Math.max(2, aVis / (mode === 'sphere2' ? 6 : 1)));
+
+      pressBars.forEach((bar, i) => {
+        if (dEff < 1e-4 || a < 1e-6) { bar.visible = false; return; }
+        const xi = -1 + (i / (nBars - 1)) * 2;
+        const p = pressureAt(xi * a, a, p0);
+        if (p <= 0) { bar.visible = false; return; }
+        bar.visible = true;
+        const hBar = (p / p0) * (mode === 'cyl' ? 14 : 12);
+        bar.position.set(xi * aVis, yContact + hBar / 2 + 0.3, 0);
+        bar.scale.set(aVis * 2 / nBars * 0.85, hBar, mode === 'cyl' ? 4 : 3);
+        const t = p / p0;
+        bar.material.color.setRGB(0.77, 0.36 + 0.25 * (1 - t), 0.15);
+      });
+
+      loadArrow.position.set(0, bodyA.position.y + bodyA.userData.rVis + 6, 0);
+      loadArrow.setLength(10 + 16 * (dEff / DELTA_MAX), 4, 2.5);
+      const squash = dEff > 0 ? 1 - Math.min(0.04, dEff * 0.35) : 1;
+      bodyA.scale.set(1, squash, 1);
+      if (mode !== 'sphere') bodyB.scale.set(1, squash, 1);
+
+      const stageKey = dEff < 1e-4 ? 'sep' : dEff < 0.02 ? 'init' : 'load';
+      badge.textContent = stageKey === 'sep' ? 'Separated' : stageKey === 'init' ? 'Initial contact' : 'Hertz contact';
+      badge.className = 'badge' + (stageKey === 'sep' ? '' : ' ' + stageKey);
+      deltaV.textContent = delta.toFixed(3);
+      hud.innerHTML = 'δ = ' + delta.toFixed(3) + ' mm<br>a = ' + a.toFixed(3) + ' mm · p₀ = ' + p0.toFixed(1) + ' MPa';
+      readout.textContent = loadLabel + ' · E* = ' + (Es / 1000).toFixed(0) + ' GPa · a = ' + a.toFixed(3) + ' mm';
+      drawPressure(a, p0);
+    }
+
+    function refresh() { update(parseFloat(deltaEl.value)); }
+    function setPlayUi(on) {
+      playing = on;
+      playBtn.textContent = on ? 'Pause' : 'Play';
+      playBtn.classList.toggle('primary', !on);
+    }
+    function stopPlay() {
+      playing = false;
+      if (playRaf) cancelAnimationFrame(playRaf);
+      playRaf = 0;
+      setPlayUi(false);
+    }
+    function playLoop(t) {
+      if (!playing) return;
+      const dt = Math.min(0.05, (t - playLast) / 1000);
+      playLast = t;
+      let v = parseFloat(deltaEl.value) + 0.012 * dt;
+      if (v >= DELTA_MAX) { deltaEl.value = String(DELTA_MAX); refresh(); stopPlay(); return; }
+      deltaEl.value = String(v);
+      refresh();
+      playRaf = requestAnimationFrame(playLoop);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (playing) { stopPlay(); return; }
+      if (parseFloat(deltaEl.value) >= DELTA_MAX - 1e-6) { deltaEl.value = '0'; refresh(); }
+      setPlayUi(true);
+      playLast = performance.now();
+      playRaf = requestAnimationFrame(playLoop);
+    });
+    resetBtn.addEventListener('click', () => { stopPlay(); deltaEl.value = '0'; refresh(); });
+    deltaEl.addEventListener('input', () => { if (playing) stopPlay(); refresh(); });
+    modeEl.addEventListener('change', () => { if (playing) stopPlay(); buildBodies(modeEl.value); refresh(); });
+
+    function fit() {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      camera.aspect = Math.max(w / Math.max(h, 1), 0.1);
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      resizePress();
+      refresh();
+    }
+    window.addEventListener('resize', fit);
+    new ResizeObserver(fit).observe(stage);
+    new ResizeObserver(() => { resizePress(); refresh(); }).observe(pressCanvas);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    fit();
+    animate();
+  </script>
+</body>
+</html>
