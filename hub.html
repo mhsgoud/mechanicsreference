@@ -233,6 +233,8 @@
       display:block;width:100%;height:min(52vh,420px);
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
     }
+    .scene-frame-tall{height:min(68vh,560px)}
+    .figure-caption{margin:0 0 4px;font-size:0.9rem;color:var(--muted)}
     .figure-section{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
     .figure-grid{
       display:grid;
@@ -655,8 +657,8 @@ const topics = [
     "Classical Hertz theory is the smooth closed-form limit for small patches of linearly elastic bodies. An approach δ closes the gap; the contact half-width a and the peak pressure p₀ then follow from E* and R*. The pressure is elliptic — finite, smooth, and zero at the edge of the patch. That is the opposite of Williams’ 1/√r crack-tip field.",
     "The discrete FEM problem is a variational inequality. Penalty, Lagrange multipliers, and augmented Lagrangian methods are the three standard realisations; mortar and node-to-segment pairings decide which points are checked against which faces. Penalty is simple but stiffens the tangent; multipliers enforce the gap exactly but enlarge the system; augmentation combines both.",
     "Friction, even Coulomb, makes the tangent nonsymmetric and the path dependent. Contact is a geometric nonlinearity even when the material is linear. A consistent linearisation of the gap and of the sliding direction is required if Newton’s method is to be more than a heuristic.",
-    "The figure is Hertz contact of two elastic bodies. Increase the approach δ, switch cylinder–cylinder, sphere–flat, or sphere–sphere, and watch the elliptic pressure grow with the patch."
-  ], tags:["contact","friction","KKT","mortar","penalty","Hertz"], scene:"hertzContact"},
+    "The first figure is Hertz contact of two elastic bodies: increase the approach δ and watch the elliptic pressure grow with the patch. The second is a ContactFEA hex-mesh double-cantilever: both arms bend from a fixed wall, tip loads close a 1.25 mm gap, and the deformed mesh carries a finite contact pressure near the tip."
+  ], tags:["contact","friction","KKT","mortar","penalty","Hertz","ContactFEA"], scenes:["hertzContact","beamContact"]},
 
   // Part IV – Applications in Engineering
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
@@ -1155,15 +1157,23 @@ function renderTopicScene(topic){
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
     fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
-    hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'}
+    hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'},
+    beamContact: {src:'contact-beam.html', title:'Double-cantilever ContactFEA', tall:true}
   };
-  const page = pages[topic.scene];
-  if(!page) return '';
-  return `
+  const keys = topic.scenes || (topic.scene ? [topic.scene] : []);
+  if(!keys.length) return '';
+  return keys.map((key, i) => {
+    const page = pages[key];
+    if(!page) return '';
+    const heading = keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1));
+    const frameClass = page.tall ? 'scene-frame scene-frame-tall' : 'scene-frame';
+    return `
 <section class="figure-section" aria-label="${page.title}">
-  <h2>Figure</h2>
-  <iframe class="scene-frame" title="${page.title}" src="${page.src}" loading="lazy"></iframe>
+  <h2>${heading}</h2>
+  <p class="figure-caption">${page.title}</p>
+  <iframe class="${frameClass}" title="${page.title}" src="${page.src}" loading="lazy"></iframe>
 </section>`;
+  }).join('');
 }
 
 function renderTopicIllustrations(topic){
@@ -1875,7 +1885,7 @@ window.addEventListener('keydown', (e)=>{
     ok('element chooser slug', slug('Element Types & Families (Chooser)') === 'element-types-families-chooser');
     ok('variational principles topic', topics.some(t => t.title === 'Variational Principles'));
     ok('mixed methods topic', topics.some(t => t.title === 'Mixed Methods and Locking'));
-    ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && t.scene === 'hertzContact'));
+    ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('beamContact')));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));
