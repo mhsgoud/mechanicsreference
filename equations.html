@@ -75,7 +75,7 @@
     <p class="standfirst">These are the field identities behind the entries in the library: how deformation is measured, how forces are carried, how mass and momentum are conserved, and how those statements become a discrete system on a mesh.</p>
 
     <h2 id="continuum">Continuum mechanics</h2>
-    <p class="deck">Motion, stress, and conservation, before any choice of element or solver.</p>
+    <p class="deck">Motion, stress, and conservation — including the momentum equations in spatial, integral, and referential form — before any choice of element or solver. See also <a href="hub.html#basic-equations">Basic Equations</a> in the library.</p>
     <div class="eq-grid">
       <article class="eq-card">
         <div class="eq-kicker">Kinematics</div>
@@ -147,13 +147,37 @@
         <div class="eq-kicker">Balance</div>
         <h3>Conservation of mass</h3>
         <div class="eq">∂ρ/∂t + ∇ · (ρ v) = 0</div>
-        <p>Local mass balance. If the motion is incompressible, this is equivalent to a divergence-free velocity field.</p>
+        <p>Local mass balance. Referential form: ρ₀ = ρ J. If the motion is incompressible, this is equivalent to ∇ · v = 0.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Balance</div>
-        <h3>Linear momentum</h3>
+        <h3>Linear momentum (spatial)</h3>
         <div class="eq">∇ · σ + ρ b = ρ a</div>
-        <p>The divergence of stress, together with body force, balances inertia. In a static problem the right-hand side is zero. On a <a href="linear-momentum.html">supported body</a> the reactions on the supported area close the global balance.</p>
+        <p>Cauchy’s first law: divergence of stress and body force balance inertia. Static problems set a = 0. On a <a href="linear-momentum.html">supported body</a> the reactions on the support close the global balance.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Balance</div>
+        <h3>Linear momentum (integral)</h3>
+        <div class="eq">∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV</div>
+        <p>Global statement on any part of the body. The divergence theorem plus localization recovers ∇ · σ + ρ b = ρ a. Essential and natural boundary data partition the surface into support and loaded faces.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Balance</div>
+        <h3>Linear momentum (referential)</h3>
+        <div class="eq">Div P + ρ₀ B = ρ₀ A</div>
+        <p>The same physics on the undeformed placement, with P = J σ F⁻ᵀ. Total Lagrangian finite elements discretize this form; Updated Lagrangian rewrites it on the current mesh. <a href="hub.html#basic-equations">Basic equations</a>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Balance</div>
+        <h3>Angular momentum</h3>
+        <div class="eq">σ = σᵀ</div>
+        <p>Without couple stresses, Cauchy’s second law is symmetry of σ. Equivalently P Fᵀ = F Pᵀ. It is an algebraic restriction, not a differential one.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Balance</div>
+        <h3>Energy</h3>
+        <div class="eq">ρ ė = σ : D − ∇ · q + ρ r</div>
+        <p>First law: internal energy rate equals stress power, heat efflux (−∇ · q), and supply r. Fourier’s law q = −k ∇θ closes conduction in the usual thermal problems.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Constitutive</div>
@@ -172,12 +196,6 @@
         <h3>Jaumann rate</h3>
         <div class="eq">∇σ = σ̇ − Wσ + σW</div>
         <p>An objective rate of Cauchy stress. A <a href="objective-rates.html">pure rotation of a constant uniaxial stress</a> changes the laboratory components and leaves ∇σ at zero.</p>
-      </article>
-      <article class="eq-card">
-        <div class="eq-kicker">Balance</div>
-        <h3>Angular momentum</h3>
-        <div class="eq">σ = σᵀ</div>
-        <p>Without couple stresses, Cauchy’s second law is symmetry of σ. It is an algebraic restriction, not a differential one.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Fluids</div>

@@ -423,26 +423,33 @@
 const topics = [
   // Part I – Fundamentals of Mechanics
   {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
-    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass and momentum are conserved, a constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
-    "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ).",
-    "Stress: Cauchy traction t = σ n is force per current area. Without couple stresses, angular momentum requires σ = σᵀ.",
-    "Balance: local mass conservation is ∂ρ/∂t + ∇·(ρ v) = 0. Linear momentum is ∇·σ + ρ b = ρ a (static: ∇·σ + ρ b = 0).",
-    "Constitutive closure for isotropic linear elasticity: σ = λ tr(ε) I + 2μ ε, or σ = ℂ : ε.",
-    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV. FEM replaces u and δu with shape functions on a mesh.",
-    "Discrete linear elasticity: K a = f after interpolation uʰ = N a and assembly. Nonlinear problems solve R(u) = 0 by Newton–Raphson: K_T Δu = −R(u).",
-    "Same momentum balance describes fluids with a different constitutive law. Incompressible Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b with ∇·v = 0."
+    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, linear momentum, angular momentum, and energy are conserved (or balanced, once heat and external power are admitted). A constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
+    "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ). Volume change is J = det F.",
+    "Stress and traction: Cauchy’s theorem says the traction on a current surface with outward normal n is t = σ n. Without couple stresses, angular momentum requires σ = σᵀ. Forces measured per reference area use the first Piola–Kirchhoff stress P = J σ F⁻ᵀ.",
+    "Mass: local conservation is ∂ρ/∂t + ∇·(ρ v) = 0, or equivalently ρ₀ = ρ J in the reference placement. Incompressibility is ∇·v = 0 (or J = 1).",
+    "Linear momentum (spatial form): on every part of the body, the resultant of surface tractions and body forces equals the rate of change of linear momentum. Locally that is Cauchy’s first law, ∇·σ + ρ b = ρ a. At rest, ∇·σ + ρ b = 0. The acceleration a is that of the material points; b is force per unit mass.",
+    "Linear momentum (referential form): the same balance pulled back to the undeformed mesh is Div P + ρ₀ B = ρ₀ A, with Div the reference divergence. Total Lagrangian finite elements discretize this statement; Updated Lagrangian keeps rewriting it on the current placement.",
+    "Boundary data: part of the surface carries a prescribed displacement (essential / Dirichlet) and an unknown reaction; the complementary part carries a prescribed traction (natural / Neumann). Those two statements, together with the local momentum equation, are one global balance.",
+    "Energy: the first law balances the rate of internal energy with mechanical power and heat supply. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual closure for conduction.",
+    "Constitutive closure for isotropic linear elasticity: σ = λ tr(ε) I + 2μ ε, or σ = ℂ : ε. Fluids use the same momentum equation with a viscous law; incompressible Navier–Stokes is ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b with ∇·v = 0.",
+    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV (inertia adds ∫ ρ a · δu when dynamics matter). FEM replaces u and δu with shape functions on a mesh, yielding K a = f in linear elasticity, or R(u) = 0 solved by Newton–Raphson with tangent K_T.",
+    "The figure is linear momentum on a supported body: reactions on the support and tractions on the free surface close the global balance while ∇·σ + ρ b = ρ a holds inside."
   ], equations:[
-    {name:"Deformation gradient", expr:"F = ∂x / ∂X", note:"Maps a material line element from the reference placement X to the current placement x."},
+    {name:"Deformation gradient", expr:"F = ∂x / ∂X", note:"Maps a material line element from the reference placement X to the current placement x. J = det F is local volume change."},
     {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
     {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
-    {name:"Cauchy traction", expr:"t = σ n", note:"Force per current area on a surface with outward normal n."},
-    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Local mass balance; incompressibility is ∇ · v = 0."},
-    {name:"Linear momentum", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. At rest the right-hand side vanishes."},
+    {name:"Cauchy traction", expr:"t = σ n", note:"Force per current area on a surface with outward normal n. Angular momentum without couples requires σ = σᵀ."},
+    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", note:"Nominal stress: current force per reference area. Work-conjugate to Ḟ."},
+    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Local mass balance. Referential form: ρ₀ = ρ J. Incompressibility is ∇ · v = 0."},
+    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. Static problems set a = 0. Integral statement: ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV."},
+    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", note:"Same balance on the reference placement. Total Lagrangian FEM discretizes this form."},
+    {name:"Angular momentum", expr:"σ = σᵀ", note:"Cauchy’s second law in the absence of couple stresses — an algebraic restriction, not a PDE."},
+    {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", note:"First law: internal energy rate equals stress power, minus heat efflux, plus heat supply r."},
     {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
-    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", note:"Weak form of momentum. FEM interpolates u and δu with shape functions."},
+    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", note:"Weak form of momentum (quasi-static). Dynamics adds ∫ ρ a · δu on the left or right by convention."},
     {name:"Discrete linear system", expr:"K a = f", note:"Assembled stiffness times nodal unknowns equals the load vector."},
     {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
-  ], tags:["basic equations","continuum","strain","stress","conservation","Hooke","virtual work","FEM","Newton-Raphson"]},
+  ], tags:["basic equations","continuum","strain","stress","conservation","momentum","Hooke","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum"},
   {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
@@ -497,11 +504,21 @@ const topics = [
     "Because t is defined on the current surface, the arrows move when the body deforms. Stresses pulled back to the reference placement are different tensors, used when the weak form is written on the undeformed mesh.",
     "Turn the cut in the figure. The stress tensor is fixed; the traction, and its split into normal and shear, are not."
   ], tags:["traction","Cauchy stress","normal stress","shear"], scene:"tractionCut"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", bullets:[
-    "Mass, linear momentum, and energy are conserved in every continuum theory. Once a stress and a heat flux are introduced, the local forms of those statements become partial differential equations.",
-    "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Part of the boundary is supported, with prescribed displacement and an unknown reaction. Applied tractions act on the free surface and move with it. The acceleration a is that of the material points.",
-    "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Tractions and body forces are data; they do not replace the balance laws."
-  ], tags:["balance","momentum","energy","mass","Cauchy","traction"], scene:"linearMomentum"},
+  {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", equations:[
+    {name:"Mass (spatial)", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", note:"Continuity. Referential: ρ₀ = ρ J."},
+    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", note:"Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."},
+    {name:"Linear momentum (integral)", expr:"∫_∂Ω t dA + ∫_Ω ρ b dV = d/dt ∫_Ω ρ v dV", note:"Global statement on any part Ω. Localization plus the divergence theorem recovers the PDE."},
+    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", note:"Same physics on the reference placement; used by Total Lagrangian FEM."},
+    {name:"Angular momentum", expr:"σ = σᵀ", note:"No couple stresses. Equivalently P Fᵀ = F Pᵀ."},
+    {name:"Energy", expr:"ρ ė = σ : D − ∇ · q + ρ r", note:"Internal energy, stress power, heat flux, and supply."}
+  ], bullets:[
+    "Mass, linear momentum, angular momentum, and energy are conserved in every continuum theory — or balanced, once heat flux and external power are admitted. Once a stress (and a heat flux) are introduced, the local forms of those statements become partial differential equations.",
+    "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Globally, the resultant of tractions and body forces equals the rate of change of linear momentum of that part. The divergence theorem turns the surface term into ∇·σ and yields the PDE.",
+    "Part of the boundary is supported, with prescribed displacement and an unknown reaction. Applied tractions act on the free surface and move with it. The acceleration a is that of the material points. Those boundary partitions are data; they do not replace the balance laws.",
+    "The same statement written on the reference placement uses the first Piola–Kirchhoff stress: Div P + ρ₀ B = ρ₀ A. Choosing spatial or referential form is a bookkeeping choice that matches Updated versus Total Lagrangian discretizations.",
+    "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Energy balance introduces temperature and heat flux; mechanical theories often close it later, after momentum and a constitutive law are already on the table.",
+    "The figure is a body on a small support. Reactions and free-surface tractions close the global momentum balance while the local equation holds in the interior."
+  ], tags:["balance","momentum","energy","mass","Cauchy","traction","Piola"], scene:"linearMomentum"},
   {part:"Part I – Fundamentals of Mechanics", title:"Constitutive Models", bullets:[
     "Balance laws do not determine the stress. A constitutive model relates stress to the history of deformation: Hooke’s law for small elastic strain, hyperelasticity for finite elastic strain, viscoelasticity when rate matters, and plasticity when unloading leaves a permanent set.",
     "Every model is constrained by the same list of requirements. It must be independent of the observer (objectivity), it must not produce energy in a closed cycle unless that energy is accounted for as heat or as stored energy, and it must have a well-posed initial-boundary-value problem. The Clausius–Duhem inequality is the usual filter for the last two.",
@@ -1889,6 +1906,8 @@ window.addEventListener('keydown', (e)=>{
     ok('variational principles topic', topics.some(t => t.title === 'Variational Principles'));
     ok('mixed methods topic', topics.some(t => t.title === 'Mixed Methods and Locking'));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('beamContact')));
+    ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && (t.equations||[]).some(e => /momentum/i.test(e.name))));
+    ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));
