@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -233,7 +233,7 @@
       display:block;width:100%;height:min(52vh,420px);
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
     }
-    .scene-frame-tall{height:min(68vh,560px)}
+    .scene-frame-tall{height:min(84vh,720px)}
     .figure-caption{margin:0 0 4px;font-size:0.9rem;color:var(--muted)}
     .figure-section{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
     .figure-grid{
@@ -323,7 +323,7 @@
         <a href="./">Home</a>
         <a href="./#contents">Contents</a>
         <a href="./#figures">Figures</a>
-        <a href="equations.html">Equations</a>
+        <a href="theory.html">Theory</a>
         <a href="hub.html" class="active" aria-current="page">Library</a>
       </nav>
     </header>
@@ -677,7 +677,7 @@ const topics = [
     "Classical Hertz theory is the smooth closed-form limit for small patches of linearly elastic bodies. An approach δ closes the gap; the contact half-width a and the peak pressure p₀ then follow from E* and R*. The pressure is elliptic — finite, smooth, and zero at the edge of the patch. That is the opposite of Williams’ 1/√r crack-tip field.",
     "The discrete FEM problem is a variational inequality. Penalty, Lagrange multipliers, and augmented Lagrangian methods are the three standard realisations; mortar and node-to-segment pairings decide which points are checked against which faces. Penalty is simple but stiffens the tangent; multipliers enforce the gap exactly but enlarge the system; augmentation combines both.",
     "Friction, even Coulomb, makes the tangent nonsymmetric and the path dependent. Contact is a geometric nonlinearity even when the material is linear. A consistent linearisation of the gap and of the sliding direction is required if Newton’s method is to be more than a heuristic.",
-    "The first figure is Hertz contact of two elastic bodies: increase the approach δ and watch the elliptic pressure grow with the patch. The second is a ContactFEA hex-mesh double-cantilever: both arms bend from a fixed wall, tip loads close a 1.25 mm gap, and the deformed mesh carries a finite contact pressure near the tip."
+    "The first figure is Hertz contact of two elastic bodies: increase the approach δ and watch the elliptic pressure grow with the patch. The second is a ContactFEA hex-mesh double-cantilever: both arms bend from a fixed wall, tip loads close a 1.25 mm gap, and the MATLAB Newton–Raphson path is plotted as tip force versus tip U₂."
   ], tags:["contact","friction","KKT","mortar","penalty","Hertz","ContactFEA"], scenes:["hertzContact","beamContact"]},
 
   // Part IV – Applications in Engineering
