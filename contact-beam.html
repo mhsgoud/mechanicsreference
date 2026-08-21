@@ -118,7 +118,7 @@
           <div class="row"><span>Tip force F</span><span id="forceVal" class="mono">280 kN</span></div>
           <div class="row"><span>Tip U₂</span><span id="tipU2Val" class="mono">—</span></div>
           <div>
-            <label for="scaleSlider">Mesh scale <span id="scaleValue" class="mono">1.00</span>× of λ·U</label>
+            <label for="scaleSlider">Mesh exaggerate <span id="scaleValue" class="mono">1.00</span>×</label>
             <input id="scaleSlider" type="range" min="0.5" max="1.5" step="0.01" value="1" />
           </div>
           <div class="row"><span>Clearance (mesh)</span><span class="mono">1.25 mm</span></div>
@@ -183,7 +183,7 @@
           <li>Both arms bend after the gap closes — contact pressure loads the lower arm. Before contact (~λ &lt; 0.02) only the upper arm deflects.</li>
           <li>Tip U₂ ≈ −15.2 mm at the load nodes (λ = 1) is <em>deflection</em>, not the clearance.</li>
           <li>The F–δ curve softens until contact (~1.28 mm tip U₂), then stiffens as the patch grows.</li>
-          <li>Mesh shape at intermediate λ is λ·U(λ=1) — the curve itself is the true N–R path.</li>
+          <li>Mesh at intermediate λ matches the F–δ tip U₂: before contact only the upper arm moves; after contact both arms share the closing motion. The chart is the true N–R path.</li>
           <li>Compare with the smooth <a href="contact.html">Hertz elliptic pressure</a>.</li>
         </ul>
       </div>
@@ -499,7 +499,59 @@
             return a;
         });
 
-        function updateLoads(scale) {
+        function tipFinalU2() {
+            if (!meshData) return -15.22;
+            let s = 0;
+            for (const id of FORCE_NODE_IDS) s += meshData.disp[id - 1][1];
+            return s / FORCE_NODE_IDS.length;
+        }
+
+        function tipContactU2() {
+            const path = (meshData && meshData.loadPath) || [];
+            const hit = path.find(p => p.nContact > 0);
+            return hit ? hit.tipU2 : -GAP0;
+        }
+
+        /** Path-consistent morph: pre-contact = slave only; post-contact blends in master. */
+        function morphScales(lambda, exaggerate) {
+            const sample = samplePath(lambda);
+            const tipF = tipFinalU2();
+            const tipC = tipContactU2();
+            const tipT = sample.tipU2;
+            let sSlave = 0, sMaster = 0;
+            if (!(tipF < 0)) {
+                return { sSlave: 0, sMaster: 0, sample, tipT };
+            }
+            if (tipT > tipC) {
+                // Still above contact: only upper arm moves (true until gap closes)
+                sSlave = tipT / tipF;
+                sMaster = 0;
+            } else {
+                const sClose = tipC / tipF;
+                const sBoth = (tipT - tipC) / (tipF - tipC);
+                sSlave = sClose + sBoth * (1 - sClose);
+                sMaster = sBoth;
+            }
+            return {
+                sSlave: sSlave * exaggerate,
+                sMaster: sMaster * exaggerate,
+                sample,
+                tipT
+            };
+        }
+
+        let slaveNodeSet = null;
+        function ensureSlaveNodes(data) {
+            if (slaveNodeSet) return slaveNodeSet;
+            slaveNodeSet = new Set();
+            const end = data.slaveElems[1];
+            for (let e = 0; e < end; e++) {
+                for (const nid of data.elems[e]) slaveNodeSet.add(nid);
+            }
+            return slaveNodeSet;
+        }
+
+        function updateLoads(sSlave) {
             if (!meshData) return;
             const show = document.getElementById('loadToggle').checked;
             loadGroup.visible = show;
@@ -510,11 +562,10 @@
                 const i = FORCE_NODE_IDS[k] - 1;
                 const n = nodes[i];
                 const d = disp[i];
-                // Place arrow origin at deformed load node (arrow points down onto the tip face)
                 loadArrows[k].position.set(
-                    n[0] + scale * d[0],
-                    n[1] + scale * d[1],
-                    n[2] + scale * d[2]
+                    n[0] + sSlave * d[0],
+                    n[1] + sSlave * d[1],
+                    n[2] + sSlave * d[2]
                 );
             }
         }
@@ -549,7 +600,7 @@
             document.getElementById('splitToggle').disabled = matMode;
         }
 
-        function buildPartGeometry(data, scale, field, ghost, part /* 'all'|'slave'|'master' */, contour) {
+        function buildPartGeometry(data, sSlave, sMaster, field, ghost, part /* 'all'|'slave'|'master' */, contour) {
             const nodes = data.nodes;
             const disp = data.disp;
             const elems = data.elems;
@@ -558,6 +609,7 @@
             const edgePos = [];
             const split = document.getElementById('splitToggle').checked;
             const slaveEnd = data.slaveElems[1];
+            const slaves = ensureSlaveNodes(data);
 
             if (contour && !ghost) {
                 let fMin = Infinity, fMax = -Infinity;
@@ -580,10 +632,11 @@
                     const i = nid - 1;
                     const n = nodes[i];
                     const d = disp[i];
+                    const sc = slaves.has(nid) ? sSlave : sMaster;
                     return [
-                        n[0] + scale * d[0],
-                        n[1] + scale * d[1],
-                        n[2] + scale * d[2],
+                        n[0] + sc * d[0],
+                        n[1] + sc * d[1],
+                        n[2] + sc * d[2],
                         i
                     ];
                 });
@@ -636,7 +689,7 @@
             if (!meshData) return;
             const lambda = parseFloat(document.getElementById('lambdaSlider').value);
             const exaggerate = parseFloat(document.getElementById('scaleSlider').value);
-            const scale = lambda * exaggerate;
+            const { sSlave, sMaster, tipT } = morphScales(lambda, exaggerate);
             currentField = document.getElementById('fieldSelect').value;
             const mode = document.getElementById('viewMode').value;
             const matMode = isMaterialMode(mode);
@@ -662,8 +715,8 @@
 
             if (matMode) {
                 const preset = MATS[mode];
-                const slaveBuilt = buildPartGeometry(meshData, scale, currentField, false, 'slave', false);
-                const masterBuilt = buildPartGeometry(meshData, scale, currentField, false, 'master', false);
+                const slaveBuilt = buildPartGeometry(meshData, sSlave, sMaster, currentField, false, 'slave', false);
+                const masterBuilt = buildPartGeometry(meshData, sSlave, sMaster, currentField, false, 'master', false);
                 const group = new THREE.Group();
                 group.add(new THREE.Mesh(slaveBuilt.geo, preset.slave));
                 group.add(new THREE.Mesh(masterBuilt.geo, preset.master));
@@ -685,7 +738,7 @@
                 slaveBuilt.edgeGeo.dispose();
                 masterBuilt.edgeGeo.dispose();
             } else {
-                const { geo, edgeGeo } = buildPartGeometry(meshData, scale, currentField, false, 'all', true);
+                const { geo, edgeGeo } = buildPartGeometry(meshData, sSlave, sMaster, currentField, false, 'all', true);
                 solidMesh = new THREE.Mesh(
                     geo,
                     new THREE.MeshLambertMaterial({
@@ -705,7 +758,7 @@
             root.add(edgeLines);
 
             if (document.getElementById('undefToggle').checked) {
-                const g = buildPartGeometry(meshData, 0, currentField, true, 'all', true);
+                const g = buildPartGeometry(meshData, 0, 0, currentField, true, 'all', true);
                 ghostMesh = new THREE.Mesh(
                     g.geo,
                     new THREE.MeshLambertMaterial({
@@ -719,17 +772,19 @@
                 root.add(ghostMesh);
             }
 
-            document.getElementById('scaleValue').textContent = scale.toFixed(2);
+            document.getElementById('scaleValue').textContent = exaggerate.toFixed(2);
             document.getElementById('cbarMax').textContent = fieldMax.toFixed(2);
             document.getElementById('cbarMin').textContent = fieldMin.toFixed(2);
             document.getElementById('cbarMid').textContent = ((fieldMin + fieldMax) / 2).toFixed(2);
+            const gapNow = (GAP0 + tipT).toFixed(2);
             document.getElementById('dispOverlay').innerHTML = matMode
-                ? `${MATS[mode].label} · fixed-wall cantilevers · scale = ${scale.toFixed(2)}×`
-                : `scale = ${scale.toFixed(2)}× · ${currentField}<br>` +
+                ? `${MATS[mode].label} · tip U₂ = ${tipT.toFixed(2)} mm · rem. gap ≈ ${gapNow} mm`
+                : `tip U₂ = ${tipT.toFixed(2)} mm · rem. gap ≈ ${gapNow} mm · ${currentField}<br>` +
                   `<span style="opacity:.7">${currentField} ∈ [${fieldMin.toFixed(3)}, ${fieldMax.toFixed(3)}]</span>`;
 
-            updateLoads(scale);
+            updateLoads(sSlave);
             fixture.visible = document.getElementById('fixtureToggle').checked;
+            gapDim.visible = document.getElementById('gapDimToggle').checked && Math.abs(tipT) < GAP0 * 0.85;
         }
 
         function resetCamera() {
@@ -890,20 +945,24 @@
 
         function syncLambdaUI() {
             const lambda = parseFloat(document.getElementById('lambdaSlider').value);
+            const exaggerate = parseFloat(document.getElementById('scaleSlider').value);
             const sample = samplePath(lambda);
+            const { sSlave } = morphScales(lambda, exaggerate);
             document.getElementById('lambdaValue').textContent = lambda.toFixed(2);
-            document.getElementById('scaleValue').textContent = parseFloat(document.getElementById('scaleSlider').value).toFixed(2);
+            document.getElementById('scaleValue').textContent = exaggerate.toFixed(2);
             document.getElementById('forceVal').textContent = sample.F_kN.toFixed(1) + ' kN';
             document.getElementById('tipU2Val').textContent = sample.tipU2.toFixed(3) + ' mm';
             document.getElementById('pMaxVal').textContent = sample.pMax > 0 ? sample.pMax.toFixed(0) : '0';
             document.getElementById('nContactVal').textContent = String(sample.nContact);
             const badge = document.getElementById('statusBadge');
             if (badge && meshData) badge.textContent = 'ContactFEA · λ = ' + lambda.toFixed(2);
+            const rem = (GAP0 + sample.tipU2).toFixed(2);
             document.getElementById('dispOverlay').textContent =
                 'F = ' + sample.F_kN.toFixed(1) + ' kN · tip U₂ = ' + sample.tipU2.toFixed(2) + ' mm' +
+                ' · rem. gap ≈ ' + rem + ' mm' +
                 (sample.nContact ? ' · ' + sample.nContact + ' contact pts' : ' · open');
             drawChart(sample);
-            updateLoads(lambda * parseFloat(document.getElementById('scaleSlider').value));
+            updateLoads(sSlave);
         }
 
         async function loadFEA() {
@@ -954,12 +1013,15 @@
         document.getElementById('fixtureToggle').addEventListener('change', () => {
             fixture.visible = document.getElementById('fixtureToggle').checked;
         });
-        document.getElementById('gapDimToggle').addEventListener('change', () => {
-            gapDim.visible = document.getElementById('gapDimToggle').checked;
-        });
         document.getElementById('loadToggle').addEventListener('change', () => {
-            updateLoads(parseFloat(document.getElementById('lambdaSlider').value) *
-                parseFloat(document.getElementById('scaleSlider').value));
+            const lambda = parseFloat(document.getElementById('lambdaSlider').value);
+            const exaggerate = parseFloat(document.getElementById('scaleSlider').value);
+            updateLoads(morphScales(lambda, exaggerate).sSlave);
+        });
+        document.getElementById('gapDimToggle').addEventListener('change', () => {
+            const lambda = parseFloat(document.getElementById('lambdaSlider').value);
+            const tipT = samplePath(lambda).tipU2;
+            gapDim.visible = document.getElementById('gapDimToggle').checked && Math.abs(tipT) < GAP0 * 0.85;
         });
         document.getElementById('wireToggle').addEventListener('change', () => {
             if (edgeLines) edgeLines.visible = document.getElementById('wireToggle').checked;
