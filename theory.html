@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -81,8 +81,6 @@
     </a>
     <nav class="top-nav">
       <a href="./">Home</a>
-      <a href="./#contents">Contents</a>
-      <a href="./#figures">Figures</a>
       <a href="theory.html" class="active" aria-current="page">Theory</a>
       <a href="hub.html">Library</a>
     </nav>
@@ -90,7 +88,7 @@
   <main class="wrap">
     <p class="crumb"><a href="./">Home</a> · Theory</p>
     <h1>Theory</h1>
-    <p class="standfirst">These are the field identities behind the entries in the library: how deformation is measured, how forces are carried, how mass and momentum are conserved, and how those statements become a discrete system on a mesh.</p>
+    <p class="standfirst">These are the field identities behind the entries in the library: how deformation is measured, how forces are carried, how mass and momentum are conserved, how static balance becomes elastodynamics and coupled multiphysics, and how those statements become a discrete system on a mesh.</p>
 
     <h2 id="continuum">Continuum mechanics</h2>
     <p class="deck">Motion, stress, and conservation — including the momentum equations in spatial, integral, and referential form — before any choice of element or solver. See also <a href="hub.html#basic-equations">Basic Equations</a> in the library.</p>
@@ -204,6 +202,24 @@
         <p>Linear elasticity in the isotropic case, written with the Lamé parameters. The compact form is σ = ℂ : ε. <a href="hooke-poisson.html">Uniaxial tension</a> produces lateral strain −ν ε.</p>
       </article>
       <article class="eq-card">
+        <div class="eq-kicker">Elastodynamics</div>
+        <h3>Navier–Cauchy equation</h3>
+        <div class="eq">\[(\lambda + \mu)\boldsymbol{\nabla}(\boldsymbol{\nabla}\cdot\mathbf{u}) + \mu\nabla^2\mathbf{u} + \mathbf{b} = \rho\dfrac{\partial^2\mathbf{u}}{\partial t^2}\]</div>
+        <p>Substitute isotropic Hooke’s law and the infinitesimal strain into Cauchy’s first law. The static problem drops the right-hand side. Index form of momentum is σ<sub>ij,j</sub> + b<sub>i</sub> = ρ ü<sub>i</sub>.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Elastodynamics</div>
+        <h3>Helmholtz wave uncoupling</h3>
+        <div class="eq">\[\mathbf{u} = \boldsymbol{\nabla}\phi + \boldsymbol{\nabla}\times\boldsymbol{\psi},\quad \boldsymbol{\nabla}\cdot\boldsymbol{\psi}=0\]</div>
+        <p>Elastodynamics splits into a compressional P-wave with speed c<sub>p</sub> = √((λ+2μ)/ρ) and a shear S-wave with speed c<sub>s</sub> = √(μ/ρ). Static mechanics neglects inertia; dynamic response is carried by these finite wave speeds.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Coupled</div>
+        <h3>Thermoelasticity</h3>
+        <div class="eq">\[\boldsymbol{\sigma} = \lambda(\mathrm{tr}\,\boldsymbol{\varepsilon})\mathbf{I} + 2\mu\boldsymbol{\varepsilon} - (3\lambda+2\mu)\alpha(T-T_0)\mathbf{I}\]</div>
+        <p>Thermal expansion enters the stress. The heat equation gains a coupling term −(3λ+2μ)α T₀ ∂<sub>t</sub>(∇ · u). Two-way thermoelasticity exchanges energy between deformation and temperature.</p>
+      </article>
+      <article class="eq-card">
         <div class="eq-kicker">Constitutive</div>
         <h3>Neo-Hookean stored energy</h3>
         <div class="eq">\[W = \dfrac{\mu}{2}(I_1 - 3) - \mu\ln J + \dfrac{\lambda}{2}(\ln J)^2\]</div>
@@ -262,6 +278,24 @@
         <div class="eq">\[\displaystyle\int \delta p\,(\nabla\cdot\mathbf{u})\,\mathrm{d}V = 0\]</div>
         <p>A displacement-only space cannot represent ∇ · u = 0 without <a href="hub.html#mixed-methods-and-locking">locking</a>. Pressure is interpolated independently, and the pair must satisfy an inf-sup condition.</p>
       </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Discrete system</div>
+        <h3>Elastodynamics matrices</h3>
+        <div class="eq">\[\mathbf{M}\ddot{\hat{\mathbf{u}}} + \mathbf{C}\dot{\hat{\mathbf{u}}} + \mathbf{K}\hat{\mathbf{u}} = \mathbf{F}^{\mathrm{ext}}\]</div>
+        <p>Galerkin discretization of linear elastodynamics. M comes from ρ NᵀN, K from BᵀℂB, and C is usually Rayleigh damping. Nonlinear problems replace Kû by an internal force R(û).</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Coupled FE</div>
+        <h3>Thermoelastic block system</h3>
+        <div class="eq">\[\begin{bmatrix}\mathbf{M}_{uu}&\mathbf{0}\\\mathbf{0}&\mathbf{0}\end{bmatrix}\begin{Bmatrix}\ddot{\hat{\mathbf{u}}}\\\ddot{\hat{\mathbf{T}}}\end{Bmatrix}+\begin{bmatrix}\mathbf{C}_{uu}&\mathbf{0}\\\mathbf{C}_{Tu}&\mathbf{C}_{TT}\end{bmatrix}\begin{Bmatrix}\dot{\hat{\mathbf{u}}}\\\dot{\hat{\mathbf{T}}}\end{Bmatrix}+\begin{bmatrix}\mathbf{K}_{uu}&\mathbf{K}_{uT}\\\mathbf{0}&\mathbf{K}_{TT}\end{bmatrix}\begin{Bmatrix}\hat{\mathbf{u}}\\\hat{\mathbf{T}}\end{Bmatrix}=\begin{Bmatrix}\mathbf{F}_u\\\mathbf{F}_T\end{Bmatrix}\]</div>
+        <p>Displacement–temperature coupling after spatial discretization. K<sub>uT</sub> carries thermal stress; C<sub>Tu</sub> carries the mechanical heating term in the energy balance.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Coupled FE</div>
+        <h3>Poromechanics (u–p)</h3>
+        <div class="eq">\[\begin{bmatrix}\mathbf{M}_{uu}&\mathbf{0}\\\mathbf{0}&\mathbf{0}\end{bmatrix}\begin{Bmatrix}\ddot{\hat{\mathbf{u}}}\\\ddot{\hat{\mathbf{p}}}\end{Bmatrix}+\begin{bmatrix}\mathbf{C}_{uu}&\mathbf{0}\\\mathbf{Q}_{pu}&\mathbf{S}_{pp}\end{bmatrix}\begin{Bmatrix}\dot{\hat{\mathbf{u}}}\\\dot{\hat{\mathbf{p}}}\end{Bmatrix}+\begin{bmatrix}\mathbf{K}_{uu}&-\mathbf{Q}_{up}\\\mathbf{0}&\mathbf{H}_{pp}\end{bmatrix}\begin{Bmatrix}\hat{\mathbf{u}}\\\hat{\mathbf{p}}\end{Bmatrix}=\begin{Bmatrix}\mathbf{F}_u\\\mathbf{Q}_p\end{Bmatrix}\]</div>
+        <p>Biot solid–fluid coupling on a mesh. Q couples volumetric strain to pressure storage; H is the Darcy permeability operator. See also <a href="#porous">porous media</a>.</p>
+      </article>
     </div>
 
     <h2 id="numerical">Numerical methods</h2>
@@ -272,6 +306,24 @@
         <h3>Newton–Raphson</h3>
         <div class="eq">\[\mathbf{K}_{T}\,\Delta\mathbf{u} = -\mathbf{R}(\mathbf{u})\]</div>
         <p>A residual R(u) = 0 is linearized at the current guess. The tangent K<sub>T</sub> is the Jacobian of that residual. <a href="hub.html#newton-raphson-iteration-in-fem">Consistent linearisation</a> is what makes the convergence quadratic.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Nonlinear solve</div>
+        <h3>Full, modified, and BFGS</h3>
+        <div class="eq">\[\mathbf{K}_{\mathrm{eff}}^{(k)}\Delta\mathbf{u}^{(k)} = -\mathbf{R}^{(k)}\]</div>
+        <p>Full Newton reassembles and factorizes every iteration (quadratic). Modified Newton freezes K<sub>eff</sub> across the step (linear, cheap backsolves). BFGS stores rank-2 inverse updates (superlinear) and avoids refactorization.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Dynamics</div>
+        <h3>Generalized-α</h3>
+        <div class="eq">\[\mathbf{K}_{\mathrm{eff}}=(1-\alpha_m)\mathbf{M}+(1-\alpha_f)\gamma\Delta t\,\mathbf{C}_T+(1-\alpha_f)\beta\Delta t^2\,\mathbf{K}_T\]</div>
+        <p>Equilibrium is evaluated at intermediate shifts t<sub>n+1−α<sub>m</sub></sub> and t<sub>n+1−α<sub>f</sub></sub>. Spectral radius ρ<sub>∞</sub> ∈ [0, 1] sets high-frequency dissipation while keeping low modes accurate.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">Dynamics</div>
+        <h3>Explicit vs implicit</h3>
+        <div class="eq">\[\Delta t \le \Delta t_{\mathrm{CFL}} = \dfrac{L_{\min}}{c_p}\quad\text{(explicit)}\]</div>
+        <p>Central difference needs only a lumped M and is natural for impact and contact chatter, but is CFL-limited. Implicit Newton–Raphson is unconditionally stable and better for structural vibration, seismic response, and creep.</p>
       </article>
       <article class="eq-card">
         <div class="eq-kicker">Stability</div>
