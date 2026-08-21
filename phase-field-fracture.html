@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phase-Field Fracture — Mechanics Reference</title>
+  <meta name="description" content="A sharp crack is replaced by a diffuse phase field d. Length scale ℓ sets the band width; the regularized Griffith energy recovers a discrete surface as ℓ → 0." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mechanicsreference.com/phase-field-fracture.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{
+      --paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;
+      --navy:#1e3a5f;--blue:#3a5f8a;--accent:#c45c26;--plate:#1a2740;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0} html{scrollbar-gutter:stable}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:var(--blue)}
+    header{
+      position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;padding:12px 28px;
+    }
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    .crumb a{color:var(--blue);text-decoration:none}
+    h1{
+      margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;
+      font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy);letter-spacing:-0.02em;
+    }
+    .standfirst{margin:0 0 28px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{
+      display:grid;grid-template-columns:1fr minmax(260px,340px);
+      border:1px solid var(--rule);background:#fff;min-height:540px;
+    }
+    #stage{position:relative;background:var(--plate);min-height:440px}
+    #stage canvas{display:block;width:100%;height:100%}
+    #ui{padding:18px 20px 20px;border-left:1px solid var(--rule);background:#fff;display:flex;flex-direction:column;gap:10px}
+    #ui h2{margin:0;font-family:"Source Serif 4",Georgia,serif;font-size:1.15rem;color:var(--navy);font-weight:600}
+    #description{color:var(--ink-soft);font-size:0.92rem;min-height:3.8em}
+    .modes{display:flex;border:1px solid var(--rule)}
+    .modes button{
+      flex:1;appearance:none;border:0;background:#fff;color:var(--navy);
+      font:600 0.84rem "Source Sans 3",system-ui,sans-serif;padding:7px 8px;cursor:pointer;
+    }
+    .modes button.on{background:var(--navy);color:#fff}
+    label.ctrl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:0.88rem;color:var(--ink-soft)}
+    label.ctrl span.v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.8rem;color:var(--navy)}
+    input[type=range]{grid-column:1 / -1;width:100%}
+    #formula{font-family:"Source Serif 4",Georgia,serif;font-size:0.98rem;color:var(--navy);line-height:1.45}
+    #profile-wrap{background:#f1efe9;padding:8px 10px 6px}
+    #profile-wrap h3{margin:0 0 4px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    #profile{display:block;width:100%;height:88px}
+    .legend{display:flex;gap:14px;font-size:0.8rem;color:var(--ink-soft)}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+    .hint{margin:0;font-size:0.78rem;color:#7a8494}
+    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    html.embed,html.embed body{height:100%;background:var(--paper)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;min-height:0}
+    @media (max-width:860px){
+      .figure-shell{grid-template-columns:1fr}
+      #ui{border-left:0;border-top:1px solid var(--rule)}
+      #stage{min-height:320px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      html.embed .figure-shell{grid-template-rows:1fr auto}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="./" aria-label="Mechanics Reference home">
+      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+    </a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="./#contents">Contents</a>
+      <a href="./#figures">Figures</a>
+      <a href="theory.html">Theory</a>
+      <a href="hub.html#phase-field-modelling-of-fracture">Library</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#phase-field-modelling-of-fracture">Phase-field fracture</a></p>
+      <h1>A crack as a diffuse field</h1>
+      <p class="standfirst">Phase-field fracture replaces a sharp surface with a continuous damage field <i>d</i> ∈ [0, 1]. Intact material is <i>d</i> = 0; a fully broken band is <i>d</i> = 1. A material length <i>ℓ</i> sets the band width. As <i>ℓ</i> → 0 the regularized Griffith energy converges to a discrete crack surface of energy <i>G</i><sub>c</sub> per unit area — without tracking topology or remeshing.</p>
+    </div>
+
+    <div class="figure-shell">
+      <div id="stage"></div>
+      <aside id="ui">
+        <h2>Regularized crack</h2>
+        <div id="description"></div>
+        <div class="modes" role="group" aria-label="Crack density model">
+          <button type="button" id="at2" class="on">AT2</button>
+          <button type="button" id="at1">AT1</button>
+          <button type="button" id="sharp">Sharp limit</button>
+        </div>
+        <label class="ctrl">Length scale <i>ℓ</i> <span class="v" id="ellV"></span>
+          <input id="ell" type="range" min="8" max="55" value="22" />
+        </label>
+        <label class="ctrl">Crack length <i>a</i> <span class="v" id="aV"></span>
+          <input id="alen" type="range" min="15" max="85" value="55" />
+        </label>
+        <div id="formula"></div>
+        <div id="profile-wrap">
+          <h3>Profile d(n) across the band</h3>
+          <canvas id="profile" width="300" height="88"></canvas>
+        </div>
+        <div class="legend">
+          <div><span class="dot" style="background:#6d9ad6"></span>d ≈ 0 intact</div>
+          <div><span class="dot" style="background:#e39a4a"></span>d → 1 cracked</div>
+        </div>
+        <p class="hint">Drag to orbit · Scroll to zoom</p>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="lefm.html">LEFM</a> · <a href="cohesive-crack.html">Cohesive</a> · <a href="j-integral.html">J-integral</a> · <a href="hub.html#phase-field-modelling-of-fracture">Library</a></span>
+    </div>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+    const stage = document.getElementById('stage');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0.6, 1.8, 7.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+
+    const labels = new CSS2DRenderer();
+    labels.domElement.style.position = 'absolute';
+    labels.domElement.style.inset = '0';
+    labels.domElement.style.pointerEvents = 'none';
+    stage.appendChild(labels.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+    controls.minDistance = 4;
+    controls.maxDistance = 14;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+    const key = new THREE.DirectionalLight(0xffffff, 1.55);
+    key.position.set(4, 6, 8);
+    scene.add(key);
+
+    const W = 5.2, H = 3.6;
+    const NX = 72, NY = 48;
+    const geom = new THREE.PlaneGeometry(W, H, NX, NY);
+    geom.rotateX(-Math.PI / 2);
+
+    function heat(t) {
+      t = Math.max(0, Math.min(1, t));
+      const r = Math.round(26 + t * 200);
+      const g = Math.round(48 + t * 90);
+      const b = Math.round(78 + (1 - t) * 100);
+      return [r / 255, g / 255, b / 255];
+    }
+
+    const colors = new Float32Array((NX + 1) * (NY + 1) * 3);
+    geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const plate = new THREE.Mesh(
+      geom,
+      new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })
+    );
+    plate.position.y = 0.02;
+    scene.add(plate);
+
+    const frame = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.PlaneGeometry(W, H)),
+      new THREE.LineBasicMaterial({ color: 0x8aa3c4 })
+    );
+    frame.rotation.x = -Math.PI / 2;
+    frame.position.y = 0.03;
+    scene.add(frame);
+
+    const bandLine = new THREE.Line(
+      new THREE.BufferGeometry(),
+      new THREE.LineBasicMaterial({ color: 0xf4efe6, transparent: true, opacity: 0.85 })
+    );
+    scene.add(bandLine);
+
+    function makeLabel(text, pos) {
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = text;
+      const obj = new CSS2DObject(div);
+      obj.position.copy(pos);
+      scene.add(obj);
+      return obj;
+    }
+    makeLabel('d = 0', new THREE.Vector3(-2.1, 0.15, 1.4));
+    makeLabel('d → 1', new THREE.Vector3(0.15, 0.15, 0.05));
+    makeLabel('ℓ', new THREE.Vector3(0.95, 0.15, -0.55));
+    const aLabel = makeLabel('a', new THREE.Vector3(-0.4, 0.15, 0));
+
+    let model = 'at2';
+    const ellEl = document.getElementById('ell');
+    const aEl = document.getElementById('alen');
+    const desc = document.getElementById('description');
+    const formula = document.getElementById('formula');
+    const profile = document.getElementById('profile');
+
+    function dProfile(n, ell) {
+      const x = Math.abs(n);
+      if (model === 'sharp') return x < 0.02 * ell ? 1 : 0;
+      if (model === 'at1') {
+        const xi = x / (2 * ell);
+        if (xi >= 1) return 0;
+        const s = 1 - xi;
+        return s * s;
+      }
+      return Math.exp(-x / ell);
+    }
+
+    function updateField() {
+      const ell = (+ellEl.value) / 100;
+      const a = (+aEl.value) / 100 * W * 0.92;
+      const x0 = -W / 2;
+      const tip = x0 + a;
+
+      document.getElementById('ellV').textContent = ell.toFixed(2);
+      document.getElementById('aV').textContent = a.toFixed(2);
+      aLabel.position.set(x0 + a * 0.55, 0.15, 0.35);
+
+      const pos = geom.attributes.position;
+      const col = geom.attributes.color;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        let d = 0;
+        if (x <= tip) {
+          d = dProfile(z, ell);
+        } else {
+          const r = Math.hypot(x - tip, z);
+          d = dProfile(r, ell);
+        }
+        const [cr, cg, cb] = heat(d);
+        col.setXYZ(i, cr, cg, cb);
+        pos.setY(i, 0.04 * d);
+      }
+      col.needsUpdate = true;
+      pos.needsUpdate = true;
+      geom.computeVertexNormals();
+
+      const bandPts = [];
+      for (let k = 0; k <= 40; k++) {
+        const t = k / 40;
+        const x = x0 + a * t;
+        bandPts.push(x, 0.08, 0);
+      }
+      bandLine.geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute(bandPts, 3)
+      );
+
+      if (model === 'at2') {
+        desc.textContent = 'AT2 crack density: γ = d²/(2ℓ) + (ℓ/2)|∇d|². The 1-D profile across a fully developed band is d = exp(−|n|/ℓ). Softening begins at infinitesimal load.';
+        formula.innerHTML = 'γ<sub>AT2</sub> = d²/(2ℓ) + (ℓ/2)|∇d|²<br>g(d) = (1−d)² + κ';
+      } else if (model === 'at1') {
+        desc.textContent = 'AT1 has a compact support of width 4ℓ and an elastic threshold: damage stays zero until a critical energy density is reached. The 1-D profile is quadratic on |n| &lt; 2ℓ.';
+        formula.innerHTML = 'γ<sub>AT1</sub> ∝ d/ℓ + ℓ|∇d|²<br>support |n| &lt; 2ℓ';
+      } else {
+        desc.textContent = 'Formal sharp-crack limit: the diffuse band collapses onto a surface Γ of Hausdorff measure. The phase-field energy Γ-converges to G<sub>c</sub> × Area(Γ).';
+        formula.innerHTML = 'ℓ → 0 ⇒ E → ∫<sub>Ω\\Γ</sub> ψ₀ + G<sub>c</sub> |Γ|';
+      }
+      drawProfile(ell);
+    }
+
+    function drawProfile(ell) {
+      const ctx = profile.getContext('2d');
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = profile.clientWidth || 280;
+      const h = 88;
+      profile.width = Math.round(w * dpr);
+      profile.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      const pad = { l: 28, r: 8, t: 8, b: 20 };
+      const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+      const nMax = 4 * ell;
+      const x = n => pad.l + ((n + nMax) / (2 * nMax)) * iw;
+      const y = d => pad.t + (1 - d) * ih;
+      ctx.strokeStyle = '#d8d4cb';
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ih); ctx.lineTo(pad.l + iw, pad.t + ih);
+      ctx.stroke();
+      ctx.fillStyle = '#5c6574';
+      ctx.font = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.fillText('d', 6, pad.t + 10);
+      ctx.fillText('n', pad.l + iw - 12, h - 6);
+      ctx.beginPath();
+      ctx.strokeStyle = '#1e3a5f';
+      ctx.lineWidth = 1.8;
+      const N = 120;
+      for (let i = 0; i <= N; i++) {
+        const n = -nMax + (2 * nMax * i) / N;
+        const d = dProfile(n, ell);
+        const px = x(n), py = y(d);
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = '#c45c26';
+      ctx.beginPath();
+      ctx.moveTo(x(-ell), pad.t); ctx.lineTo(x(-ell), pad.t + ih);
+      ctx.moveTo(x(ell), pad.t); ctx.lineTo(x(ell), pad.t + ih);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#c45c26';
+      ctx.fillText('±ℓ', x(ell) + 2, pad.t + 12);
+    }
+
+    document.getElementById('at2').addEventListener('click', () => setModel('at2'));
+    document.getElementById('at1').addEventListener('click', () => setModel('at1'));
+    document.getElementById('sharp').addEventListener('click', () => setModel('sharp'));
+    function setModel(m) {
+      model = m;
+      document.getElementById('at2').classList.toggle('on', m === 'at2');
+      document.getElementById('at1').classList.toggle('on', m === 'at1');
+      document.getElementById('sharp').classList.toggle('on', m === 'sharp');
+      updateField();
+    }
+    ellEl.addEventListener('input', updateField);
+    aEl.addEventListener('input', updateField);
+
+    function resize() {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      camera.aspect = w / Math.max(h, 1);
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      labels.setSize(w, h);
+      drawProfile((+ellEl.value) / 100);
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+    updateField();
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+      labels.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
