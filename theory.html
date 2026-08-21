@@ -361,6 +361,42 @@
         <div class="eq">\[p(x) = p_0\sqrt{1-(x/a)^2}\]</div>
         <p>Elliptic profile on a patch of half-width <i>a</i>. Peak at the centre, zero at the edges. <a href="contact.html">Increase the approach and watch the patch grow</a>. For a discrete ContactFEA mesh of two cantilevers, see the <a href="contact-beam.html">beam contact figure</a>.</p>
       </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Signorini–Coulomb conditions</h3>
+        <div class="eq">\[g \ge 0,\quad t_N \le 0,\quad \mathbf{t}^{(1)} = -\mathbf{t}^{(2)},\quad |\mathbf{t}_T| \le \mu |t_N|\]</div>
+        <p>Open-source ContactFEA convention (Wang et al.): non-penetration, compression-only normal traction, action–reaction, and Coulomb stick/slip. Equality \(|\mathbf{t}_T| = \mu |t_N|\) is slip; strict inequality is stick.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Contact virtual work</h3>
+        <div class="eq">\[\delta W_c = \displaystyle\int_{\gamma^{(1)}}(\delta\mathbf{u}^{(1)} - \delta\mathbf{u}^{(2)})^{\mathsf{T}}\mathbf{t}^{(1)}\,\mathrm{d}a^{(1)}\]</div>
+        <p>Large-deformation virtual work on slave/master bodies plus this contact term. Linearization supplies the (generally nonsymmetric) contact tangent \(\mathbf{K}_c\) assembled into Newton–Raphson.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Ray-tracing gap</h3>
+        <div class="eq">\[g = \bigl(\mathbf{x}^{(2)}(\boldsymbol{\eta}^{(2)},t) - \mathbf{x}^{(1)}(\boldsymbol{\eta}^{(1)},t)\bigr)^{\mathsf{T}}\mathbf{n}^{(1)}\]</div>
+        <p>Slave point projected onto the master surface along the slave outward normal (Zimmerman surface-to-surface). The gap enters the penalty traction and the discrete contact residual.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Penalty traction (slip / stick)</h3>
+        <div class="eq">\[\mathbf{t}^{(1)}_{\mathrm{slip}} = \varepsilon g\,(\mathbf{n}^{(1)} + \mu\mathbf{s}^{(1)}),\quad \mathbf{t}^{(1)}_{\mathrm{stick}} = \varepsilon\,\mathbf{g}_s\]</div>
+        <p>Slip uses scalar gap and friction direction \(\mathbf{s}^{(1)}\); stick uses the vectorial gap \(\mathbf{g}_s\) from the previous master contact point. \(\varepsilon\) is the penalty — too small yields penetration, too large stalls Newton.</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Slip criterion</h3>
+        <div class="eq">\[\Phi = |\mathbf{t}_T^{(1)}| - \mu |t_n|,\quad \Phi &lt; 0\ \text{stick},\ \Phi = 0\ \text{slip}\]</div>
+        <p>Trial traction decides stick versus slip. First contact is often started in friction slip (or frictionless slip) for robustness; later steps assume stick and check \(\Phi\).</p>
+      </article>
+      <article class="eq-card">
+        <div class="eq-kicker">ContactFEA</div>
+        <h3>Two-beam example</h3>
+        <div class="eq">\[E = 2.1\times 10^5\,\mathrm{MPa},\ \nu = 0.3,\ \varepsilon = 10^6\]</div>
+        <p>Upper arm \(50\times 15\times 8.75\) mm (20×6×4 hexes) loads the lower \(50\times 30\times 10\) mm arm (13×8×3 hexes); fixed left ends, tip forces on the upper free end. Friction reduces tip deflection and relative slip. Interactive mesh: <a href="contact-beam.html">beam contact figure</a>.</p>
+      </article>
     </div>
 
     <h2 id="fracture">Fracture</h2>

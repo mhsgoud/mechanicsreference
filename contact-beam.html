@@ -12,7 +12,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      function go() {
+        if (!window.renderMathInElement) { setTimeout(go, 30); return; }
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      go();
+    });
+  </script>
   <style>
     :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
     *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
@@ -57,10 +75,21 @@
     .notes h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.05rem;color:var(--navy)}
     .notes ul{margin:0;padding-left:1.15em;font-size:0.95rem;color:var(--ink-soft)}
     .notes li{margin:0.35em 0}
+    .theory{margin-top:36px}
+    .theory > h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.45rem;color:var(--navy)}
+    .theory .deck{margin:0 0 22px;color:var(--ink-soft);max-width:46em}
+    .eq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .eq-card{background:#fff;border:1px solid var(--rule);padding:20px 20px 16px}
+    .eq-kicker{font-size:0.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+    .eq-card h3{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--navy)}
+    .eq{background:#f1efe9;padding:14px 16px;margin:0 0 12px;overflow-x:auto;text-align:center;line-height:1.4}
+    .eq .katex{font-size:1.12em;color:var(--ink)}
+    .eq-card p{margin:0;font-size:0.95rem;color:var(--ink-soft)}
+    @media (max-width:800px){.eq-grid{grid-template-columns:1fr}}
     footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
     html.embed,html.embed body{height:100%;background:#e8ecf1}
-    html.embed header,html.embed .page-copy,html.embed footer,html.embed .notes{display:none}
+    html.embed header,html.embed .page-copy,html.embed footer,html.embed .notes,html.embed .theory{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
     html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
     html.embed .stage-row{flex:1.4;min-height:0}
@@ -192,6 +221,61 @@
         </ul>
       </div>
     </div>
+
+    <section class="theory page-copy" id="theory">
+      <h2>Theory — ContactFEA beam example</h2>
+      <p class="deck">Formulation used by the open-source MATLAB ContactFEA solver (Wang, Bai, Lu &amp; Zuo, <em>Adv. Eng. Softw.</em> 199, 2025): surface-to-surface frictional contact with large deformation, penalty regularization, and Newton–Raphson. The mesh and load path on this page are that beam example (clearance enlarged to 5 mm for visualization).</p>
+      <div class="eq-grid">
+        <article class="eq-card">
+          <div class="eq-kicker">Balance</div>
+          <h3>Bodies without contact</h3>
+          <div class="eq">\[\nabla\cdot\boldsymbol{\sigma}+\mathbf{b}=\mathbf{0}\ \text{in }\Omega^{(1)}\cup\Omega^{(2)}\]</div>
+          <p>Cauchy balance on slave and master continua, with prescribed traction on \(\Gamma_t\) and fixed displacement on \(\Gamma_u\) (here the wall at \(X=-50\)).</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Contact</div>
+          <h3>Signorini–Coulomb</h3>
+          <div class="eq">\[g\ge 0,\quad t_N\le 0,\quad \mathbf{t}^{(1)}=-\mathbf{t}^{(2)}\]</div>
+          <p>Non-penetration, compression-only normal traction, and action–reaction on \(\gamma^{(1)}\cup\gamma^{(2)}\). Tangential response obeys Coulomb: stick if \(|\mathbf{t}_T|&lt;\mu|t_N|\), slip if equality holds.</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Weak form</div>
+          <h3>Contact virtual work</h3>
+          <div class="eq">\[\delta W_c=\int_{\gamma^{(1)}}(\delta\mathbf{u}^{(1)}-\delta\mathbf{u}^{(2)})^{\mathsf{T}}\mathbf{t}^{(1)}\,\mathrm{d}a^{(1)}\]</div>
+          <p>Added to the internal and external virtual work of both bodies. When the surfaces are separated, \(\delta W_c=0\); in contact, \(g=0\) and \(t_N&lt;0\).</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Kinematics</div>
+          <h3>Ray-tracing gap</h3>
+          <div class="eq">\[g=\bigl(\mathbf{x}^{(2)}-\mathbf{x}^{(1)}\bigr)^{\mathsf{T}}\mathbf{n}^{(1)}\]</div>
+          <p>Master contact point found by projecting the slave point along the slave outward normal (Zimmerman surface-to-surface). Relative slip velocity defines the friction direction \(\mathbf{s}^{(1)}\).</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Constitutive</div>
+          <h3>Penalty (slip / stick)</h3>
+          <div class="eq">\[\mathbf{t}^{(1)}_{\mathrm{slip}}=\varepsilon g\,(\mathbf{n}^{(1)}+\mu\mathbf{s}^{(1)}),\quad \mathbf{t}^{(1)}_{\mathrm{stick}}=\varepsilon\,\mathbf{g}_s\]</div>
+          <p>Slip uses the scalar gap; stick uses the vectorial gap from the previous master point. The paper uses \(\varepsilon=10^6\) (order of \(E\)); too small → penetration, too large → more NR iterations.</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">State</div>
+          <h3>Slip criterion</h3>
+          <div class="eq">\[\Phi=|\mathbf{t}_T^{(1)}|-\mu|t_n|\]</div>
+          <p>\(\Phi&lt;0\) stick, \(\Phi=0\) slip. First contact is often started in friction slip for stability; later increments trial stick and correct with \(\Phi\).</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Example</div>
+          <h3>Geometry and mesh</h3>
+          <div class="eq">\[\text{upper }50\times 15\times 8.75,\ \text{lower }50\times 30\times 10\ \mathrm{mm}\]</div>
+          <p>Upper (slave) 20×6×4 hexes; lower (master) 13×8×3 hexes. Left ends fixed. Paper tip load: 40 kN nodal forces on the upper free end (here seven equal forces, \(\Sigma F_Y=-280\,\mathrm{kN}\) at \(\lambda=1\)).</p>
+        </article>
+        <article class="eq-card">
+          <div class="eq-kicker">Example</div>
+          <h3>Material and friction</h3>
+          <div class="eq">\[E=2.1\times 10^5\,\mathrm{MPa},\ \nu=0.3\]</div>
+          <p>Steel-like isotropic elasticity. With \(\mu=0.6\) versus frictionless, the paper reports smaller tip deflection, lower peak Mises stress and contact traction, and less relative slip — friction enlarges the stick patch. See also <a href="theory.html#numerical">Theory · Numerical methods</a>.</p>
+        </article>
+      </div>
+    </section>
   </main>
   <footer>
     <div class="wrap">
