@@ -93,7 +93,7 @@
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#contact-and-friction">Contact and Friction</a> · <a href="contact.html">Hertz</a></p>
       <h1>Two cantilevers close a gap</h1>
-      <p class="standfirst">A ContactFEA hex-mesh solution of a double-cantilever contact test. Both arms are fixed at a rigid wall; tip loads on the upper (slave) arm drive the clearance shut. The load–displacement path is the Newton–Raphson history from MATLAB (total tip force vs mean tip U₂).</p>
+      <p class="standfirst">A ContactFEA hex-mesh solution of a double-cantilever contact test. Both arms are fixed at a rigid wall; tip loads on the upper (slave) arm close a <strong>1.25 mm</strong> face-to-face clearance (not the ~15 mm tip deflection). The load–displacement path is the Newton–Raphson history from MATLAB.</p>
     </div>
     <div class="figure-shell">
       <div class="stage-row">
@@ -121,6 +121,8 @@
             <label for="scaleSlider">Mesh scale <span id="scaleValue" class="mono">1.00</span>× of λ·U</label>
             <input id="scaleSlider" type="range" min="0.5" max="1.5" step="0.01" value="1" />
           </div>
+          <div class="row"><span>Clearance (mesh)</span><span class="mono">1.25 mm</span></div>
+          <div class="row"><span>Upper thickness</span><span class="mono">8.75 mm</span></div>
           <div>
             <label for="viewMode">View mode</label>
             <select id="viewMode">
@@ -141,6 +143,7 @@
           </div>
           <div class="checks">
             <label><input id="fixtureToggle" type="checkbox" checked /> Wall + clamps</label>
+            <label><input id="gapDimToggle" type="checkbox" checked /> Gap dimension (1.25 mm)</label>
             <label><input id="loadToggle" type="checkbox" checked /> Tip loads (slave)</label>
             <label><input id="wireToggle" type="checkbox" /> Mesh edges</label>
             <label><input id="undefToggle" type="checkbox" /> Undeformed ghost</label>
@@ -170,16 +173,16 @@
         <ul>
           <li>Rigid wall and clamp plates fix both cantilevers at X = −50.</li>
           <li>Upper arm (slave) and lower arm (master) share the wall.</li>
+          <li>Initial clearance between the facing faces is <strong>1.25 mm</strong> (upper bottom at Y = 1.25, lower top at Y = 0). The upper arm is only 8.75 mm thick, so that slit is thin — do not confuse it with tip deflection (~15 mm at λ = 1).</li>
           <li>Tip loads F<sub>Y</sub> = −40 kN on seven slave nodes at the free end.</li>
-          <li>Initial clearance 1.25 mm; contact closes near the tip.</li>
         </ul>
       </div>
       <div>
         <h2>What to notice</h2>
         <ul>
-          <li>Both arms bend — this is not a rigid foundation.</li>
-          <li>Tip U₂ ≈ −15.2 mm at the load nodes (λ = 1); field min ≈ −15.6 mm.</li>
-          <li>The F–δ curve softens until contact (~λ = 0.02), then stiffens as the patch grows.</li>
+          <li>Both arms bend after the gap closes — contact pressure loads the lower arm. Before contact (~λ &lt; 0.02) only the upper arm deflects.</li>
+          <li>Tip U₂ ≈ −15.2 mm at the load nodes (λ = 1) is <em>deflection</em>, not the clearance.</li>
+          <li>The F–δ curve softens until contact (~1.28 mm tip U₂), then stiffens as the patch grows.</li>
           <li>Mesh shape at intermediate λ is λ·U(λ=1) — the curve itself is the true N–R path.</li>
           <li>Compare with the smooth <a href="contact.html">Hertz elliptic pressure</a>.</li>
         </ul>
@@ -427,6 +430,46 @@
 
             // Floor pedestal under the wall
             addBox(fixture, 28, 4, 48, -52, -16, 15, baseMat);
+        })();
+
+        // Undeformed clearance callout: facing faces at Y=0 (master) and Y=1.25 (slave)
+        const GAP0 = 1.25;
+        const gapDim = new THREE.Group();
+        scene.add(gapDim);
+        (function buildGapDimension() {
+            const mat = new THREE.LineBasicMaterial({ color: 0xc45c26 });
+            const z = 12.5, x = -2;
+            const pts = [
+                new THREE.Vector3(x, 0, z),
+                new THREE.Vector3(x, GAP0, z)
+            ];
+            gapDim.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
+            // end ticks
+            const tick = 1.2;
+            gapDim.add(new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(x - tick, 0, z), new THREE.Vector3(x + tick, 0, z)
+                ]), mat));
+            gapDim.add(new THREE.Line(
+                new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(x - tick, GAP0, z), new THREE.Vector3(x + tick, GAP0, z)
+                ]), mat));
+            // label sprite
+            const cv = document.createElement('canvas');
+            cv.width = 256; cv.height = 64;
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = 'rgba(26,39,64,0.92)';
+            ctx.fillRect(0, 0, 256, 64);
+            ctx.fillStyle = '#f7f6f2';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('gap = 1.25 mm', 128, 32);
+            const tex = new THREE.CanvasTexture(cv);
+            const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+            spr.scale.set(10, 2.5, 1);
+            spr.position.set(x + 6, GAP0 / 2, z);
+            gapDim.add(spr);
         })();
 
         // Tip loads from ModelInformation_Beam.m: ForceNode = 705:5:735, F_Y = -4e4 each
@@ -805,7 +848,7 @@
                 chartCtx.textAlign = 'left';
                 chartCtx.textBaseline = 'top';
                 chartCtx.font = '10px "Source Sans 3", sans-serif';
-                chartCtx.fillText('gap', xOf(gap) + 4, pad.t + 2);
+                chartCtx.fillText('close', xOf(gap) + 4, pad.t + 2);
             }
 
             if (pathPts.length) {
@@ -910,6 +953,9 @@
         document.getElementById('viewMode').addEventListener('change', rebuild);
         document.getElementById('fixtureToggle').addEventListener('change', () => {
             fixture.visible = document.getElementById('fixtureToggle').checked;
+        });
+        document.getElementById('gapDimToggle').addEventListener('change', () => {
+            gapDim.visible = document.getElementById('gapDimToggle').checked;
         });
         document.getElementById('loadToggle').addEventListener('change', () => {
             updateLoads(parseFloat(document.getElementById('lambdaSlider').value) *
