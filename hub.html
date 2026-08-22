@@ -154,10 +154,20 @@
       padding:8px 12px;
     }
     .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
+    .menu-toggle{
+      display:none;appearance:none;border:1px solid var(--rule);background:#fff;
+      color:var(--navy);font:inherit;font-size:0.88rem;font-weight:600;
+      padding:8px 12px;cursor:pointer;margin-left:8px;
+    }
+    .menu-toggle:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+    .sidebar-backdrop{
+      display:none;position:fixed;inset:0;background:rgba(28,36,48,0.35);z-index:25;
+    }
+    .sidebar-backdrop.open{display:block}
     .search{
       display:flex;align-items:center;gap:10px;
       background:#fff;border:1px solid var(--rule);padding:8px 12px;
-      margin:0 8px 14px;
+      margin:0 8px 12px;
     }
     .search svg{color:#6b7382;flex-shrink:0}
     .search svg path{fill:currentColor}
@@ -172,21 +182,53 @@
       grid-area:sidebar;overflow:auto;scrollbar-gutter:stable;
       border-right:1px solid var(--rule);
       background:#f1efe9;
-      padding:18px 12px 28px;
+      padding:14px 10px 28px;
     }
-    .part{
-      margin:20px 8px 8px;padding:0;
+    .part-jump{
+      display:flex;flex-wrap:wrap;gap:4px;
+      margin:0 8px 12px;padding-bottom:12px;
+      border-bottom:1px solid var(--rule);
+    }
+    .part-jump button{
+      appearance:none;border:1px solid var(--rule);background:#fff;
+      color:var(--navy);font:inherit;font-size:0.72rem;font-weight:600;
+      letter-spacing:0.04em;padding:5px 8px;cursor:pointer;
+    }
+    .part-jump button:hover{border-color:var(--navy)}
+    .part-jump button:focus-visible{outline:2px solid var(--navy);outline-offset:1px}
+    .part-jump button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .part-group{margin:0 0 2px}
+    .part-toggle{
+      display:flex;align-items:center;gap:8px;width:100%;
+      margin:0;padding:10px 8px 8px;
+      border:none;background:transparent;cursor:pointer;
+      font:inherit;text-align:left;
       color:var(--accent);font-size:0.72rem;font-weight:600;
-      text-transform:uppercase;letter-spacing:.12em;
+      text-transform:uppercase;letter-spacing:.1em;
     }
-    .part:first-child{margin-top:4px}
-    .tabs{display:flex;flex-direction:column}
+    .part-toggle:hover{color:var(--navy)}
+    .part-toggle:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
+    .part-toggle .part-label{flex:1;min-width:0;line-height:1.35}
+    .part-toggle .part-meta{
+      flex-shrink:0;font-size:0.7rem;font-weight:600;letter-spacing:0;
+      text-transform:none;color:var(--muted);
+    }
+    .part-toggle .chev{
+      flex-shrink:0;width:0;height:0;
+      border-left:4px solid transparent;border-right:4px solid transparent;
+      border-top:5px solid currentColor;
+      transition:transform 0.15s ease;
+    }
+    .part-group.collapsed .chev{transform:rotate(-90deg)}
+    .part-group.collapsed .tabs{display:none}
+    .part-group.current .part-toggle{color:var(--navy)}
+    .tabs{display:flex;flex-direction:column;padding:0 0 6px}
     .tab{
       display:block;width:100%;
-      padding:9px 10px 9px 12px;
+      padding:8px 10px 8px 12px;
       border:none;border-left:2px solid transparent;
       cursor:pointer;text-align:left;background:transparent;
-      font-family:inherit;font-size:0.92rem;color:var(--navy);
+      font-family:inherit;font-size:0.9rem;line-height:1.35;color:var(--navy);
     }
     .tab:hover{background:#e8e4db}
     .tab:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
@@ -195,7 +237,29 @@
       border-left-color:var(--accent);
       font-weight:600;
     }
-    .tab small{color:var(--muted);font-size:0.75rem;line-height:1.35;margin-top:2px;display:block;font-weight:400}
+    .topic-nav{
+      display:grid;grid-template-columns:1fr 1fr;gap:12px;
+      margin-top:2.4rem;padding-top:1.4rem;border-top:1px solid var(--rule);
+    }
+    .topic-nav button{
+      appearance:none;border:1px solid var(--rule);background:#fff;
+      color:var(--navy);font:inherit;text-align:left;
+      padding:14px 16px;cursor:pointer;min-width:0;
+    }
+    .topic-nav button:hover{border-color:var(--navy)}
+    .topic-nav button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+    .topic-nav button:disabled{opacity:0.4;cursor:default;border-color:var(--rule)}
+    .topic-nav button:disabled:hover{border-color:var(--rule)}
+    .topic-nav .dir{
+      display:block;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;
+      text-transform:uppercase;color:var(--accent);margin-bottom:4px;
+    }
+    .topic-nav .name{
+      display:block;font-family:"Source Serif 4",Georgia,serif;
+      font-size:1rem;font-weight:600;line-height:1.3;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .topic-nav .next{text-align:right}
 
     .content{grid-area:content;overflow:auto;padding:36px 40px 64px}
     .card{
@@ -303,10 +367,18 @@
 
     @media (max-width: 980px){
       .app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
-      .sidebar{display:none}
+      .menu-toggle{display:inline-flex;align-items:center;gap:6px}
+      .sidebar{
+        display:none;position:fixed;top:0;left:0;bottom:0;z-index:30;
+        width:min(320px,88vw);max-width:100%;
+        box-shadow:4px 0 24px rgba(28,36,48,0.12);
+      }
+      .sidebar.open{display:block}
       .grid2{grid-template-columns:1fr}
       .brand-logo{height:44px}
       header,.content{padding-left:18px;padding-right:18px}
+      .topic-nav{grid-template-columns:1fr}
+      .topic-nav .next{text-align:left}
     }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
@@ -324,13 +396,15 @@
         <a href="./">Home</a>
         <a href="theory.html">Theory</a>
         <a href="hub.html" class="active" aria-current="page">Library</a>
+        <button type="button" class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="topicsSidebar">Topics</button>
       </nav>
     </header>
 
-    <aside class="sidebar" aria-label="Topics navigation">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+    <aside class="sidebar" id="topicsSidebar" aria-label="Topics navigation">
       <div class="search" role="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 6.03-3.03l4 4-1.5 1.5-4-4A7.46 7.46 0 0 1 10.5 18Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"/></svg>
-        <input id="searchInput" placeholder="Search the library" />
+        <input id="searchInput" placeholder="Search the library" aria-label="Search the library" />
       </div>
       <div id="sidebar"></div>
     </aside>
@@ -1043,37 +1117,120 @@ function escHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
+// ---- Sidebar state --------------------------------------------------------
+let activeTitle = "";
+let expandedParts = new Set();
+let lastFilter = "";
+
+function partShortLabel(part){
+  const m = String(part).match(/^Part\s+([IVX]+)/i);
+  return m ? m[1] : part.slice(0, 8);
+}
+
 // ---- Render sidebar -------------------------------------------------------
 const sidebar = document.getElementById('sidebar');
 function renderSidebar(filter=""){
+  lastFilter = filter;
   sidebar.innerHTML = '';
   let totalMatches = 0;
   const grouped = groupBy(topics, 'part');
-  Object.entries(grouped).forEach(([part, items]) => {
+  const parts = Object.keys(grouped);
+  const isSearching = filter.trim().length > 0;
+
+  if(isSearching){
+    parts.forEach(p => {
+      const has = grouped[p].some(t =>
+        (t.title+" "+(t.bullets||[]).join(" ")+" "+(t.tags||[]).join(" "))
+          .toLowerCase().includes(filter.toLowerCase())
+      );
+      if(has) expandedParts.add(p);
+    });
+  } else if(expandedParts.size === 0){
+    const cur = topics.find(t => t.title === activeTitle);
+    expandedParts.add(cur ? cur.part : parts[0]);
+  }
+
+  const jump = document.createElement('div');
+  jump.className = 'part-jump';
+  jump.setAttribute('role', 'navigation');
+  jump.setAttribute('aria-label', 'Jump to part');
+  parts.forEach(part => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Part ' + partShortLabel(part);
+    btn.title = part;
+    const cur = topics.find(t => t.title === activeTitle);
+    if(cur && cur.part === part) btn.classList.add('on');
+    btn.addEventListener('click', () => {
+      expandedParts = new Set([part]);
+      const cur = topics.find(t => t.title === activeTitle);
+      if(!cur || cur.part !== part){
+        const first = grouped[part][0];
+        if(first) selectTopic(first.title, {fromSidebar:true});
+        else renderSidebar(lastFilter);
+      } else {
+        renderSidebar(lastFilter);
+      }
+      requestAnimationFrame(() => {
+        const target = Array.from(sidebar.querySelectorAll('.part-group')).find(el => el.dataset.part === part);
+        if(target) target.scrollIntoView({block:'nearest'});
+      });
+    });
+    jump.appendChild(btn);
+  });
+  sidebar.appendChild(jump);
+
+  parts.forEach(part => {
+    const items = grouped[part];
     const visible = items.filter(t =>
-      (t.title+" "+t.bullets.join(" ")+" "+(t.tags||[]).join(" "))
+      (t.title+" "+(t.bullets||[]).join(" ")+" "+(t.tags||[]).join(" "))
         .toLowerCase().includes(filter.toLowerCase())
     );
     if(visible.length === 0) return;
     totalMatches += visible.length;
 
-    const partEl = document.createElement('div');
-    partEl.className = 'part';
-    partEl.textContent = part;
-    sidebar.appendChild(partEl);
+    const open = isSearching || expandedParts.has(part);
+    const group = document.createElement('div');
+    group.className = 'part-group' + (open ? '' : ' collapsed') +
+      ((topics.find(t => t.title === activeTitle)?.part === part) ? ' current' : '');
+    group.dataset.part = part;
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'part-toggle';
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.innerHTML =
+      `<span class="chev" aria-hidden="true"></span>` +
+      `<span class="part-label">${escHtml(part)}</span>` +
+      `<span class="part-meta">${visible.length}</span>`;
+    toggle.addEventListener('click', () => {
+      if(expandedParts.has(part)){
+        expandedParts.delete(part);
+      } else {
+        expandedParts.add(part);
+      }
+      renderSidebar(lastFilter);
+      const active = document.querySelector('.tab.active');
+      if(active) active.scrollIntoView({block:'nearest'});
+    });
+    group.appendChild(toggle);
 
     const list = document.createElement('div');
     list.className = 'tabs';
+    list.setAttribute('role', 'list');
     visible.forEach(t => {
       const b = document.createElement('button');
-      b.className = 'tab';
+      b.type = 'button';
+      b.className = 'tab' + (t.title === activeTitle ? ' active' : '');
       b.id = 'tab-' + slug(t.title);
       b.setAttribute('data-slug', slug(t.title));
-      b.innerHTML = `<div><div>${escHtml(t.title)}</div><small>${escHtml((t.tags||[]).slice(0,3).join(' · '))}</small></div>`;
-      b.addEventListener('click', () => selectTopic(t.title));
+      b.setAttribute('role', 'listitem');
+      b.textContent = t.title;
+      b.addEventListener('click', () => selectTopic(t.title, {fromSidebar:true}));
       list.appendChild(b);
     });
-    sidebar.appendChild(list);
+    group.appendChild(list);
+    sidebar.appendChild(group);
   });
 
   if(totalMatches === 0){
@@ -1880,19 +2037,49 @@ function renderContent(topic){
       ${illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
+      ${topicNavHtml(topic)}
     </article>
   `;
 
   // Update active state
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   const active = document.querySelector(`#tab-${slug(topic.title)}`);
-  if(active) active.classList.add('active');
+  if(active){
+    active.classList.add('active');
+    active.scrollIntoView({block:'nearest'});
+  }
+
+  const nav = content.querySelector('.topic-nav');
+  if(nav){
+    nav.querySelectorAll('button[data-title]').forEach(btn => {
+      btn.addEventListener('click', () => selectTopic(btn.getAttribute('data-title')));
+    });
+  }
 
   // Mount interactive widgets AFTER DOM update
   if(topic.interactive === "elementChooser"){
     mountElementChooser();
   }
   typesetMath(content);
+}
+
+function topicNeighbors(topic){
+  const i = topics.findIndex(t => t.title === topic.title);
+  return {
+    prev: i > 0 ? topics[i - 1] : null,
+    next: i >= 0 && i < topics.length - 1 ? topics[i + 1] : null
+  };
+}
+
+function topicNavHtml(topic){
+  const {prev, next} = topicNeighbors(topic);
+  const prevBtn = prev
+    ? `<button type="button" data-title="${escHtml(prev.title)}"><span class="dir">Previous</span><span class="name">${escHtml(prev.title)}</span></button>`
+    : `<button type="button" disabled><span class="dir">Previous</span><span class="name">—</span></button>`;
+  const nextBtn = next
+    ? `<button type="button" class="next" data-title="${escHtml(next.title)}"><span class="dir">Next</span><span class="name">${escHtml(next.title)}</span></button>`
+    : `<button type="button" class="next" disabled><span class="dir">Next</span><span class="name">—</span></button>`;
+  return `<nav class="topic-nav" aria-label="Adjacent topics">${prevBtn}${nextBtn}</nav>`;
 }
 
 function typesetMath(root){
@@ -1911,9 +2098,12 @@ function typesetMath(root){
 }
 
 // ---- Selection + deep-linking --------------------------------------------
-function selectTopic(title){
+function selectTopic(title, opts={}){
   const t = topics.find(x => x.title === title);
   if(!t) return;
+  activeTitle = t.title;
+  expandedParts = new Set([t.part]);
+  renderSidebar(lastFilter);
   renderContent(t);
   const h = '#'+slug(t.title);
   if(location.hash !== h){ history.replaceState(null,'',h); }
@@ -1924,6 +2114,7 @@ function selectTopic(title){
     desc.setAttribute('content', summary + (t.bullets[0].length > 155 ? '…' : ''));
   }
   content.focus({preventScroll:false});
+  if(opts.fromSidebar) closeMobileSidebar();
 }
 
 function initFromHash(){
@@ -1936,17 +2127,53 @@ function initFromHash(){
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('input', (e)=>{
   const q = e.target.value || '';
+  if(!q.trim() && activeTitle){
+    const cur = topics.find(t => t.title === activeTitle);
+    if(cur) expandedParts = new Set([cur.part]);
+  }
   renderSidebar(q);
+});
+
+// ---- Mobile sidebar -------------------------------------------------------
+const topicsSidebar = document.getElementById('topicsSidebar');
+const menuToggle = document.getElementById('menuToggle');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+function openMobileSidebar(){
+  topicsSidebar.classList.add('open');
+  sidebarBackdrop.classList.add('open');
+  sidebarBackdrop.hidden = false;
+  menuToggle.setAttribute('aria-expanded', 'true');
+}
+function closeMobileSidebar(){
+  topicsSidebar.classList.remove('open');
+  sidebarBackdrop.classList.remove('open');
+  sidebarBackdrop.hidden = true;
+  menuToggle.setAttribute('aria-expanded', 'false');
+}
+function toggleMobileSidebar(){
+  if(topicsSidebar.classList.contains('open')) closeMobileSidebar();
+  else openMobileSidebar();
+}
+menuToggle.addEventListener('click', toggleMobileSidebar);
+sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeMobileSidebar();
 });
 
 // ---- Keyboard navigation --------------------------------------------------
 window.addEventListener('keydown', (e)=>{
   if(e.ctrlKey && e.key.toLowerCase() === 'k'){
-    e.preventDefault();searchInput.focus();
+    e.preventDefault();
+    openMobileSidebar();
+    searchInput.focus();
   }
+  const tag = (e.target && e.target.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable)) return;
   if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
     const tabs = Array.from(document.querySelectorAll('.tab'));
     if(tabs.length === 0) return;
+    e.preventDefault();
     const activeIndex = tabs.findIndex(t=>t.classList.contains('active'));
     const target = (activeIndex === -1)
       ? 0
