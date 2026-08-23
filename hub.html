@@ -48,7 +48,8 @@
         { "@type": "ListItem", "position": 7, "name": "Element Types & Families (Chooser)" },
         { "@type": "ListItem", "position": 8, "name": "Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)" },
         { "@type": "ListItem", "position": 9, "name": "Shape Functions & Isoparametric Mapping" },
-        { "@type": "ListItem", "position": 10, "name": "Numerical Integration & Gauss Quadrature" },
+        { "@type": "ListItem", "position": 10, "name": "p-Version FEM & Lobatto Shape Functions" },
+        { "@type": "ListItem", "position": 11, "name": "Numerical Integration & Gauss Quadrature" },
         { "@type": "ListItem", "position": 11, "name": "Assembly of the Global Stiffness Matrix" },
         { "@type": "ListItem", "position": 12, "name": "Boundary Conditions & Loads" },
         { "@type": "ListItem", "position": 13, "name": "Solving Linear Systems" },
@@ -286,7 +287,7 @@
       color:var(--navy);font-weight:600;
     }
     .prose p, .card > p, .content p{line-height:1.7;color:var(--ink-soft);margin:0 0 1em}
-    .prose p:last-child{margin-bottom:0}
+    .card > p, .content > p{margin:0 0 1em}
     ul{margin:.35em 0 1em;padding-left:1.2em;color:var(--ink-soft)}
     li{margin:.35em 0}
 
@@ -300,7 +301,6 @@
     }
     .scene-frame-tall{height:min(84vh,720px)}
     .figure-caption{margin:0 0 4px;font-size:0.9rem;color:var(--muted)}
-    .figure-section{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
     .figure-grid{
       display:grid;
       grid-template-columns:repeat(auto-fill, minmax(min(100%, 240px), 1fr));
@@ -355,15 +355,79 @@
     .ok{border-color:var(--success-border);background:var(--success-bg);color:var(--success)}
     .muted{color:var(--muted)}
     .mono{font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;font-size:0.92em}
-    .eq-list{display:flex;flex-direction:column;gap:12px;margin:8px 0 24px}
-    .eq-card{background:#fff;border:1px solid var(--rule);padding:16px 18px 14px}
-    .eq-card h3{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.02rem;color:var(--navy)}
-    .eq-card .eq{
-      background:#f1efe9;padding:12px 14px;overflow-x:auto;margin:0 0 8px;
-      text-align:center;line-height:1.4;color:var(--ink);
+    .part-path{
+      display:flex;flex-wrap:wrap;align-items:center;gap:6px 0;
+      margin:0 0 18px;padding:0 0 14px;
+      border-bottom:1px solid var(--rule);
+      font-size:0.78rem;font-weight:600;letter-spacing:0.04em;
+      text-transform:uppercase;color:var(--muted);
     }
-    .eq-card .eq .katex{font-size:1.08em}
-    .eq-card p{margin:0;color:var(--muted);font-size:0.92rem;line-height:1.5}
+    .part-path .arc{
+      color:var(--navy);letter-spacing:0.08em;
+    }
+    .part-path .sep{margin:0 8px;color:var(--rule);font-weight:400;letter-spacing:0}
+    .part-path .pos{font-variant-numeric:tabular-nums;letter-spacing:0.02em}
+    .part-arcs{
+      display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px;
+    }
+    .part-arcs button{
+      appearance:none;border:1px solid var(--rule);background:#fff;
+      color:var(--muted);font:inherit;font-size:0.78rem;font-weight:600;
+      letter-spacing:0.04em;text-transform:uppercase;
+      padding:6px 10px;cursor:pointer;
+    }
+    .part-arcs button:hover{border-color:var(--navy);color:var(--navy)}
+    .part-arcs button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+    .part-arcs button.current{
+      background:var(--navy);border-color:var(--navy);color:#fff;cursor:default;
+    }
+
+    .topic-lead{
+      margin:-6px 0 1.4rem;
+      font-family:"Source Serif 4",Georgia,serif;
+      font-size:1.12rem;line-height:1.55;color:var(--ink-soft);
+      max-width:38rem;
+    }
+    .topic-bridge{
+      margin:2rem 0 0;padding:16px 0 0;
+      border-top:1px solid var(--rule);
+      color:var(--muted);font-size:0.98rem;line-height:1.6;
+      font-style:italic;max-width:40rem;
+    }
+    .topic-bridge strong{
+      font-style:normal;font-weight:600;color:var(--navy);
+    }
+
+    .prose{display:flex;flex-direction:column;gap:0}
+    .prose p{
+      margin:0 0 1.05em;padding:0 0 0 1rem;
+      border-left:2px solid transparent;
+      line-height:1.72;color:var(--ink-soft);
+    }
+    .prose p:first-child{
+      border-left-color:var(--accent);
+      color:var(--ink);
+    }
+    .prose p:last-child{margin-bottom:0}
+
+    .eq-list{display:flex;flex-direction:column;gap:0;margin:8px 0 28px}
+    .eq-card{
+      background:transparent;border:none;border-left:2px solid var(--rule);
+      padding:0 0 1.5rem 1rem;margin:0;
+    }
+    .eq-card:last-child{padding-bottom:0}
+    .eq-card h3{
+      margin:0 0 8px;
+      font-family:"Source Serif 4",Georgia,serif;
+      font-size:1.08rem;font-weight:600;color:var(--navy);
+    }
+    .eq-card .eq{
+      background:#fff;border:1px solid var(--rule);
+      padding:14px 16px;overflow-x:auto;margin:0 0 10px;
+      text-align:center;line-height:1.45;color:var(--ink);
+    }
+    .eq-card .eq .katex{font-size:1.1em}
+    .eq-card p{margin:0;color:var(--ink-soft);font-size:0.98rem;line-height:1.65}
 
     .eq-flow{margin:8px 0 28px}
     .eq-flow-section{margin:0 0 2.4rem}
@@ -375,7 +439,11 @@
     .eq-flow-section > .lead{
       margin:0 0 1.2rem;color:var(--ink-soft);line-height:1.7;
     }
-    .eq-step{margin:0 0 1.6rem}
+    .eq-step{
+      margin:0 0 1.5rem;padding:0 0 0 1rem;
+      border-left:2px solid var(--rule);
+    }
+    .eq-step:last-child{margin-bottom:0}
     .eq-step h3{
       margin:0 0 8px;
       font-family:"Source Serif 4",Georgia,serif;
@@ -395,14 +463,30 @@
       font-style:italic;
     }
 
-    .theory-extra{margin-top:2rem}
-    .theory-extra > h2{margin-top:2rem}
-    .theory-panel{background:#fff;border:1px solid var(--rule);padding:20px 22px;margin:0 0 20px}
+    .section-label{
+      margin:2rem 0 12px;
+      font-size:0.72rem;font-weight:600;letter-spacing:0.12em;
+      text-transform:uppercase;color:var(--accent);
+    }
+    .figure-section .section-label{margin-top:0}
+    .figure-section{
+      margin-top:2.2rem;padding-top:1.4rem;border-top:1px solid var(--rule);
+    }
+
+    .theory-extra{margin-top:2.4rem;padding-top:1.6rem;border-top:1px solid var(--rule)}
+    .theory-extra > h2{margin-top:0.35rem}
+    .theory-panel{
+      background:transparent;border:none;border-left:2px solid var(--rule);
+      padding:0 0 0 1rem;margin:0 0 1.8rem;
+    }
     .theory-panel h3{margin:1.1rem 0 0.5rem;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--navy)}
     .theory-panel h3:first-child{margin-top:0}
     .theory-panel ol{margin:0.5rem 0 1rem;padding-left:1.25rem;color:var(--ink-soft)}
     .theory-panel li{margin:0.4rem 0}
-    .theory-panel .eq{background:#f1efe9;padding:12px 14px;overflow-x:auto;margin:0.5rem 0 0;text-align:center}
+    .theory-panel .eq{
+      background:#fff;border:1px solid var(--rule);
+      padding:12px 14px;overflow-x:auto;margin:0.5rem 0 0;text-align:center;
+    }
     .callout{background:#f1efe9;border-left:3px solid var(--accent);padding:12px 14px;margin:14px 0 0;color:var(--ink-soft);font-size:0.95rem}
     .callout strong{color:var(--navy)}
     .theory-table{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:0.9rem}
@@ -500,6 +584,7 @@
         <li><a href="hub.html#element-types-families-chooser">Element Types &amp; Families (Chooser)</a></li>
         <li><a href="hub.html#mesh-generation-embedded-unfitted-methods-fem-fcm">Mesh Generation &amp; Embedded/Unfitted Methods (FEM/FCM)</a></li>
         <li><a href="hub.html#shape-functions-isoparametric-mapping">Shape Functions &amp; Isoparametric Mapping</a></li>
+        <li><a href="hub.html#p-version-fem-lobatto-shape-functions">p-Version FEM &amp; Lobatto Shape Functions</a></li>
         <li><a href="hub.html#numerical-integration-gauss-quadrature">Numerical Integration &amp; Gauss Quadrature</a></li>
         <li><a href="hub.html#assembly-of-the-global-stiffness-matrix">Assembly of the Global Stiffness Matrix</a></li>
         <li><a href="hub.html#boundary-conditions-loads">Boundary Conditions &amp; Loads</a></li>
@@ -920,6 +1005,12 @@ const topics = [
     "The parent element is a line, triangle, square, tetrahedron, or cube. Distortion of the physical element degrades the map: a vanishing Jacobian is an illegal mesh, and a large aspect ratio inflates the condition number even when the Jacobian stays positive.",
     "The figure on the left is the parent square in (ξ, η). The same nodal shape functions send it to the warped quadrilateral on the right."
   ], tags:["shape functions","isoparametric","tri","quad","tet","hex"], illustrations:"isoparametric"},
+  {part:"Part II – Numerical Methods", title:"p-Version FEM & Lobatto Shape Functions", bullets:[
+    "The p-version holds the mesh fixed and raises the polynomial degree of the shape functions. For smooth solutions the error then falls exponentially in p — typically far fewer degrees of freedom than refining an h-mesh at low order. Near singularities an hp strategy restores that exponential rate: geometric refinement at the tip, high order in the smooth remainder.",
+    "Hierarchical Lobatto (integrated Legendre) bases are the usual enrichment. Vertex modes ℓ₀ and ℓ₁ are the linear hats; every mode with k ≥ 2 carries the factor (ξ² − 1) and vanishes at the endpoints. On a quadrilateral the 2-D basis is built by tensor products: four vertex modes, four edge modes per new order k, then interior bubbles ℓᵢ(ξ) ℓⱼ(η) with i, j ≥ 2.",
+    "Raising p only appends new edge and bubble rows; existing modes are left untouched. Bubbles have support in one element and can be statically condensed before assembly. The same orthogonal construction keeps the element matrices far better conditioned than a monomial or nodal Lagrange basis of equal degree.",
+    "Algebraic rates on a sequence of meshes still read ‖u − uʰ‖_{L²} = O(h^{p+1}) and ‖∇(u − uʰ)‖ = O(h^p) when the solution is smooth. The p-version claim is that climbing those steeper families on a coarse mesh often beats refining a linear one. Quadrature must integrate at least degree 2p − 2, or the expected rates silently disappear."
+  ], tags:["p-version","hp-FEM","Lobatto","hierarchical","shape functions","spectral","bubble","edge modes","conditioning"], scene:"pVersionFem", sources:[{label:"Šolín, Segeth & Doležel, Higher-Order Finite Element Methods, Chapman & Hall/CRC (2004)", href:"https://www.crcpress.com/Higher-Order-Finite-Element-Methods/Solin-Segeth-Dolezel/p/book/9781584884385"}]},
   {part:"Part II – Numerical Methods", title:"Numerical Integration & Gauss Quadrature", bullets:[
     "Element matrices are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated by Gauss quadrature on the parent element: ∫ f dV ≈ Σ_q w_q f(ξ_q) det J(ξ_q).",
     "The number of points must be high enough to integrate the chosen polynomial, or deliberately reduced when under-integration is part of the formulation. Full integration of a bilinear quadrilateral uses 2×2 points; reduced integration uses one, and then hourglass control is required.",
@@ -1593,7 +1684,8 @@ function renderTopicScene(topic){
     lefmCenterCrack: {src:'lefm-center-crack.html', title:'Center crack and tip singularity', tall:true},
     dcbCohesive: {src:'dcb-cohesive.html', title:'DCB cohesive crack', tall:true},
     fiberInterface: {src:'fiber-interface.html', title:'Inclined fiber interface debonding', tall:true},
-    phaseFieldFracture: {src:'phase-field-fracture.html', title:'Phase-field fracture', tall:true}
+    phaseFieldFracture: {src:'phase-field-fracture.html', title:'Phase-field fracture', tall:true},
+    pVersionFem: {src:'p-version-fem.html', title:'p-version FEM and Lobatto modes', tall:true}
   };
   const keys = topic.scenes || (topic.scene ? [topic.scene] : []);
   if(!keys.length) return '';
@@ -1604,7 +1696,7 @@ function renderTopicScene(topic){
     const frameClass = page.tall ? 'scene-frame scene-frame-tall' : 'scene-frame';
     return `
 <section class="figure-section" aria-label="${page.title}">
-  <h2>${heading}</h2>
+  <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
   <iframe class="${frameClass}" title="${page.title}" src="${page.src}" loading="lazy"></iframe>
 </section>`;
@@ -2143,7 +2235,7 @@ function renderTopicIllustrations(topic){
   if(topic.illustrations !== 'introContinuum') return '';
   return `
 <section class="figure-section" aria-label="Schematic figures for introduction">
-  <h2>Figures</h2>
+  <p class="section-label">Figures</p>
   <p>Elementary models that introduce geometric nonlinearity, strain measures, and Newton iteration.</p>
   <div class="figure-grid">
     <figure class="figure-card">
@@ -2247,7 +2339,8 @@ function renderTopicIllustrations(topic){
 function renderBeamSimWidget(){
   return `
     <div class="theory-extra">
-      <h2>Interactive beam simulator</h2>
+      <p class="section-label">Interactive</p>
+      <h2>Beam simulator</h2>
       <p class="muted">A cantilever that compares steady static bending with a dynamic impact regime — the same qualitative difference as static balance versus elastodynamics.</p>
       <div class="sim-panel">
         <div class="sim-controls">
@@ -2445,6 +2538,127 @@ function mountBeamSimulator(){
   animate();
 }
 
+function partTopics(part){
+  return topics.filter(t => t.part === part);
+}
+
+const PART_I = "Part I – Fundamentals of Mechanics";
+
+const PART_I_ARC = {
+  "Basic Equations": "Overview",
+  "Introduction to Continuum Mechanics": "Overview",
+  "Kinematics of Deformation": "Kinematics",
+  "Tensors and the Divergence Theorem": "Kinematics",
+  "Polar Decomposition": "Kinematics",
+  "Finite Strain Measures": "Kinematics",
+  "Principal Stretches and Invariants": "Kinematics",
+  "Velocity Gradient and Material Derivative": "Kinematics",
+  "Cauchy Stress and Traction": "Stress & balance",
+  "Balance Laws & Conservation": "Stress & balance",
+  "Constitutive Models": "Constitutive response",
+  "Work-Conjugate Stresses": "Constitutive response",
+  "Principal Stresses and von Mises": "Constitutive response",
+  "Objective Rates": "Constitutive response",
+  "Hooke’s Law": "Constitutive response",
+  "Hyperelasticity": "Constitutive response",
+  "Metal Plasticity": "Constitutive response",
+  "Fluids: Continuity and Navier–Stokes": "Coupled continua",
+  "Thermodynamics of Continua": "Coupled continua"
+};
+
+const PART_I_LEAD = {
+  "Basic Equations": "The closed list of field equations that the rest of Part I expands, one subject at a time.",
+  "Introduction to Continuum Mechanics": "Why continuum statements and finite-element discretizations are written together: nonlinearity, linearization, and the Newton step.",
+  "Kinematics of Deformation": "Motion as a map from the reference placement to the current one; strain begins with the deformation gradient.",
+  "Tensors and the Divergence Theorem": "The bookkeeping of components, and the integral identity that turns volume balance into surface traction.",
+  "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
+  "Finite Strain Measures": "Green–Lagrange, Almansi, and the one-dimensional stretch measures that agree only as λ → 1.",
+  "Principal Stretches and Invariants": "The eigenvalues of U, the invariants of C, and the split into change of volume and change of shape.",
+  "Velocity Gradient and Material Derivative": "Rates of those fields: stretching D, spin W, and the derivative that follows a particle.",
+  "Cauchy Stress and Traction": "Force per current area on a cut: t = σ n.",
+  "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
+  "Constitutive Models": "Balance does not determine stress; a constitutive map says what the material may remember.",
+  "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
+  "Principal Stresses and von Mises": "Hydrostatic part, stress deviator, and the cylindrical yield surface of J₂ plasticity.",
+  "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
+  "Hooke’s Law": "The first elastic closure: two isotropic moduli, Poisson contraction, and locking as ν → ½.",
+  "Hyperelasticity": "Finite elastic stretch from a stored-energy function; S = ∂W/∂E.",
+  "Metal Plasticity": "Yield, associated flow, hardening, and the return map at each quadrature point.",
+  "Fluids: Continuity and Navier–Stokes": "The same momentum equation once Newton’s viscosity replaces Hooke’s law.",
+  "Thermodynamics of Continua": "Heat, the second law, and thermal coupling back into momentum."
+};
+
+const PART_I_BRIDGE = {
+  "Basic Equations": "The next entry is the narrative of why those continuum statements and a finite-element code are the same subject.",
+  "Introduction to Continuum Mechanics": "That pipeline begins with a precise definition of motion — the kinematics of deformation.",
+  "Kinematics of Deformation": "The language of those maps is tensors, and the divergence theorem turns volume statements into surface ones.",
+  "Tensors and the Divergence Theorem": "Any invertible F then splits uniquely into stretch and rotation.",
+  "Polar Decomposition": "Strain itself is built from that stretch, not from the rotation.",
+  "Finite Strain Measures": "The eigenvalues of U are the principal stretches; isotropic energies depend on their invariants.",
+  "Principal Stretches and Invariants": "Rates of those fields live in the spatial velocity gradient.",
+  "Velocity Gradient and Material Derivative": "With kinematics in hand, the next question is force per area — Cauchy stress and traction.",
+  "Cauchy Stress and Traction": "Mass, momentum, and energy turn that stress into field equations.",
+  "Balance Laws & Conservation": "Balance still does not determine the stress; a constitutive model closes the theory.",
+  "Constitutive Models": "Different stress tensors are work-conjugate to different rates of deformation.",
+  "Work-Conjugate Stresses": "Plasticity in metals cares about the magnitude of the stress deviator — the von Mises stress.",
+  "Principal Stresses and von Mises": "Rate forms of constitutive laws also need an objective stress rate.",
+  "Objective Rates": "The first elastic closure is isotropic Hooke’s law.",
+  "Hooke’s Law": "Finite elastic stretch replaces that linear law by a stored-energy function.",
+  "Hyperelasticity": "Metals below yield are elastic; beyond it they flow — metal plasticity.",
+  "Metal Plasticity": "The same momentum equation describes a fluid once viscosity replaces elasticity.",
+  "Fluids: Continuity and Navier–Stokes": "Heat and the second law close the continuum setting for thermo-mechanical coupling.",
+  "Thermodynamics of Continua": "Part II takes the weak form of these continuum statements onto a mesh."
+};
+
+const PART_I_ARC_ORDER = ["Overview", "Kinematics", "Stress & balance", "Constitutive response", "Coupled continua"];
+
+function topicArc(topic){
+  return topic.arc || PART_I_ARC[topic.title] || null;
+}
+
+function topicLead(topic){
+  return topic.lead || PART_I_LEAD[topic.title] || null;
+}
+
+function topicBridge(topic){
+  return topic.bridge || PART_I_BRIDGE[topic.title] || null;
+}
+
+function partPathHtml(topic){
+  if(topic.part !== PART_I) return "";
+  const siblings = partTopics(topic.part);
+  const idx = siblings.findIndex(t => t.title === topic.title);
+  if(idx < 0) return "";
+  const arc = topicArc(topic);
+  return `<div class="part-path" aria-label="Position in Part I">
+    <span class="arc">${escHtml(arc || "Part I")}</span>
+    <span class="sep">·</span>
+    <span class="pos">${idx + 1} of ${siblings.length}</span>
+  </div>`;
+}
+
+function partArcsHtml(topic){
+  if(topic.part !== PART_I) return "";
+  const current = topicArc(topic);
+  const siblings = partTopics(topic.part);
+  return `<nav class="part-arcs" aria-label="Part I arcs">${PART_I_ARC_ORDER.map(arc => {
+    const first = siblings.find(t => topicArc(t) === arc);
+    if(!first) return "";
+    const isCurrent = arc === current;
+    return `<button type="button" class="${isCurrent ? "current" : ""}" data-title="${escHtml(first.title)}" ${isCurrent ? "aria-current=\"true\"" : ""}>${escHtml(arc)}</button>`;
+  }).join("")}</nav>`;
+}
+
+function topicBridgeHtml(topic){
+  const text = topicBridge(topic);
+  if(!text) return "";
+  const {next} = topicNeighbors(topic);
+  const nextBit = next && next.part === topic.part
+    ? ` Next: <strong>${escHtml(next.title)}</strong>.`
+    : (next ? ` Continues in <strong>${escHtml(next.part)}</strong>.` : "");
+  return `<p class="topic-bridge">${escHtml(text)}${nextBit}</p>`;
+}
+
 function renderEquationFlow(flow){
   if(!flow || !flow.length) return "";
   return `<div class="eq-flow">${flow.map(sec => `
@@ -2463,6 +2677,7 @@ function renderEquationFlow(flow){
 
 function renderContent(topic){
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
+  const lead = topicLead(topic);
 
   const interactiveBlock =
     topic.interactive === "elementChooser" ? renderElementChooserWidget()
@@ -2477,7 +2692,7 @@ function renderContent(topic){
 
   const flowBlock = topic.flow ? renderEquationFlow(topic.flow) : "";
   const eqBlock = (!topic.flow && topic.equations && topic.equations.length)
-    ? `<h2>Field equations</h2>
+    ? `<p class="section-label">Field equations</p>
       <div class="eq-list">${topic.equations.map(eq => `
         <article class="eq-card">
           <h3>${escHtml(eq.name)}</h3>
@@ -2489,7 +2704,10 @@ function renderContent(topic){
   content.innerHTML = `
     <article class="card">
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
+      ${partPathHtml(topic)}
+      ${partArcsHtml(topic)}
       <h1>${escHtml(topic.title)}</h1>
+      ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
       <div class="prose">${prose}</div>
       ${flowBlock}
       ${eqBlock}
@@ -2497,6 +2715,7 @@ function renderContent(topic){
       ${illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
+      ${topicBridgeHtml(topic)}
       ${topicNavHtml(topic)}
     </article>
   `;
@@ -2508,6 +2727,10 @@ function renderContent(topic){
     active.classList.add('active');
     active.scrollIntoView({block:'nearest'});
   }
+
+  content.querySelectorAll('.part-arcs button[data-title]').forEach(btn => {
+    btn.addEventListener('click', () => selectTopic(btn.getAttribute('data-title')));
+  });
 
   const nav = content.querySelector('.topic-nav');
   if(nav){
