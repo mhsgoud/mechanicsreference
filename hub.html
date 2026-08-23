@@ -49,6 +49,8 @@
         { "@type": "ListItem", "position": 8, "name": "Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)" },
         { "@type": "ListItem", "position": 8, "name": "Extended & Generalized Finite Element Methods (XFEM/GFEM)" },
         { "@type": "ListItem", "position": 8, "name": "Discontinuous Galerkin Method" },
+        { "@type": "ListItem", "position": 8, "name": "Shell Elements" },
+        { "@type": "ListItem", "position": 8, "name": "Truss Elements" },
         { "@type": "ListItem", "position": 9, "name": "Shape Functions & Isoparametric Mapping" },
         { "@type": "ListItem", "position": 10, "name": "p-Version FEM & Lobatto Shape Functions" },
         { "@type": "ListItem", "position": 11, "name": "Numerical Integration & Gauss Quadrature" },
@@ -66,6 +68,7 @@
         { "@type": "ListItem", "position": 22, "name": "Contact and Friction" },
         { "@type": "ListItem", "position": 23, "name": "Fracture Mechanics" },
         { "@type": "ListItem", "position": 24, "name": "Linear Elastic Fracture Mechanics" },
+        { "@type": "ListItem", "position": 24, "name": "Mode I, II & Mixed-Mode Cracking" },
         { "@type": "ListItem", "position": 25, "name": "Cohesive Cracking" },
         { "@type": "ListItem", "position": 26, "name": "The J-Integral" },
         { "@type": "ListItem", "position": 27, "name": "Phase-Field Modelling of Fracture" },
@@ -588,6 +591,8 @@
         <li><a href="hub.html#virtual-element-method">Virtual Element Method</a></li>
         <li><a href="hub.html#extended-generalized-finite-element-methods-xfem-gfem">Extended &amp; Generalized Finite Element Methods (XFEM/GFEM)</a></li>
         <li><a href="hub.html#discontinuous-galerkin-method">Discontinuous Galerkin Method</a></li>
+        <li><a href="hub.html#shell-elements">Shell Elements</a></li>
+        <li><a href="hub.html#truss-elements">Truss Elements</a></li>
         <li><a href="hub.html#mesh-generation-embedded-unfitted-methods-fem-fcm">Mesh Generation &amp; Embedded/Unfitted Methods (FEM/FCM)</a></li>
         <li><a href="hub.html#shape-functions-isoparametric-mapping">Shape Functions &amp; Isoparametric Mapping</a></li>
         <li><a href="hub.html#p-version-fem-lobatto-shape-functions">p-Version FEM &amp; Lobatto Shape Functions</a></li>
@@ -607,6 +612,7 @@
         <li><a href="hub.html#contact-and-friction">Contact and Friction</a></li>
         <li><a href="hub.html#fracture-mechanics">Fracture Mechanics</a></li>
         <li><a href="hub.html#linear-elastic-fracture-mechanics">Linear Elastic Fracture Mechanics</a></li>
+        <li><a href="hub.html#mode-i-ii-mixed-mode-cracking">Mode I, II &amp; Mixed-Mode Cracking</a></li>
         <li><a href="hub.html#cohesive-cracking">Cohesive Cracking</a></li>
         <li><a href="hub.html#the-j-integral">The J-Integral</a></li>
         <li><a href="hub.html#phase-field-modelling-of-fracture">Phase-Field Modelling of Fracture</a></li>
@@ -1031,6 +1037,32 @@ const topics = [
     "The figures below are two neighbouring elements with independent traces and a jump, the SIPG interface terms on the shared face, and the contrast between a continuous node and duplicated DG unknowns."
   ], tags:["DG","discontinuous Galerkin","SIPG","NIPG","HDG","numerical flux","interior penalty","upwind","local conservation","nonconforming"], illustrations:"discontinuousGalerkin", sources:[{label:"Reed & Hill, Triangular mesh methods for the neutron transport equation, Los Alamos Report LA-UR-73-479 (1973)", href:"https://www.osti.gov/biblio/4491151"},{label:"Arnold, Brezzi, Cockburn & Marini, Unified analysis of discontinuous Galerkin methods for elliptic problems, SIAM J. Numer. Anal. 39 (2002)", href:"https://doi.org/10.1137/S0036142901384162"},{label:"Di Pietro & Ern, Mathematical Aspects of Discontinuous Galerkin Methods, Springer (2012)", href:"https://doi.org/10.1007/978-3-642-22980-0"}]},
 
+  {part:"Part II – Numerical Methods", title:"Shell Elements", equations:[
+    {name:"Reissner–Mindlin shear", expr:"γ = ∇w − θ", tex:"\\boldsymbol{\\gamma} = \\nabla w - \\boldsymbol{\\theta}", note:"Independent rotation θ of the director. Transverse shear is first-order; the thin limit γ → 0 is a constraint on the discrete space, not automatic."},
+    {name:"Kirchhoff–Love", expr:"θ = ∇w,   γ = 0", tex:"\\boldsymbol{\\theta} = \\nabla w,\\quad \\boldsymbol{\\gamma} = \\mathbf{0}", note:"Normals remain normal. Curvature involves second derivatives of w, so C¹ continuity (or a discrete Kirchhoff construction) is required. Classical thin-plate theory is the flat special case."},
+    {name:"Resultant constitutive law", expr:"{N; M} = [A, B; B, D] {ε₀; κ}", tex:"\\begin{Bmatrix} \\mathbf{N} \\\\ \\mathbf{M} \\end{Bmatrix} = \\begin{bmatrix} \\mathbf{A} & \\mathbf{B} \\\\ \\mathbf{B} & \\mathbf{D} \\end{bmatrix}\\begin{Bmatrix} \\boldsymbol{\\varepsilon}_0 \\\\ \\boldsymbol{\\kappa} \\end{Bmatrix}", note:"Membrane forces N and moments M from mid-surface strain and curvature. For a laminate, A, B, D come from classical lamination theory; B = 0 for a symmetric stack."},
+    {name:"Shear energy (thin limit)", expr:"(1/2) ∫ G t γ · γ dA → 0 as t/L → 0", tex:"\\tfrac{1}{2}\\int G t\\,\\boldsymbol{\\gamma}\\cdot\\boldsymbol{\\gamma}\\,\\mathrm{d}A \\to 0 \\quad\\text{as}\\quad t/L \\to 0", note:"If the discrete γ cannot vanish in pure bending, this term dominates and the element locks. Assumed-strain / MITC interpolations of γ are the standard cure."}
+  ], bullets:[
+    "A shell element discretises a thin three-dimensional body on its mid-surface. Through-thickness kinematics are reduced to a director: the displacement of a material point is the mid-surface motion plus a rotation (and stretch, in some continuum shells) of that director. Five or six nodal degrees of freedom are typical — three translations and two or three rotations — instead of a stack of solid elements through the thickness.",
+    "Two continuum theories dominate the element catalogue. Kirchhoff–Love (thin) shells enforce zero transverse shear and need C¹ continuity or a discrete Kirchhoff constraint. Reissner–Mindlin (thick / shear-deformable) shells keep independent rotations and C⁰ continuity, which is far easier to implement — and far more prone to shear locking as the thickness-to-span ratio falls. Membrane locking is the curved-shell cousin: parasitic membrane strain in pure bending stiffens the response the same way.",
+    "Practical C⁰ shells therefore never leave γ to the raw displacement derivatives alone. MITC (mixed interpolation of tensorial components), assumed natural strain (ANS), and enhanced assumed strain (EAS) replace or enrich the shear (and sometimes membrane) strains so that the thin limit is attainable. Flat facet shells assemble plate bending with a membrane triangle or quad; curved continuum shells carry geometry in the isoparametric map and must resolve both locking modes.",
+    "Solid-shell and continuum-shell formulations keep a 3-D constitutive law with one or a few elements through the thickness and special kinematics to avoid locking — useful for composites, contact, and large strain. For laminated plates the mid-surface resultants are exactly the ABD relation of classical lamination theory; interlaminar stress still needs a 3-D or layerwise model.",
+    "The element chooser flags bending-dominated shells for Mindlin/Reissner families with a proper shear treatment. The figures below are the mid-surface director, Kirchhoff versus Mindlin kinematics, and the shear-energy trap that produces locking."
+  ], tags:["shells","plates","Kirchhoff","Mindlin","Reissner","MITC","ANS","EAS","shear locking","membrane locking","ABD","composites"], illustrations:"shellElements", sources:[{label:"Chapelle & Bathe, The Finite Element Analysis of Shells — Fundamentals, Springer (2011)", href:"https://doi.org/10.1007/978-3-642-16408-8"},{label:"Bathe & Dvorkin, A four-node plate bending element based on Mindlin/Reissner plate theory and a mixed interpolation, Int. J. Numer. Methods Eng. 21 (1985)", href:"https://doi.org/10.1002/nme.1620210310"},{label:"Belytschko, Liu, Moran & Elkhodary, Nonlinear Finite Elements for Continua and Structures, Wiley (2014)", href:"https://www.wiley.com/en-us/Nonlinear+Finite+Elements+for+Continua+and+Structures%2C+2nd+Edition-p-9781118632703"}]},
+
+  {part:"Part II – Numerical Methods", title:"Truss Elements", equations:[
+    {name:"Engineering axial strain", expr:"ε = (ℓ − ℓ₀) / ℓ₀", tex:"\\varepsilon = \\dfrac{\\ell - \\ell_0}{\\ell_0}", note:"Change of length over the reference length. Small-strain linear trusses linearise ℓ about ℓ₀; finite-strain trusses keep the stretch λ = ℓ/ℓ₀ and a work-conjugate stress."},
+    {name:"Axial force", expr:"N = EA ε", tex:"N = EA\\,\\varepsilon", note:"Linear elastic bar. Only the axial resultant exists: no shear, no bending moment. Plasticity and cables replace EA ε by a uniaxial constitutive map N(ε) or N(λ)."},
+    {name:"Local stiffness (2-node)", expr:"k_loc = (EA/ℓ₀) [1, −1; −1, 1]", tex:"\\mathbf{k}_{\\mathrm{loc}} = \\dfrac{EA}{\\ell_0}\\begin{bmatrix} 1 & -1 \\\\ -1 & 1 \\end{bmatrix}", note:"In the bar axis. Transform by the direction cosines (c, s) to global components: the classic 4×4 (2-D) or 6×6 (3-D) truss matrix is Tᵀ k_loc T."},
+    {name:"Geometric stiffness", expr:"k_G ∼ (N/ℓ) [s², −cs; −cs, c²]", tex:"\\mathbf{k}_G \\sim \\dfrac{N}{\\ell}\\begin{bmatrix} s^2 & -cs \\\\ -cs & c^2 \\end{bmatrix}", note:"From the change of direction of the axial force under a lateral perturbation. Tension stiffens transverse motion; compression softens it and supplies the truss-bar route to Euler buckling of a pin-jointed frame."}
+  ], bullets:[
+    "A truss (or bar) element is the simplest continuum reduction in FEM: a straight member that carries only axial force between two pin joints. Nodal unknowns are translations; there are no rotational degrees of freedom and no bending stiffness. Assemblies of such bars model pin-jointed frames, bracing, space structures, and — with a unilateral constitutive law — cables.",
+    "In the linear small-displacement setting the element matrix is EA/ℓ₀ in the local axis, rotated into global coordinates by the direction cosines of the bar. Constant strain along the member is exact for a prismatic linear-elastic bar under end loads; higher-order truss shape functions are rarely needed unless the section or the material varies along the length.",
+    "Geometrically nonlinear trusses update the current length and orientation each iteration. The material stiffness from EA (or from a uniaxial hyperelastic/plastic law) is joined by a geometric stiffness that accounts for the rotation of the axial force — the same term that appears in the introductory large-displacement truss example under Continuum Mechanics. A cable is the tension-only special case: N = 0 whenever the bar would go slack.",
+    "Trusses are not beams. A beam (Euler–Bernoulli or Timoshenko) adds bending and, usually, shear; connecting beams with moment continuity is a different joint model from a pin. Embedded fibre models in a solid mesh are kin to trusses kinematically (axial strain along a line) but couple to the continuum through slip or perfect bond rather than through shared pin nodes alone.",
+    "The figures below are a two-node bar with axial force only, the local-to-global transformation by direction cosines, and tension versus compression geometric stiffness."
+  ], tags:["truss","bar","cable","axial","pin-jointed","geometric stiffness","EA/L","large displacement"], illustrations:"trussElements", sources:[{label:"Bathe, Finite Element Procedures, Prentice-Hall (1996)", href:"https://www.worldcat.org/title/finite-element-procedures/oclc/32893840"},{label:"Crisfield, Non-linear Finite Element Analysis of Solids and Structures, Vol. 1, Wiley (1991)", href:"https://www.wiley.com/en-us/Non+linear+Finite+Element+Analysis+of+Solids+and+Structures%2C+Volume+1%3A+Essentials-p-9780471929420"},{label:"Belytschko, Liu, Moran & Elkhodary, Nonlinear Finite Elements for Continua and Structures, Wiley (2014)", href:"https://www.wiley.com/en-us/Nonlinear+Finite+Elements+for+Continua+and+Structures%2C+2nd+Edition-p-9781118632703"}]},
+
   // NEW: Mesh generation + fitted/embedded + finite cell
   {part:"Part II – Numerical Methods", title:"Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)", bullets:[
     "A body-fitted mesh is still the ordinary route: clean the CAD, set a sizing field, mesh the surface, fill the volume, then improve quality. Delaunay, advancing-front, octree, and hex-dominant algorithms trade robustness against element quality.",
@@ -1086,7 +1118,7 @@ const topics = [
   {part:"Part II – Numerical Methods", title:"Mixed Methods and Locking", bullets:[
     "A displacement-only interpolation of an incompressible, or nearly incompressible, solid cannot represent ∇ · u = 0 without locking: the only fields that satisfy the constraint are too poor to represent bending or even uniform compression. The same happens in thin plates with a shear-deformable kinematic, and in Stokes flow.",
     "The remedy is a mixed method. Displacement and pressure are interpolated independently, and the constraint ∇ · u = 0 (or a nearly incompressible volumetric law) is enforced weakly. Inf-sup stable pairs — Taylor–Hood, Q2–P1, Q1–P0 with stabilisation — are the catalogue.",
-    "Reduced integration of the volumetric term is a cheaper cousin, and it can introduce hourglass modes that must then be controlled. Locking is a property of the discrete space, not of the mesh size alone. Refining a locking element refines a wrong constraint."
+    "Reduced integration of the volumetric term is a cheaper cousin, and it can introduce hourglass modes that must then be controlled. Locking is a property of the discrete space, not of the mesh size alone. Refining a locking element refines a wrong constraint. Thin shells add a parallel story — shear and membrane locking — treated under Shell Elements."
   ], tags:["locking","mixed","inf-sup","incompressible","hourglass"]},
 
   // Part III – Advanced FEM Concepts
@@ -1144,7 +1176,7 @@ const topics = [
     "Griffith’s argument is energetic. Advance of the crack by an area dA releases potential energy G = −dΠ/dA. In LEFM, Irwin’s relation G = K_I² / E′ identifies G with K (E′ = E in plane stress, E/(1−ν²) in plane strain). Fracture occurs when G reaches a material toughness Gc, or equivalently when K reaches Kc. The J-integral is the same G for a nonlinear elastic solid.",
     "The 1/√r singularity is a consequence of linear elasticity at a sharp notch, not a physical infinite stress. Real materials yield, damage, or open cohesively in a process zone. LEFM remains valid under small-scale yielding: that zone is small compared with the crack length and the remaining ligament. When it is not, the characterizing parameter is J, a cohesive law, or a continuum damage length.",
     "Numerically the crack may be fitted to the mesh (and remeshed as it grows), enriched so that the jump lives inside the approximation (XFEM, GFEM, or an enriched mesh-free method), or smeared as a phase-field or damage band whose width is a material length. Each choice changes what the mesh must resolve.",
-    "The next entries are the singular field, the cohesive process zone, the contour integral that extracts G, the phase-field regularization that turns a sharp surface into a diffuse band, and—under Numerical Methods—the extended/generalized FEM that embeds the jump and tip asymptotics without remeshing."
+    "The next entries are the singular field, Mode I / II / mixed-mode cracking and kink criteria, the cohesive process zone, the contour integral that extracts G, the phase-field regularization that turns a sharp surface into a diffuse band, and—under Numerical Methods—the extended/generalized FEM that embeds the jump and tip asymptotics without remeshing."
   ], tags:["fracture","LEFM","SIF","Griffith","Williams","singularity","cohesive","XFEM","phase-field"], illustrations:"fractureOverview"},
   {part:"Part IV – Applications in Engineering", title:"Linear Elastic Fracture Mechanics", equations:[
     {name:"Williams field", expr:"σ_ij = K / √(2π r) · f_ij(θ)", tex:"\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)", note:"Leading term at a sharp crack in a linear elastic solid. The angular functions f depend on the mode. Stress is unbounded as r → 0; energy release is finite."},
@@ -1156,8 +1188,20 @@ const topics = [
     "Mode I is opening: σ_yy on the ligament is K_I / √(2π r). Mode II is in-plane shear; mode III is antiplane tearing. A mixed-mode tip kinks; the direction of maximum hoop stress, written in terms of K_I and K_II, is the usual criterion for the next increment of a brittle crack. Those intensities are extracted from a contour or domain integral — J itself, or an interaction integral that isolates each mode.",
     "Griffith required that the energy released by an increment of crack area pay the surface energy. Irwin identified that release rate with K²/E′. Toughness is then a critical Kc or a critical Gc. The J-integral evaluates the same G from a contour that need not sit in the singular zone.",
     "The unbounded stress is an artefact of the linear model. Cut it off with a yield stress and a plastic zone appears; cut it off with a tensile strength and a cohesive zone appears. If that zone is small, the outer K-field is unchanged and LEFM still sets the load at fracture. If it is not, the next entry is the right model.",
-    "The figure is a plate with an edge crack. Switch mode I and mode II. The colour is the Williams stress; the log–log plot of ligament stress has slope −1/2."
-  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding"], scenes:["lefm","lefmCenterCrack"], illustrations:"lefm"},
+    "The interactive figure is a plate with an edge crack: switch mode I and mode II to see the Williams stress. Mode definitions, mixity, kink angle, and mixed-mode failure envelopes are expanded in the next entry."
+  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding","mode I","mode II","mixed-mode"], scenes:["lefm","lefmCenterCrack"], illustrations:"lefm"},
+  {part:"Part IV – Applications in Engineering", title:"Mode I, II & Mixed-Mode Cracking", equations:[
+    {name:"Mode I opening", expr:"σ_θθ(θ=0) = K_I / √(2π r)", tex:"\\sigma_{\\theta\\theta}(\\theta=0) = \\dfrac{K_I}{\\sqrt{2\\pi r}}", note:"Symmetric opening of the faces. Remote tension normal to the crack is the archetype. Propagation under pure mode I continues in the crack plane for an isotropic brittle solid."},
+    {name:"Mode mixity", expr:"ψ = arctan(K_II / K_I)", tex:"\\psi = \\arctan(K_{II}/K_I)", note:"Phase angle of the in-plane tip field. ψ = 0 is pure mode I; |ψ| → 90° is pure mode II. Interface cracks need a length scale in the definition of ψ because of the oscillatory singularity."},
+    {name:"Mixed-mode energy release", expr:"G = (K_I² + K_II²)/E′ + K_III²/(2μ)", tex:"G = \\dfrac{K_I^2 + K_{II}^2}{E'} + \\dfrac{K_{III}^2}{2\\mu}", note:"Irwin’s identity for an isotropic linear solid. Fracture when G reaches Gc, or when a mode-weighted envelope in (K_I, K_II) space is crossed — Gc alone does not fix the kink direction."},
+    {name:"Maximum hoop-stress kink", expr:"θ_c = 2 arctan[(K_I − √(K_I² + 8 K_II²))/(4 K_II)]", tex:"\\theta_c = 2\\arctan\\!\\left[\\dfrac{K_I - \\sqrt{K_I^2 + 8 K_{II}^2}}{4 K_{II}}\\right]", note:"Erdogan–Sih: the crack turns toward the direction of maximum σ_θθ. Pure mode I gives θ_c = 0; pure mode II gives θ_c ≈ ±70.5°. Equivalent to K_I sin θ_c + K_II (3 cos θ_c − 1) = 0."}
+  ], bullets:[
+    "Mode I opens the crack faces symmetrically. Mode II slides them in the plane of the body: one face forward, the other back. Mode III tears them out of plane (antiplane shear). Each mode has its own Williams angular field and its own intensity K_I, K_II, or K_III. Remote tension normal to an edge crack is nearly pure mode I; remote in-plane shear, or a kinked or inclined crack under tension, produces mode II or a mixture.",
+    "Most engineering cracks are mixed-mode: K_I and K_II are both nonzero. The energy release rate still collapses to a single G through Irwin’s sum of squares, but the crack path does not stay in plane. The usual brittle criterion is maximum circumferential (hoop) stress: the next increment follows the angle θ_c at which σ_θθ is largest in the Williams field. That is Erdogan–Sih; it recovers coplanar growth in pure mode I and a kink of about 70° in pure mode II.",
+    "Initiation is not path alone. A toughness surface in (K_I, K_II) — often an ellipse (K_I/K_Ic)² + (K_II/K_IIc)² = 1, or a critical equivalent intensity built from G — decides whether the tip advances. K_Ic from a mode-I test is not K_IIc; shear toughness is typically higher. Interface fracture adds a mixity-dependent Gc(ψ) because the process zone on a bimaterial interface sees both opening and sliding.",
+    "Numerically, interaction (M-)integrals extract K_I and K_II separately from the same mesh that computes J. Propagation then updates the tip with θ_c (or a maximum energy-release-rate competitor) and remeshes, enriches (XFEM), or advances a cohesive segment. Pure mode-II growth is subtle: contact and friction on the faces can shield the tip, so a frictionless LEFM prediction overestimates the driving force.",
+    "The figures below are opening versus sliding kinematics, the mixed-mode kink under combined K_I and K_II, and a schematic toughness envelope in the (K_I, K_II) plane."
+  ], tags:["mode I","mode II","mode III","mixed-mode","kink","Erdogan-Sih","mixity","stress intensity","LEFM","toughness envelope"], illustrations:"mixedModeCrack", sources:[{label:"Erdogan & Sih, On the crack extension in plates under plane loading and transverse shear, J. Basic Eng. 85 (1963)", href:"https://doi.org/10.1115/1.3656897"},{label:"Anderson, Fracture Mechanics: Fundamentals and Applications, CRC Press (2017)", href:"https://www.routledge.com/Fracture-Mechanics-Fundamentals-and-Applications/Anderson/p/book/9781498728133"}]},
   {part:"Part IV – Applications in Engineering", title:"Cohesive Cracking", equations:[
     {name:"Traction–separation", expr:"t = t(δ),   G_f = ∫_0^{w_c} t dδ", tex:"t = t(\\delta),\\quad G_f = \\displaystyle\\int_0^{w_c} t\\,\\mathrm{d}\\delta", note:"The area under the law is the fracture energy. Linear, bilinear, and exponential shapes are the usual choices. The tensile strength ft is the peak traction."},
     {name:"Hillerborg length", expr:"ℓ_ch = E G_f / f_t²", tex:"\\ell_{\\mathrm{ch}} = \\dfrac{E G_f}{f_t^2}", note:"Characteristic size of the process zone. LEFM is recovered when ℓ_ch is small compared with the crack and the specimen."},
@@ -1828,6 +1872,66 @@ function renderTopicIllustrations(topic){
   </div>
 </section>`;
   }
+  if(topic.illustrations === 'mixedModeCrack'){
+    return `
+<section class="figure-section" aria-label="Mode I, II and mixed-mode cracking">
+  <h2>Opening, sliding, and kink</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="ink ink-thick" x1="24" y1="50" x2="100" y2="50"/>
+        <path class="ink" d="M 100 50 L 100 28"/>
+        <path class="ink" d="M 100 50 L 100 72"/>
+        <polygon points="100,28 96,38 104,38" fill="currentColor"/>
+        <polygon points="100,72 96,62 104,62" fill="currentColor"/>
+        <text x="40" y="44">I</text>
+        <line class="ink ink-thick" x1="140" y1="50" x2="230" y2="50"/>
+        <path class="ink" d="M 185 50 L 210 50"/>
+        <polygon points="210,50 200,46 200,54" fill="currentColor"/>
+        <path class="ink" d="M 185 50 L 160 50"/>
+        <polygon points="160,50 170,46 170,54" fill="currentColor"/>
+        <text x="155" y="44">II</text>
+        <line class="ink ink-thick" x1="24" y1="120" x2="100" y2="120"/>
+        <path class="ink" d="M 70 120 L 70 105"/>
+        <polygon points="70,105 66,113 74,113" fill="currentColor"/>
+        <path class="ink" d="M 70 120 L 70 135"/>
+        <polygon points="70,135 66,127 74,127" fill="currentColor"/>
+        <text x="40" y="114">III</text>
+        <text x="120" y="128">out of plane</text>
+      </svg>
+      <figcaption><strong>Three modes.</strong> I opens the faces; II slides them in plane; III tears them antiplane. Each has its own K and Williams angular field. Engineering cracks are often I–II mixtures.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="ink ink-thick" x1="36" y1="100" x2="140" y2="100"/>
+        <line class="ink ink-thick" x1="140" y1="100" x2="210" y2="55"/>
+        <circle cx="140" cy="100" r="4" fill="currentColor"/>
+        <path class="muted-line" d="M 170 100 A 30 30 0 0 0 158 78" fill="none"/>
+        <text x="172" y="88">θ<sub>c</sub></text>
+        <text x="48" y="92">crack</text>
+        <text x="150" y="140">max σ<sub>θθ</sub> kink</text>
+      </svg>
+      <figcaption><strong>Mixed-mode path.</strong> Under combined K<sub>I</sub> and K<sub>II</sub> the tip does not stay in plane. Erdogan–Sih sends the next increment along the maximum hoop-stress direction θ<sub>c</sub>(K<sub>I</sub>, K<sub>II</sub>) — about ±70° in pure mode II.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="muted-line" x1="40" y1="130" x2="220" y2="130"/>
+        <line class="muted-line" x1="40" y1="130" x2="40" y2="30"/>
+        <path class="ink" d="M 40 130 Q 40 50 180 50" fill="none"/>
+        <text x="222" y="134">K<sub>I</sub></text>
+        <text x="8" y="40">K<sub>II</sub></text>
+        <text x="100" y="90">safe</text>
+        <text x="150" y="44">fracture</text>
+        <circle cx="40" cy="50" r="3" fill="currentColor"/>
+        <circle cx="180" cy="130" r="3" fill="currentColor"/>
+        <text x="48" y="48">K<sub>IIc</sub></text>
+        <text x="168" y="148">K<sub>Ic</sub></text>
+      </svg>
+      <figcaption><strong>Toughness envelope.</strong> Initiation when the tip state (K<sub>I</sub>, K<sub>II</sub>) crosses a material curve — often an ellipse with different K<sub>Ic</sub> and K<sub>IIc</sub>. Energy release G alone does not fix the kink angle.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
   if(topic.illustrations === 'cohesive'){
     return `
 <section class="figure-section" aria-label="Cohesive process zone">
@@ -2425,6 +2529,103 @@ function renderTopicIllustrations(topic){
         <text x="150" y="140">DG pair at a vertex</text>
       </svg>
       <figcaption><strong>DOF count.</strong> Continuous Galerkin shares one unknown per vertex. DG duplicates unknowns on each element that meets the vertex — more degrees of freedom, but a block-local mass matrix and no continuity constraint to assemble.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
+  if(topic.illustrations === 'shellElements'){
+    return `
+<section class="figure-section" aria-label="Shell elements">
+  <h2>Mid-surface kinematics</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="ink" d="M 36 100 Q 100 40 160 70 Q 210 90 230 55" fill="none" stroke-width="1.8"/>
+        <line class="ink ink-thick" x1="160" y1="70" x2="175" y2="28"/>
+        <polygon points="175,28 168,36 178,38" fill="currentColor"/>
+        <line class="muted-line" x1="160" y1="70" x2="160" y2="118"/>
+        <text x="180" y="40">director</text>
+        <text x="70" y="130">mid-surface</text>
+        <text x="168" y="112">t/2</text>
+      </svg>
+      <figcaption><strong>Reduced kinematics.</strong> The 3-D body is represented by its mid-surface plus a director through the thickness. Nodal unknowns are mid-surface translations and director rotations — not a full solid mesh through t.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="muted-line" x1="40" y1="100" x2="120" y2="100"/>
+        <line class="ink ink-thick" x1="80" y1="100" x2="80" y2="48"/>
+        <text x="48" y="44">Kirchhoff</text>
+        <text x="52" y="128">θ = ∇w</text>
+        <line class="muted-line" x1="150" y1="100" x2="230" y2="100"/>
+        <line class="ink ink-thick" x1="190" y1="100" x2="210" y2="48"/>
+        <line class="muted-line" x1="190" y1="100" x2="190" y2="48" stroke-dasharray="3 3"/>
+        <text x="158" y="44">Mindlin</text>
+        <text x="155" y="128">γ = ∇w − θ</text>
+      </svg>
+      <figcaption><strong>Two theories.</strong> Kirchhoff keeps the director normal to the mid-surface (γ = 0). Mindlin/Reissner allows an independent rotation, so transverse shear appears and C⁰ elements become possible.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="muted-line" x1="36" y1="120" x2="220" y2="120"/>
+        <line class="muted-line" x1="36" y1="120" x2="36" y2="28"/>
+        <path class="ink" d="M 44 110 L 90 40 L 200 40" fill="none"/>
+        <text x="222" y="124">t/L → 0</text>
+        <text x="8" y="40">K</text>
+        <text x="100" y="36">lock</text>
+        <text x="140" y="70">MITC / ANS</text>
+        <path class="muted-line" d="M 44 110 Q 120 100 200 88" fill="none"/>
+      </svg>
+      <figcaption><strong>Shear locking.</strong> As the plate thins, a naive Mindlin element cannot represent γ = 0 in bending, so shear energy dominates and the stiffness explodes. Assumed-strain (MITC, ANS) interpolations restore the thin limit.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
+  if(topic.illustrations === 'trussElements'){
+    return `
+<section class="figure-section" aria-label="Truss elements">
+  <h2>Axial members only</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="48" cy="110" r="8" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="212" cy="50" r="8" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+        <line class="ink ink-thick" x1="56" y1="107" x2="204" y2="53"/>
+        <path class="ink" d="M 100 90 L 130 78" fill="none"/>
+        <polygon points="130,78 120,74 122,84" fill="currentColor"/>
+        <text x="42" y="132">1</text>
+        <text x="208" y="40">2</text>
+        <text x="120" y="100">N</text>
+        <text x="90" y="148">pins · axial only</text>
+      </svg>
+      <figcaption><strong>Two-node truss.</strong> Translations at the pins; no rotational DOFs. The member carries a single axial resultant N. Moments and shear are identically zero by kinematics.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="muted-line" x1="40" y1="120" x2="220" y2="120"/>
+        <line class="muted-line" x1="40" y1="120" x2="40" y2="30"/>
+        <line class="ink ink-thick" x1="40" y1="120" x2="180" y2="50"/>
+        <text x="100" y="78">ℓ</text>
+        <text x="150" y="118">c = cos α</text>
+        <text x="150" y="138">s = sin α</text>
+        <text x="48" y="48">α</text>
+        <path class="muted-line" d="M 70 120 A 30 30 0 0 1 58 95" fill="none"/>
+      </svg>
+      <figcaption><strong>Local to global.</strong> Assemble EA/ℓ₀ along the bar, then rotate with the direction cosines. In 2-D each node has (u, v); in 3-D, (u, v, w). The angle updates every Newton step in a large-displacement analysis.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="ink ink-thick" x1="50" y1="80" x2="120" y2="80"/>
+        <line class="muted-line" x1="120" y1="80" x2="120" y2="40" stroke-dasharray="3 3"/>
+        <path class="ink" d="M 120 80 Q 145 55 120 40" fill="none"/>
+        <text x="40" y="100">N &gt; 0</text>
+        <text x="128" y="36">stiffens</text>
+        <line class="ink ink-thick" x1="160" y1="80" x2="230" y2="80"/>
+        <line class="muted-line" x1="230" y1="80" x2="230" y2="120" stroke-dasharray="3 3"/>
+        <path class="ink" d="M 230 80 Q 250 100 230 120" fill="none"/>
+        <text x="150" y="100">N &lt; 0</text>
+        <text x="200" y="140">softens</text>
+      </svg>
+      <figcaption><strong>Geometric stiffness.</strong> A tensed bar resists sideways motion; a compressed bar loses transverse stiffness and can buckle. That k<sub>G</sub> term is why a nonlinear truss needs more than the material EA matrix.</figcaption>
     </figure>
   </div>
 </section>`;
@@ -3173,6 +3374,8 @@ window.addEventListener('keydown', (e)=>{
     ok('constrained fem topic', topics.some(t => t.title === 'Constrained FEM' && t.illustrations === 'constrainedFem' && (t.equations||[]).length >= 3));
     ok('xfem gfem topic', topics.some(t => t.title === 'Extended & Generalized Finite Element Methods (XFEM/GFEM)' && t.illustrations === 'xfemGfem' && (t.equations||[]).length >= 3));
     ok('discontinuous galerkin topic', topics.some(t => t.title === 'Discontinuous Galerkin Method' && t.illustrations === 'discontinuousGalerkin' && (t.equations||[]).length >= 3));
+    ok('shell elements topic', topics.some(t => t.title === 'Shell Elements' && t.illustrations === 'shellElements' && (t.equations||[]).length >= 3));
+    ok('truss elements topic', topics.some(t => t.title === 'Truss Elements' && t.illustrations === 'trussElements' && (t.equations||[]).length >= 3));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('beamContact')));
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
@@ -3181,6 +3384,7 @@ window.addEventListener('keydown', (e)=>{
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));
     ok('lefm topic', topics.some(t => t.title === 'Linear Elastic Fracture Mechanics' && Array.isArray(t.scenes) && t.scenes.includes('lefm') && t.scenes.includes('lefmCenterCrack')));
+    ok('mixed-mode cracking topic', topics.some(t => t.title === 'Mode I, II & Mixed-Mode Cracking' && t.illustrations === 'mixedModeCrack' && (t.equations||[]).length >= 3));
     ok('cohesive cracking topic', topics.some(t => t.title === 'Cohesive Cracking' && Array.isArray(t.scenes) && t.scenes.includes('cohesiveCrack') && t.scenes.includes('dcbCohesive')));
     ok('j-integral topic', topics.some(t => t.title === 'The J-Integral' && t.scene === 'jIntegral'));
     ok('phase-field fracture topic', topics.some(t => t.title === 'Phase-Field Modelling of Fracture' && t.scene === 'phaseFieldFracture' && (t.equations||[]).length >= 3));
