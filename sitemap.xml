@@ -181,6 +181,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mechanicsreference.com/fiber-pullout.html</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mechanicsreference.com/consolidation.html</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>monthly</changefreq>
@@ -206,6 +212,18 @@
   </url>
   <url>
     <loc>https://mechanicsreference.com/hub.html#constrained-fem</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mechanicsreference.com/hub.html#extended-generalized-finite-element-methods-xfem-gfem</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mechanicsreference.com/hub.html#discontinuous-galerkin-method</loc>
     <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

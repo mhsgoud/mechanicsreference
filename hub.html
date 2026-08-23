@@ -47,6 +47,8 @@
         { "@type": "ListItem", "position": 6, "name": "Variational Principles" },
         { "@type": "ListItem", "position": 7, "name": "Element Types & Families (Chooser)" },
         { "@type": "ListItem", "position": 8, "name": "Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)" },
+        { "@type": "ListItem", "position": 8, "name": "Extended & Generalized Finite Element Methods (XFEM/GFEM)" },
+        { "@type": "ListItem", "position": 8, "name": "Discontinuous Galerkin Method" },
         { "@type": "ListItem", "position": 9, "name": "Shape Functions & Isoparametric Mapping" },
         { "@type": "ListItem", "position": 10, "name": "p-Version FEM & Lobatto Shape Functions" },
         { "@type": "ListItem", "position": 11, "name": "Numerical Integration & Gauss Quadrature" },
@@ -584,6 +586,8 @@
         <li><a href="hub.html#variational-principles">Variational Principles</a></li>
         <li><a href="hub.html#element-types-families-chooser">Element Types &amp; Families (Chooser)</a></li>
         <li><a href="hub.html#virtual-element-method">Virtual Element Method</a></li>
+        <li><a href="hub.html#extended-generalized-finite-element-methods-xfem-gfem">Extended &amp; Generalized Finite Element Methods (XFEM/GFEM)</a></li>
+        <li><a href="hub.html#discontinuous-galerkin-method">Discontinuous Galerkin Method</a></li>
         <li><a href="hub.html#mesh-generation-embedded-unfitted-methods-fem-fcm">Mesh Generation &amp; Embedded/Unfitted Methods (FEM/FCM)</a></li>
         <li><a href="hub.html#shape-functions-isoparametric-mapping">Shape Functions &amp; Isoparametric Mapping</a></li>
         <li><a href="hub.html#p-version-fem-lobatto-shape-functions">p-Version FEM &amp; Lobatto Shape Functions</a></li>
@@ -1001,6 +1005,32 @@ const topics = [
     "The payoff is mesh flexibility: complex CAD, fractured domains, and adaptive remeshing can stay on a single polyhedral mesh instead of being forced into triangles and hexahedra. The cost is paid in formulation detail—choosing the projector, scaling the stabilisation, and treating nonlinear constitutive laws through projected strains—rather than in mesh generation. For complex geometry the element chooser lists VEM alongside CutFEM and the finite cell method as a fitted polygonal alternative to unfitted background grids."
   ], tags:["VEM","virtual elements","polygonal","polyhedral","projection","stabilisation","Galerkin","mesh flexibility"], sources:[{label:"Beirão da Veiga, Brezzi, Cangiani, Manzini, Marini & Russo, Basic principles of Virtual Element Methods, Math. Models Methods Appl. Sci. 23 (2013)", href:"https://doi.org/10.1142/S0218202512500492"}]},
 
+  {part:"Part II – Numerical Methods", title:"Extended & Generalized Finite Element Methods (XFEM/GFEM)", equations:[
+    {name:"Partition-of-unity enrichment", expr:"uʰ = Σ_I N_I a_I + Σ_J N_J ψ b_J", tex:"\\mathbf{u}^h = \\sum_I N_I\\,\\mathbf{a}_I + \\sum_J N_J\\,\\psi\\,\\mathbf{b}_J", note:"Standard FEM plus enrichment. The nodal partition of unity N_J multiplies a known function ψ that already carries the jump or the singularity; b_J are extra degrees of freedom on selected nodes."},
+    {name:"Heaviside (strong discontinuity)", expr:"ψ = H(φ) = {1 if φ ≥ 0;  0 if φ < 0}", tex:"\\psi = H(\\phi) = \\begin{cases} 1 & \\phi \\ge 0 \\\\ 0 & \\phi < 0 \\end{cases}", note:"φ is a level-set (usually signed distance to the crack or interface). Enriching with H lets the displacement jump inside an element without aligning the mesh to the surface."},
+    {name:"Crack-tip asymptotics", expr:"ψ_α ∈ {√r sin(θ/2), √r cos(θ/2), …}", tex:"\\psi_\\alpha \\in \\bigl\\{\\sqrt{r}\\sin(\\theta/2),\\;\\sqrt{r}\\cos(\\theta/2),\\;\\ldots\\bigr\\}", note:"Williams leading terms in polar coordinates at the tip. Four (plane) asymptotic functions are the classical LEFM tip enrichment; they restore the 1/√r stress field on a coarse mesh."},
+    {name:"Shifted enrichment", expr:"ψ̃(x) = ψ(x) − ψ(x_J)", tex:"\\tilde{\\psi}(\\mathbf{x}) = \\psi(\\mathbf{x}) - \\psi(\\mathbf{x}_J)", note:"Subtracting the nodal value of ψ restores the Kronecker-δ property of the standard DOFs: a_I remains the nodal displacement. Without the shift, Dirichlet data mix a and b."}
+  ], bullets:[
+    "Extended and generalized FEM are the same partition-of-unity idea under two names. Start from a standard C⁰ mesh. Wherever the solution has a known feature—a jump across a crack or material interface, or a tip singularity—multiply selected shape functions by an enrichment ψ and add the corresponding enriched degrees of freedom. The mesh need not fit the feature; the approximation does.",
+    "GFEM (Melenk–Babuška) emphasises the abstract construction: any local function space can be glued by a partition of unity. XFEM (Belytschko and co-workers) is the fracture and interface specialisation: a Heaviside enrichment for the open crack faces, asymptotic tip enrichments for the Williams field, and a level-set (or explicit front) to track geometry as the crack grows. Material interfaces use a ridge or absolute-value enrichment of the signed distance instead of H.",
+    "Only nodes whose support meets the discontinuity or the tip are enriched. Elements cut by the crack need special quadrature—sub-triangulation or equivalent—so that the jump is integrated accurately on each side. Blending elements, which see some but not all enriched neighbours, can degrade convergence unless the enrichment is corrected (shifted, corrected XFEM, or topological enrichment rules).",
+    "Compared with remeshing, the topology of the crack never appears in the connectivity: propagation updates φ and the enrichment set. Compared with phase-field, the discontinuity stays sharp and the tip field can be built in. The price is bookkeeping—level sets, cut-cell integration, enrichment transitions—and conditioning when tip functions are poorly scaled. Cohesive XFEM replaces the traction-free faces by a traction–separation law on the enriched jump.",
+    "The figures below are a crack cutting a fixed mesh with enriched nodes marked, the Heaviside jump across an interface, and the tip enrichment cloud that carries the asymptotic LEFM modes."
+  ], tags:["XFEM","GFEM","enrichment","partition of unity","Heaviside","level set","crack tip","blending","CutFEM"], illustrations:"xfemGfem", sources:[{label:"Melenk & Babuška, The partition of unity finite element method, Comput. Methods Appl. Mech. Eng. 139 (1996)", href:"https://doi.org/10.1016/S0045-7825(96)01087-0"},{label:"Moës, Dolbow & Belytschko, A finite element method for crack growth without remeshing, Int. J. Numer. Methods Eng. 46 (1999)", href:"https://doi.org/10.1002/(SICI)1097-0207(19990910)46:1%3C131::AID-NME726%3E3.0.CO;2-J"},{label:"Fries & Belytschko, The extended/generalized finite element method: An overview of the method and its applications, Int. J. Numer. Methods Eng. 84 (2010)", href:"https://doi.org/10.1002/nme.2914"}]},
+
+  {part:"Part II – Numerical Methods", title:"Discontinuous Galerkin Method", equations:[
+    {name:"Jump and average", expr:"[[u]] = u⁺ − u⁻,   {σ} = (σ⁺ + σ⁻)/2", tex:"[\\![u]\\!] = u^+ - u^-,\\quad \\{\\boldsymbol{\\sigma}\\} = \\tfrac{1}{2}(\\boldsymbol{\\sigma}^+ + \\boldsymbol{\\sigma}^-)", note:"On an interior face with opposite traces (+) and (−). The jump measures discontinuity; the average is the centred numerical flux for the continuous traction."},
+    {name:"Interior residual (elementwise)", expr:"∫_K ∇v · σ(u) dV − ∫_∂K v (σ n) dA", tex:"\\int_K \\nabla v\\cdot\\boldsymbol{\\sigma}(u)\\,\\mathrm{d}V - \\int_{\\partial K} v\\,(\\boldsymbol{\\sigma}\\mathbf{n})\\,\\mathrm{d}A", note:"Integrate the strong form by parts on each element separately. Face terms do not cancel with the neighbour because the spaces are discontinuous — that is where the numerical flux enters."},
+    {name:"SIPG interface terms", expr:"∫_Γ (−[[v]]·{σ(u)} − {σ(v)}·[[u]] + (η/h) [[v]]·[[u]]) dA", tex:"\\int_\\Gamma \\Bigl(-[\\![v]\\!]\\cdot\\{\\boldsymbol{\\sigma}(u)\\} - \\{\\boldsymbol{\\sigma}(v)\\}\\cdot[\\![u]\\!] + \\dfrac{\\eta}{h}[\\![v]\\!]\\cdot[\\![u]\\!]\\Bigr)\\,\\mathrm{d}A", note:"Symmetric interior-penalty Galerkin. Consistency uses the average traction; symmetry restores adjoint consistency; the penalty η/h stabilises the jump. NIPG drops the second term; IIPG incomplete variants sit between."},
+    {name:"Hyperbolic upwind flux", expr:"û = u⁻ if β·n > 0, else u⁺", tex:"\\hat{u} = \\begin{cases} u^- & \\boldsymbol{\\beta}\\cdot\\mathbf{n} > 0 \\\\ u^+ & \\text{otherwise} \\end{cases}", note:"For advection (or any first-order hyperbolic system) the numerical flux is taken from the upwind side. That single choice supplies both consistency and the dissipation that damps unresolved modes."}
+  ], bullets:[
+    "Discontinuous Galerkin (DG) keeps a polynomial space on each element and does not enforce continuity across faces. Neighbouring elements communicate only through numerical fluxes on the shared skeleton Γ. The global space is therefore broken: degrees of freedom live element-wise, and hanging nodes or nonconforming interfaces are admissible without multipoint constraints.",
+    "For elliptic and solid-mechanics problems the classical family is interior-penalty DG. After integration by parts on every element, consistency requires replacing the missing inter-element traction by an average {σ}, while a penalty (η/h) [[u]] controls the jump. SIPG is symmetric and adjoint-consistent; NIPG and IIPG trade symmetry for a simpler stencil. Hybridisable DG (HDG) introduces face unknowns and statically condenses the element interiors, recovering a globally coupled system only on the skeleton.",
+    "For hyperbolic conservation laws and advection-dominated transport, DG uses upwind (or Riemann) fluxes. Local conservation holds element by element: the residual of each cell equals the net numerical flux through its boundary. That property, together with easy p-enrichment and mesh adaptation, is why DG is standard in compressible flow, wave propagation, and neutron transport — historically Reed–Hill — before it entered solids.",
+    "Compared with continuous Galerkin, DG pays in degrees of freedom: a linear triangle has three nodal unknowns in CG and typically six (two per vertex, duplicated) in DG, and the gap grows with p. The return is local conservation, natural treatment of discontinuities and nonconforming meshes, and block-diagonal mass matrices that suit explicit dynamics. Compared with XFEM, a crack or interface is usually fitted to element faces (or cut with a specialised numerical flux), not embedded by enrichment inside the cell.",
+    "The figures below are two neighbouring elements with independent traces and a jump, the SIPG interface terms on the shared face, and the contrast between a continuous node and duplicated DG unknowns."
+  ], tags:["DG","discontinuous Galerkin","SIPG","NIPG","HDG","numerical flux","interior penalty","upwind","local conservation","nonconforming"], illustrations:"discontinuousGalerkin", sources:[{label:"Reed & Hill, Triangular mesh methods for the neutron transport equation, Los Alamos Report LA-UR-73-479 (1973)", href:"https://www.osti.gov/biblio/4491151"},{label:"Arnold, Brezzi, Cockburn & Marini, Unified analysis of discontinuous Galerkin methods for elliptic problems, SIAM J. Numer. Anal. 39 (2002)", href:"https://doi.org/10.1137/S0036142901384162"},{label:"Di Pietro & Ern, Mathematical Aspects of Discontinuous Galerkin Methods, Springer (2012)", href:"https://doi.org/10.1007/978-3-642-22980-0"}]},
+
   // NEW: Mesh generation + fitted/embedded + finite cell
   {part:"Part II – Numerical Methods", title:"Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)", bullets:[
     "A body-fitted mesh is still the ordinary route: clean the CAD, set a sizing field, mesh the surface, fill the volume, then improve quality. Delaunay, advancing-front, octree, and hex-dominant algorithms trade robustness against element quality.",
@@ -1114,7 +1144,7 @@ const topics = [
     "Griffith’s argument is energetic. Advance of the crack by an area dA releases potential energy G = −dΠ/dA. In LEFM, Irwin’s relation G = K_I² / E′ identifies G with K (E′ = E in plane stress, E/(1−ν²) in plane strain). Fracture occurs when G reaches a material toughness Gc, or equivalently when K reaches Kc. The J-integral is the same G for a nonlinear elastic solid.",
     "The 1/√r singularity is a consequence of linear elasticity at a sharp notch, not a physical infinite stress. Real materials yield, damage, or open cohesively in a process zone. LEFM remains valid under small-scale yielding: that zone is small compared with the crack length and the remaining ligament. When it is not, the characterizing parameter is J, a cohesive law, or a continuum damage length.",
     "Numerically the crack may be fitted to the mesh (and remeshed as it grows), enriched so that the jump lives inside the approximation (XFEM, GFEM, or an enriched mesh-free method), or smeared as a phase-field or damage band whose width is a material length. Each choice changes what the mesh must resolve.",
-    "The next entries are the singular field, the cohesive process zone, the contour integral that extracts G, and the phase-field regularization that turns a sharp surface into a diffuse band."
+    "The next entries are the singular field, the cohesive process zone, the contour integral that extracts G, the phase-field regularization that turns a sharp surface into a diffuse band, and—under Numerical Methods—the extended/generalized FEM that embeds the jump and tip asymptotics without remeshing."
   ], tags:["fracture","LEFM","SIF","Griffith","Williams","singularity","cohesive","XFEM","phase-field"], illustrations:"fractureOverview"},
   {part:"Part IV – Applications in Engineering", title:"Linear Elastic Fracture Mechanics", equations:[
     {name:"Williams field", expr:"σ_ij = K / √(2π r) · f_ij(θ)", tex:"\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)", note:"Leading term at a sharp crack in a linear elastic solid. The angular functions f depend on the mode. Stress is unbounded as r → 0; energy release is finite."},
@@ -2295,6 +2325,110 @@ function renderTopicIllustrations(topic){
   </div>
 </section>`;
   }
+  if(topic.illustrations === 'xfemGfem'){
+    return `
+<section class="figure-section" aria-label="XFEM and GFEM enrichment">
+  <h2>Enrichment on a fixed mesh</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line class="muted-line" x1="36" y1="40" x2="224" y2="40"/>
+        <line class="muted-line" x1="36" y1="80" x2="224" y2="80"/>
+        <line class="muted-line" x1="36" y1="120" x2="224" y2="120"/>
+        <line class="muted-line" x1="36" y1="40" x2="36" y2="120"/>
+        <line class="muted-line" x1="98" y1="40" x2="98" y2="120"/>
+        <line class="muted-line" x1="160" y1="40" x2="160" y2="120"/>
+        <line class="muted-line" x1="224" y1="40" x2="224" y2="120"/>
+        <line class="ink ink-thick" x1="36" y1="100" x2="175" y2="58"/>
+        <circle cx="175" cy="58" r="5" fill="currentColor"/>
+        <circle cx="98" cy="80" r="4" fill="currentColor"/>
+        <circle cx="160" cy="80" r="4" fill="currentColor"/>
+        <circle cx="160" cy="40" r="4" fill="currentColor"/>
+        <circle cx="98" cy="40" r="4" fill="currentColor"/>
+        <circle cx="98" cy="120" r="4" fill="currentColor"/>
+        <circle cx="160" cy="120" r="3" fill="#fff" stroke="currentColor" stroke-width="1.2"/>
+        <text x="40" y="150">enriched nodes · tip</text>
+      </svg>
+      <figcaption><strong>Crack on a fixed mesh.</strong> The discontinuity cuts elements; connectivity does not change. Nodes whose support meets the crack or tip carry enriched degrees of freedom (filled); ordinary nodes stay standard FEM.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="40" y="28" width="90" height="100" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <rect x="130" y="28" width="90" height="100" fill="#fff" stroke="currentColor" stroke-width="1.3"/>
+        <line class="ink ink-thick" x1="130" y1="28" x2="130" y2="128"/>
+        <path class="ink" d="M 70 55 L 110 55" fill="none"/>
+        <path class="ink" d="M 150 95 L 190 95" fill="none"/>
+        <polygon points="110,55 100,51 100,59" fill="currentColor"/>
+        <polygon points="190,95 180,91 180,99" fill="currentColor"/>
+        <text x="58" y="48">H = 1</text>
+        <text x="148" y="48">H = 0</text>
+        <text x="88" y="148">[[u]] across φ = 0</text>
+      </svg>
+      <figcaption><strong>Heaviside enrichment.</strong> The level set φ = 0 is the interface. Multiplying N<sub>J</sub> by H(φ) lets the displacement jump inside the cut element without fitting edges to the surface.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="130" cy="78" r="46" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <circle cx="130" cy="78" r="22" class="fill-soft" stroke="currentColor" stroke-width="1.2"/>
+        <line class="ink ink-thick" x1="40" y1="78" x2="130" y2="78"/>
+        <circle cx="130" cy="78" r="4" fill="currentColor"/>
+        <text x="148" y="54">√r modes</text>
+        <text x="148" y="74">ψ<sub>α</sub>(r, θ)</text>
+        <text x="52" y="70">crack</text>
+        <text x="70" y="148">tip enrichment support</text>
+      </svg>
+      <figcaption><strong>Tip enrichment.</strong> Nodes around the tip are enriched with Williams asymptotics so the 1/√r stress field appears without refining to the process zone. Away from the tip, only Heaviside (or ridge) enrichment is needed.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
+  if(topic.illustrations === 'discontinuousGalerkin'){
+    return `
+<section class="figure-section" aria-label="Discontinuous Galerkin">
+  <h2>Broken spaces and numerical fluxes</h2>
+  <div class="figure-grid">
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="28" y="36" width="90" height="90" class="fill-soft" stroke="currentColor" stroke-width="1.4"/>
+        <rect x="142" y="36" width="90" height="90" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+        <line class="ink ink-thick" x1="118" y1="36" x2="118" y2="126"/>
+        <line class="ink ink-thick" x1="142" y1="36" x2="142" y2="126"/>
+        <text x="58" y="88">u⁻</text>
+        <text x="172" y="88">u⁺</text>
+        <text x="100" y="150">[[u]] = u⁺ − u⁻</text>
+      </svg>
+      <figcaption><strong>Broken space.</strong> Each element owns its own traces. Continuity is not built into the basis; the jump across the interface is a first-class quantity controlled by the numerical flux.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="40" y="40" width="70" height="80" class="fill-soft" stroke="currentColor" stroke-width="1.3"/>
+        <rect x="150" y="40" width="70" height="80" fill="#fff" stroke="currentColor" stroke-width="1.3"/>
+        <line class="ink" x1="110" y1="40" x2="110" y2="120" stroke-dasharray="4 3"/>
+        <line class="ink" x1="150" y1="40" x2="150" y2="120" stroke-dasharray="4 3"/>
+        <path class="ink" d="M 118 80 L 142 80" fill="none"/>
+        <polygon points="142,80 132,76 132,84" fill="currentColor"/>
+        <text x="70" y="36">{σ}</text>
+        <text x="168" y="36">η/h</text>
+        <text x="56" y="148">SIPG face terms</text>
+      </svg>
+      <figcaption><strong>Interior penalty.</strong> Consistency uses the average traction {σ}; a penalty η/h times the jump stabilises the method. SIPG adds the symmetric adjoint term so the bilinear form stays symmetric for self-adjoint problems.</figcaption>
+    </figure>
+    <figure class="figure-card">
+      <svg class="illustration-svg" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="70" cy="78" r="16" fill="#fff" stroke="currentColor" stroke-width="1.5"/>
+        <text x="64" y="83" class="label-strong">1</text>
+        <text x="40" y="120">CG node</text>
+        <circle cx="170" cy="58" r="14" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="198" cy="98" r="14" class="fill-soft" stroke="currentColor" stroke-width="1.4"/>
+        <text x="164" y="63" class="label-strong">a</text>
+        <text x="192" y="103" class="label-strong">b</text>
+        <text x="150" y="140">DG pair at a vertex</text>
+      </svg>
+      <figcaption><strong>DOF count.</strong> Continuous Galerkin shares one unknown per vertex. DG duplicates unknowns on each element that meets the vertex — more degrees of freedom, but a block-local mass matrix and no continuity constraint to assemble.</figcaption>
+    </figure>
+  </div>
+</section>`;
+  }
   if(topic.illustrations === 'embeddedFibers'){
     return `
 <section class="figure-section" aria-label="Embedded fibre kinematics">
@@ -3037,6 +3171,8 @@ window.addEventListener('keydown', (e)=>{
     ok('variational principles topic', topics.some(t => t.title === 'Variational Principles'));
     ok('mixed methods topic', topics.some(t => t.title === 'Mixed Methods and Locking'));
     ok('constrained fem topic', topics.some(t => t.title === 'Constrained FEM' && t.illustrations === 'constrainedFem' && (t.equations||[]).length >= 3));
+    ok('xfem gfem topic', topics.some(t => t.title === 'Extended & Generalized Finite Element Methods (XFEM/GFEM)' && t.illustrations === 'xfemGfem' && (t.equations||[]).length >= 3));
+    ok('discontinuous galerkin topic', topics.some(t => t.title === 'Discontinuous Galerkin Method' && t.illustrations === 'discontinuousGalerkin' && (t.equations||[]).length >= 3));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('beamContact')));
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
