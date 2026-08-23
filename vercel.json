@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/theory.html",
+      "destination": "/hub.html#basic-equations",
+      "permanent": true
+    },
+    {
+      "source": "/equations.html",
+      "destination": "/hub.html#basic-equations",
+      "permanent": true
+    }
+  ]
+}
