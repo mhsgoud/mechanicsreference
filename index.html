@@ -114,62 +114,83 @@
     .cta-ghost{background:transparent;color:var(--navy);border-color:var(--rule)}
     .cta-ghost:hover{border-color:var(--navy);color:var(--navy)}
 
-    .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
-    .band{padding:72px 0;border-bottom:1px solid var(--rule)}
-    .band:last-of-type{border-bottom:none}
-    .band-head{max-width:36rem;margin-bottom:40px}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+    .band{padding:80px 0}
+    .band-head{max-width:40rem;margin:0 auto 48px;text-align:center}
     .band-head h2{
-      margin:0 0 12px;
+      margin:0 0 14px;
       font-family:"Source Serif 4", Georgia, serif;
-      font-size:clamp(1.7rem, 3vw, 2.15rem);
-      font-weight:600;letter-spacing:-0.02em;color:var(--navy);line-height:1.2;
+      font-size:clamp(1.85rem, 3.2vw, 2.35rem);
+      font-weight:600;letter-spacing:-0.02em;color:var(--navy);line-height:1.18;
     }
-    .band-head p{margin:0;color:var(--ink-soft);font-size:1.08rem;line-height:1.55}
+    .band-head p{margin:0;color:var(--ink-soft);font-size:1.1rem;line-height:1.55}
 
-    .foundations{display:grid;gap:0}
-    .foundation{
-      display:grid;grid-template-columns:5.5rem 1fr;gap:24px;
-      padding:36px 0;border-top:1px solid var(--rule);
-      color:inherit;
+    .foundations{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:0;
+      border-top:1px solid var(--rule);
+      border-bottom:1px solid var(--rule);
     }
-    .foundation:last-child{border-bottom:1px solid var(--rule)}
-    .f-num{
-      font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.35rem;font-weight:600;color:var(--accent);padding-top:4px;
+    .foundation{
+      padding:36px 28px 40px;
+      border-left:1px solid var(--rule);
+      display:flex;
+      flex-direction:column;
+      min-height:100%;
+      opacity:0;
+      transform:translateY(12px);
+      animation:rise 0.7s ease forwards;
+    }
+    .foundation:first-child{border-left:none}
+    .foundation:nth-child(1){animation-delay:0.05s}
+    .foundation:nth-child(2){animation-delay:0.15s}
+    .foundation:nth-child(3){animation-delay:0.25s}
+    .f-label{
+      margin:0 0 18px;
+      font-size:0.72rem;font-weight:600;
+      letter-spacing:0.14em;text-transform:uppercase;
+      color:var(--accent);
     }
     .f-title{
-      margin:0 0 12px;
+      margin:0 0 16px;
       font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.45rem;font-weight:600;color:var(--navy);
+      font-size:1.55rem;font-weight:600;color:var(--navy);line-height:1.2;
     }
-    .f-body{margin:0 0 12px;color:var(--ink-soft);max-width:42em;line-height:1.6}
-    .f-body:last-of-type{margin-bottom:14px}
-    .f-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+    .f-body{
+      margin:0 0 14px;
+      color:var(--ink-soft);
+      font-size:0.98rem;
+      line-height:1.62;
+    }
+    .f-body:last-of-type{margin-bottom:22px;flex:1}
+    .f-links{display:flex;flex-direction:column;gap:8px;margin-top:auto}
     .f-links a{
-      font-size:0.92rem;font-weight:600;text-decoration:none;
+      font-size:0.9rem;font-weight:600;text-decoration:none;
+      color:var(--navy);
+    }
+    .f-links a:hover{color:var(--accent)}
+    .f-links a::after{content:" →"}
+
+    .close{
+      text-align:center;
+      padding:8px 0 24px;
+      border-top:1px solid var(--rule);
+    }
+    .close p{
+      margin:0 0 20px;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:clamp(1.25rem, 2.4vw, 1.55rem);
+      font-weight:600;color:var(--navy);line-height:1.35;
+      max-width:28rem;margin-left:auto;margin-right:auto;
     }
 
-    .featured{
-      display:grid;grid-template-columns:repeat(3, 1fr);
-      gap:1px;background:var(--rule);border:1px solid var(--rule);
+    @keyframes rise{
+      to{opacity:1;transform:translateY(0)}
     }
-    .featured a{
-      display:block;background:var(--paper);padding:28px 24px 32px;
-      text-decoration:none;color:inherit;
+    @media (prefers-reduced-motion: reduce){
+      .foundation{animation:none;opacity:1;transform:none}
     }
-    .featured a:hover{background:#fff}
-    .featured a:hover .fig-title{color:var(--accent)}
-    .fig-symbol{
-      display:block;font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.6rem;font-weight:600;color:var(--navy);margin-bottom:14px;
-    }
-    .fig-title{
-      display:block;font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:6px;
-    }
-    .fig-desc{display:block;font-size:0.95rem;color:var(--muted);line-height:1.45}
-    .band-foot{margin-top:28px;font-size:0.95rem;font-weight:600}
-    .band-foot a{text-decoration:none}
 
     footer{
       border-top:1px solid var(--rule);
@@ -178,12 +199,18 @@
     }
     footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0}
 
-    @media (max-width: 800px){
+    @media (max-width: 900px){
       header,.wrap,footer,.hero-actions{padding-left:18px;padding-right:18px}
       .brand-logo{height:44px}
-      .featured{grid-template-columns:1fr}
-      .foundation{grid-template-columns:3.5rem 1fr;gap:16px;padding:24px 0}
+      .foundations{grid-template-columns:1fr}
+      .foundation{
+        padding:28px 0;
+        border-left:none;
+        border-top:1px solid var(--rule);
+      }
+      .foundation:first-child{border-top:none}
       .band{padding:56px 0}
+      .band-head{margin-bottom:32px;text-align:left}
     }
   </style>
   <script>
@@ -220,74 +247,48 @@
     <div class="wrap">
       <section class="band" aria-labelledby="foundations-title">
         <div class="band-head">
-          <h2 id="foundations-title">Three foundations</h2>
-          <p>The same three questions run through the work: how a body is described, how that description is discretized, and how the discrete system is solved.</p>
+          <h2 id="foundations-title">How the subject is organized</h2>
+          <p>Every topic in the library sits on one of three layers: the continuum description, its finite-element discretization, or the numerical methods that solve the discrete system.</p>
         </div>
         <div class="foundations">
           <article class="foundation">
-            <span class="f-num">01</span>
-            <div>
-              <h3 class="f-title">Continuum mechanics</h3>
-              <p class="f-body">A solid or a fluid is treated as a continuous medium. Motion is measured by strain; internal forces by stress. Conservation of mass and momentum must hold — Cauchy’s first law ∇·σ + ρ b = ρ a in the current placement, or Div P + ρ₀ B = ρ₀ A on the reference mesh — and a constitutive model says how stress depends on deformation or on the rate of deformation.</p>
-              <p class="f-body">That is enough to distinguish elasticity from plasticity, and a viscous fluid from an elastic solid, without yet choosing a numerical method.</p>
-              <div class="f-links">
-                <a href="hub.html#basic-equations">Basic equations</a>
-                <a href="hub.html#balance-laws-conservation">Balance laws</a>
-              </div>
+            <p class="f-label">Continuum</p>
+            <h3 class="f-title">Continuum mechanics</h3>
+            <p class="f-body">A solid or a fluid is treated as a continuous medium. Motion is measured by strain; internal forces by stress. Conservation of mass and momentum must hold — Cauchy’s first law ∇·σ + ρ b = ρ a in the current placement, or Div P + ρ₀ B = ρ₀ A on the reference mesh — and a constitutive model says how stress depends on deformation or on the rate of deformation.</p>
+            <p class="f-body">That is enough to distinguish elasticity from plasticity, and a viscous fluid from an elastic solid, without yet choosing a numerical method.</p>
+            <div class="f-links">
+              <a href="hub.html#basic-equations">Basic equations</a>
+              <a href="hub.html#balance-laws-conservation">Balance laws</a>
             </div>
           </article>
           <article class="foundation">
-            <span class="f-num">02</span>
-            <div>
-              <h3 class="f-title">Finite elements</h3>
-              <p class="f-body">The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
-              <p class="f-body">Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
-              <div class="f-links">
-                <a href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
-                <a href="hub.html#variational-principles">Variational principles</a>
-                <a href="hub.html#mixed-methods-and-locking">Locking</a>
-              </div>
+            <p class="f-label">Discretization</p>
+            <h3 class="f-title">Finite elements</h3>
+            <p class="f-body">The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
+            <p class="f-body">Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
+            <div class="f-links">
+              <a href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
+              <a href="hub.html#variational-principles">Variational principles</a>
+              <a href="hub.html#mixed-methods-and-locking">Locking</a>
             </div>
           </article>
           <article class="foundation">
-            <span class="f-num">03</span>
-            <div>
-              <h3 class="f-title">Numerical methods</h3>
-              <p class="f-body">Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
-              <p class="f-body">Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
-              <div class="f-links">
-                <a href="hub.html#solving-linear-systems">Linear systems</a>
-                <a href="hub.html#newton-raphson-iteration-in-fem">Newton iteration</a>
-                <a href="hub.html#path-following-and-arc-length">Arc-length</a>
-              </div>
+            <p class="f-label">Solution</p>
+            <h3 class="f-title">Numerical methods</h3>
+            <p class="f-body">Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
+            <p class="f-body">Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
+            <div class="f-links">
+              <a href="hub.html#solving-linear-systems">Linear systems</a>
+              <a href="hub.html#newton-raphson-iteration-in-fem">Newton iteration</a>
+              <a href="hub.html#path-following-and-arc-length">Arc-length</a>
             </div>
           </article>
         </div>
       </section>
 
-      <section class="band" aria-labelledby="figures-title">
-        <div class="band-head">
-          <h2 id="figures-title">Start with a figure</h2>
-          <p>Interactive plates for the identities that are easiest to misread on paper.</p>
-        </div>
-        <div class="featured">
-          <a href="deformation-gradient.html">
-            <span class="fig-symbol">F</span>
-            <span class="fig-title">Deformation gradient</span>
-            <span class="fig-desc">Translation, rotation, stretch, and shear</span>
-          </a>
-          <a href="polar-decomposition.html">
-            <span class="fig-symbol">RU</span>
-            <span class="fig-title">Polar decomposition</span>
-            <span class="fig-desc">Stretch then rotate—or the reverse</span>
-          </a>
-          <a href="linear-momentum.html">
-            <span class="fig-symbol">σ</span>
-            <span class="fig-title">Linear momentum</span>
-            <span class="fig-desc">A supported body and a moving traction</span>
-          </a>
-        </div>
-        <p class="band-foot"><a href="hub.html">Browse the full library →</a></p>
+      <section class="band close" aria-label="Enter the library">
+        <p>Figures, derivations, and worked topics live in the library.</p>
+        <a class="cta cta-primary" href="hub.html">Browse the library</a>
       </section>
     </div>
   </main>
