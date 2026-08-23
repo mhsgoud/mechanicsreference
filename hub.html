@@ -365,6 +365,36 @@
     .eq-card .eq .katex{font-size:1.08em}
     .eq-card p{margin:0;color:var(--muted);font-size:0.92rem;line-height:1.5}
 
+    .eq-flow{margin:8px 0 28px}
+    .eq-flow-section{margin:0 0 2.4rem}
+    .eq-flow-section > h2{
+      margin:0 0 10px;
+      padding-bottom:8px;
+      border-bottom:1px solid var(--rule);
+    }
+    .eq-flow-section > .lead{
+      margin:0 0 1.2rem;color:var(--ink-soft);line-height:1.7;
+    }
+    .eq-step{margin:0 0 1.6rem}
+    .eq-step h3{
+      margin:0 0 8px;
+      font-family:"Source Serif 4",Georgia,serif;
+      font-size:1.08rem;font-weight:600;color:var(--navy);
+    }
+    .eq-step .eq{
+      background:#fff;border:1px solid var(--rule);
+      padding:14px 16px;overflow-x:auto;margin:0 0 10px;
+      text-align:center;line-height:1.45;color:var(--ink);
+    }
+    .eq-step .eq .katex{font-size:1.1em}
+    .eq-step .body{
+      margin:0;color:var(--ink-soft);line-height:1.7;
+    }
+    .eq-step .bridge{
+      margin:10px 0 0;color:var(--muted);font-size:0.95rem;line-height:1.55;
+      font-style:italic;
+    }
+
     .theory-extra{margin-top:2rem}
     .theory-extra > h2{margin-top:2rem}
     .theory-panel{background:#fff;border:1px solid var(--rule);padding:20px 22px;margin:0 0 20px}
@@ -526,38 +556,214 @@
 const topics = [
   // Part I – Fundamentals of Mechanics
   {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
-    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, linear momentum, angular momentum, and energy are conserved (or balanced, once heat and external power are admitted). A constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
-    "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ). Volume change is J = det F.",
-    "Stress and traction: Cauchy’s theorem says the traction on a current surface with outward normal n is t = σ n. Without couple stresses, angular momentum requires σ = σᵀ. Forces measured per reference area use the first Piola–Kirchhoff stress P = J σ F⁻ᵀ and the second Piola–Kirchhoff S = J F⁻¹ σ F⁻ᵀ.",
-    "Mass: local conservation is ∂ρ/∂t + ∇·(ρ v) = 0, or equivalently ρ₀ = ρ J in the reference placement. Incompressibility is ∇·v = 0 (or J = 1).",
-    "Linear momentum (spatial form): on every part of the body, the resultant of surface tractions and body forces equals the rate of change of linear momentum. Locally that is Cauchy’s first law, ∇·σ + ρ b = ρ a. At rest, ∇·σ + ρ b = 0.",
-    "Linear momentum (referential form): the same balance pulled back to the undeformed mesh is Div P + ρ₀ B = ρ₀ A. Total Lagrangian finite elements discretize this statement; Updated Lagrangian keeps rewriting it on the current placement.",
-    "Elastodynamics: substitute isotropic Hooke and infinitesimal strain into Cauchy’s first law to obtain the Navier–Cauchy equation. Helmholtz potentials then uncouple compressional (P) and shear (S) waves at finite speeds c_p and c_s. Static mechanics drops inertia; dynamic response is carried by those waves.",
-    "Energy: the first law balances the rate of internal energy with mechanical power and heat supply. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual closure for conduction.",
-    "Constitutive closure for isotropic linear elasticity: σ = λ tr(ε) I + 2μ ε, or σ = ℂ : ε. Fluids use the same momentum equation with a viscous law; incompressible Navier–Stokes is ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b with ∇·v = 0.",
-    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV (inertia adds ∫ ρ a · δu when dynamics matter). FEM replaces u and δu with shape functions on a mesh, yielding K a = f in linear elasticity, or M ü + C u̇ + K u = f in linear elastodynamics, or R(u) = 0 solved by Newton–Raphson with tangent K_T.",
-    "The figure is linear momentum on a supported body. The simulator below compares steady static bending with a dynamic impact regime — the same qualitative difference as static balance versus elastodynamics."
-  ], equations:[
-    {name:"Deformation gradient", expr:"F = ∂x / ∂X", tex:"F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Maps a material line element from the reference placement X to the current placement x. J = det F is local volume change."},
-    {name:"Jacobian", expr:"J = det F = dv/dV", tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}", note:"Local volume change. Mass balance in the reference placement is ρ₀ = ρ J. Incompressibility is J = 1."},
-    {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
-    {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
-    {name:"Cauchy traction", expr:"t = σ n", tex:"\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}", note:"Force per current area on a surface with outward normal n. Angular momentum without couples requires σ = σᵀ."},
-    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Nominal stress: current force per reference area. Work-conjugate to Ḟ."},
-    {name:"Second Piola–Kirchhoff", expr:"S = J F⁻¹ σ F⁻ᵀ", tex:"\\mathbf{S} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are often written S = ∂W/∂E."},
-    {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Local mass balance. Referential form: ρ₀ = ρ J. Incompressibility is ∇ · v = 0."},
-    {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}", note:"Cauchy’s first law. Static problems set a = 0. Integral statement: ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV."},
-    {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}", note:"Same balance on the reference placement. Total Lagrangian FEM discretizes this form."},
-    {name:"Angular momentum", expr:"σ = σᵀ", tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}", note:"Cauchy’s second law in the absence of couple stresses — an algebraic restriction, not a PDE."},
-    {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"First law: internal energy rate equals stress power, minus heat efflux, plus heat supply r."},
-    {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
-    {name:"Navier–Cauchy equation", expr:"(λ+μ)∇(∇·u) + μ ∇²u + b = ρ ü", tex:"(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}", note:"Substitute isotropic Hooke and infinitesimal strain into Cauchy’s first law. The static problem drops the right-hand side."},
-    {name:"Helmholtz wave split", expr:"u = ∇φ + ∇×ψ", tex:"\\mathbf{u} = \\boldsymbol{\\nabla}\\phi + \\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi},\\quad \\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0", note:"Elastodynamics uncouples into a P-wave at c_p = √((λ+2μ)/ρ) and an S-wave at c_s = √(μ/ρ)."},
-    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", tex:"\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V", note:"Weak form of momentum (quasi-static). Dynamics adds ∫ ρ a · δu on the left or right by convention."},
-    {name:"Discrete linear system", expr:"K a = f", tex:"\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}", note:"Assembled stiffness times nodal unknowns equals the load vector."},
-    {name:"Elastodynamics matrices", expr:"M ü + C u̇ + K u = F", tex:"\\mathbf{M}\\ddot{\\hat{\\mathbf{u}}} + \\mathbf{C}\\dot{\\hat{\\mathbf{u}}} + \\mathbf{K}\\hat{\\mathbf{u}} = \\mathbf{F}^{\\mathrm{ext}}", note:"Galerkin discretization of linear elastodynamics. Nonlinear problems replace Kû by an internal force R(û)."},
-    {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", tex:"\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
-  ], tags:["basic equations","continuum","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","elastodynamics","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
+    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, momentum, and energy are conserved or balanced, a constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
+    "The development below follows that order: kinematics, then stress, then the balance laws, then constitutive closure, then the passage to elastodynamics and to a discrete system on a mesh."
+  ], flow:[
+    {
+      section:"Kinematics — how motion is measured",
+      lead:"A material point occupies a reference place X and a current place x. The map between them is the kinematics of the continuum. Strain is built from that map; nothing about force has entered yet.",
+      items:[
+        {
+          name:"Deformation gradient",
+          tex:"F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}",
+          body:"The deformation gradient is the linear part of the motion: it sends a material line element dX to its image dx = F dX. Rigid translation never appears in F. Rotation, stretch, and shear do. Every finite-strain measure below is built from this single tensor.",
+          bridge:"Volume change is the determinant of the same map."
+        },
+        {
+          name:"Jacobian",
+          tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}",
+          body:"J is the local ratio of current volume to reference volume. Mass balance on the reference placement is simply ρ₀ = ρ J. Incompressibility is the constraint J = 1 (equivalently ∇ · v = 0 in the spatial description).",
+          bridge:"Change of squared length, not of volume alone, defines strain."
+        },
+        {
+          name:"Green–Lagrange strain",
+          tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)",
+          body:"Green–Lagrange strain lives on the reference placement. It vanishes in a rigid motion, which is the requirement that strain must meet. When displacement gradients are small, the quadratic terms drop and E reduces to the infinitesimal strain used in linear solid mechanics.",
+          bridge:"That small-gradient limit is the strain of most introductory finite-element courses."
+        },
+        {
+          name:"Infinitesimal strain",
+          tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)",
+          body:"The symmetric gradient of the displacement is enough when rotations and stretches are both small. It is the strain that enters isotropic Hooke’s law below, and the strain that a linear elastic finite-element code actually forms from the shape-function derivatives."
+        }
+      ]
+    },
+    {
+      section:"Stress — how forces are carried",
+      lead:"Once kinematics are set, the next question is how internal forces are distributed. Traction on a cut is force per area; Cauchy’s theorem says that traction is linear in the outward normal, and the coefficient of that map is the stress tensor.",
+      items:[
+        {
+          name:"Cauchy traction",
+          tex:"\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}",
+          body:"The traction t on a current surface with outward unit normal n is force per current area. Without couple stresses, angular momentum will require σ = σᵀ — an algebraic restriction, not a differential equation. Turn the cut and the same σ produces a different t.",
+          bridge:"Finite-element meshes are often written on the undeformed placement, so the same force must also be measured per reference area."
+        },
+        {
+          name:"First Piola–Kirchhoff stress",
+          tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}",
+          body:"P is the nominal stress: current force measured per reference area. It is work-conjugate to Ḟ. Total Lagrangian finite elements discretize balance written with P; Updated Lagrangian keeps rewriting the same physics on the current mesh with σ.",
+          bridge:"Hyperelastic stored-energy functions are usually differentiated with respect to Green strain, which returns a different stress."
+        },
+        {
+          name:"Second Piola–Kirchhoff stress",
+          tex:"\\mathbf{S} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}",
+          body:"S lives entirely on the reference placement and is work-conjugate to Ė. A hyperelastic law of the form S = ∂W/∂E is therefore consistent with the kinematics already introduced. When stretches and rotations are both small, P, S, and σ coincide to first order."
+        }
+      ]
+    },
+    {
+      section:"Balance laws — what must hold for every continuum",
+      lead:"Kinematics and stress are definitions. The balance laws are statements of physics: mass is conserved, linear and angular momentum are balanced, and energy is conserved once heat is admitted. With a stress (and a heat flux) in hand, those statements become field equations.",
+      items:[
+        {
+          name:"Conservation of mass",
+          tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0",
+          body:"Local mass balance in the current placement. The referential form is ρ₀ = ρ J — the same statement once volume change is expressed through the deformation gradient. If the motion is incompressible, continuity reduces to ∇ · v = 0.",
+          bridge:"Forces on a part of the body must equal the rate of change of its linear momentum."
+        },
+        {
+          name:"Linear momentum (spatial)",
+          tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}",
+          body:"Cauchy’s first law. The divergence of stress and the body force balance inertia. At rest, a = 0 and the equation is ∇ · σ + ρ b = 0. Globally, ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV on any part of the body; the divergence theorem recovers the local form.",
+          bridge:"The same balance pulled back to the undeformed placement is what Total Lagrangian codes assemble."
+        },
+        {
+          name:"Linear momentum (referential)",
+          tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
+          body:"Identical physics on the reference mesh, with Div the reference divergence. Choosing spatial or referential form is bookkeeping that matches Updated versus Total Lagrangian discretizations — not a change of constitutive model.",
+          bridge:"Angular momentum closes the stress description."
+        },
+        {
+          name:"Angular momentum",
+          tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}",
+          body:"In the absence of couple stresses, Cauchy’s second law is symmetry of σ (equivalently P Fᵀ = F Pᵀ). It is an algebraic restriction on the stress, not a PDE to be discretized.",
+          bridge:"Energy balance brings temperature and heat into the same continuum setting."
+        },
+        {
+          name:"Energy (local)",
+          tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r",
+          body:"The first law: the rate of internal energy equals stress power σ : D, minus heat efflux, plus supply r. Fourier’s law q = −k ∇θ is the usual closure for conduction. Many purely mechanical analyses postpone this equation until after momentum and a constitutive law are already closed."
+        }
+      ]
+    },
+    {
+      section:"Constitutive closure and elastodynamics",
+      lead:"Balance laws do not determine the stress. A constitutive model relates stress to deformation (or to its rate). The isotropic linear solid is the first closure; substituting it into momentum yields elastodynamics.",
+      items:[
+        {
+          name:"Hooke’s law (isotropic)",
+          tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}",
+          body:"Linear isotropic elasticity in Lamé form — equivalently σ = ℂ : ε. Two independent moduli fix the entire response. Fluids use the same momentum equation once Newton’s viscous law replaces Hooke’s law.",
+          bridge:"Substitute this law and the infinitesimal strain into Cauchy’s first law."
+        },
+        {
+          name:"Navier–Cauchy equation",
+          tex:"(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}",
+          body:"The displacement form of isotropic linear elastodynamics. The static problem drops the right-hand side. Index form of momentum before substitution is σ_{ij,j} + b_i = ρ ü_i.",
+          bridge:"Helmholtz potentials uncouple that vector equation into waves that travel at finite speeds."
+        },
+        {
+          name:"Helmholtz wave split",
+          tex:"\\mathbf{u} = \\boldsymbol{\\nabla}\\phi + \\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi},\\quad \\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0",
+          body:"With this decomposition, elastodynamics splits into a compressional P-wave at c_p = √((λ+2μ)/ρ) and a shear S-wave at c_s = √(μ/ρ). Static mechanics neglects inertia; dynamic response is carried by these finite wave speeds — the distinction the beam simulator below illustrates."
+        }
+      ]
+    },
+    {
+      section:"From continuum statement to discrete system",
+      lead:"A strong-form PDE is not what a finite-element code solves. The weak form of momentum is the continuum statement that survives discretization; after shape functions and assembly it becomes a linear or nonlinear algebraic system.",
+      items:[
+        {
+          name:"Principle of virtual work",
+          tex:"\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V",
+          body:"A weak statement of linear momentum (quasi-static). Dynamics adds ∫ ρ a · δu. Finite elements replace the trial and test displacements with shape-function expansions on a mesh; the stress is evaluated from the constitutive law at the quadrature points.",
+          bridge:"For linear elasticity that Galerkin projection is a stiffness system."
+        },
+        {
+          name:"Discrete linear system",
+          tex:"\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}",
+          body:"After interpolation and assembly, the unknown nodal coefficients a satisfy a sparse stiffness equation whose right-hand side carries the applied loads. Boundary conditions partition the surface into essential (prescribed displacement) and natural (prescribed traction) data.",
+          bridge:"When inertia and damping matter, the same discretization produces a second-order system in time."
+        },
+        {
+          name:"Elastodynamics matrices",
+          tex:"\\mathbf{M}\\ddot{\\hat{\\mathbf{u}}} + \\mathbf{C}\\dot{\\hat{\\mathbf{u}}} + \\mathbf{K}\\hat{\\mathbf{u}} = \\mathbf{F}^{\\mathrm{ext}}",
+          body:"M comes from ρ NᵀN, K from BᵀℂB, and C is usually Rayleigh damping. Nonlinear problems replace Kû by an internal force residual R(û) that must be driven to zero.",
+          bridge:"That residual is solved by linearization."
+        },
+        {
+          name:"Newton–Raphson",
+          tex:"\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})",
+          body:"A residual R(u) = 0 is linearized at the current guess. The consistent tangent K_T is the Jacobian of that residual; when it is exact, convergence is quadratic. Every nonlinear finite-element increment is this step in disguise.",
+          bridge:"The same continuum setting extends immediately to coupled multiphysics — heat, pore fluid, and viscous flow — without changing the balance structure."
+        }
+      ]
+    },
+    {
+      section:"Coupled continua — heat, pore fluid, and flow",
+      lead:"Once momentum and a solid constitutive law are closed, additional fields enter through the same balance laws. Temperature couples to stress through thermal expansion; pore pressure couples through Biot’s effective stress; a fluid replaces Hooke’s law by a viscous law. The library entries Multiphase Porous Materials, Heat Transfer & Multiphysics, and Fluids develop each case in full.",
+      items:[
+        {
+          name:"Thermoelasticity",
+          tex:"\\boldsymbol{\\sigma} = \\lambda(\\mathrm{tr}\\,\\boldsymbol{\\varepsilon})\\mathbf{I} + 2\\mu\\boldsymbol{\\varepsilon} - (3\\lambda+2\\mu)\\alpha(T-T_0)\\mathbf{I}",
+          body:"Thermal expansion enters the stress as an isotropic eigenstress. The heat equation gains a coupling term −(3λ+2μ)α T₀ ∂_t(∇ · u): deformation does work on the thermal field. Two-way thermoelasticity exchanges energy between displacement and temperature; one-way coupling keeps only the thermal stress in momentum.",
+          bridge:"A saturated porous solid replaces the thermal field by one or more pore pressures."
+        },
+        {
+          name:"Multiphase Biot momentum",
+          tex:"\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}' - \\alpha\\boldsymbol{\\nabla}(S_w p_w + S_n p_n) + \\mathbf{b} = \\rho\\ddot{\\mathbf{u}}",
+          body:"The skeleton constitutive law sees the effective stress σ′. Total stress is recovered by Biot’s split with wetting and non-wetting pressures weighted by saturations. Phase mass balances use Darcy relative velocities v_α = −(K k_{rα}/μ_α)(∇p_α − ρ_α g). Terzaghi’s principle is the saturated limit α = 1. The library entry Multiphase Porous Materials, and the consolidation figures, are the full mixture setting.",
+          bridge:"The same momentum equation describes a fluid once viscosity replaces elasticity."
+        },
+        {
+          name:"Incompressible Navier–Stokes",
+          tex:"\\rho\\bigl(\\partial_t\\mathbf{v} + \\mathbf{v}\\cdot\\nabla\\mathbf{v}\\bigr) = -\\nabla p + \\mu\\nabla^2\\mathbf{v} + \\rho\\mathbf{b}",
+          body:"Cauchy’s first law closed by Newton’s law of viscosity, together with ∇ · v = 0. The continuum structure is unchanged: balance of momentum plus a constitutive map from kinematics to stress. The library entry Fluids: Continuity and Navier–Stokes takes this further.",
+          bridge:"On a mesh, coupled fields produce block systems rather than a single K a = f."
+        }
+      ]
+    },
+    {
+      section:"Coupled discrete systems",
+      lead:"Galerkin projection of a coupled continuum theory yields block matrices. The displacement block is still a momentum residual; the extra rows enforce energy or mass balance for the secondary field.",
+      items:[
+        {
+          name:"Thermoelastic block system",
+          tex:"\\begin{bmatrix}\\mathbf{M}_{uu}&\\mathbf{0}\\\\\\mathbf{0}&\\mathbf{0}\\end{bmatrix}\\begin{Bmatrix}\\ddot{\\hat{\\mathbf{u}}}\\\\\\ddot{\\hat{\\mathbf{T}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{C}_{uu}&\\mathbf{0}\\\\\\mathbf{C}_{Tu}&\\mathbf{C}_{TT}\\end{bmatrix}\\begin{Bmatrix}\\dot{\\hat{\\mathbf{u}}}\\\\\\dot{\\hat{\\mathbf{T}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{K}_{uu}&\\mathbf{K}_{uT}\\\\\\mathbf{0}&\\mathbf{K}_{TT}\\end{bmatrix}\\begin{Bmatrix}\\hat{\\mathbf{u}}\\\\\\hat{\\mathbf{T}}\\end{Bmatrix}=\\begin{Bmatrix}\\mathbf{F}_u\\\\\\mathbf{F}_T\\end{Bmatrix}",
+          body:"Displacement–temperature coupling after spatial discretization. K_uT carries thermal stress into momentum; C_Tu carries mechanical heating into the energy balance. Staggered or monolithic time integrators solve the same block structure.",
+          bridge:"Poromechanics is the analogous u–p system for a saturated skeleton."
+        },
+        {
+          name:"Poromechanics (u–p)",
+          tex:"\\begin{bmatrix}\\mathbf{M}_{uu}&\\mathbf{0}\\\\\\mathbf{0}&\\mathbf{0}\\end{bmatrix}\\begin{Bmatrix}\\ddot{\\hat{\\mathbf{u}}}\\\\\\ddot{\\hat{\\mathbf{p}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{C}_{uu}&\\mathbf{0}\\\\\\mathbf{Q}_{pu}&\\mathbf{S}_{pp}\\end{bmatrix}\\begin{Bmatrix}\\dot{\\hat{\\mathbf{u}}}\\\\\\dot{\\hat{\\mathbf{p}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{K}_{uu}&-\\mathbf{Q}_{up}\\\\\\mathbf{0}&\\mathbf{H}_{pp}\\end{bmatrix}\\begin{Bmatrix}\\hat{\\mathbf{u}}\\\\\\hat{\\mathbf{p}}\\end{Bmatrix}=\\begin{Bmatrix}\\mathbf{F}_u\\\\\\mathbf{Q}_p\\end{Bmatrix}",
+          body:"Biot solid–fluid coupling on a mesh. Q couples volumetric strain to pressure storage; H is the Darcy permeability operator; S_pp is fluid compressibility storage. Undrained response is nearly incompressible and equal-order u–p elements lock — the same issue as rubber, treated under Mixed Methods and Locking. One-Dimensional Consolidation, Gibson Consolidation, and the Mandel–Cryer Effect are the classical tests of this coupling."
+        }
+      ]
+    },
+    {
+      section:"Where the library continues",
+      lead:"Fracture, fibre composites, contact, and GPU performance sit on the same foundations. Each has its own library entry; the identities below are the bridges from Basic Equations into those topics.",
+      items:[
+        {
+          name:"Williams field (LEFM)",
+          tex:"\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)",
+          body:"A sharp crack in a linear solid is singular: stress unbounded as r → 0, energy release finite. Modes I–III each have an intensity factor K. Linear Elastic Fracture Mechanics, the J-integral, cohesive cracking, and phase-field fracture are the next entries in the library.",
+          bridge:"A unidirectional composite replaces an isotropic ℂ by a transversely isotropic ply law."
+        },
+        {
+          name:"Classical lamination (membrane–bending)",
+          tex:"\\mathbf{N} = \\mathbf{A}\\boldsymbol{\\varepsilon}_0 + \\mathbf{B}\\boldsymbol{\\kappa},\\quad \\mathbf{M} = \\mathbf{B}\\boldsymbol{\\varepsilon}_0 + \\mathbf{D}\\boldsymbol{\\kappa}",
+          body:"Force and moment resultants on a laminate midplane. A is membrane stiffness, D bending, B the coupling a symmetric stack removes. Fiber-Reinforced Composites, Embedded Fiber Models, and Fiber Neutrality develop the discrete-fibre and CLT routes.",
+          bridge:"Contact adds inequalities on the same virtual-work statement."
+        },
+        {
+          name:"Contact complementarity",
+          tex:"g \\le 0,\\quad p \\ge 0,\\quad p\\,g = 0",
+          body:"Gap, pressure, and the requirement that one of them vanish. Friction adds a tangential law and a nonsymmetric contact tangent. Contact and Friction, and the Hertz and beam-contact figures, are the computational side of that constraint."
+        }
+      ]
+    }
+  ], tags:["basic equations","continuum","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","elastodynamics","multiphase","Biot","thermoelasticity","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
   {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
@@ -2235,6 +2441,22 @@ function mountBeamSimulator(){
   animate();
 }
 
+function renderEquationFlow(flow){
+  if(!flow || !flow.length) return "";
+  return `<div class="eq-flow">${flow.map(sec => `
+    <section class="eq-flow-section">
+      <h2>${escHtml(sec.section)}</h2>
+      ${sec.lead ? `<p class="lead">${escHtml(sec.lead)}</p>` : ""}
+      ${(sec.items||[]).map(item => `
+        <div class="eq-step">
+          <h3>${escHtml(item.name)}</h3>
+          <div class="eq">\\[${item.tex || escHtml(item.expr || "")}\\]</div>
+          <p class="body">${escHtml(item.body || item.note || "")}</p>
+          ${item.bridge ? `<p class="bridge">${escHtml(item.bridge)}</p>` : ""}
+        </div>`).join("")}
+    </section>`).join("")}</div>`;
+}
+
 function renderContent(topic){
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
 
@@ -2249,7 +2471,8 @@ function renderContent(topic){
     ? `<p class="muted" style="margin-top:1.6em">${topic.sources.map(s => `<a href="${escHtml(s.href)}">${escHtml(s.label)}</a>`).join('<br>')}</p>`
     : "";
 
-  const eqBlock = (topic.equations && topic.equations.length)
+  const flowBlock = topic.flow ? renderEquationFlow(topic.flow) : "";
+  const eqBlock = (!topic.flow && topic.equations && topic.equations.length)
     ? `<h2>Field equations</h2>
       <div class="eq-list">${topic.equations.map(eq => `
         <article class="eq-card">
@@ -2263,8 +2486,9 @@ function renderContent(topic){
     <article class="card">
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
       <h1>${escHtml(topic.title)}</h1>
-      ${eqBlock}
       <div class="prose">${prose}</div>
+      ${flowBlock}
+      ${eqBlock}
       ${sceneBlock}
       ${illustrationsBlock}
       ${interactiveBlock}
@@ -2440,7 +2664,8 @@ window.addEventListener('keydown', (e)=>{
     ok('variational principles topic', topics.some(t => t.title === 'Variational Principles'));
     ok('mixed methods topic', topics.some(t => t.title === 'Mixed Methods and Locking'));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('beamContact')));
-    ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && (t.equations||[]).some(e => /momentum/i.test(e.name))));
+    ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
+    ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
