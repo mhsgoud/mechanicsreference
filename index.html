@@ -122,21 +122,25 @@
     .foundations{display:grid;gap:0}
     .foundation{
       display:grid;grid-template-columns:5.5rem 1fr;gap:24px;
-      padding:32px 0;border-top:1px solid var(--rule);
-      text-decoration:none;color:inherit;
+      padding:36px 0;border-top:1px solid var(--rule);
+      color:inherit;
     }
     .foundation:last-child{border-bottom:1px solid var(--rule)}
-    .foundation:hover .f-title{color:var(--accent)}
     .f-num{
       font-family:"Source Serif 4", Georgia, serif;
       font-size:1.35rem;font-weight:600;color:var(--accent);padding-top:4px;
     }
     .f-title{
-      margin:0 0 8px;
+      margin:0 0 12px;
       font-family:"Source Serif 4", Georgia, serif;
       font-size:1.45rem;font-weight:600;color:var(--navy);
     }
-    .f-body{margin:0;color:var(--ink-soft);max-width:42em;line-height:1.6}
+    .f-body{margin:0 0 12px;color:var(--ink-soft);max-width:42em;line-height:1.6}
+    .f-body:last-of-type{margin-bottom:14px}
+    .f-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+    .f-links a{
+      font-size:0.92rem;font-weight:600;text-decoration:none;
+    }
 
     .featured{
       display:grid;grid-template-columns:repeat(3, 1fr);
@@ -192,8 +196,8 @@
       <img
         src="hero-banner.png"
         alt="Mechanics Reference — computational mechanics and engineering: continuum theory, finite elements, and numerical methods"
-        width="1920"
-        height="800"
+        width="1024"
+        height="512"
         fetchpriority="high"
       />
     </div>
@@ -209,27 +213,44 @@
           <p>The same three questions run through the work: how a body is described, how that description is discretized, and how the discrete system is solved.</p>
         </div>
         <div class="foundations">
-          <a class="foundation" href="hub.html#basic-equations">
+          <article class="foundation">
             <span class="f-num">01</span>
-            <span>
+            <div>
               <h3 class="f-title">Continuum mechanics</h3>
-              <p class="f-body">Strain measures motion; stress measures internal force. Mass and momentum must balance, and a constitutive model closes the theory—before any mesh is chosen.</p>
-            </span>
-          </a>
-          <a class="foundation" href="hub.html#finite-element-method-introduction">
+              <p class="f-body">A solid or a fluid is treated as a continuous medium. Motion is measured by strain; internal forces by stress. Conservation of mass and momentum must hold — Cauchy’s first law ∇·σ + ρ b = ρ a in the current placement, or Div P + ρ₀ B = ρ₀ A on the reference mesh — and a constitutive model says how stress depends on deformation or on the rate of deformation.</p>
+              <p class="f-body">That is enough to distinguish elasticity from plasticity, and a viscous fluid from an elastic solid, without yet choosing a numerical method.</p>
+              <div class="f-links">
+                <a href="hub.html#basic-equations">Basic equations</a>
+                <a href="hub.html#balance-laws-conservation">Balance laws</a>
+              </div>
+            </div>
+          </article>
+          <article class="foundation">
             <span class="f-num">02</span>
-            <span>
+            <div>
               <h3 class="f-title">Finite elements</h3>
-              <p class="f-body">Shape functions on a mesh replace the strong form with virtual work. Whether the discrete model is faithful depends on the element, the mesh, and the boundary data.</p>
-            </span>
-          </a>
-          <a class="foundation" href="hub.html#solving-linear-systems">
+              <p class="f-body">The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
+              <p class="f-body">Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
+              <div class="f-links">
+                <a href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
+                <a href="hub.html#variational-principles">Variational principles</a>
+                <a href="hub.html#mixed-methods-and-locking">Locking</a>
+              </div>
+            </div>
+          </article>
+          <article class="foundation">
             <span class="f-num">03</span>
-            <span>
+            <div>
               <h3 class="f-title">Numerical methods</h3>
-              <p class="f-body">Quadrature, Newton iteration, and sparse solvers decide whether a formulation that is correct on paper can be solved at all—on CPU or on GPU.</p>
-            </span>
-          </a>
+              <p class="f-body">Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
+              <p class="f-body">Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
+              <div class="f-links">
+                <a href="hub.html#solving-linear-systems">Linear systems</a>
+                <a href="hub.html#newton-raphson-iteration-in-fem">Newton iteration</a>
+                <a href="hub.html#path-following-and-arc-length">Arc-length</a>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
