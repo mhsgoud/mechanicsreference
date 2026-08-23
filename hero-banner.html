@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bracket overlay — mechanicsReference</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #030712; }
+    .stage {
+      position: relative;
+      width: min(100vw, 1600px);
+      margin: 0 auto;
+      aspect-ratio: 2 / 1;
+      max-height: 100vh;
+      overflow: hidden;
+      background: #030712;
+    }
+    .stage > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    #slot {
+      position: absolute;
+      left: 48%;
+      top: 6%;
+      width: 40%;
+      height: 58%;
+      z-index: 1;
+      background: transparent;
+      pointer-events: auto;
+      cursor: grab;
+    }
+    #slot:active { cursor: grabbing; }
+    #slot canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #9eb6d4;
+      font: 600 12px/1.4 system-ui, sans-serif;
+      pointer-events: none;
+      text-shadow: 0 1px 4px #000;
+      z-index: 2;
+    }
+    .hud {
+      position: absolute;
+      left: 50%;
+      bottom: 14%;
+      z-index: 3;
+      transform: translateX(-10%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      background: rgba(8, 16, 32, 0.72);
+      border: 1px solid rgba(120, 170, 230, 0.25);
+      color: #d7e4f5;
+      font: 600 12px/1.2 system-ui, sans-serif;
+      pointer-events: auto;
+      backdrop-filter: blur(6px);
+    }
+    .hud label { white-space: nowrap; opacity: 0.9; }
+    .hud input[type="range"] {
+      width: min(180px, 28vw);
+      accent-color: #3a9fd4;
+      cursor: pointer;
+    }
+    .hud #loadVal {
+      font-variant-numeric: tabular-nums;
+      min-width: 3.2em;
+      color: #7ec8f0;
+    }
+    .hud button {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #e8f0fa;
+      background: transparent;
+      border: 1px solid rgba(120, 170, 230, 0.4);
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .hud button.on {
+      background: rgba(58, 159, 212, 0.25);
+      border-color: #3a9fd4;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <img src="hero-banner.png" alt="" width="1024" height="512" fetchpriority="high" />
+    <div id="slot">
+      <div class="loading" id="loading">Loading…</div>
+      <canvas id="c"></canvas>
+    </div>
+    <div class="hud" id="hud" hidden>
+      <label for="load">Load F</label>
+      <input id="load" type="range" min="0" max="100" value="55" />
+      <span id="loadVal">0.55</span>
+      <button type="button" id="animateBtn">Animate</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    const slot = document.getElementById('slot');
+    const canvas = document.getElementById('c');
+    const loading = document.getElementById('loading');
+    const hud = document.getElementById('hud');
+    const loadSlider = document.getElementById('load');
+    const loadVal = document.getElementById('loadVal');
+    const animateBtn = document.getElementById('animateBtn');
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      premultipliedAlpha: false,
+      powerPreference: 'high-performance',
+    });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const scene = new THREE.Scene();
+
+    // Soft studio IBL so metals/plastics read real on the transparent banner
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.85;
+
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 50);
+    camera.position.set(0.35, 0.55, 4.2);
+    camera.lookAt(0, 0, 0);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.target.set(0, 0, 0);
+    controls.minZoom = 0.55;
+    controls.maxZoom = 2.4;
+    controls.update();
+
+    // Rest pose facing the screen; user can orbit freely
+    const POSE = {
+      rotX: 0.12,
+      rotY: 0.08,
+      rotZ: 0,
+      fill: 0.88,
+    };
+
+    const TIP_DEFL = 0.14;
+
+    /* ── Realistic lighting + soft shadow on the banner ── */
+    scene.add(new THREE.AmbientLight(0xb8c8e0, 0.22));
+    scene.add(new THREE.HemisphereLight(0xd8e8ff, 0x1a2235, 0.45));
+
+    const key = new THREE.DirectionalLight(0xfff5ea, 2.4);
+    key.position.set(2.2, 4.5, 3.2);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.bias = -0.00025;
+    key.shadow.normalBias = 0.02;
+    key.shadow.radius = 3.5;
+    key.shadow.camera.near = 0.2;
+    key.shadow.camera.far = 12;
+    const s = 1.8;
+    key.shadow.camera.left = -s;
+    key.shadow.camera.right = s;
+    key.shadow.camera.top = s;
+    key.shadow.camera.bottom = -s;
+    scene.add(key);
+
+    const fill = new THREE.DirectionalLight(0x6a9fd8, 0.55);
+    fill.position.set(-3.2, 1.2, 2.0);
+    scene.add(fill);
+
+    const rim = new THREE.DirectionalLight(0xa8c8ff, 0.7);
+    rim.position.set(-0.5, 2.2, -3.5);
+    scene.add(rim);
+
+    const bounce = new THREE.DirectionalLight(0x8899aa, 0.25);
+    bounce.position.set(0, -2, 1);
+    scene.add(bounce);
+
+    // Shadow catcher — soft contact shadow drawn over the banner image
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(4, 4),
+      new THREE.ShadowMaterial({ opacity: 0.42 })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.42;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Subtle contact blob (extra soft falloff under the part)
+    const contact = new THREE.Mesh(
+      new THREE.CircleGeometry(0.85, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.18,
+        depthWrite: false,
+      })
+    );
+    contact.rotation.x = -Math.PI / 2;
+    contact.position.y = -0.415;
+    scene.add(contact);
+
+    function feaColor(t) {
+      t = THREE.MathUtils.clamp(t, 0, 1);
+      const stops = [
+        [0.0, [0.05, 0.08, 0.5]],
+        [0.15, [0.05, 0.3, 0.95]],
+        [0.32, [0.0, 0.8, 0.85]],
+        [0.48, [0.15, 0.9, 0.25]],
+        [0.62, [0.9, 0.95, 0.05]],
+        [0.78, [0.98, 0.55, 0.0]],
+        [0.9, [0.95, 0.2, 0.0]],
+        [1.0, [0.75, 0.0, 0.05]],
+      ];
+      let i = 0;
+      while (i < stops.length - 2 && t > stops[i + 1][0]) i++;
+      const a = stops[i], b = stops[i + 1];
+      const u = (t - a[0]) / (b[0] - a[0] || 1);
+      return new THREE.Color(
+        a[1][0] + (b[1][0] - a[1][0]) * u,
+        a[1][1] + (b[1][1] - a[1][1]) * u,
+        a[1][2] + (b[1][2] - a[1][2]) * u
+      );
+    }
+
+    function makeForceArrow() {
+      const g = new THREE.Group();
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0xe53935,
+        metalness: 0.15,
+        roughness: 0.4,
+        emissive: 0x4a0000,
+        emissiveIntensity: 0.35,
+      });
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.22, 16), mat);
+      shaft.position.y = 0.13;
+      shaft.castShadow = true;
+      const head = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.055, 18), mat);
+      head.rotation.x = Math.PI;
+      head.castShadow = true;
+      g.add(shaft, head);
+
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d');
+      ctx.font = 'bold 96px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ff5252';
+      ctx.shadowColor = '#000';
+      ctx.shadowBlur = 8;
+      ctx.fillText('F', 64, 70);
+      const spr = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true })
+      );
+      spr.scale.set(0.08, 0.08, 1);
+      spr.position.set(0.055, 0.18, 0.025);
+      g.add(spr);
+      return g;
+    }
+
+    const root = new THREE.Group();
+    scene.add(root);
+
+    let mesh = null;
+    let edges = null;
+    let arrow = null;
+    let restPos = null;
+    let xMin = 0, xSpan = 1, yNA = 0;
+    let tipLocal = new THREE.Vector3();
+    let load = 0.55;
+    let animating = false;
+
+    function stressAt(xn, yn, loadFactor) {
+      let s = (0.08 + 0.45 * xn + 0.15 * yn) * (0.25 + 0.75 * loadFactor);
+      s += 0.55 * loadFactor * Math.exp(-(((xn - 1) / 0.14) ** 2));
+      s += 0.25 * loadFactor * Math.exp(-(((xn - 0.35) / 0.16) ** 2) - (((yn - 0.7) / 0.22) ** 2));
+      return s;
+    }
+
+    function applyDeformation(loadFactor, rebuildEdges = true) {
+      if (!mesh || !restPos) return;
+      const pos = mesh.geometry.attributes.position;
+      const col = mesh.geometry.attributes.color;
+
+      for (let i = 0; i < pos.count; i++) {
+        const rx = restPos[i * 3];
+        const ry = restPos[i * 3 + 1];
+        const rz = restPos[i * 3 + 2];
+        const xn = THREE.MathUtils.clamp((rx - xMin) / xSpan, 0, 1);
+        // Cantilever: δ(x) ∝ 3ξ² − ξ³, slope θ ∝ 6ξ − 3ξ²
+        const defl = TIP_DEFL * loadFactor * (3 * xn * xn - xn * xn * xn);
+        const slope = -(TIP_DEFL * loadFactor / xSpan) * (6 * xn - 3 * xn * xn) * 0.25;
+        const yRel = ry - yNA;
+        const ca = Math.cos(slope);
+        const sa = Math.sin(slope);
+        const y2 = yNA + yRel * ca - defl;
+        const z2 = rz + yRel * sa * 0.2;
+
+        pos.setXYZ(i, rx, y2, z2);
+
+        const yn = THREE.MathUtils.clamp((ry - (yNA - xSpan * 0.4)) / (xSpan * 0.9), 0, 1);
+        const c = feaColor(stressAt(xn, yn, loadFactor));
+        col.setXYZ(i, c.r, c.g, c.b);
+      }
+      pos.needsUpdate = true;
+      col.needsUpdate = true;
+      mesh.geometry.computeVertexNormals();
+
+      if (rebuildEdges) {
+        if (edges) {
+          mesh.remove(edges);
+          edges.geometry.dispose();
+          edges.material.dispose();
+        }
+        edges = new THREE.LineSegments(
+          new THREE.EdgesGeometry(mesh.geometry, 28),
+          new THREE.LineBasicMaterial({ color: 0x061018, transparent: true, opacity: 0.28 })
+        );
+        mesh.add(edges);
+      }
+
+      if (arrow) {
+        const tipY = tipLocal.y - TIP_DEFL * loadFactor + 0.1;
+        arrow.position.set(tipLocal.x, tipY, tipLocal.z);
+      }
+    }
+
+    function frameOrtho() {
+      if (!mesh) return;
+      root.rotation.set(POSE.rotX, POSE.rotY, POSE.rotZ);
+      root.position.set(0, 0, 0);
+      mesh.position.set(0, 0, 0);
+      root.updateMatrixWorld(true);
+
+      const box = new THREE.Box3().setFromObject(root);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      root.position.set(-center.x, -center.y, -center.z);
+
+      const w = slot.clientWidth || 1;
+      const h = slot.clientHeight || 1;
+      const aspect = w / h;
+      const pad = 1 / POSE.fill;
+      let halfW = size.x * 0.5 * pad;
+      let halfH = size.y * 0.5 * pad;
+      if (halfW / halfH < aspect) halfW = halfH * aspect;
+      else halfH = halfW / aspect;
+
+      camera.left = -halfW;
+      camera.right = halfW;
+      camera.top = halfH;
+      camera.bottom = -halfH;
+      if (!camera.userData.framed) {
+        camera.position.set(0, 0.15, Math.max(size.z * 4, 2));
+        camera.lookAt(controls.target);
+        camera.userData.framed = true;
+        controls.update();
+      }
+      camera.updateProjectionMatrix();
+    }
+
+    function setLoad(v, { edges = true, reframe = false } = {}) {
+      load = THREE.MathUtils.clamp(v, 0, 1);
+      loadSlider.value = String(Math.round(load * 100));
+      loadVal.textContent = load.toFixed(2);
+      applyDeformation(load, edges);
+      if (reframe) frameOrtho();
+    }
+
+    loadSlider.addEventListener('input', () => {
+      animating = false;
+      animateBtn.classList.remove('on');
+      setLoad(Number(loadSlider.value) / 100, { edges: true, reframe: false });
+    });
+
+    animateBtn.addEventListener('click', () => {
+      animating = !animating;
+      animateBtn.classList.toggle('on', animating);
+    });
+
+    new STLLoader().load(
+      'bracket.stl',
+      (geometry) => {
+        geometry.computeBoundingBox();
+        const c0 = new THREE.Vector3();
+        geometry.boundingBox.getCenter(c0);
+        geometry.translate(-c0.x, -c0.y, -c0.z);
+
+        geometry.rotateX(-Math.PI / 2);
+        geometry.computeBoundingBox();
+
+        const bb = geometry.boundingBox;
+        xMin = bb.min.x;
+        xSpan = bb.max.x - bb.min.x || 1;
+        yNA = (bb.min.y + bb.max.y) * 0.5;
+
+        const pos = geometry.attributes.position;
+        restPos = new Float32Array(pos.count * 3);
+        for (let i = 0; i < pos.count; i++) {
+          restPos[i * 3] = pos.getX(i);
+          restPos[i * 3 + 1] = pos.getY(i);
+          restPos[i * 3 + 2] = pos.getZ(i);
+        }
+
+        // Placeholder colors; applyDeformation fills them
+        geometry.setAttribute(
+          'color',
+          new THREE.BufferAttribute(new Float32Array(pos.count * 3), 3)
+        );
+        geometry.computeVertexNormals();
+
+        mesh = new THREE.Mesh(
+          geometry,
+          new THREE.MeshPhysicalMaterial({
+            vertexColors: true,
+            metalness: 0.28,
+            roughness: 0.38,
+            clearcoat: 0.35,
+            clearcoatRoughness: 0.4,
+            envMapIntensity: 0.9,
+            side: THREE.DoubleSide,
+          })
+        );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        tipLocal.set(bb.max.x * 0.92, bb.max.y * 0.75, 0.03);
+        arrow = makeForceArrow();
+        arrow.scale.setScalar(bb.getSize(new THREE.Vector3()).x);
+        mesh.add(arrow);
+
+        root.add(mesh);
+        root.rotation.set(POSE.rotX, POSE.rotY, POSE.rotZ);
+        setLoad(0.55, { edges: true, reframe: true });
+
+        // Place shadow plane under the part
+        root.updateMatrixWorld(true);
+        const worldBox = new THREE.Box3().setFromObject(root);
+        ground.position.y = worldBox.min.y - 0.002;
+        contact.position.y = worldBox.min.y - 0.001;
+        const footprint = Math.max(worldBox.max.x - worldBox.min.x, worldBox.max.z - worldBox.min.z);
+        contact.scale.setScalar(footprint * 0.7);
+
+        // Aim key light at the part; tighten shadow camera
+        key.target.position.copy(controls.target);
+        scene.add(key.target);
+        const mid = worldBox.getCenter(new THREE.Vector3());
+        const ext = worldBox.getSize(new THREE.Vector3());
+        const span = Math.max(ext.x, ext.y, ext.z) * 0.75;
+        key.shadow.camera.left = -span;
+        key.shadow.camera.right = span;
+        key.shadow.camera.top = span;
+        key.shadow.camera.bottom = -span;
+        key.shadow.camera.updateProjectionMatrix();
+        key.position.set(mid.x + span * 1.2, mid.y + span * 2.2, mid.z + span * 1.6);
+
+        hud.hidden = false;
+        loading.remove();
+      },
+      (xhr) => {
+        if (xhr.total) loading.textContent = `${Math.round((100 * xhr.loaded) / xhr.total)}%`;
+      },
+      (err) => {
+        console.error(err);
+        loading.textContent = 'Failed to load bracket.stl';
+      }
+    );
+
+    function resize() {
+      const w = slot.clientWidth;
+      const h = slot.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      frameOrtho();
+    }
+    resize();
+    addEventListener('resize', resize);
+    new ResizeObserver(resize).observe(slot);
+
+    const clock = new THREE.Clock();
+    let edgeTick = 0;
+    (function tick() {
+      requestAnimationFrame(tick);
+      if (animating) {
+        const t = clock.getElapsedTime();
+        edgeTick++;
+        setLoad(0.5 + 0.5 * Math.sin(t * 0.9), {
+          edges: edgeTick % 8 === 0,
+          reframe: false,
+        });
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>

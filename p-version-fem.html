@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>p-Version FEM &amp; Lobatto Shape Functions — Mechanics Reference</title>
+  <meta name="description" content="Tunable Three.js contours of hierarchical Lobatto shape functions in 1D, 2D, and 3D for the p-version of the finite element method." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mechanicsreference.com/p-version-fem.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{
+      --paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;
+      --navy:#1e3a5f;--blue:#3a5f8a;--accent:#c45c26;--plate:#1a2740;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0} html{scrollbar-gutter:stable}
+    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    a{color:var(--blue)} a:hover{color:var(--accent)}
+    header{
+      position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;padding:12px 28px;
+    }
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
+    .crumb a{color:var(--blue);text-decoration:none}
+    h1{
+      margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;
+      font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy);letter-spacing:-0.02em;
+    }
+    .standfirst{margin:0 0 28px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
+    .figure-shell{
+      display:grid;grid-template-columns:1fr minmax(300px,360px);
+      border:1px solid var(--rule);background:#fff;min-height:560px;
+    }
+    #stage{position:relative;background:var(--plate);min-height:480px;isolation:isolate}
+    #stage canvas.view{display:block;width:100%;height:100%;position:absolute;inset:0}
+    #overlay{
+      position:absolute;left:10px;right:10px;bottom:10px;display:flex;flex-wrap:wrap;gap:8px;
+      pointer-events:none;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.72rem;color:#d7e0ec;z-index:2;
+    }
+    #overlay span{background:rgba(18,28,48,.82);border:1px solid rgba(138,163,196,.35);padding:5px 8px}
+    #cbar{
+      position:absolute;top:12px;right:12px;width:14px !important;height:140px !important;
+      max-width:14px;max-height:140px;border:1px solid rgba(244,239,230,.35);
+      pointer-events:none;z-index:2;display:block;
+    }
+    #ui{
+      padding:16px 18px 18px;border-left:1px solid var(--rule);background:#fff;
+      display:flex;flex-direction:column;gap:10px;max-height:min(78vh,720px);overflow:auto;
+    }
+    #ui h2{margin:0;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--navy);font-weight:600}
+    #description{color:var(--ink-soft);font-size:0.88rem;min-height:3.4em}
+    .modes,.dims{display:flex;border:1px solid var(--rule)}
+    .modes button,.dims button{
+      flex:1;appearance:none;border:0;background:#fff;color:var(--navy);
+      font:600 0.8rem "Source Sans 3",system-ui,sans-serif;padding:7px 4px;cursor:pointer;
+    }
+    .modes button.on,.dims button.on{background:var(--navy);color:#fff}
+    label.ctrl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;font-size:0.84rem;color:var(--ink-soft)}
+    label.ctrl span.v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.76rem;color:var(--navy)}
+    input[type=range],select{grid-column:1 / -1;width:100%}
+    select{
+      appearance:none;border:1px solid var(--rule);background:#fff;color:var(--navy);
+      font:600 0.84rem "Source Sans 3",system-ui,sans-serif;padding:7px 9px;
+    }
+    .idx-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .idx-row label{display:flex;flex-direction:column;gap:4px;font-size:0.78rem;color:var(--ink-soft)}
+    .idx-row select{font-size:0.82rem;padding:6px}
+    .idx-row .off{opacity:.35;pointer-events:none}
+    #formula{
+      font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.74rem;color:var(--navy);
+      background:#f1efe9;padding:9px 10px;line-height:1.5;border:1px solid var(--rule);
+    }
+    .hint{margin:0;font-size:0.76rem;color:#7a8494}
+    .sep{height:1px;background:var(--rule);margin:2px 0}
+    .page-copy h2,.prose h2{
+      margin:40px 0 12px;font-family:"Source Serif 4",Georgia,serif;
+      font-size:1.45rem;font-weight:600;color:var(--navy);
+    }
+    .page-copy h2:first-of-type{margin-top:36px}
+    .prose p,.page-copy > p{margin:0 0 14px;max-width:44em;color:var(--ink-soft)}
+    .prose ul{margin:0 0 16px;padding-left:1.2em;max-width:44em;color:var(--ink-soft)}
+    .prose li{margin:0 0 6px}
+    .compare{
+      display:grid;grid-template-columns:1fr 1fr;gap:0;
+      border:1px solid var(--rule);background:#fff;margin:20px 0 28px;
+    }
+    .compare div{padding:18px 20px}
+    .compare div + div{border-left:1px solid var(--rule)}
+    .compare h3{margin:0 0 8px;font-size:0.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+    .compare p{margin:0;font-size:0.95rem;color:var(--ink-soft)}
+    .eq{
+      margin:16px 0 20px;padding:14px 16px;background:#fff;border:1px solid var(--rule);
+      font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.86rem;color:var(--navy);
+      overflow-x:auto;line-height:1.7;
+    }
+    .fig{margin:24px 0 8px;border:1px solid var(--rule);background:#fff}
+    .fig img{display:block;width:100%;height:auto}
+    .figcaption{
+      margin:0 0 28px;padding:10px 14px;font-size:0.88rem;color:var(--ink-soft);
+      border:1px solid var(--rule);border-top:0;background:#fff;
+    }
+    .figcaption strong{color:var(--navy)}
+    .trio{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+      border:1px solid var(--rule);background:#fff;margin:20px 0 28px;
+    }
+    .trio article{padding:18px 16px;border-left:1px solid var(--rule)}
+    .trio article:first-child{border-left:0}
+    .trio h3{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-size:1.05rem;color:var(--navy)}
+    .trio p{margin:0;font-size:0.9rem;color:var(--ink-soft)}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--paper)}
+    html.embed header,html.embed .page-copy,html.embed .prose,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell{height:100%;border:0;min-height:0}
+    html.embed #stage{min-height:0;height:100%}
+    @media (max-width:960px){
+      .figure-shell,.compare,.trio{grid-template-columns:1fr}
+      .compare div + div,.trio article{border-left:0;border-top:1px solid var(--rule)}
+      #ui{border-left:0;border-top:1px solid var(--rule);max-height:none}
+      #stage{min-height:360px}
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      html.embed .figure-shell{grid-template-rows:1fr auto}
+      html.embed #stage{height:auto;min-height:0;flex:1}
+    }
+  </style>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header>
+    <a href="./" aria-label="Mechanics Reference home">
+      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+    </a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="hub.html#p-version-fem-lobatto-shape-functions">Library</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#p-version-fem-lobatto-shape-functions">p-version FEM</a></p>
+      <h1>Raise <i>p</i>, keep the mesh</h1>
+      <p class="standfirst">
+        Hierarchical Lobatto shape functions are the workhorse of the <i>p</i>-version.
+        The viewer below evaluates the same 1-D library as a typical high-order code, then builds tensor-product modes in 1-D, 2-D, and 3-D — contours, warped surfaces, volume slices, and isosurfaces you can tune live.
+      </p>
+    </div>
+
+    <div class="figure-shell">
+      <div id="stage">
+        <canvas id="cbar" width="14" height="140" aria-hidden="true"></canvas>
+        <div id="overlay">
+          <span id="probe">φ = —</span>
+          <span id="rangeLabel">min · max</span>
+        </div>
+      </div>
+      <aside id="ui">
+        <h2>Lobatto contours</h2>
+        <div id="description">Tensor-product hierarchical modes on the reference element [−1, 1]<sup>d</sup>.</div>
+
+        <div class="dims" role="group" aria-label="Dimension">
+          <button type="button" id="d1">1D</button>
+          <button type="button" id="d2" class="on">2D</button>
+          <button type="button" id="d3">3D</button>
+        </div>
+
+        <div class="modes" role="group" aria-label="Mode family">
+          <button type="button" id="mVertex" class="on">Vertex</button>
+          <button type="button" id="mEdge">Edge</button>
+          <button type="button" id="mFace" hidden>Face</button>
+          <button type="button" id="mBubble">Bubble</button>
+        </div>
+
+        <div class="idx-row" id="idxRow">
+          <label>i (ξ)
+            <select id="idxI"></select>
+          </label>
+          <label id="labJ">j (η)
+            <select id="idxJ"></select>
+          </label>
+          <label id="labK" class="off">k (ζ)
+            <select id="idxK"></select>
+          </label>
+        </div>
+
+        <div id="formula">φ = ℓᵢ(ξ)</div>
+        <div class="sep"></div>
+
+        <label class="ctrl">Preset <span class="v" id="presetV">custom</span>
+          <select id="preset"></select>
+        </label>
+
+        <label class="ctrl">Resolution <span class="v" id="resV">48</span>
+          <input id="res" type="range" min="16" max="80" value="48" />
+        </label>
+        <label class="ctrl" id="warpWrap">Warp scale <span class="v" id="warpV">0.0</span>
+          <input id="warp" type="range" min="0" max="30" value="0" />
+        </label>
+        <label class="ctrl" id="contourWrap">Contour lines <span class="v" id="nContV">8</span>
+          <input id="nCont" type="range" min="0" max="16" value="8" />
+        </label>
+        <label class="ctrl" id="isoWrap" hidden>Isosurface |φ| <span class="v" id="isoV">0.35</span>
+          <input id="iso" type="range" min="5" max="95" value="35" />
+        </label>
+        <label class="ctrl" id="sliceWrap" hidden>Slice ζ <span class="v" id="sliceV">0.00</span>
+          <input id="slice" type="range" min="-100" max="100" value="0" />
+        </label>
+        <label class="ctrl" id="opacityWrap" hidden>Volume opacity <span class="v" id="opV">0.55</span>
+          <input id="opacity" type="range" min="10" max="100" value="55" />
+        </label>
+        <label class="ctrl">Amplify φ <span class="v" id="ampV">1.0×</span>
+          <input id="amp" type="range" min="10" max="400" value="100" />
+        </label>
+
+        <p class="hint">Drag to orbit · scroll to zoom · same ℓ<sub>k</sub> as <code>lobatto.m</code>.</p>
+      </aside>
+    </div>
+
+    <div class="prose">
+      <h2><i>h</i>-version versus <i>p</i>-version</h2>
+      <div class="compare">
+        <div>
+          <h3>h-version</h3>
+          <p>Keep the polynomial degree fixed (usually <i>p</i> = 1 or 2) and refine the mesh size <i>h</i>. Algebraic rates follow: ‖<i>u</i> − <i>u<sup>h</sup></i>‖<sub>L²</sub> = O(<i>h</i><sup><i>p</i>+1</sup>) and ‖∇(<i>u</i> − <i>u<sup>h</sup></i>)‖ = O(<i>h</i><sup><i>p</i></sup>) when the solution is smooth enough.</p>
+        </div>
+        <div>
+          <h3>p-version</h3>
+          <p>Keep the mesh, raise the degree. For analytic solutions the error decays exponentially in <i>p</i>. Near singularities an <i>hp</i> strategy — geometric refinement plus high order away from the tip — recovers exponential rates again.</p>
+        </div>
+      </div>
+      <p>
+        The plots below show the classical algebraic rates on a sequence of meshes for <i>p</i> = 1…7.
+        Steeper slopes at higher <i>p</i> are exactly the O(<i>h</i><sup><i>p</i>+1</sup>) and O(<i>h</i><sup><i>p</i></sup>) predictions for the field and its gradient.
+      </p>
+
+      <figure class="fig">
+        <img src="p-version-convergence.png" alt="Log-log convergence of relative L2 error in u and grad u for polynomial orders p = 1 to 7 versus mesh size" width="1200" height="520" loading="lazy" />
+      </figure>
+      <p class="figcaption"><strong>Convergence.</strong> Relative L² error in <i>u</i> (left) falls as O(<i>h</i><sup><i>p</i>+1</sup>); the gradient (right) as O(<i>h</i><sup><i>p</i></sup>).</p>
+
+      <h2>Why Lobatto, not monomials</h2>
+      <p>
+        A naïve basis {1, ξ, ξ², …, ξ<sup><i>p</i></sup>} on [−1, 1] becomes severely ill-conditioned as <i>p</i> grows.
+        Integrated Legendre (Lobatto) polynomials vanish at the endpoints for <i>k</i> ≥ 2 and stay nearly orthogonal in the energy inner product, so hierarchical element matrices remain usable at high <i>p</i>.
+      </p>
+      <div class="eq">
+        ℓ₀(ξ) = (1 − ξ)/2<br />
+        ℓ₁(ξ) = (1 + ξ)/2<br />
+        ℓ₂(ξ) = ½√(3/2) (ξ² − 1)<br />
+        ℓ₃(ξ) = ½√(5/2) (ξ² − 1) ξ<br />
+        ℓ₄(ξ) = ⅛√(7/2) (ξ² − 1)(5ξ² − 1)<br />
+        ℓ<sub>k</sub>(ξ) = c<sub>k</sub> (ξ² − 1) P′<sub>k−1</sub>(ξ) &nbsp; for k ≥ 2
+      </div>
+
+      <h2>Families on the reference element</h2>
+      <div class="trio">
+        <article>
+          <h3>Vertex / edge</h3>
+          <p>Vertex modes use only ℓ₀, ℓ₁. Edge modes put one factor at order <i>k</i> ≥ 2 and pin the transverse directions to a vertex factor so continuity lives on that edge alone.</p>
+        </article>
+        <article>
+          <h3>Face (3D)</h3>
+          <p>On a hexahedron a face mode has two high-order factors in the face plane and one vertex factor normal to the face — zero on the other five faces.</p>
+        </article>
+        <article>
+          <h3>Bubble</h3>
+          <p>All free directions use <i>k</i> ≥ 2, so the mode vanishes on the entire boundary and can be statically condensed.</p>
+        </article>
+      </div>
+      <div class="eq">
+        1D: &nbsp; φ = ℓᵢ(ξ)<br />
+        2D: &nbsp; φ = ℓᵢ(ξ) ℓⱼ(η)<br />
+        3D: &nbsp; φ = ℓᵢ(ξ) ℓⱼ(η) ℓₖ(ζ)
+      </div>
+
+      <h2>Reference bubble set</h2>
+      <p>
+        Diagonal bubbles ℓ<sub>k</sub>(ξ) ℓ<sub>k</sub>(η) for <i>k</i> = 2…7 from the original ParaView export — reproduce them in the viewer with dimension <b>2D</b>, family <b>Bubble</b>, and <i>i</i> = <i>j</i> = <i>k</i>.
+      </p>
+      <figure class="fig">
+        <img src="p-version-lobatto-bubbles.png" alt="Contour plots of Lobatto bubble shape functions for orders k equals 2 through 7" width="1200" height="720" loading="lazy" />
+      </figure>
+      <p class="figcaption"><strong>Interior bubbles.</strong> Blue / red opposite signs; green near zero. Every panel vanishes on all four edges.</p>
+
+      <h2>Practical notes</h2>
+      <ul>
+        <li><strong>Quadrature.</strong> Integrate at least degree 2<i>p</i> − 2, or expected rates disappear.</li>
+        <li><strong>Condensation.</strong> Bubbles (and often faces) have local support and can be eliminated before assembly.</li>
+        <li><strong>Singularities.</strong> Pure <i>p</i> on a coarse mesh stalls at tips; use <i>hp</i> geometric refinement.</li>
+        <li><strong>Spectral cousins.</strong> GLL nodal bases use the same orthogonal polynomials, but are nodal rather than hierarchical.</li>
+      </ul>
+      <p>
+        Contours above match Šolín, Segeth &amp; Doležel, <i>Higher-Order Finite Element Methods</i>, and the MATLAB Lobatto library used to write <code>shFuncs.vtu</code>.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#shape-functions-isoparametric-mapping">Shape functions</a> · <a href="hub.html#element-types-families-chooser">Element families</a> · <a href="hub.html#p-version-fem-lobatto-shape-functions">Library</a></span>
+    </div>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+
+    // ---- Lobatto 1-D library (matches lobatto.m) ---------------------------
+    function lobatto(p, xi) {
+      const x2 = xi * xi;
+      switch (p | 0) {
+        case 0: return (1 - xi) / 2;
+        case 1: return (1 + xi) / 2;
+        case 2: return 0.5 * Math.sqrt(1.5) * (x2 - 1);
+        case 3: return 0.5 * Math.sqrt(2.5) * (x2 - 1) * xi;
+        case 4: return 0.125 * Math.sqrt(3.5) * (x2 - 1) * (5 * x2 - 1);
+        case 5: return 0.125 * Math.sqrt(4.5) * (x2 - 1) * (7 * x2 - 3) * xi;
+        case 6: return (1 / 16) * Math.sqrt(5.5) * (x2 - 1) * (21 * x2 * x2 - 14 * x2 + 1);
+        case 7: return (1 / 16) * Math.sqrt(6.5) * (x2 - 1) * (33 * x2 * x2 - 30 * x2 + 5) * xi;
+        case 8: {
+          const x4 = x2 * x2, x6 = x4 * x2;
+          return (1 / 128) * Math.sqrt(7.5) * (x2 - 1) * (429 * x6 - 495 * x4 + 135 * x2 - 5);
+        }
+        case 9: {
+          const x4 = x2 * x2, x6 = x4 * x2;
+          return (1 / 128) * Math.sqrt(8.5) * (x2 - 1) * (715 * x6 - 1001 * x4 + 385 * x2 - 35) * xi;
+        }
+        case 10: {
+          const x4 = x2 * x2, x6 = x4 * x2, x8 = x4 * x4;
+          return (1 / 256) * Math.sqrt(9.5) * (x2 - 1) * (2431 * x8 - 4004 * x6 + 2002 * x4 - 308 * x2 + 7);
+        }
+        default: return 0;
+      }
+    }
+
+    function heatRGB(t) {
+      t = Math.max(0, Math.min(1, t));
+      if (t < 0.5) {
+        const u = t * 2;
+        return [(40 + u * 50) / 255, (80 + u * 120) / 255, (180 - u * 60) / 255];
+      }
+      const u = (t - 0.5) * 2;
+      return [(90 + u * 150) / 255, (200 - u * 140) / 255, (120 - u * 90) / 255];
+    }
+
+    function paintColorbar() {
+      const c = document.getElementById('cbar');
+      const ctx = c.getContext('2d');
+      const h = c.height, w = c.width;
+      for (let y = 0; y < h; y++) {
+        const [r, g, b] = heatRGB(1 - y / (h - 1));
+        ctx.fillStyle = `rgb(${(r * 255) | 0},${(g * 255) | 0},${(b * 255) | 0})`;
+        ctx.fillRect(0, y, w, 1);
+      }
+    }
+    paintColorbar();
+
+    // ---- DOM --------------------------------------------------------------
+    const stage = document.getElementById('stage');
+    const els = {
+      desc: document.getElementById('description'),
+      formula: document.getElementById('formula'),
+      probe: document.getElementById('probe'),
+      range: document.getElementById('rangeLabel'),
+      idxI: document.getElementById('idxI'),
+      idxJ: document.getElementById('idxJ'),
+      idxK: document.getElementById('idxK'),
+      labJ: document.getElementById('labJ'),
+      labK: document.getElementById('labK'),
+      preset: document.getElementById('preset'),
+      res: document.getElementById('res'),
+      warp: document.getElementById('warp'),
+      nCont: document.getElementById('nCont'),
+      iso: document.getElementById('iso'),
+      slice: document.getElementById('slice'),
+      opacity: document.getElementById('opacity'),
+      amp: document.getElementById('amp'),
+      faceBtn: document.getElementById('mFace'),
+      warpWrap: document.getElementById('warpWrap'),
+      contourWrap: document.getElementById('contourWrap'),
+      isoWrap: document.getElementById('isoWrap'),
+      sliceWrap: document.getElementById('sliceWrap'),
+      opacityWrap: document.getElementById('opacityWrap')
+    };
+
+    const state = {
+      dim: 2,
+      family: 'vertex',
+      i: 0, j: 0, k: 0,
+      rebuildTimer: 0
+    };
+
+    // ---- Three.js scene ---------------------------------------------------
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a2740);
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 100);
+    camera.position.set(3.2, 2.6, 4.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.domElement.classList.add('view');
+    stage.insertBefore(renderer.domElement, stage.firstChild);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0.2, 0);
+    controls.minDistance = 1.2;
+    controls.maxDistance = 18;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.15));
+    const key = new THREE.DirectionalLight(0xffffff, 1.35);
+    key.position.set(4, 7, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x9bb6d4, 0.45);
+    fill.position.set(-3, 2, -4);
+    scene.add(fill);
+
+    const root = new THREE.Group();
+    scene.add(root);
+
+    const boxHelper = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(2, 2, 2)),
+      new THREE.LineBasicMaterial({ color: 0x8aa3c4, transparent: true, opacity: 0.55 })
+    );
+    scene.add(boxHelper);
+
+    const axisGroup = new THREE.Group();
+    scene.add(axisGroup);
+    const axisMat = new THREE.LineBasicMaterial({ color: 0xc5d0de, transparent: true, opacity: 0.5 });
+    function addAxis(a, b) {
+      const g = new THREE.BufferGeometry().setFromPoints([a, b]);
+      axisGroup.add(new THREE.Line(g, axisMat));
+    }
+    addAxis(new THREE.Vector3(-1.15, -1, -1), new THREE.Vector3(1.15, -1, -1));
+    addAxis(new THREE.Vector3(-1, -1.15, -1), new THREE.Vector3(-1, 1.15, -1));
+    addAxis(new THREE.Vector3(-1, -1, -1.15), new THREE.Vector3(-1, -1, 1.15));
+
+    // ---- Sampling ---------------------------------------------------------
+    function phi(xi, eta = 0, zeta = 0) {
+      const amp = (+els.amp.value) / 100;
+      if (state.dim === 1) return amp * lobatto(state.i, xi);
+      if (state.dim === 2) return amp * lobatto(state.i, xi) * lobatto(state.j, eta);
+      return amp * lobatto(state.i, xi) * lobatto(state.j, eta) * lobatto(state.k, zeta);
+    }
+
+    function colorFor(v, lim) {
+      const t = lim > 0 ? 0.5 + 0.5 * (v / lim) : 0.5;
+      const [r, g, b] = heatRGB(t);
+      return new THREE.Color(r, g, b);
+    }
+
+    function clearRoot() {
+      while (root.children.length) {
+        const o = root.children.pop();
+        o.geometry?.dispose?.();
+        if (o.material) {
+          if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+          else o.material.dispose();
+        }
+      }
+    }
+
+    function setCameraForDim() {
+      if (state.dim === 1) {
+        camera.position.set(0, 0.9, 3.6);
+        controls.target.set(0, 0.2, 0);
+        controls.maxPolarAngle = Math.PI;
+        boxHelper.visible = false;
+        boxHelper.scale.set(1, 1, 0.001);
+        boxHelper.position.set(0, 0, 0);
+      } else if (state.dim === 2) {
+        // Top-down contour view (ParaView-style), slight tilt
+        camera.position.set(0, 4.2, 0.01);
+        controls.target.set(0, 0, 0);
+        controls.maxPolarAngle = Math.PI / 2.05;
+        boxHelper.visible = true;
+        boxHelper.scale.set(1, 0.001, 1);
+        boxHelper.position.set(0, -0.02, 0);
+      } else {
+        camera.position.set(3.4, 2.8, 3.8);
+        controls.target.set(0, 0, 0);
+        controls.maxPolarAngle = Math.PI;
+        boxHelper.visible = true;
+        boxHelper.scale.set(1, 1, 1);
+        boxHelper.position.set(0, 0, 0);
+      }
+      controls.update();
+    }
+
+    // Contour polylines on a 2D grid via marching squares (zero-level + levels)
+    function contourLines(n, levels, lim, warp) {
+      const group = new THREE.Group();
+      const mat = new THREE.LineBasicMaterial({ color: 0xf4efe6, transparent: true, opacity: 0.55 });
+      const grid = new Float64Array(n * n);
+      for (let j = 0; j < n; j++) {
+        const eta = -1 + 2 * j / (n - 1);
+        for (let i = 0; i < n; i++) {
+          const xi = -1 + 2 * i / (n - 1);
+          grid[j * n + i] = phi(xi, eta);
+        }
+      }
+      function pushSeg(ax, ay, az, bx, by, bz, arr) {
+        arr.push(ax, ay, az, bx, by, bz);
+      }
+      function cellSegs(level, segs) {
+        for (let j = 0; j < n - 1; j++) {
+          for (let i = 0; i < n - 1; i++) {
+            const i00 = j * n + i, i10 = i00 + 1, i01 = i00 + n, i11 = i01 + 1;
+            const v00 = grid[i00] - level, v10 = grid[i10] - level;
+            const v01 = grid[i01] - level, v11 = grid[i11] - level;
+            let code = 0;
+            if (v00 >= 0) code |= 1;
+            if (v10 >= 0) code |= 2;
+            if (v11 >= 0) code |= 4;
+            if (v01 >= 0) code |= 8;
+            if (code === 0 || code === 15) continue;
+            const x0 = -1 + 2 * i / (n - 1), x1 = -1 + 2 * (i + 1) / (n - 1);
+            const y0 = -1 + 2 * j / (n - 1), y1 = -1 + 2 * (j + 1) / (n - 1);
+            const lerp = (a, b, va, vb) => a + (b - a) * (0 - va) / (vb - va || 1e-12);
+            const pts = [];
+            const edge = (side) => {
+              if (side === 0 && (v00 >= 0) !== (v10 >= 0)) pts.push([lerp(x0, x1, v00, v10), y0]);
+              if (side === 1 && (v10 >= 0) !== (v11 >= 0)) pts.push([x1, lerp(y0, y1, v10, v11)]);
+              if (side === 2 && (v01 >= 0) !== (v11 >= 0)) pts.push([lerp(x0, x1, v01, v11), y1]);
+              if (side === 3 && (v00 >= 0) !== (v01 >= 0)) pts.push([x0, lerp(y0, y1, v00, v01)]);
+            };
+            edge(0); edge(1); edge(2); edge(3);
+            if (pts.length >= 2) {
+              const yLift = warp ? (level / (lim || 1)) * warp + 0.01 : 0.02;
+              pushSeg(pts[0][0], yLift, pts[0][1], pts[1][0], yLift, pts[1][1], segs);
+            }
+          }
+        }
+      }
+      for (const level of levels) {
+        const segs = [];
+        cellSegs(level, segs);
+        if (!segs.length) continue;
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(segs, 3));
+        const line = new THREE.LineSegments(geo, mat.clone());
+        if (Math.abs(level) < 1e-10) line.material.opacity = 0.9;
+        group.add(line);
+      }
+      return group;
+    }
+
+    function build1D() {
+      const n = Math.max(64, +els.res.value * 2);
+      const warp = (+els.warp.value) / 10;
+      const positions = [];
+      const colors = [];
+      let mn = Infinity, mx = -Infinity;
+      const vals = new Float64Array(n);
+      for (let i = 0; i < n; i++) {
+        const xi = -1 + 2 * i / (n - 1);
+        const v = phi(xi);
+        vals[i] = v;
+        if (v < mn) mn = v;
+        if (v > mx) mx = v;
+      }
+      const lim = Math.max(Math.abs(mn), Math.abs(mx), 1e-12);
+      for (let i = 0; i < n; i++) {
+        const xi = -1 + 2 * i / (n - 1);
+        const v = vals[i];
+        positions.push(xi, (v / lim) * warp, 0);
+        const c = colorFor(v, lim);
+        colors.push(c.r, c.g, c.b);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 }));
+      root.add(line);
+
+      // tube-like ribbon for presence
+      const ribbon = [];
+      const rCols = [];
+      const half = 0.045;
+      for (let i = 0; i < n - 1; i++) {
+        const xi0 = -1 + 2 * i / (n - 1), xi1 = -1 + 2 * (i + 1) / (n - 1);
+        const y0 = (vals[i] / lim) * warp, y1 = (vals[i + 1] / lim) * warp;
+        const c0 = colorFor(vals[i], lim), c1 = colorFor(vals[i + 1], lim);
+        ribbon.push(xi0, y0, -half, xi1, y1, -half, xi1, y1, half);
+        ribbon.push(xi0, y0, -half, xi1, y1, half, xi0, y0, half);
+        for (let t = 0; t < 3; t++) rCols.push(c0.r, c0.g, c0.b);
+        for (let t = 0; t < 3; t++) rCols.push(c1.r, c1.g, c1.b);
+      }
+      const rGeo = new THREE.BufferGeometry();
+      rGeo.setAttribute('position', new THREE.Float32BufferAttribute(ribbon, 3));
+      rGeo.setAttribute('color', new THREE.Float32BufferAttribute(rCols, 3));
+      root.add(new THREE.Mesh(rGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })));
+
+      // baseline
+      const base = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-1, 0, 0), new THREE.Vector3(1, 0, 0)
+      ]);
+      root.add(new THREE.Line(base, new THREE.LineBasicMaterial({ color: 0x6b7c93 })));
+
+      els.range.textContent = `${mn.toExponential(2)} · ${mx.toExponential(2)}`;
+      return { lim, mn, mx };
+    }
+
+    function build2D() {
+      const n = +els.res.value;
+      const warp = (+els.warp.value) / 10;
+      const nCont = +els.nCont.value;
+      const geo = new THREE.PlaneGeometry(2, 2, n - 1, n - 1);
+      // Keep plane in XY (facing a top-down camera looking along −Y after we rotate the group)
+      // Map: x → ξ, y → η, then rotate so the plate lies in XZ with normal +Y
+      geo.rotateX(-Math.PI / 2);
+      const pos = geo.attributes.position;
+      const cols = new Float32Array(pos.count * 3);
+      let mn = Infinity, mx = -Infinity;
+      const raw = new Float64Array(pos.count);
+      for (let i = 0; i < pos.count; i++) {
+        const xi = pos.getX(i);
+        const eta = pos.getZ(i);
+        const v = phi(xi, eta);
+        raw[i] = v;
+        if (v < mn) mn = v;
+        if (v > mx) mx = v;
+      }
+      const lim = Math.max(Math.abs(mn), Math.abs(mx), 1e-12);
+      for (let i = 0; i < pos.count; i++) {
+        const v = raw[i];
+        pos.setY(i, (v / lim) * warp);
+        const c = colorFor(v, lim);
+        cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+      }
+      pos.needsUpdate = true;
+      geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      geo.computeVertexNormals();
+      // BasicMaterial: vertex colors must read true (no lighting washout on flat map)
+      root.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+        vertexColors: true, side: THREE.DoubleSide
+      })));
+
+      const frame = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.PlaneGeometry(2, 2)),
+        new THREE.LineBasicMaterial({ color: 0xf4efe6 })
+      );
+      frame.rotation.x = -Math.PI / 2;
+      frame.position.y = 0.02;
+      root.add(frame);
+
+      if (nCont > 0) {
+        const levels = [];
+        for (let c = 0; c < nCont; c++) {
+          const t = (c + 1) / (nCont + 1);
+          levels.push(-lim + 2 * lim * t);
+        }
+        levels.push(0);
+        root.add(contourLines(Math.min(n, 56), levels, lim, warp));
+      }
+
+      els.range.textContent = `${mn.toExponential(2)} · ${mx.toExponential(2)}`;
+      return { lim, mn, mx };
+    }
+
+    function build3D() {
+      const n = Math.min(+els.res.value, 36);
+      const isoFrac = (+els.iso.value) / 100;
+      const sliceZ = (+els.slice.value) / 100;
+      const opacity = (+els.opacity.value) / 100;
+      const nCont = +els.nCont.value;
+
+      let mn = Infinity, mx = -Infinity;
+      const field = new Float64Array(n * n * n);
+      for (let k = 0; k < n; k++) {
+        const zeta = -1 + 2 * k / (n - 1);
+        for (let j = 0; j < n; j++) {
+          const eta = -1 + 2 * j / (n - 1);
+          for (let i = 0; i < n; i++) {
+            const xi = -1 + 2 * i / (n - 1);
+            const v = phi(xi, eta, zeta);
+            field[(k * n + j) * n + i] = v;
+            if (v < mn) mn = v;
+            if (v > mx) mx = v;
+          }
+        }
+      }
+      const lim = Math.max(Math.abs(mn), Math.abs(mx), 1e-12);
+
+      // volume points (subsampled)
+      const step = n > 28 ? 2 : 1;
+      const positions = [];
+      const colors = [];
+      for (let k = 0; k < n; k += step) {
+        const zeta = -1 + 2 * k / (n - 1);
+        for (let j = 0; j < n; j += step) {
+          const eta = -1 + 2 * j / (n - 1);
+          for (let i = 0; i < n; i += step) {
+            const xi = -1 + 2 * i / (n - 1);
+            const v = field[(k * n + j) * n + i];
+            if (Math.abs(v) < 0.08 * lim) continue;
+            positions.push(xi, zeta, eta); // y = ζ for upright cube
+            const c = colorFor(v, lim);
+            colors.push(c.r, c.g, c.b);
+          }
+        }
+      }
+      if (positions.length) {
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        pGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        root.add(new THREE.Points(pGeo, new THREE.PointsMaterial({
+          size: 0.055, vertexColors: true, transparent: true, opacity: opacity * 0.85, depthAttenuation: true
+        })));
+      }
+
+      // slice at ζ = sliceZ (plane y = sliceZ)
+      {
+        const sn = Math.min(n, 48);
+        const sGeo = new THREE.PlaneGeometry(2, 2, sn - 1, sn - 1);
+        // plane in XZ at y = sliceZ; PlaneGeometry is XY → rotate to XZ
+        sGeo.rotateX(-Math.PI / 2);
+        const pos = sGeo.attributes.position;
+        const cols = new Float32Array(pos.count * 3);
+        for (let i = 0; i < pos.count; i++) {
+          const xi = pos.getX(i);
+          const eta = pos.getZ(i);
+          const v = phi(xi, eta, sliceZ);
+          pos.setY(i, sliceZ);
+          const c = colorFor(v, lim);
+          cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+        }
+        pos.needsUpdate = true;
+        sGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+        root.add(new THREE.Mesh(sGeo, new THREE.MeshBasicMaterial({
+          vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.92
+        })));
+        if (nCont > 0) {
+          // 2D contours on the slice: temporarily evaluate at fixed ζ
+          const levels = [];
+          for (let c = 0; c < nCont; c++) levels.push(-lim + 2 * lim * (c + 1) / (nCont + 1));
+          levels.push(0);
+          const group = new THREE.Group();
+          const mat = new THREE.LineBasicMaterial({ color: 0xf4efe6, transparent: true, opacity: 0.7 });
+          const gn = Math.min(n, 40);
+          const grid = new Float64Array(gn * gn);
+          for (let j = 0; j < gn; j++) {
+            const eta = -1 + 2 * j / (gn - 1);
+            for (let i = 0; i < gn; i++) {
+              const xi = -1 + 2 * i / (gn - 1);
+              grid[j * gn + i] = phi(xi, eta, sliceZ);
+            }
+          }
+          for (const level of levels) {
+            const segs = [];
+            for (let j = 0; j < gn - 1; j++) {
+              for (let i = 0; i < gn - 1; i++) {
+                const i00 = j * gn + i, i10 = i00 + 1, i01 = i00 + gn, i11 = i01 + 1;
+                const v00 = grid[i00] - level, v10 = grid[i10] - level;
+                const v01 = grid[i01] - level, v11 = grid[i11] - level;
+                let code = 0;
+                if (v00 >= 0) code |= 1;
+                if (v10 >= 0) code |= 2;
+                if (v11 >= 0) code |= 4;
+                if (v01 >= 0) code |= 8;
+                if (!code || code === 15) continue;
+                const x0 = -1 + 2 * i / (gn - 1), x1 = -1 + 2 * (i + 1) / (gn - 1);
+                const y0 = -1 + 2 * j / (gn - 1), y1 = -1 + 2 * (j + 1) / (gn - 1);
+                const lerp = (a, b, va, vb) => a + (b - a) * (0 - va) / (vb - va || 1e-12);
+                const pts = [];
+                if ((v00 >= 0) !== (v10 >= 0)) pts.push([lerp(x0, x1, v00, v10), y0]);
+                if ((v10 >= 0) !== (v11 >= 0)) pts.push([x1, lerp(y0, y1, v10, v11)]);
+                if ((v01 >= 0) !== (v11 >= 0)) pts.push([lerp(x0, x1, v01, v11), y1]);
+                if ((v00 >= 0) !== (v01 >= 0)) pts.push([x0, lerp(y0, y1, v00, v01)]);
+                if (pts.length >= 2) {
+                  segs.push(pts[0][0], sliceZ + 0.01, pts[0][1], pts[1][0], sliceZ + 0.01, pts[1][1]);
+                }
+              }
+            }
+            if (!segs.length) continue;
+            const g = new THREE.BufferGeometry();
+            g.setAttribute('position', new THREE.Float32BufferAttribute(segs, 3));
+            group.add(new THREE.LineSegments(g, mat.clone()));
+          }
+          root.add(group);
+        }
+      }
+
+      // ± isosurfaces (MarchingCubes field already spans ≈[-1,1]³)
+      if (isoFrac > 0.05) {
+        const isol = Math.max(5, isoFrac * 100);
+        for (const sign of [1, -1]) {
+          const mc = new MarchingCubes(n, new THREE.MeshLambertMaterial({
+            color: sign > 0 ? 0xc45c26 : 0x3a6ea5,
+            transparent: true,
+            opacity: 0.42,
+            side: THREE.DoubleSide,
+            depthWrite: false
+          }), false, false, 80000);
+          mc.isolation = isol;
+          mc.reset();
+          for (let k = 0; k < n; k++) {
+            for (let j = 0; j < n; j++) {
+              for (let i = 0; i < n; i++) {
+                const v = field[(k * n + j) * n + i];
+                const strength = Math.max(0, sign * v / lim);
+                // setCell(x,y,z): x→ξ, y→ζ, z→η to match the point cloud
+                mc.setCell(i, k, j, strength * 100);
+              }
+            }
+          }
+          mc.update();
+          root.add(mc);
+        }
+      }
+
+      els.range.textContent = `${mn.toExponential(2)} · ${mx.toExponential(2)}`;
+      return { lim, mn, mx };
+    }
+
+    function rebuild() {
+      clearRoot();
+      if (state.dim === 1) build1D();
+      else if (state.dim === 2) build2D();
+      else build3D();
+      updateCopy();
+    }
+
+    function scheduleRebuild() {
+      clearTimeout(state.rebuildTimer);
+      state.rebuildTimer = setTimeout(rebuild, 40);
+    }
+
+    // ---- UI / family / presets --------------------------------------------
+    function fillIndexSelect(sel, min, max, value) {
+      sel.innerHTML = '';
+      for (let p = min; p <= max; p++) {
+        const o = document.createElement('option');
+        o.value = String(p);
+        o.textContent = String(p);
+        sel.appendChild(o);
+      }
+      sel.value = String(Math.min(max, Math.max(min, value)));
+    }
+
+    function syncIndexLimits() {
+      const maxP = 7;
+      if (state.family === 'vertex') {
+        fillIndexSelect(els.idxI, 0, 1, state.i <= 1 ? state.i : 0);
+        fillIndexSelect(els.idxJ, 0, 1, state.j <= 1 ? state.j : 0);
+        fillIndexSelect(els.idxK, 0, 1, state.k <= 1 ? state.k : 0);
+      } else if (state.family === 'edge') {
+        // one high-order, others vertex — default: i high
+        fillIndexSelect(els.idxI, 0, maxP, state.i);
+        fillIndexSelect(els.idxJ, 0, maxP, state.j);
+        fillIndexSelect(els.idxK, 0, maxP, state.k);
+      } else if (state.family === 'face') {
+        fillIndexSelect(els.idxI, 0, maxP, state.i);
+        fillIndexSelect(els.idxJ, 0, maxP, state.j);
+        fillIndexSelect(els.idxK, 0, maxP, state.k);
+      } else {
+        fillIndexSelect(els.idxI, 2, maxP, Math.max(2, state.i));
+        fillIndexSelect(els.idxJ, 2, maxP, Math.max(2, state.j));
+        fillIndexSelect(els.idxK, 2, maxP, Math.max(2, state.k));
+      }
+      state.i = +els.idxI.value;
+      state.j = +els.idxJ.value;
+      state.k = +els.idxK.value;
+    }
+
+    function applyFamilyDefaults() {
+      if (state.family === 'vertex') {
+        state.i = 0; state.j = 0; state.k = 0;
+      } else if (state.family === 'edge') {
+        if (state.dim === 1) { state.i = 3; }
+        else if (state.dim === 2) { state.i = 0; state.j = 3; }
+        else { state.i = 0; state.j = 0; state.k = 3; }
+      } else if (state.family === 'face') {
+        state.i = 3; state.j = 3; state.k = 0;
+      } else {
+        state.i = 3; state.j = 3; state.k = state.dim === 3 ? 3 : 0;
+      }
+      syncIndexLimits();
+    }
+
+    function updateCopy() {
+      const { i, j, k, dim, family } = state;
+      let latex, tip;
+      if (dim === 1) {
+        latex = `φ(ξ) = ℓ_${i}(ξ)`;
+        tip = i < 2
+          ? 'Vertex mode on the reference interval: ℓ₀, ℓ₁ are the linear hats.'
+          : `Higher-order Lobatto mode ℓ_${i}. Vanishes at ξ = ±1.`;
+      } else if (dim === 2) {
+        latex = `φ(ξ, η) = ℓ_${i}(ξ) · ℓ_${j}(η)`;
+        if (family === 'vertex') tip = 'Bilinear vertex mode. Equals 1 at one corner, 0 at the others.';
+        else if (family === 'edge') tip = 'Edge mode: one factor order ≥ 2, the other a vertex factor. Supported on one side.';
+        else tip = 'Bubble: both factors ≥ 2, so φ ≡ 0 on the entire boundary.';
+      } else {
+        latex = `φ(ξ, η, ζ) = ℓ_${i}(ξ) · ℓ_${j}(η) · ℓ_${k}(ζ)`;
+        if (family === 'vertex') tip = 'Trilinear vertex mode of the hexahedron.';
+        else if (family === 'edge') tip = 'Edge mode: one high-order factor along the edge, vertex factors transversely.';
+        else if (family === 'face') tip = 'Face mode: two high-order factors in the face, one vertex factor normal to it.';
+        else tip = 'Volume bubble: all three factors ≥ 2. Condensable; zero on ∂Ωₑ.';
+      }
+      els.formula.textContent = latex;
+      els.desc.textContent = tip;
+
+      els.labJ.classList.toggle('off', dim < 2);
+      els.labK.classList.toggle('off', dim < 3);
+      els.faceBtn.hidden = dim < 3;
+      els.warpWrap.style.display = dim === 3 ? 'none' : '';
+      els.contourWrap.style.display = dim === 1 ? 'none' : '';
+      els.isoWrap.hidden = dim !== 3;
+      els.sliceWrap.hidden = dim !== 3;
+      els.opacityWrap.hidden = dim !== 3;
+
+      document.getElementById('resV').textContent = els.res.value;
+      document.getElementById('warpV').textContent = ((+els.warp.value) / 10).toFixed(1);
+      document.getElementById('nContV').textContent = els.nCont.value;
+      document.getElementById('isoV').textContent = ((+els.iso.value) / 100).toFixed(2);
+      document.getElementById('sliceV').textContent = ((+els.slice.value) / 100).toFixed(2);
+      document.getElementById('opV').textContent = ((+els.opacity.value) / 100).toFixed(2);
+      document.getElementById('ampV').textContent = ((+els.amp.value) / 100).toFixed(1) + '×';
+    }
+
+    function buildPresets() {
+      const presets = [
+        { id: 'custom', label: '— custom —' },
+        { id: '1d-l0', label: '1D · ℓ₀', dim: 1, family: 'vertex', i: 0 },
+        { id: '1d-l2', label: '1D · ℓ₂', dim: 1, family: 'edge', i: 2 },
+        { id: '1d-l5', label: '1D · ℓ₅', dim: 1, family: 'edge', i: 5 },
+        { id: '2d-v', label: '2D · vertex ℓ₀ℓ₀', dim: 2, family: 'vertex', i: 0, j: 0 },
+        { id: '2d-e3', label: '2D · edge ℓ₀ℓ₃', dim: 2, family: 'edge', i: 0, j: 3 },
+        { id: '2d-b2', label: '2D · bubble ℓ₂ℓ₂', dim: 2, family: 'bubble', i: 2, j: 2 },
+        { id: '2d-b3', label: '2D · bubble ℓ₃ℓ₃ (fig.)', dim: 2, family: 'bubble', i: 3, j: 3 },
+        { id: '2d-b4', label: '2D · bubble ℓ₄ℓ₄ (fig.)', dim: 2, family: 'bubble', i: 4, j: 4 },
+        { id: '2d-b5', label: '2D · bubble ℓ₅ℓ₅ (fig.)', dim: 2, family: 'bubble', i: 5, j: 5 },
+        { id: '2d-b6', label: '2D · bubble ℓ₆ℓ₆ (fig.)', dim: 2, family: 'bubble', i: 6, j: 6 },
+        { id: '2d-b7', label: '2D · bubble ℓ₇ℓ₇ (fig.)', dim: 2, family: 'bubble', i: 7, j: 7 },
+        { id: '3d-v', label: '3D · vertex', dim: 3, family: 'vertex', i: 0, j: 0, k: 0 },
+        { id: '3d-e', label: '3D · edge ℓ₀ℓ₀ℓ₃', dim: 3, family: 'edge', i: 0, j: 0, k: 3 },
+        { id: '3d-f', label: '3D · face ℓ₃ℓ₃ℓ₀', dim: 3, family: 'face', i: 3, j: 3, k: 0 },
+        { id: '3d-b', label: '3D · bubble ℓ₃ℓ₃ℓ₃', dim: 3, family: 'bubble', i: 3, j: 3, k: 3 }
+      ];
+      els.preset.innerHTML = '';
+      presets.forEach(p => {
+        const o = document.createElement('option');
+        o.value = p.id;
+        o.textContent = p.label;
+        o._p = p;
+        els.preset.appendChild(o);
+      });
+      els.preset._list = presets;
+    }
+
+    function setDim(d) {
+      state.dim = d;
+      document.getElementById('d1').classList.toggle('on', d === 1);
+      document.getElementById('d2').classList.toggle('on', d === 2);
+      document.getElementById('d3').classList.toggle('on', d === 3);
+      if (d < 3 && state.family === 'face') state.family = 'bubble';
+      document.getElementById('mVertex').classList.toggle('on', state.family === 'vertex');
+      document.getElementById('mEdge').classList.toggle('on', state.family === 'edge');
+      document.getElementById('mFace').classList.toggle('on', state.family === 'face');
+      document.getElementById('mBubble').classList.toggle('on', state.family === 'bubble');
+      setCameraForDim();
+      applyFamilyDefaults();
+      els.preset.value = 'custom';
+      document.getElementById('presetV').textContent = 'custom';
+      scheduleRebuild();
+    }
+
+    function setFamily(f) {
+      state.family = f;
+      ['vertex', 'edge', 'face', 'bubble'].forEach(name => {
+        const id = 'm' + name[0].toUpperCase() + name.slice(1);
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.toggle('on', name === f);
+      });
+      applyFamilyDefaults();
+      els.preset.value = 'custom';
+      document.getElementById('presetV').textContent = 'custom';
+      scheduleRebuild();
+    }
+
+    function readIndices() {
+      state.i = +els.idxI.value;
+      state.j = +els.idxJ.value;
+      state.k = +els.idxK.value;
+      els.preset.value = 'custom';
+      document.getElementById('presetV').textContent = 'custom';
+      scheduleRebuild();
+    }
+
+    // ---- Events -----------------------------------------------------------
+    document.getElementById('d1').addEventListener('click', () => setDim(1));
+    document.getElementById('d2').addEventListener('click', () => setDim(2));
+    document.getElementById('d3').addEventListener('click', () => setDim(3));
+    document.getElementById('mVertex').addEventListener('click', () => setFamily('vertex'));
+    document.getElementById('mEdge').addEventListener('click', () => setFamily('edge'));
+    document.getElementById('mFace').addEventListener('click', () => setFamily('face'));
+    document.getElementById('mBubble').addEventListener('click', () => setFamily('bubble'));
+    els.idxI.addEventListener('change', readIndices);
+    els.idxJ.addEventListener('change', readIndices);
+    els.idxK.addEventListener('change', readIndices);
+    ['res', 'warp', 'nCont', 'iso', 'slice', 'opacity', 'amp'].forEach(id => {
+      els[id].addEventListener('input', () => {
+        updateCopy();
+        scheduleRebuild();
+      });
+    });
+
+    els.preset.addEventListener('change', () => {
+      const p = els.preset.selectedOptions[0]._p;
+      if (!p || p.id === 'custom') return;
+      state.dim = p.dim;
+      state.family = p.family;
+      state.i = p.i ?? 0;
+      state.j = p.j ?? 0;
+      state.k = p.k ?? 0;
+      document.getElementById('d1').classList.toggle('on', state.dim === 1);
+      document.getElementById('d2').classList.toggle('on', state.dim === 2);
+      document.getElementById('d3').classList.toggle('on', state.dim === 3);
+      document.getElementById('mVertex').classList.toggle('on', state.family === 'vertex');
+      document.getElementById('mEdge').classList.toggle('on', state.family === 'edge');
+      document.getElementById('mFace').classList.toggle('on', state.family === 'face');
+      document.getElementById('mBubble').classList.toggle('on', state.family === 'bubble');
+      setCameraForDim();
+      syncIndexLimits();
+      document.getElementById('presetV').textContent = p.label;
+      scheduleRebuild();
+    });
+
+    // pointer probe via raycast against a hidden unit plane / box
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const probePlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide })
+    );
+    probePlane.rotation.x = -Math.PI / 2;
+    scene.add(probePlane);
+
+    renderer.domElement.addEventListener('pointermove', (ev) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      if (state.dim === 1) {
+        // project to x on baseline
+        const hits = raycaster.intersectObject(probePlane);
+        if (!hits.length) { els.probe.textContent = 'φ = —'; return; }
+        const xi = Math.max(-1, Math.min(1, hits[0].point.x));
+        const v = phi(xi);
+        els.probe.textContent = `ξ=${xi.toFixed(2)}  φ=${v.toExponential(3)}`;
+      } else if (state.dim === 2) {
+        const hits = raycaster.intersectObject(probePlane);
+        if (!hits.length) { els.probe.textContent = 'φ = —'; return; }
+        const xi = Math.max(-1, Math.min(1, hits[0].point.x));
+        const eta = Math.max(-1, Math.min(1, hits[0].point.z));
+        const v = phi(xi, eta);
+        els.probe.textContent = `ξ=${xi.toFixed(2)} η=${eta.toFixed(2)}  φ=${v.toExponential(3)}`;
+      } else {
+        const sliceZ = (+els.slice.value) / 100;
+        probePlane.position.y = sliceZ;
+        const hits = raycaster.intersectObject(probePlane);
+        probePlane.position.y = 0;
+        if (!hits.length) { els.probe.textContent = 'φ = —'; return; }
+        const xi = Math.max(-1, Math.min(1, hits[0].point.x));
+        const eta = Math.max(-1, Math.min(1, hits[0].point.z));
+        const v = phi(xi, eta, sliceZ);
+        els.probe.textContent = `ξ=${xi.toFixed(2)} η=${eta.toFixed(2)} ζ=${sliceZ.toFixed(2)}  φ=${v.toExponential(3)}`;
+      }
+    });
+
+    function resize() {
+      const w = stage.clientWidth, h = Math.max(320, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+    }
+    window.addEventListener('resize', resize);
+
+    function tick() {
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    buildPresets();
+    setDim(2);
+    setFamily('bubble');
+    // start on the classic ℓ₃ℓ₃ bubble matching the figure
+    state.i = 3; state.j = 3; state.k = 0;
+    syncIndexLimits();
+    els.preset.value = '2d-b3';
+    document.getElementById('presetV').textContent = '2D · bubble ℓ₃ℓ₃ (fig.)';
+    resize();
+    rebuild();
+    tick();
+  </script>
+</body>
+</html>
