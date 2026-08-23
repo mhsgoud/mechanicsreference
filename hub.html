@@ -365,6 +365,31 @@
     .eq-card .eq .katex{font-size:1.08em}
     .eq-card p{margin:0;color:var(--muted);font-size:0.92rem;line-height:1.5}
 
+    .theory-extra{margin-top:2rem}
+    .theory-extra > h2{margin-top:2rem}
+    .theory-panel{background:#fff;border:1px solid var(--rule);padding:20px 22px;margin:0 0 20px}
+    .theory-panel h3{margin:1.1rem 0 0.5rem;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--navy)}
+    .theory-panel h3:first-child{margin-top:0}
+    .theory-panel ol{margin:0.5rem 0 1rem;padding-left:1.25rem;color:var(--ink-soft)}
+    .theory-panel li{margin:0.4rem 0}
+    .theory-panel .eq{background:#f1efe9;padding:12px 14px;overflow-x:auto;margin:0.5rem 0 0;text-align:center}
+    .callout{background:#f1efe9;border-left:3px solid var(--accent);padding:12px 14px;margin:14px 0 0;color:var(--ink-soft);font-size:0.95rem}
+    .callout strong{color:var(--navy)}
+    .theory-table{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:0.9rem}
+    .theory-table th,.theory-table td{border:1px solid var(--rule);padding:10px 12px;text-align:left;vertical-align:top}
+    .theory-table th{background:#f1efe9;color:var(--navy);font-weight:600}
+    .theory-table td{color:var(--ink-soft)}
+    .sim-panel{background:#0f172a;border:1px solid #1e293b;padding:14px;margin:12px 0 24px;color:#e2e8f0}
+    .sim-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:12px}
+    .sim-controls .g{display:flex;flex-direction:column;gap:4px}
+    .sim-controls label{font-size:0.72rem;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8}
+    .sim-controls select,.sim-controls input[type=range],.sim-controls button{
+      background:#1e293b;color:#f8fafc;border:1px solid #334155;padding:8px 10px;font:inherit
+    }
+    .sim-controls button{cursor:pointer;font-weight:600}
+    #theory-canvas{width:100%;height:400px;background:#050b14}
+    @media (max-width:800px){#theory-canvas{height:300px}}
+
     @media (max-width: 980px){
       .app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
       .menu-toggle{display:inline-flex;align-items:center;gap:6px}
@@ -381,6 +406,8 @@
       .topic-nav .next{text-align:left}
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
@@ -394,7 +421,6 @@
       <h1 class="visually-hidden">Encyclopedia of mechanics: basic equations, continuum mechanics, finite elements, and numerical methods</h1>
       <nav class="top-nav" aria-label="Site">
         <a href="./">Home</a>
-        <a href="theory.html">Theory</a>
         <a href="hub.html" class="active" aria-current="page">Library</a>
         <button type="button" class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="topicsSidebar">Topics</button>
       </nav>
@@ -502,31 +528,36 @@ const topics = [
   {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
     "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, linear momentum, angular momentum, and energy are conserved (or balanced, once heat and external power are admitted). A constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
     "Kinematics: the deformation gradient F = ∂x/∂X maps reference line elements to the current placement. Finite strain uses E = ½(FᵀF − I); small displacement gradients use ε = ½(∇u + (∇u)ᵀ). Volume change is J = det F.",
-    "Stress and traction: Cauchy’s theorem says the traction on a current surface with outward normal n is t = σ n. Without couple stresses, angular momentum requires σ = σᵀ. Forces measured per reference area use the first Piola–Kirchhoff stress P = J σ F⁻ᵀ.",
+    "Stress and traction: Cauchy’s theorem says the traction on a current surface with outward normal n is t = σ n. Without couple stresses, angular momentum requires σ = σᵀ. Forces measured per reference area use the first Piola–Kirchhoff stress P = J σ F⁻ᵀ and the second Piola–Kirchhoff S = J F⁻¹ σ F⁻ᵀ.",
     "Mass: local conservation is ∂ρ/∂t + ∇·(ρ v) = 0, or equivalently ρ₀ = ρ J in the reference placement. Incompressibility is ∇·v = 0 (or J = 1).",
-    "Linear momentum (spatial form): on every part of the body, the resultant of surface tractions and body forces equals the rate of change of linear momentum. Locally that is Cauchy’s first law, ∇·σ + ρ b = ρ a. At rest, ∇·σ + ρ b = 0. The acceleration a is that of the material points; b is force per unit mass.",
-    "Linear momentum (referential form): the same balance pulled back to the undeformed mesh is Div P + ρ₀ B = ρ₀ A, with Div the reference divergence. Total Lagrangian finite elements discretize this statement; Updated Lagrangian keeps rewriting it on the current placement.",
-    "Boundary data: part of the surface carries a prescribed displacement (essential / Dirichlet) and an unknown reaction; the complementary part carries a prescribed traction (natural / Neumann). Those two statements, together with the local momentum equation, are one global balance.",
+    "Linear momentum (spatial form): on every part of the body, the resultant of surface tractions and body forces equals the rate of change of linear momentum. Locally that is Cauchy’s first law, ∇·σ + ρ b = ρ a. At rest, ∇·σ + ρ b = 0.",
+    "Linear momentum (referential form): the same balance pulled back to the undeformed mesh is Div P + ρ₀ B = ρ₀ A. Total Lagrangian finite elements discretize this statement; Updated Lagrangian keeps rewriting it on the current placement.",
+    "Elastodynamics: substitute isotropic Hooke and infinitesimal strain into Cauchy’s first law to obtain the Navier–Cauchy equation. Helmholtz potentials then uncouple compressional (P) and shear (S) waves at finite speeds c_p and c_s. Static mechanics drops inertia; dynamic response is carried by those waves.",
     "Energy: the first law balances the rate of internal energy with mechanical power and heat supply. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual closure for conduction.",
     "Constitutive closure for isotropic linear elasticity: σ = λ tr(ε) I + 2μ ε, or σ = ℂ : ε. Fluids use the same momentum equation with a viscous law; incompressible Navier–Stokes is ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b with ∇·v = 0.",
-    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV (inertia adds ∫ ρ a · δu when dynamics matter). FEM replaces u and δu with shape functions on a mesh, yielding K a = f in linear elasticity, or R(u) = 0 solved by Newton–Raphson with tangent K_T.",
-    "The figure is linear momentum on a supported body: reactions on the support and tractions on the free surface close the global balance while ∇·σ + ρ b = ρ a holds inside."
+    "Weak form (virtual work): ∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV (inertia adds ∫ ρ a · δu when dynamics matter). FEM replaces u and δu with shape functions on a mesh, yielding K a = f in linear elasticity, or M ü + C u̇ + K u = f in linear elastodynamics, or R(u) = 0 solved by Newton–Raphson with tangent K_T.",
+    "The figure is linear momentum on a supported body. The simulator below compares steady static bending with a dynamic impact regime — the same qualitative difference as static balance versus elastodynamics."
   ], equations:[
     {name:"Deformation gradient", expr:"F = ∂x / ∂X", tex:"F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Maps a material line element from the reference placement X to the current placement x. J = det F is local volume change."},
+    {name:"Jacobian", expr:"J = det F = dv/dV", tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}", note:"Local volume change. Mass balance in the reference placement is ρ₀ = ρ J. Incompressibility is J = 1."},
     {name:"Green–Lagrange strain", expr:"E = ½ (Fᵀ F − I)", tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)", note:"Finite strain on the reference configuration; reduces to ε for small displacement gradients."},
     {name:"Infinitesimal strain", expr:"ε = ½ (∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"Symmetric displacement gradient used in linear solid mechanics and linear FEM."},
     {name:"Cauchy traction", expr:"t = σ n", tex:"\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}", note:"Force per current area on a surface with outward normal n. Angular momentum without couples requires σ = σᵀ."},
     {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Nominal stress: current force per reference area. Work-conjugate to Ḟ."},
+    {name:"Second Piola–Kirchhoff", expr:"S = J F⁻¹ σ F⁻ᵀ", tex:"\\mathbf{S} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Stress on the reference placement, work-conjugate to Green–Lagrange strain. Hyperelastic laws are often written S = ∂W/∂E."},
     {name:"Conservation of mass", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Local mass balance. Referential form: ρ₀ = ρ J. Incompressibility is ∇ · v = 0."},
     {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}", note:"Cauchy’s first law. Static problems set a = 0. Integral statement: ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV."},
     {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}", note:"Same balance on the reference placement. Total Lagrangian FEM discretizes this form."},
     {name:"Angular momentum", expr:"σ = σᵀ", tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}", note:"Cauchy’s second law in the absence of couple stresses — an algebraic restriction, not a PDE."},
     {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"First law: internal energy rate equals stress power, minus heat efflux, plus heat supply r."},
     {name:"Hooke’s law (isotropic)", expr:"σ = λ tr(ε) I + 2μ ε", tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}", note:"Linear isotropic elasticity in Lamé form; equivalently σ = ℂ : ε."},
+    {name:"Navier–Cauchy equation", expr:"(λ+μ)∇(∇·u) + μ ∇²u + b = ρ ü", tex:"(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}", note:"Substitute isotropic Hooke and infinitesimal strain into Cauchy’s first law. The static problem drops the right-hand side."},
+    {name:"Helmholtz wave split", expr:"u = ∇φ + ∇×ψ", tex:"\\mathbf{u} = \\boldsymbol{\\nabla}\\phi + \\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi},\\quad \\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0", note:"Elastodynamics uncouples into a P-wave at c_p = √((λ+2μ)/ρ) and an S-wave at c_s = √(μ/ρ)."},
     {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", tex:"\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V", note:"Weak form of momentum (quasi-static). Dynamics adds ∫ ρ a · δu on the left or right by convention."},
     {name:"Discrete linear system", expr:"K a = f", tex:"\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}", note:"Assembled stiffness times nodal unknowns equals the load vector."},
+    {name:"Elastodynamics matrices", expr:"M ü + C u̇ + K u = F", tex:"\\mathbf{M}\\ddot{\\hat{\\mathbf{u}}} + \\mathbf{C}\\dot{\\hat{\\mathbf{u}}} + \\mathbf{K}\\hat{\\mathbf{u}} = \\mathbf{F}^{\\mathrm{ext}}", note:"Galerkin discretization of linear elastodynamics. Nonlinear problems replace Kû by an internal force R(û)."},
     {name:"Newton–Raphson", expr:"K_T Δu = −R(u)", tex:"\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})", note:"Linearization of a nonlinear residual; K_T is the consistent tangent."}
-  ], tags:["basic equations","continuum","strain","stress","conservation","momentum","Hooke","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum"},
+  ], tags:["basic equations","continuum","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","elastodynamics","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
   {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
@@ -2003,13 +2034,214 @@ function renderTopicIllustrations(topic){
 </section>`;
 }
 
+function renderBeamSimWidget(){
+  return `
+    <div class="theory-extra">
+      <h2>Interactive beam simulator</h2>
+      <p class="muted">A cantilever that compares steady static bending with a dynamic impact regime — the same qualitative difference as static balance versus elastodynamics.</p>
+      <div class="sim-panel">
+        <div class="sim-controls">
+          <div class="g">
+            <label for="mode-select">Loading regime</label>
+            <select id="mode-select">
+              <option value="static">Static equilibrium</option>
+              <option value="dynamic">Dynamic impact</option>
+            </select>
+          </div>
+          <div class="g">
+            <label for="force-slider">Force magnitude</label>
+            <input type="range" id="force-slider" min="1" max="10" value="5" step="0.5" />
+          </div>
+          <div class="g">
+            <label for="damping-slider">Damping ζ</label>
+            <input type="range" id="damping-slider" min="0" max="1" value="0.15" step="0.05" />
+          </div>
+          <div class="g" style="margin-left:auto">
+            <label>&nbsp;</label>
+            <button type="button" id="reset-btn">Reset</button>
+          </div>
+        </div>
+        <div id="theory-canvas" aria-label="Interactive cantilever beam simulator"></div>
+        <p class="muted" style="margin:12px 0 0;font-size:0.85rem;color:#94a3b8">Vertex colour ≈ bending stress (blue low → red high). Static mode uses the cubic Euler–Bernoulli tip curve; dynamic mode is a damped tip oscillator with a traveling wave modulation.</p>
+      </div>
+
+      <h2>From momentum to elastodynamics</h2>
+      <p class="muted">Cauchy’s first law, isotropic Hooke, and the strain–displacement map combine into the Navier–Cauchy equation; Helmholtz potentials then uncouple P- and S-waves.</p>
+      <div class="theory-panel">
+        <h3>Step-by-step derivation of Navier–Cauchy</h3>
+        <ol>
+          <li><strong>Cauchy momentum (index form):</strong>
+            <div class="eq">\\[\\sigma_{ij,j} + b_i = \\rho\\ddot{u}_i\\]</div>
+          </li>
+          <li><strong>Isotropic Hooke:</strong>
+            <div class="eq">\\[\\sigma_{ij} = \\lambda\\varepsilon_{kk}\\delta_{ij} + 2\\mu\\varepsilon_{ij}\\]</div>
+          </li>
+          <li><strong>Infinitesimal strain:</strong>
+            <div class="eq">\\[\\varepsilon_{ij} = \\tfrac{1}{2}(u_{i,j}+u_{j,i})\\]</div>
+          </li>
+          <li><strong>Stress in terms of displacement:</strong>
+            <div class="eq">\\[\\sigma_{ij} = \\lambda u_{k,k}\\delta_{ij} + \\mu(u_{i,j}+u_{j,i})\\]</div>
+          </li>
+          <li><strong>Divergence:</strong>
+            <div class="eq">\\[\\sigma_{ij,j} = (\\lambda+\\mu)(\\boldsymbol{\\nabla}\\cdot\\mathbf{u})_{,i} + \\mu\\nabla^2 u_i\\]</div>
+          </li>
+        </ol>
+        <p style="margin:0 0 8px;color:var(--ink-soft)">Yielding the Navier–Cauchy equation</p>
+        <div class="eq">\\[(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}\\]</div>
+        <div class="callout">
+          <strong>Helmholtz wave uncoupling.</strong> With \\(\\mathbf{u}=\\boldsymbol{\\nabla}\\phi+\\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi}\\) and \\(\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0\\), elastodynamics splits into a P-wave \\(\\nabla^2\\phi=c_p^{-2}\\partial_t^2\\phi\\) at \\(c_p=\\sqrt{(\\lambda+2\\mu)/\\rho}\\) and an S-wave \\(\\nabla^2\\boldsymbol{\\psi}=c_s^{-2}\\partial_t^2\\boldsymbol{\\psi}\\) at \\(c_s=\\sqrt{\\mu/\\rho}\\).
+        </div>
+      </div>
+
+      <div class="theory-panel">
+        <h3>Static vs dynamic mechanics</h3>
+        <table class="theory-table">
+          <thead>
+            <tr><th>Feature</th><th>Static</th><th>Dynamic</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Governing PDE</strong></td>
+              <td>\\(\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}+\\mathbf{b}=\\mathbf{0}\\)</td>
+              <td>\\(\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}+\\mathbf{b}=\\rho\\ddot{\\mathbf{u}}\\)</td>
+            </tr>
+            <tr>
+              <td><strong>Inertia</strong></td>
+              <td>Neglected (\\(\\mathbf{a}=\\mathbf{0}\\))</td>
+              <td>Primary (\\(\\rho\\mathbf{a}\\))</td>
+            </tr>
+            <tr>
+              <td><strong>Stress response</strong></td>
+              <td>Instantaneous global balance</td>
+              <td>Waves at finite speeds \\(c_p,c_s\\)</td>
+            </tr>
+            <tr>
+              <td><strong>Material model</strong></td>
+              <td>Rate-independent elasticity / plasticity</td>
+              <td>Often rate-dependent (e.g. Johnson–Cook)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+let beamSimRaf = 0;
+function mountBeamSimulator(){
+  if (beamSimRaf) { cancelAnimationFrame(beamSimRaf); beamSimRaf = 0; }
+  const container = document.getElementById('theory-canvas');
+  if (!container || typeof THREE === 'undefined') return;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050b14);
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / Math.max(container.clientHeight, 1), 0.1, 1000);
+  camera.position.set(8, 6, 14);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(10, 15, 10);
+  scene.add(dirLight);
+  const gridHelper = new THREE.GridHelper(20, 20, 0x334155, 0x1e293b);
+  gridHelper.position.y = -3;
+  scene.add(gridHelper);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4, 3), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+  wall.position.set(-4.25, 0, 0);
+  scene.add(wall);
+
+  const segments = 30, beamLength = 8;
+  const beamGeo = new THREE.BoxGeometry(beamLength, 0.8, 1.2, segments, 1, 1);
+  beamGeo.translate(beamLength / 2 - 4, 0, 0);
+  const count = beamGeo.attributes.position.count;
+  beamGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  const beam = new THREE.Mesh(beamGeo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.3, metalness: 0.2 }));
+  scene.add(beam);
+  const posAttr = beamGeo.attributes.position;
+  const initialPositions = posAttr.array.slice();
+
+  const modeSelect = document.getElementById('mode-select');
+  const forceSlider = document.getElementById('force-slider');
+  const dampingSlider = document.getElementById('damping-slider');
+  const resetBtn = document.getElementById('reset-btn');
+  let simTime = 0, dynamicTipVelocity = 0, dynamicTipDisplacement = 0;
+  if (resetBtn) resetBtn.onclick = function () {
+    simTime = 0; dynamicTipVelocity = 0; dynamicTipDisplacement = 0;
+  };
+
+  function applyStressColor(ratio, colorArray, index) {
+    colorArray[index] = Math.min(1, ratio * 2);
+    colorArray[index + 1] = 0.2;
+    colorArray[index + 2] = Math.max(0, 1 - ratio * 2);
+  }
+
+  const clock = new THREE.Clock();
+  let alive = true;
+  function animate() {
+    if (!alive || !document.getElementById('theory-canvas')) return;
+    beamSimRaf = requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    simTime += dt;
+    controls.update();
+    const mode = modeSelect ? modeSelect.value : 'static';
+    const force = forceSlider ? parseFloat(forceSlider.value) : 5;
+    const damping = dampingSlider ? parseFloat(dampingSlider.value) : 0.15;
+    const positions = posAttr.array;
+    const colorAttr = beamGeo.attributes.color.array;
+
+    if (mode === 'static') {
+      const maxTipDeflection = force * 0.15;
+      for (let i = 0; i < count; i++) {
+        const x = initialPositions[i * 3] + 4;
+        const normX = x / beamLength;
+        const deflectionFactor = (3 * normX * normX - normX * normX * normX) / 2;
+        positions[i * 3 + 1] = initialPositions[i * 3 + 1] - maxTipDeflection * deflectionFactor;
+        applyStressColor(Math.min(1, (1 - normX) * (force / 10)), colorAttr, i * 3);
+      }
+    } else {
+      const stiffness = 20, mass = 1.5;
+      const omega = Math.sqrt(stiffness / mass);
+      const dynamicForce = Math.sin(simTime * 8) > 0.8 ? force * 0.8 : 0;
+      const accel = (dynamicForce - 2 * damping * omega * dynamicTipVelocity - stiffness * dynamicTipDisplacement) / mass;
+      dynamicTipVelocity += accel * dt;
+      dynamicTipDisplacement += dynamicTipVelocity * dt;
+      for (let i = 0; i < count; i++) {
+        const x = initialPositions[i * 3] + 4;
+        const normX = x / beamLength;
+        const wavePhase = simTime * 12 - normX * 4;
+        const waveComponent = Math.sin(wavePhase) * 0.08 * (force / 5);
+        const deflectionFactor = Math.pow(normX, 2);
+        positions[i * 3 + 1] = initialPositions[i * 3 + 1] - (dynamicTipDisplacement * deflectionFactor + waveComponent * normX);
+        applyStressColor(Math.min(1, Math.abs(dynamicTipDisplacement * (1 - normX) * 0.5 + waveComponent)), colorAttr, i * 3);
+      }
+    }
+    posAttr.needsUpdate = true;
+    beamGeo.attributes.color.needsUpdate = true;
+    renderer.render(scene, camera);
+  }
+  const onResize = function () {
+    if (!container.clientWidth) return;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  };
+  window.addEventListener('resize', onResize);
+  animate();
+}
+
 function renderContent(topic){
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
 
   const interactiveBlock =
-    topic.interactive === "elementChooser"
-      ? renderElementChooserWidget()
-      : "";
+    topic.interactive === "elementChooser" ? renderElementChooserWidget()
+    : topic.interactive === "beamSim" ? renderBeamSimWidget()
+    : "";
 
   const illustrationsBlock = renderTopicIllustrations(topic);
   const sceneBlock = renderTopicScene(topic);
@@ -2059,6 +2291,9 @@ function renderContent(topic){
   // Mount interactive widgets AFTER DOM update
   if(topic.interactive === "elementChooser"){
     mountElementChooser();
+  }
+  if(topic.interactive === "beamSim"){
+    mountBeamSimulator();
   }
   typesetMath(content);
 }
@@ -2120,7 +2355,7 @@ function selectTopic(title, opts={}){
 function initFromHash(){
   const h = location.hash.replace('#','');
   const byHash = topics.find(t => slug(t.title) === h);
-  return byHash || topics.find(t => t.title === "Introduction to Continuum Mechanics") || topics[0];
+  return byHash || topics.find(t => t.title === "Basic Equations") || topics[0];
 }
 
 // ---- Search ---------------------------------------------------------------

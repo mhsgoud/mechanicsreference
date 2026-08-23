@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -11,7 +11,7 @@
   <link rel="canonical" href="https://mechanicsreference.com/" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <meta property="og:image" content="https://mechanicsreference.com/logo.png" />
+  <meta property="og:image" content="https://mechanicsreference.com/hero-banner.png" />
   <link rel="sitemap" type="application/xml" href="https://mechanicsreference.com/sitemap.xml" />
   <meta property="og:site_name" content="Mechanics Reference" />
   <meta property="og:title" content="Mechanics Reference — An Encyclopedia of Continuum Mechanics and Finite Elements" />
@@ -19,7 +19,7 @@
   <meta property="og:url" content="https://mechanicsreference.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Mechanics Reference" />
   <meta name="twitter:description" content="An encyclopedia of continuum mechanics, finite elements, and numerical methods." />
   <script type="application/ld+json">
@@ -41,14 +41,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     :root{
-      --paper: #f7f6f2;
-      --ink: #1c2430;
-      --ink-soft: #3d4756;
-      --rule: #d8d4cb;
-      --navy: #1e3a5f;
-      --blue: #3a5f8a;
-      --accent: #c45c26;
-      --card: #fff;
+      --paper:#f7f6f2;
+      --ink:#1c2430;
+      --ink-soft:#3d4756;
+      --muted:#5c6574;
+      --rule:#d8d4cb;
+      --navy:#1e3a5f;
+      --blue:#3a5f8a;
+      --accent:#c45c26;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth;scrollbar-gutter:stable}
@@ -62,6 +62,7 @@
     }
     a{color:var(--blue)}
     a:hover{color:var(--accent)}
+
     header{
       position:sticky;top:0;z-index:20;
       background:#fff;
@@ -77,106 +78,101 @@
       padding:8px 12px;
     }
     .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
-    .wrap{max-width:980px;margin:0 auto;padding:0 28px}
 
-    .masthead{
-      padding:72px 0 48px;
+    .hero{
+      display:block;
+      width:100%;
+      line-height:0;
+      background:#0f1a2e;
+    }
+    .hero img{
+      display:block;
+      width:100%;
+      height:auto;
+    }
+    .hero-actions{
+      display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+      padding:28px;
+      background:#fff;
       border-bottom:1px solid var(--rule);
     }
-    .masthead p.kicker{
-      margin:0 0 18px;
-      font-size:0.78rem;font-weight:600;
-      letter-spacing:.16em;text-transform:uppercase;
-      color:var(--accent);
+    .cta{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:11px 22px;
+      font:inherit;font-size:0.95rem;font-weight:600;
+      text-decoration:none;border:1px solid transparent;
     }
-    h1{
-      margin:0 0 22px;
-      font-family:"Source Serif 4", Georgia, serif;
-      font-size:clamp(2.4rem, 5.4vw, 3.6rem);
-      font-weight:600;
-      line-height:1.15;
-      letter-spacing:-0.02em;
-      color:var(--navy);
-    }
-    .standfirst{
-      margin:0;
-      max-width:38em;
-      font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.22rem;
-      font-weight:400;
-      line-height:1.55;
-      color:var(--ink-soft);
-    }
+    .cta-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .cta-primary:hover{background:#2a4d78;color:#fff}
+    .cta-ghost{background:transparent;color:var(--navy);border-color:var(--rule)}
+    .cta-ghost:hover{border-color:var(--navy);color:var(--navy)}
 
-    section{padding:56px 0 8px}
-    h2{
-      margin:0 0 8px;
-      font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.7rem;font-weight:600;
-      color:var(--navy);
-    }
-    .deck{
-      margin:0 0 28px;
-      max-width:40em;
-      color:var(--ink-soft);
-    }
-
-    .contents{
-      list-style:none;margin:0;padding:0;
-      border-top:1px solid var(--rule);
-    }
-    .contents li{border-bottom:1px solid var(--rule)}
-    .contents a{
-      display:grid;
-      grid-template-columns: 4.5rem 1fr auto;
-      gap:16px;align-items:baseline;
-      padding:18px 4px;
-      text-decoration:none;color:inherit;
-    }
-    .contents a:hover .t{color:var(--accent)}
-    .contents .n{
-      font-variant-numeric:lining-nums;
-      font-size:0.85rem;font-weight:600;color:var(--accent);
-      letter-spacing:.04em;
-    }
-    .contents .t{
-      font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.2rem;font-weight:600;color:var(--navy);
-    }
-    .contents .s{color:var(--ink-soft);font-size:0.95rem}
-
-    .essays{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:28px;
-    }
-    article h3{
+    .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+    .band{padding:72px 0;border-bottom:1px solid var(--rule)}
+    .band:last-of-type{border-bottom:none}
+    .band-head{max-width:36rem;margin-bottom:40px}
+    .band-head h2{
       margin:0 0 12px;
       font-family:"Source Serif 4", Georgia, serif;
-      font-size:1.28rem;font-weight:600;color:var(--navy);
+      font-size:clamp(1.7rem, 3vw, 2.15rem);
+      font-weight:600;letter-spacing:-0.02em;color:var(--navy);line-height:1.2;
     }
-    article p{margin:0 0 12px;color:var(--ink-soft)}
-    article p:last-child{margin:0}
-    article .more{
-      display:inline-block;margin-top:10px;margin-right:16px;
-      font-size:0.92rem;font-weight:600;text-decoration:none;
+    .band-head p{margin:0;color:var(--ink-soft);font-size:1.08rem;line-height:1.55}
+
+    .foundations{display:grid;gap:0}
+    .foundation{
+      display:grid;grid-template-columns:5.5rem 1fr;gap:24px;
+      padding:32px 0;border-top:1px solid var(--rule);
+      text-decoration:none;color:inherit;
     }
+    .foundation:last-child{border-bottom:1px solid var(--rule)}
+    .foundation:hover .f-title{color:var(--accent)}
+    .f-num{
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.35rem;font-weight:600;color:var(--accent);padding-top:4px;
+    }
+    .f-title{
+      margin:0 0 8px;
+      font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.45rem;font-weight:600;color:var(--navy);
+    }
+    .f-body{margin:0;color:var(--ink-soft);max-width:42em;line-height:1.6}
+
+    .featured{
+      display:grid;grid-template-columns:repeat(3, 1fr);
+      gap:1px;background:var(--rule);border:1px solid var(--rule);
+    }
+    .featured a{
+      display:block;background:var(--paper);padding:28px 24px 32px;
+      text-decoration:none;color:inherit;
+    }
+    .featured a:hover{background:#fff}
+    .featured a:hover .fig-title{color:var(--accent)}
+    .fig-symbol{
+      display:block;font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.6rem;font-weight:600;color:var(--navy);margin-bottom:14px;
+    }
+    .fig-title{
+      display:block;font-family:"Source Serif 4", Georgia, serif;
+      font-size:1.15rem;font-weight:600;color:var(--navy);margin-bottom:6px;
+    }
+    .fig-desc{display:block;font-size:0.95rem;color:var(--muted);line-height:1.45}
+    .band-foot{margin-top:28px;font-size:0.95rem;font-weight:600}
+    .band-foot a{text-decoration:none}
 
     footer{
-      margin-top:64px;
       border-top:1px solid var(--rule);
       padding:22px 28px 36px;
-      font-size:0.9rem;color:var(--ink-soft);
+      font-size:0.9rem;color:var(--ink-soft);background:var(--paper);
     }
     footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0}
 
     @media (max-width: 800px){
-      .essays{grid-template-columns:1fr}
-      .contents a{grid-template-columns:3.2rem 1fr;gap:10px}
-      .contents .s{grid-column:2}
-      header,.wrap,footer{padding-left:18px;padding-right:18px}
-      .masthead{padding-top:48px}
+      header,.wrap,footer,.hero-actions{padding-left:18px;padding-right:18px}
       .brand-logo{height:44px}
+      .featured{grid-template-columns:1fr}
+      .foundation{grid-template-columns:3.5rem 1fr;gap:16px;padding:24px 0}
+      .band{padding:56px 0}
     }
   </style>
 </head>
@@ -187,293 +183,79 @@
     </a>
     <nav class="top-nav" aria-label="Site">
       <a href="./" class="active" aria-current="page">Home</a>
-      <a href="theory.html">Theory</a>
       <a href="hub.html">Library</a>
     </nav>
   </header>
 
   <main>
+    <div class="hero">
+      <img
+        src="hero-banner.png"
+        alt="Mechanics Reference — computational mechanics and engineering: continuum theory, finite elements, and numerical methods"
+        width="1920"
+        height="800"
+        fetchpriority="high"
+      />
+    </div>
+    <div class="hero-actions">
+      <a class="cta cta-primary" href="hub.html">Open the library</a>
+      <a class="cta cta-ghost" href="hub.html#basic-equations">Read the theory</a>
+    </div>
+
     <div class="wrap">
-      <section class="masthead">
-        <p class="kicker">A reference for engineers and students</p>
-        <h1>A reference to continuum mechanics and finite elements.</h1>
-        <p class="standfirst">This encyclopedia collects the ideas used to describe how solids deform and fluids flow, and the finite element methods used to compute those descriptions. It is meant to be consulted, not read cover to cover: kinematics, constitutive theory, discretization, and the linear algebra that makes large analyses possible.</p>
-      </section>
-
-      <section id="contents">
-        <h2>Contents</h2>
-        <p class="deck">Six parts, from the continuum setting to the solvers that turn it into numbers.</p>
-        <ol class="contents">
-          <li>
-            <a href="hub.html#introduction-to-continuum-mechanics">
-              <span class="n">I</span>
-              <span class="t">Continuum mechanics</span>
-              <span class="s">Tensors, kinematics, stress, and constitutive models</span>
-            </a>
-          </li>
-          <li>
-            <a href="hub.html#finite-element-method-introduction">
-              <span class="n">II</span>
-              <span class="t">Finite elements</span>
-              <span class="s">Weak forms, elements, meshes, and assembly</span>
-            </a>
-          </li>
-          <li>
-            <a href="hub.html#nonlinear-fem">
-              <span class="n">III</span>
-              <span class="t">Nonlinear analysis</span>
-              <span class="s">Newton iteration, contact, and dynamics</span>
-            </a>
-          </li>
-          <li>
-            <a href="hub.html#fracture-mechanics">
-              <span class="n">IV</span>
-              <span class="t">Applications</span>
-              <span class="s">Fracture, composites, soils, heat, and batteries</span>
-            </a>
-          </li>
-          <li>
-            <a href="hub.html#gpu-programming-for-engineers">
-              <span class="n">V</span>
-              <span class="t">Scientific computing</span>
-              <span class="s">Sparse algebra and performance on CPU and GPU</span>
-            </a>
-          </li>
-          <li>
-            <a href="hub.html#matrix-fundamentals-dense-sparse">
-              <span class="n">VI</span>
-              <span class="t">Linear algebra</span>
-              <span class="s">Formats, libraries, preconditioners, and tools</span>
-            </a>
-          </li>
-        </ol>
-      </section>
-
-      <section>
-        <h2>Three foundations</h2>
-        <p class="deck">The same three questions run through the whole work: how a body is described, how that description is discretized, and how the discrete system is solved.</p>
-        <div class="essays">
-          <article>
-            <h3>Continuum mechanics</h3>
-            <p>A solid or a fluid is treated as a continuous medium. Motion is measured by strain; internal forces by stress. Conservation of mass and momentum must hold — Cauchy’s first law ∇·σ + ρ b = ρ a in the current placement, or Div P + ρ₀ B = ρ₀ A on the reference mesh — and a constitutive model says how stress depends on deformation or on the rate of deformation.</p>
-            <p>That is enough to distinguish elasticity from plasticity, and a viscous fluid from an elastic solid, without yet choosing a numerical method.</p>
-            <a class="more" href="theory.html">Read the theory</a>
-            <a class="more" href="hub.html#basic-equations">Basic equations</a>
-            <a class="more" href="hub.html#balance-laws-conservation">Balance laws</a>
-          </article>
-          <article>
-            <h3>Finite elements</h3>
-            <p>The field problem is posed on a mesh. Unknowns are interpolated with shape functions, and the strong form of the balance laws is replaced by a weak statement—virtual work, or a Galerkin projection. Element matrices assemble into a global system for the nodal degrees of freedom.</p>
-            <p>Whether that system is a faithful model depends on the element, the mesh, and the boundary conditions, not only on the continuum theory.</p>
-            <a class="more" href="hub.html#finite-element-method-introduction">Weak form and assembly</a>
-            <a class="more" href="hub.html#variational-principles">Variational principles</a>
-            <a class="more" href="hub.html#mixed-methods-and-locking">Locking</a>
-          </article>
-          <article>
-            <h3>Numerical methods</h3>
-            <p>Integrals on elements are evaluated by quadrature. Linear systems are factored or iterated. Nonlinear residuals are reduced by Newton’s method, which needs a consistent tangent. Time-dependent problems add a choice between implicit and explicit stepping.</p>
-            <p>Sparse storage, preconditioning, and the use of a GPU belong here: they decide whether a formulation that is correct on paper can be solved at all.</p>
-            <a class="more" href="hub.html#solving-linear-systems">Linear systems</a>
-            <a class="more" href="hub.html#newton-raphson-iteration-in-fem">Newton iteration</a>
-            <a class="more" href="hub.html#path-following-and-arc-length">Arc-length</a>
-          </article>
+      <section class="band" aria-labelledby="foundations-title">
+        <div class="band-head">
+          <h2 id="foundations-title">Three foundations</h2>
+          <p>The same three questions run through the work: how a body is described, how that description is discretized, and how the discrete system is solved.</p>
+        </div>
+        <div class="foundations">
+          <a class="foundation" href="hub.html#basic-equations">
+            <span class="f-num">01</span>
+            <span>
+              <h3 class="f-title">Continuum mechanics</h3>
+              <p class="f-body">Strain measures motion; stress measures internal force. Mass and momentum must balance, and a constitutive model closes the theory—before any mesh is chosen.</p>
+            </span>
+          </a>
+          <a class="foundation" href="hub.html#finite-element-method-introduction">
+            <span class="f-num">02</span>
+            <span>
+              <h3 class="f-title">Finite elements</h3>
+              <p class="f-body">Shape functions on a mesh replace the strong form with virtual work. Whether the discrete model is faithful depends on the element, the mesh, and the boundary data.</p>
+            </span>
+          </a>
+          <a class="foundation" href="hub.html#solving-linear-systems">
+            <span class="f-num">03</span>
+            <span>
+              <h3 class="f-title">Numerical methods</h3>
+              <p class="f-body">Quadrature, Newton iteration, and sparse solvers decide whether a formulation that is correct on paper can be solved at all—on CPU or on GPU.</p>
+            </span>
+          </a>
         </div>
       </section>
 
-      <section id="figures">
-        <h2>Figures</h2>
-        <p class="deck">Interactive plates for the identities that are easiest to misread on paper.</p>
-        <ol class="contents">
-          <li>
-            <a href="deformation-gradient.html">
-              <span class="n">F</span>
-              <span class="t">Deformation gradient</span>
-              <span class="s">Translation, rotation, stretch, and shear</span>
-            </a>
-          </li>
-          <li>
-            <a href="polar-decomposition.html">
-              <span class="n">RU</span>
-              <span class="t">Polar decomposition</span>
-              <span class="s">Stretch then rotate, or rotate then stretch</span>
-            </a>
-          </li>
-          <li>
-            <a href="rotation-strain.html">
-              <span class="n">E</span>
-              <span class="t">Green versus infinitesimal strain</span>
-              <span class="s">A pure rotation that ε mistakes for stretch</span>
-            </a>
-          </li>
-          <li>
-            <a href="hydrostatic-deviatoric.html">
-              <span class="n">J</span>
-              <span class="t">Volume and shape</span>
-              <span class="s">Hydrostatic change versus a volume-preserving distort</span>
-            </a>
-          </li>
-          <li>
-            <a href="principal-stretches.html">
-              <span class="n">λ</span>
-              <span class="t">Principal stretches</span>
-              <span class="s">Incompressible pull with J = 1</span>
-            </a>
-          </li>
-          <li>
-            <a href="velocity-gradient.html">
-              <span class="n">L</span>
-              <span class="t">Rate of deformation and spin</span>
-              <span class="s">D, W, and L = D + W</span>
-            </a>
-          </li>
-          <li>
-            <a href="traction-cut.html">
-              <span class="n">t</span>
-              <span class="t">Traction on a cut</span>
-              <span class="s">The same σ, a different n</span>
-            </a>
-          </li>
-          <li>
-            <a href="linear-momentum.html">
-              <span class="n">σ</span>
-              <span class="t">Linear momentum</span>
-              <span class="s">A supported body and a moving traction</span>
-            </a>
-          </li>
-          <li>
-            <a href="work-conjugates.html">
-              <span class="n">P</span>
-              <span class="t">Work-conjugate stresses</span>
-              <span class="s">Piola on the reference face, Cauchy on the current</span>
-            </a>
-          </li>
-          <li>
-            <a href="von-mises.html">
-              <span class="n">J₂</span>
-              <span class="t">von Mises cylinder</span>
-              <span class="s">Hydrostatic axis and a yielding load path</span>
-            </a>
-          </li>
-          <li>
-            <a href="hooke-poisson.html">
-              <span class="n">ν</span>
-              <span class="t">Poisson contraction</span>
-              <span class="s">Uniaxial tension and lateral strain −ν ε</span>
-            </a>
-          </li>
-          <li>
-            <a href="objective-rates.html">
-              <span class="n">∇σ</span>
-              <span class="t">Objective rates</span>
-              <span class="s">A stress that only rotates</span>
-            </a>
-          </li>
-          <li>
-            <a href="column-buckling.html">
-              <span class="n">P</span>
-              <span class="t">Euler buckling</span>
-              <span class="s">Amplification toward π² EI / L²</span>
-            </a>
-          </li>
-          <li>
-            <a href="contact.html">
-              <span class="n">p</span>
-              <span class="t">Hertz contact</span>
-              <span class="s">Gap closure, patch size a, and elliptic pressure</span>
-            </a>
-          </li>
-          <li>
-            <a href="contact-beam.html">
-              <span class="n">FEA</span>
-              <span class="t">Beam contact FEA</span>
-              <span class="s">Double-cantilever hex mesh closing a tip gap</span>
-            </a>
-          </li>
-          <li>
-            <a href="lefm.html">
-              <span class="n">K</span>
-              <span class="t">Linear elastic fracture mechanics</span>
-              <span class="s">Williams’ r<sup>−½</sup> field and the three modes</span>
-            </a>
-          </li>
-          <li>
-            <a href="lefm-center-crack.html">
-              <span class="n">a</span>
-              <span class="t">Center crack</span>
-              <span class="s">Remote tension and the tip singularity</span>
-            </a>
-          </li>
-          <li>
-            <a href="cohesive-crack.html">
-              <span class="n">G<sub>f</sub></span>
-              <span class="t">Cohesive cracking</span>
-              <span class="s">A process zone that still carries load</span>
-            </a>
-          </li>
-          <li>
-            <a href="dcb-cohesive.html">
-              <span class="n">DCB</span>
-              <span class="t">DCB cohesive crack</span>
-              <span class="s">Opening displacement and the load–displacement path</span>
-            </a>
-          </li>
-          <li>
-            <a href="j-integral.html">
-              <span class="n">J</span>
-              <span class="t">The J-integral</span>
-              <span class="s">A crack contour, and a rigid line whose J vanishes at θ<sub>n</sub></span>
-            </a>
-          </li>
-          <li>
-            <a href="phase-field-fracture.html">
-              <span class="n">d</span>
-              <span class="t">Phase-field fracture</span>
-              <span class="s">A sharp crack smeared into a diffuse band of width ℓ</span>
-            </a>
-          </li>
-          <li>
-            <a href="consolidation.html">
-              <span class="n">u</span>
-              <span class="t">Consolidation</span>
-              <span class="s">Terzaghi’s column, Gibson’s fill, and Cryer’s overshoot</span>
-            </a>
-          </li>
-          <li>
-            <a href="gpu-fem.html">
-              <span class="n">GPU</span>
-              <span class="t">GPUs in the FEM pipeline</span>
-              <span class="s">Which stages move, and which stay on the host</span>
-            </a>
-          </li>
-          <li>
-            <a href="fiber-composites.html">
-              <span class="n">θ</span>
-              <span class="t">Fiber-reinforced composites</span>
-              <span class="s">Ply angle, Ēx(θ), and a laminate stack</span>
-            </a>
-          </li>
-          <li>
-            <a href="random-fibers.html">
-              <span class="n">RVE</span>
-              <span class="t">Random fibres in a matrix</span>
-              <span class="s">A discrete packing you can orbit, align, and pick</span>
-            </a>
-          </li>
-          <li>
-            <a href="fiber-interface.html">
-              <span class="n">θ</span>
-              <span class="t">Fiber interface debonding</span>
-              <span class="s">Inclined fiber under remote tension</span>
-            </a>
-          </li>
-          <li>
-            <a href="fiber-neutrality.html">
-              <span class="n">θ<sub>n</sub></span>
-              <span class="t">Fibre neutrality</span>
-              <span class="s">E<sub>x</sub>(θ), θ<sub>n</sub>(ν), slip, and G<sub>xy</sub> as the fibres turn</span>
-            </a>
-          </li>
-        </ol>
+      <section class="band" aria-labelledby="figures-title">
+        <div class="band-head">
+          <h2 id="figures-title">Start with a figure</h2>
+          <p>Interactive plates for the identities that are easiest to misread on paper.</p>
+        </div>
+        <div class="featured">
+          <a href="deformation-gradient.html">
+            <span class="fig-symbol">F</span>
+            <span class="fig-title">Deformation gradient</span>
+            <span class="fig-desc">Translation, rotation, stretch, and shear</span>
+          </a>
+          <a href="polar-decomposition.html">
+            <span class="fig-symbol">RU</span>
+            <span class="fig-title">Polar decomposition</span>
+            <span class="fig-desc">Stretch then rotate—or the reverse</span>
+          </a>
+          <a href="linear-momentum.html">
+            <span class="fig-symbol">σ</span>
+            <span class="fig-title">Linear momentum</span>
+            <span class="fig-desc">A supported body and a moving traction</span>
+          </a>
+        </div>
+        <p class="band-foot"><a href="hub.html">Browse the full library →</a></p>
       </section>
     </div>
   </main>
@@ -481,7 +263,7 @@
   <footer>
     <div class="wrap">
       <span>Mechanics Reference</span>
-      <span><a href="hub.html">Library</a> · <a href="theory.html">Theory</a></span>
+      <span><a href="hub.html">Library</a></span>
     </div>
   </footer>
 </body>
