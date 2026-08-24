@@ -1050,11 +1050,67 @@ const topics = [
     "Element contributions are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated at Gauss points and assembled into a global sparse matrix using the map from local to global degrees of freedom. Essential boundary conditions are then imposed on that system.",
     "Accuracy is controlled by the mesh size h, the polynomial degree p, and the regularity of the solution. A crack tip, a sharp corner, or an incompressible constraint can destroy the textbook rates unless the interpolation is chosen for that pathology. The continuum theory does not by itself pick an element."
   ], tags:["FEM","weak form","discretization","elements","Galerkin"]},
-  {part:"Part II – Numerical Methods", title:"Variational Principles", bullets:[
-    "If the constitutive response derives from a stored energy, the weak form of momentum is the stationarity of the total potential Π(u) = ∫ W(ε(u)) dV − ∫ t · u dA − ∫ ρ b · u dV. The first variation δΠ = 0 is virtual work; the second variation is the tangent stiffness.",
-    "Galerkin methods that do not come from a potential still start from a weighted residual: the strong-form residual is multiplied by test functions and integrated. Integration by parts moves a derivative onto the test functions and produces the natural boundary terms. That is how a traction appears in the discrete load vector.",
-    "Stationarity is not uniqueness. A nonconvex W, a buckling bifurcation, or a limit point all make Π stationary at more than one field, or at a field that is a saddle. The discrete problem inherits those features."
-  ], tags:["potential energy","Galerkin","virtual work","variation"]},
+  {part:"Part II – Numerical Methods", title:"Variational Principles",
+  lead:"To make nonlinear finite elements clear, intuitive, and mathematically rigorous, continuum physics must be connected directly to computational execution.",
+  bullets:[
+    "In linear mechanics, solving a structural problem reduces to K u = F, where the stiffness matrix K is constant. In nonlinear continuum mechanics the residual and tangent stiffness depend on the current deformed state. The solution therefore cannot be obtained in a single step: the continuum equations must be repeatedly linearized and updated.",
+    "The sequence below connects the concepts introduced in Chapter 1 of Bonet and Wood: strong form, virtual work, finite-element discretization, consistent linearization, and Newton–Raphson iteration."
+  ], flow:[
+    {
+      section:"1. The Core Pipeline: From Continuum to Code",
+      lead:"The core workflow of nonlinear finite-element analysis proceeds through five key stages.",
+      items:[
+        {
+          name:"Pipeline",
+          tex:"\\begin{aligned}\\text{Strong Form (PDEs)}&\\xrightarrow{\\text{weak form}}\\text{Virtual Work}\\xrightarrow{\\text{FE discretization}}\\mathbf{R}(\\mathbf{a})\\\\\\mathbf{R}(\\mathbf{a})&\\xrightarrow{\\text{linearization}}\\mathbf{K}_t\\xrightarrow{\\text{Newton update}}\\Delta\\mathbf{a}\\end{aligned}",
+          body:"Each arrow is a mathematical operation that must also be implemented consistently in code."
+        },
+        {
+          name:"1. Continuum Governing Equations (Strong Form)",
+          tex:"\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}+\\mathbf{b}=\\mathbf{0}",
+          body:"Local quasi-static momentum balance. Boundary conditions complete the strong boundary-value problem."
+        },
+        {
+          name:"2. Weak Integral Statement",
+          tex:"G(\\mathbf{u},\\delta\\mathbf{u})=W_{\\mathrm{int}}-W_{\\mathrm{ext}}=0",
+          body:"Multiply momentum balance by an admissible virtual displacement δu and integrate over the domain. Integration by parts lowers the differentiability requirement and introduces the natural traction boundary term."
+        },
+        {
+          name:"3. Finite Element Discretization",
+          tex:"\\mathbf{u}(\\mathbf{x})\\approx\\sum_i N_i(\\mathbf{x})\\,\\mathbf{a}_i,\\qquad \\mathbf{R}(\\mathbf{a})=\\mathbf{F}_{\\mathrm{int}}(\\mathbf{a})-\\mathbf{F}_{\\mathrm{ext}}(\\mathbf{a})=\\mathbf{0}",
+          body:"Shape functions interpolate the continuous displacement field using nodal unknowns a. Substitution converts the weak continuum statement into a finite system of nonlinear algebraic residual equations."
+        },
+        {
+          name:"4. Directional Derivative (Linearization)",
+          tex:"\\mathbf{R}(\\mathbf{a}+\\Delta\\mathbf{a})\\approx\\mathbf{R}(\\mathbf{a})+D\\mathbf{R}(\\mathbf{a})[\\Delta\\mathbf{a}]=\\mathbf{R}(\\mathbf{a})+\\mathbf{K}_t(\\mathbf{a})\\Delta\\mathbf{a},\\qquad \\mathbf{K}_t=\\dfrac{\\partial\\mathbf{R}}{\\partial\\mathbf{a}}",
+          body:"The Gâteaux derivative of the nonlinear residual in the increment direction produces the consistent tangent stiffness matrix Kₜ."
+        },
+        {
+          name:"5. Newton–Raphson Iteration",
+          tex:"\\mathbf{K}_t(\\mathbf{a}_k)\\Delta\\mathbf{a}_k=-\\mathbf{R}(\\mathbf{a}_k),\\qquad \\mathbf{a}_{k+1}=\\mathbf{a}_k+\\Delta\\mathbf{a}_k,\\qquad \\lVert\\mathbf{R}_{k+1}\\rVert\\rightarrow0",
+          body:"Solve the linearized increment, update the nodal state, recompute the residual and tangent, and repeat until the convergence tolerances are satisfied."
+        }
+      ]
+    },
+    {
+      section:"Variational principles and stored energy",
+      items:[
+        {
+          name:"Stationary total potential",
+          tex:"\\Pi(\\mathbf{u})=\\int_{\\Omega}W(\\boldsymbol{\\varepsilon}(\\mathbf{u}))\\,\\mathrm{d}V-\\int_{\\Gamma_t}\\mathbf{t}\\cdot\\mathbf{u}\\,\\mathrm{d}A-\\int_{\\Omega}\\rho\\mathbf{b}\\cdot\\mathbf{u}\\,\\mathrm{d}V,\\qquad \\delta\\Pi=0",
+          body:"If the constitutive response derives from a stored energy, the first variation of total potential is the principle of virtual work and the second variation supplies the tangent stiffness."
+        },
+        {
+          name:"Weighted residual and Galerkin form",
+          body:"Models that do not derive from a potential still begin with a weighted residual. Multiplication by test functions and integration by parts produce the weak form and its natural boundary terms."
+        },
+        {
+          name:"Stationarity is not uniqueness",
+          body:"A nonconvex energy, buckling bifurcation, or limit point may create multiple stationary fields or a saddle point. The discrete nonlinear equations inherit these features, so Newton’s method is local and path-dependent."
+        }
+      ]
+    }
+  ], tags:["potential energy","Galerkin","virtual work","variation","strong form","weak form","residual","linearization","tangent stiffness","Newton-Raphson","Bonet Wood"]},
 
   // Interactive element chooser topic
   {part:"Part II – Numerical Methods", title:"Element Types & Families (Chooser)", interactive:"elementChooser", bullets:[
