@@ -677,9 +677,37 @@ const topics = [
     "The development below follows that order: kinematics, then stress, then the balance laws, then constitutive closure, then the passage to elastodynamics and to a discrete system on a mesh."
   ], flow:[
     {
+      section:"Continuum hypothesis — fields replace particles",
+      lead:"Continuum mechanics treats matter as continuously distributed on a region Ω rather than resolving atoms, grains, fibres, or pores individually. Density, velocity, stress, temperature, and other state variables are therefore fields defined at every admissible material or spatial point.",
+      items:[
+        {
+          name:"Continuum body and fields",
+          tex:"\\Omega_t\\subset\\mathbb{R}^3,\\qquad \\rho=\\rho(\\mathbf{x},t),\\quad \\mathbf{v}=\\mathbf{v}(\\mathbf{x},t),\\quad \\boldsymbol{\\sigma}=\\boldsymbol{\\sigma}(\\mathbf{x},t)",
+          body:"Pointwise continuum fields represent local averages over a representative volume, not the value at a single molecule. The averaging volume must contain enough microstructure to be representative while remaining small relative to macroscopic gradients.",
+          bridge:"That separation of scales is the continuum hypothesis in operational form."
+        },
+        {
+          name:"Scale separation",
+          tex:"\\ell_{\\mathrm{micro}}\\ll\\ell_{\\mathrm{RVE}}\\ll\\ell_{\\mathrm{macro}}",
+          body:"When no intermediate representative scale exists—near atomistic defects, very rarefied gases, or microstructures comparable to the component size—a classical local continuum model may fail and a discrete, nonlocal, or multiscale description is required.",
+          bridge:"Once the hypothesis is accepted, motion is described by a map between configurations."
+        },
+        {
+          name:"Unified scope",
+          body:"The same kinematics and balance laws organize elastic, plastic, viscoelastic, and fractured solids; Newtonian and non-Newtonian fluids; and coupled theories such as thermo-mechanics, poromechanics, and fluid–structure interaction. Their constitutive closures and additional fields distinguish them."
+        }
+      ]
+    },
+    {
       section:"Kinematics — how motion is measured",
       lead:"A material point occupies a reference place X and a current place x. The map between them is the kinematics of the continuum. Strain is built from that map; nothing about force has entered yet.",
       items:[
+        {
+          name:"Motion and displacement",
+          tex:"\\mathbf{x}=\\boldsymbol{\\chi}(\\mathbf{X},t),\\qquad \\mathbf{u}(\\mathbf{X},t)=\\mathbf{x}-\\mathbf{X}",
+          body:"The motion χ sends each material point X in the reference configuration Ω₀ to its current position x in Ωₜ. Displacement is the difference between those positions; velocity and acceleration are time derivatives of the motion at fixed X.",
+          bridge:"The local spatial variation of this map is the deformation gradient."
+        },
         {
           name:"Deformation gradient",
           tex:"F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}",
@@ -833,6 +861,12 @@ const topics = [
           bridge:"The same momentum equation describes a fluid once viscosity replaces elasticity."
         },
         {
+          name:"Newtonian viscous stress",
+          tex:"\\boldsymbol{\\sigma}=-p\\mathbf{I}+2\\mu_f\\mathbf{D}+\\lambda_f\\,\\mathrm{tr}(\\mathbf{D})\\mathbf{I},\\qquad \\mathbf{D}=\\tfrac{1}{2}\\bigl(\\nabla\\mathbf{v}+(\\nabla\\mathbf{v})^{\\mathsf T}\\bigr)",
+          body:"A Newtonian fluid relates stress to the rate of deformation rather than to accumulated strain. For an incompressible fluid tr(D) = ∇ · v = 0, so the bulk-viscous term vanishes and pressure enforces the constraint.",
+          bridge:"Substitution into momentum gives Navier–Stokes."
+        },
+        {
           name:"Incompressible Navier–Stokes",
           tex:"\\rho\\bigl(\\partial_t\\mathbf{v} + \\mathbf{v}\\cdot\\nabla\\mathbf{v}\\bigr) = -\\nabla p + \\mu\\nabla^2\\mathbf{v} + \\rho\\mathbf{b}",
           body:"Cauchy’s first law closed by Newton’s law of viscosity, together with ∇ · v = 0. The continuum structure is unchanged: balance of momentum plus a constitutive map from kinematics to stress. The library entry Fluids: Continuity and Navier–Stokes takes this further.",
@@ -880,8 +914,10 @@ const topics = [
         }
       ]
     }
-  ], tags:["basic equations","continuum","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","elastodynamics","multiphase","Biot","thermoelasticity","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
+  ], tags:["basic equations","continuum","continuum hypothesis","RVE","scale separation","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","Newtonian fluid","elastodynamics","multiphase","Biot","thermoelasticity","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
   {part:"Part I – Continuum Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
+    "Continuum mechanics models material as a continuous body occupying a region Ω ⊂ ℝ³. Fields such as density ρ, velocity v, stress σ, and temperature are assigned at every point as averages over a small representative volume. The approximation requires scale separation: the averaging volume must be large compared with the microstructure and small compared with the macroscopic length over which those fields vary.",
+    "This common framework covers solids, fluids, and coupled media. Universal balance laws remain the same; kinematic assumptions, constitutive equations, internal variables, and additional fields select elasticity, plasticity, viscoelasticity, fluid flow, poromechanics, thermo-mechanics, or fluid–structure interaction.",
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
     "Nonlinear computational mechanics means formulating those continuous governing equations and then solving them numerically—today almost always with the finite element method: approximate the continuum with nodes and elements, introduce shape functions for geometry and unknown fields, and replace the strong form with a weak integral statement (e.g. principle of virtual work or stationary potential energy).",
@@ -893,10 +929,10 @@ const topics = [
     "Directional derivatives and linearization of nonlinear equations are the bridge between continuum theory and Newton–Raphson: each iteration solves a linearized problem until the residual vanishes—prototype for every nonlinear FE increment.",
     "The figures below collect the elementary models used to introduce those ideas: a rigid bar on a spring, a column that buckles, one-dimensional strain measures, a truss joint, qualitative equilibrium paths, and a single Newton step.",
     "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
-  ], tags:["continuum","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
+  ], tags:["continuum","continuum hypothesis","RVE","scale separation","solid mechanics","fluid mechanics","coupled problems","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
   {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation", bullets:[
-    "Deformation is a mapping from a reference placement X to the current placement x = χ(X). When displacement gradients are small, the symmetric gradient of the displacement is enough to measure strain.",
-    "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Rigid translation never appears in F; rotation, stretch, and shear do.",
+    "A motion x = χ(X,t) maps a material point X in the reference configuration Ω₀ to its position x in the current configuration Ωₜ; displacement is u(X,t) = x − X. When displacement gradients are small, the symmetric gradient of u is enough to measure strain.",
+    "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Its positive Jacobian J = det F gives the local volume ratio dv = J dV. Rigid translation never appears in F; rotation, stretch, shear, and volume change do.",
     "The right Cauchy–Green tensor C = Fᵀ F and the left Cauchy–Green tensor b = F Fᵀ are stretch without rotation. Their eigenvalues are the squared principal stretches.",
     "The figure runs through those cases on a homogeneous motion. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
   ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green"], scene:"deformationGradient"},
@@ -1035,9 +1071,10 @@ const topics = [
   ], tags:["plasticity","J2","yield","hardening","Bauschinger","return map"]},
   {part:"Part I – Continuum Mechanics", title:"Fluids: Continuity and Navier–Stokes", bullets:[
     "Mass balance is the continuity equation ∂ρ/∂t + ∇·(ρ v) = 0. For a constant density it is ∇·v = 0, which is a constraint on the velocity, not an evolution for ρ.",
-    "Newton’s law of viscosity, σ = −p I + 2μ D for an incompressible fluid, turns Cauchy’s first law into Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b, together with ∇·v = 0.",
+    "A compressible isotropic Newtonian fluid obeys σ = −p I + 2μ_f D + λ_f tr(D) I, where D = ½(∇v + ∇vᵀ) is the rate of deformation. Unlike an elastic solid, its deviatoric stress depends on deformation rate rather than accumulated strain. Incompressibility sets tr(D) = ∇·v = 0 and removes the bulk-viscous term.",
+    "For constant viscosity, substituting the incompressible law σ = −p I + 2μ D into Cauchy’s first law gives Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b, together with ∇·v = 0.",
     "The pressure is the Lagrange multiplier for incompressibility, analogous to the pressure in an incompressible solid. Mixed velocity–pressure elements, or a slightly compressible regularisation, are the discrete counterpart of the mixed u–p pairs used in rubber."
-  ], tags:["Navier-Stokes","continuity","viscosity","incompressible"]},
+  ], tags:["Navier-Stokes","continuity","Newtonian fluid","viscosity","rate of deformation","compressible","incompressible"]},
   {part:"Part I – Continuum Mechanics", title:"Thermodynamics of Continua", bullets:[
     "The first law balances internal energy with mechanical power and heat. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual constitutive closure for conduction.",
     "The second law, in the Clausius–Duhem form, restricts what a constitutive model may do. A hyperelastic W that depends only on C automatically satisfies it in an isothermal setting; a viscous or plastic model must dissipate.",
