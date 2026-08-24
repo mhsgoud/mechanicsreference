@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hooke’s Law and Poisson Contraction — Mechanics Reference</title>
-  <meta name="description" content="Uniaxial tension of an isotropic linear solid: axial strain produces lateral contraction ν ε, and σ = E ε along the loaded axis." />
+  <meta name="description" content="Interactive Poisson contraction: uniaxial strain produces lateral strain −ν ε, with ν = −(lateral)/(longitudinal)." />
   <link rel="canonical" href="https://mechanicsreference.com/hooke-poisson.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#5b9bd5}
     *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
     body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
     a{color:#3a5f8a}
@@ -24,23 +24,35 @@
     .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
     h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
     .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
+    .figure-shell{border:1px solid var(--rule);background:#fff;overflow:hidden}
     #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
     #stage canvas{display:block;width:100%;height:100%}
-    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
+    #ui{
+      display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;
+      padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft);
+    }
     #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.84rem}
     #formula{color:var(--navy)}
-    input[type=range]{width:140px}
-    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
+    #ui label{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+    input[type=range]{width:130px;accent-color:var(--navy)}
+    .label{
+      color:#dbeafe;font-size:12px;font-weight:700;letter-spacing:0.02em;
+      text-shadow:0 1px 4px #000;pointer-events:none;text-align:center;
+      font-family:"Source Sans 3",system-ui,sans-serif;line-height:1.25;white-space:pre-line;
+    }
     footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
     html.embed,html.embed body{height:100%;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
     html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed #stage{flex:1;height:auto}
-    html.embed #ui{background:#fff}
-    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    html.embed #stage{flex:1;height:auto;min-height:0}
+    html.embed #ui{background:#fff;flex-shrink:0}
+    @media (max-width:800px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      input[type=range]{width:100px}
+    }
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -58,15 +70,15 @@
   <main class="wrap">
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#hooke-s-law">Hooke’s law</a></p>
-      <h1>Poisson contraction</h1>
-      <p class="standfirst">In uniaxial tension the only nonzero stress is along the loaded axis, σ<sub>x</sub> = E ε<sub>x</sub>. The lateral strains are −ν ε<sub>x</sub>. As ν approaches ½ the block refuses to change volume, which is why a displacement-only mesh of an incompressible solid locks.</p>
+      <h1>Poisson contraction during uniaxial tension</h1>
+      <p class="standfirst">Poisson’s ratio is −(lateral strain)/(longitudinal strain). Pull the specimen along its length: the dashed outline is the undeformed shape, and the solid outline necks under lateral contraction −ν&nbsp;ε. As ν → ½ the volume change vanishes and a displacement-only mesh locks.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage"></div>
+      <div id="stage" aria-label="Interactive Poisson contraction diagram"></div>
       <div id="ui">
-        <p id="formula">σ<sub>x</sub> = E ε<sub>x</sub>, &nbsp; ε<sub>y</sub> = ε<sub>z</sub> = −ν ε<sub>x</sub></p>
-        <label>ε<sub>x</sub> <input id="eps" type="range" min="0" max="40" value="18" /></label>
-        <label>ν <input id="nu" type="range" min="0" max="49" value="30" /></label>
+        <p id="formula">ν = − ε<sub>lat</sub> / ε<sub>long</sub></p>
+        <label>ε<sub>long</sub> <input id="strain" type="range" min="-30" max="40" step="1" value="20" /></label>
+        <label>ν <input id="poisson" type="range" min="0" max="49" step="1" value="35" /></label>
         <p id="readout"></p>
       </div>
     </div>
@@ -79,72 +91,171 @@
     import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
     const stage = document.getElementById('stage');
+    const strainEl = document.getElementById('strain');
+    const poissonEl = document.getElementById('poisson');
+    const readout = document.getElementById('readout');
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-    camera.position.set(3.8, 2.1, 3.6);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 7.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     stage.appendChild(renderer.domElement);
+
     const labels = new CSS2DRenderer();
     labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
     stage.appendChild(labels.domElement);
+
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
-    key.position.set(3, 5, 4); scene.add(key);
+    controls.enablePan = false;
+    controls.minDistance = 4;
+    controls.maxDistance = 12;
+    controls.target.set(0, 0, 0);
 
-    const ghost = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.BoxGeometry(2.2, 1.4, 1.4)),
-      new THREE.LineBasicMaterial({color:0x6d7c94})
+    const base = { x: 3.2, y: 1.45 };
+
+    const refGeo = new THREE.BoxGeometry(base.x, base.y, 0.001);
+    const refEdges = new THREE.EdgesGeometry(refGeo);
+    const refBlock = new THREE.LineSegments(
+      refEdges,
+      new THREE.LineDashedMaterial({ color: 0x6ea8d8, dashSize: 0.12, gapSize: 0.07 })
     );
-    scene.add(ghost);
+    refBlock.computeLineDistances();
+    scene.add(refBlock);
 
-    const geo = new THREE.BoxGeometry(2.2, 1.4, 1.4);
-    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-      color:0xd89b54, transparent:true, opacity:0.32, roughness:0.75
-    }));
-    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({color:0xe39a4a}));
-    const group = new THREE.Group();
-    group.add(mesh, edges);
-    scene.add(group);
+    const meshGeo = new THREE.PlaneGeometry(base.x, base.y, 40, 24);
+    const deformedMesh = new THREE.Mesh(
+      meshGeo,
+      new THREE.MeshBasicMaterial({
+        color: 0x2a4a6e,
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide
+      })
+    );
+    scene.add(deformedMesh);
 
-    const load = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(1.1,0,0), 0.9, 0xef4444, 0.14, 0.08);
-    const load2 = new THREE.ArrowHelper(new THREE.Vector3(-1,0,0), new THREE.Vector3(-1.1,0,0), 0.9, 0xef4444, 0.14, 0.08);
-    scene.add(load, load2);
+    const outlineGeo = new THREE.BufferGeometry();
+    const outlineLine = new THREE.LineSegments(
+      outlineGeo,
+      new THREE.LineBasicMaterial({ color: 0x93c5fd })
+    );
+    scene.add(outlineLine);
 
-    function tag(text, pos) {
-      const d = document.createElement('div'); d.className = 'label'; d.textContent = text;
-      const o = new CSS2DObject(d); o.position.copy(pos); scene.add(o);
+    function tag(text) {
+      const d = document.createElement('div');
+      d.className = 'label';
+      d.textContent = text;
+      return new CSS2DObject(d);
     }
-    tag('x', new THREE.Vector3(2.4, 0, 0));
 
-    const epsEl = document.getElementById('eps');
-    const nuEl = document.getElementById('nu');
-    const readout = document.getElementById('readout');
+    const labelLongRight = tag('Longitudinal\nStrain');
+    const labelLongLeft = tag('Longitudinal\nStrain');
+    const labelLatTop = tag('Lateral Strain');
+    const labelLatBottom = tag('Lateral Strain');
+    scene.add(labelLongRight, labelLongLeft, labelLatTop, labelLatBottom);
 
-    function update() {
-      const ex = (+epsEl.value) / 100;
-      const nu = (+nuEl.value) / 100;
-      const ey = -nu * ex;
-      const J = (1+ex) * (1+ey) * (1+ey);
-      group.scale.set(1+ex, 1+ey, 1+ey);
-      load.position.set(1.1*(1+ex), 0, 0);
-      load2.position.set(-1.1*(1+ex), 0, 0);
-      readout.textContent = `εx = ${ex.toFixed(2)}   ν = ${nu.toFixed(2)}   εy = ${ey.toFixed(3)}   det(I+ε) = ${J.toFixed(3)}`;
+    const arrowColor = 0x93c5fd;
+    const arrowLongRight = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(), 0.85, arrowColor, 0.2, 0.14);
+    const arrowLongLeft = new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(), 0.85, arrowColor, 0.2, 0.14);
+    const arrowLatTop = new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 0.55, arrowColor, 0.16, 0.12);
+    const arrowLatBottom = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.55, arrowColor, 0.16, 0.12);
+    scene.add(arrowLongRight, arrowLongLeft, arrowLatTop, arrowLatBottom);
+
+    function setArrow(helper, dir, origin, length) {
+      helper.setDirection(dir);
+      helper.position.copy(origin);
+      helper.setLength(length, Math.min(0.22, length * 0.35), Math.min(0.16, length * 0.25));
+      helper.visible = length > 0.04;
     }
-    epsEl.addEventListener('input', update);
-    nuEl.addEventListener('input', update);
-    update();
+
+    function profileFactor(u, ex) {
+      return 1 - (1 - u * u) * (1 - (1 + ex));
+    }
+
+    function updateDeformation() {
+      const ez = (+strainEl.value) / 100;
+      const nu = (+poissonEl.value) / 100;
+      const ex = -nu * ez;
+
+      const halfW = (base.x / 2) * (1 + ez);
+      const halfH0 = base.y / 2;
+
+      const pos = meshGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const u = pos.getX(i) / (base.x / 2);
+        const v = pos.getY(i) / (base.y / 2);
+        const x = u * halfW;
+        const y = v * halfH0 * profileFactor(u, ex);
+        pos.setXYZ(i, x, y, 0);
+      }
+      pos.needsUpdate = true;
+      meshGeo.computeBoundingSphere();
+
+      const steps = 40;
+      const top = [];
+      const bottom = [];
+      for (let i = 0; i <= steps; i++) {
+        const u = (i / steps) * 2 - 1;
+        const x = u * halfW;
+        const y = halfH0 * profileFactor(u, ex);
+        top.push(new THREE.Vector3(x, y, 0));
+        bottom.push(new THREE.Vector3(x, -y, 0));
+      }
+
+      const pts = [];
+      for (let i = 0; i < steps; i++) pts.push(top[i], top[i + 1]);
+      for (let i = 0; i < steps; i++) pts.push(bottom[i], bottom[i + 1]);
+      pts.push(top[0], bottom[0], top[steps], bottom[steps]);
+      outlineGeo.setFromPoints(pts);
+
+      const midH = halfH0 * (1 + ex);
+      const longLen = 0.75 + 0.35 * Math.min(1, Math.abs(ez) / 0.3);
+      const latLen = 0.45 + 0.35 * Math.min(1, Math.abs(ex) / 0.2);
+
+      const longSign = ez >= 0 ? 1 : -1;
+      const latSign = ex <= 0 ? 1 : -1;
+
+      setArrow(arrowLongRight, new THREE.Vector3(longSign, 0, 0), new THREE.Vector3(halfW, 0, 0), longLen);
+      setArrow(arrowLongLeft, new THREE.Vector3(-longSign, 0, 0), new THREE.Vector3(-halfW, 0, 0), longLen);
+      setArrow(arrowLatTop, new THREE.Vector3(0, -latSign, 0), new THREE.Vector3(0, midH + latLen * 0.15, 0), latLen);
+      setArrow(arrowLatBottom, new THREE.Vector3(0, latSign, 0), new THREE.Vector3(0, -midH - latLen * 0.15, 0), latLen);
+
+      labelLongRight.position.set(halfW + longLen + 0.55, 0, 0);
+      labelLongLeft.position.set(-(halfW + longLen + 0.55), 0, 0);
+      labelLatTop.position.set(0, midH + latLen + 0.35, 0);
+      labelLatBottom.position.set(0, -(midH + latLen + 0.35), 0);
+
+      const J = (1 + ez) * (1 + ex) * (1 + ex);
+      readout.textContent =
+        `εlong = ${ez.toFixed(2)}   ν = ${nu.toFixed(2)}   εlat = ${ex.toFixed(3)}   det(I+ε) ≈ ${J.toFixed(3)}`;
+    }
+
+    strainEl.addEventListener('input', updateDeformation);
+    poissonEl.addEventListener('input', updateDeformation);
 
     function resize() {
-      const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
-      camera.aspect = w/h; camera.updateProjectionMatrix();
-      renderer.setSize(w,h,false); labels.setSize(w,h);
+      const w = Math.max(1, stage.clientWidth);
+      const h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      labels.setSize(w, h);
     }
-    new ResizeObserver(resize).observe(stage); resize();
-    (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+    new ResizeObserver(resize).observe(stage);
+    resize();
+    updateDeformation();
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      controls.update();
+      renderer.render(scene, camera);
+      labels.render(scene, camera);
+    })();
   </script>
 </body>
 </html>

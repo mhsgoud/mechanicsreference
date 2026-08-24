@@ -959,11 +959,45 @@ const topics = [
     "The figure spins a block that carries a constant uniaxial Cauchy stress along its own axis. Laboratory components change; the Jaumann rate does not."
   ], tags:["Jaumann","Green-Naghdi","objectivity","corotational"], scene:"objectiveRates"},
   {part:"Part I – Fundamentals of Mechanics", title:"Hooke’s Law", bullets:[
-    "Isotropic linear elasticity is σ = λ (tr ε) I + 2μ ε, or equivalently ε = [(1+ν)/E] σ − (ν/E) (tr σ) I. The constants are not independent: μ = E / (2(1+ν)), and 3λ + 2μ is the bulk modulus.",
-    "Poisson’s ratio is the lateral contraction in uniaxial tension. It approaches ½ for incompressibility; the bulk modulus then diverges and displacement-only elements lock. Anisotropy replaces the two constants by a stiffness tensor ℂ with the usual minor and major symmetries.",
-    "The law is the first-order expansion of any hyperelastic stored energy. It remains useful for metals below yield and for rubber only while the stretches stay close to one. Large rotation still requires a conjugate pair, even when the stretch is small.",
+    "Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
+    "Poisson contraction: a uniaxial tensile load produces a transverse strain ε_transverse = −ν ε_axial. As ν → ½ the bulk modulus diverges (K → ∞), modelling an incompressible solid with volumetric strain tr(ε) → 0. Standard displacement-based finite-element formulations then suffer volumetric locking, because the interpolation cannot satisfy the pointwise zero-volume-change constraint.",
+    "Anisotropy expands the two-parameter model to a fourth-order stiffness ℂ with σ = ℂ : ε — reduced from 81 components to at most 21 independent constants by major and minor symmetries. Linear elasticity is the first-order Taylor expansion of a hyperelastic stored energy W: accurate for metals below yield, and for polymers/rubbers only near λ ≈ 1. Under finite rotations — even with small strains — a frame-invariant (objective) stress–strain rate, or a conjugate pair such as the second Piola–Kirchhoff stress and Green–Lagrange strain, must be used.",
     "The block is pulled in uniaxial tension. Lateral contraction is −ν ε; as ν approaches ½ the volume change vanishes and a displacement-only interpolation starts to lock."
-  ], tags:["Hooke","Lamé","Young","Poisson","isotropic"], scene:"hookePoisson"},
+  ], flow:[
+    {
+      section:"Constitutive equations",
+      lead:"For isotropic linear elastic solids, the relationship between the Cauchy stress tensor σ and the small strain tensor ε is parameterized by two independent elastic moduli (typically Lamé’s constants λ and μ):",
+      items:[
+        {
+          name:"Lamé form",
+          tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}",
+          body:"Stress from strain with Lamé’s constants — equivalently σ = ℂ : ε with an isotropic fourth-order stiffness.",
+          bridge:"In terms of Young’s modulus E and Poisson’s ratio ν, the inverted strain–stress formulation is:"
+        },
+        {
+          name:"Compliance form (E, ν)",
+          tex:"\\boldsymbol{\\varepsilon} = \\dfrac{1+\\nu}{E}\\boldsymbol{\\sigma} - \\dfrac{\\nu}{E}\\mathrm{tr}(\\boldsymbol{\\sigma})\\,\\mathbf{I}",
+          body:"The inverted relation used when stress is prescribed, as in uniaxial tension.",
+          bridge:"The fundamental elastic moduli interrelations are given by:"
+        },
+        {
+          name:"Shear modulus",
+          tex:"\\mu = \\dfrac{E}{2(1+\\nu)}",
+          body:"Lamé’s second parameter is the shear modulus G ≡ μ."
+        },
+        {
+          name:"Bulk modulus",
+          tex:"K = \\lambda + \\tfrac{2}{3}\\mu = \\dfrac{E}{3(1-2\\nu)}",
+          body:"K measures resistance to volumetric change. It diverges as ν → ½."
+        },
+        {
+          name:"Poisson’s ratio",
+          tex:"\\nu = -\\dfrac{\\varepsilon_{\\mathrm{lateral}}}{\\varepsilon_{\\mathrm{longitudinal}}}",
+          body:"Lateral contraction under uniaxial tension, defined so that ν is positive for ordinary materials."
+        }
+      ]
+    }
+  ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking"], scene:"hookePoisson"},
   {part:"Part I – Fundamentals of Mechanics", title:"Hyperelasticity", bullets:[
     "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
     "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
@@ -1770,7 +1804,7 @@ function renderTopicScene(topic){
     vonMises: {src:'von-mises.html', title:'von Mises yield surface'},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
-    hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction'},
+    hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Objective rates'},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
@@ -3062,7 +3096,7 @@ const PART_I_LEAD = {
   "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
   "Principal Stresses and von Mises": "Hydrostatic part, stress deviator, and the cylindrical yield surface of J₂ plasticity.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
-  "Hooke’s Law": "The first elastic closure: two isotropic moduli, Poisson contraction, and locking as ν → ½.",
+  "Hooke’s Law": "Generalized Hooke’s Law: two isotropic moduli, Poisson contraction, and locking as ν → ½.",
   "Hyperelasticity": "Finite elastic stretch from a stored-energy function; S = ∂W/∂E.",
   "Metal Plasticity": "Yield, associated flow, hardening, and the return map at each quadrature point.",
   "Fluids: Continuity and Navier–Stokes": "The same momentum equation once Newton’s viscosity replaces Hooke’s law.",
