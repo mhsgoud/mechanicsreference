@@ -43,8 +43,8 @@
         { "@type": "ListItem", "position": 2, "name": "Kinematics of Deformation" },
         { "@type": "ListItem", "position": 3, "name": "Balance Laws & Conservation" },
         { "@type": "ListItem", "position": 4, "name": "Constitutive Models" },
-        { "@type": "ListItem", "position": 5, "name": "Finite Element Method (Introduction)" },
-        { "@type": "ListItem", "position": 6, "name": "Variational Principles" },
+        { "@type": "ListItem", "position": 5, "name": "Variational Principles" },
+        { "@type": "ListItem", "position": 6, "name": "Finite Element Method (Introduction)" },
         { "@type": "ListItem", "position": 7, "name": "Element Types & Families (Chooser)" },
         { "@type": "ListItem", "position": 8, "name": "Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)" },
         { "@type": "ListItem", "position": 8, "name": "Extended & Generalized Finite Element Methods (XFEM/GFEM)" },
@@ -600,8 +600,8 @@
         <li><a href="hub.html#metal-plasticity">Metal Plasticity</a></li>
         <li><a href="hub.html#fluids-continuity-and-navier-stokes">Fluids: Continuity and Navier–Stokes</a></li>
         <li><a href="hub.html#thermodynamics-of-continua">Thermodynamics of Continua</a></li>
-        <li><a href="hub.html#finite-element-method-introduction">Finite Element Method (Introduction)</a></li>
         <li><a href="hub.html#variational-principles">Variational Principles</a></li>
+        <li><a href="hub.html#finite-element-method-introduction">Finite Element Method (Introduction)</a></li>
         <li><a href="hub.html#element-types-families-chooser">Element Types &amp; Families (Chooser)</a></li>
         <li><a href="hub.html#virtual-element-method">Virtual Element Method</a></li>
         <li><a href="hub.html#extended-generalized-finite-element-methods-xfem-gfem">Extended &amp; Generalized Finite Element Methods (XFEM/GFEM)</a></li>
@@ -1045,11 +1045,6 @@ const topics = [
   ], tags:["thermodynamics","Clausius-Duhem","Fourier","dissipation"]},
 
   // Part II – Numerical Methods
-  {part:"Part II – Numerical Methods", title:"Finite Element Method (Introduction)", bullets:[
-    "The finite element method is a Galerkin discretisation of a weak form. On each element the unknown field is interpolated by shape functions, uʰ = Σ N_a a_a. Substituting into virtual work, and requiring the residual to vanish for every test function in the same space, produces a finite algebraic system.",
-    "Element contributions are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated at Gauss points and assembled into a global sparse matrix using the map from local to global degrees of freedom. Essential boundary conditions are then imposed on that system.",
-    "Accuracy is controlled by the mesh size h, the polynomial degree p, and the regularity of the solution. A crack tip, a sharp corner, or an incompressible constraint can destroy the textbook rates unless the interpolation is chosen for that pathology. The continuum theory does not by itself pick an element."
-  ], tags:["FEM","weak form","discretization","elements","Galerkin"]},
   {part:"Part II – Numerical Methods", title:"Variational Principles",
   lead:"To make nonlinear finite elements clear, intuitive, and mathematically rigorous, continuum physics must be connected directly to computational execution.",
   bullets:[
@@ -1111,6 +1106,11 @@ const topics = [
       ]
     }
   ], tags:["potential energy","Galerkin","virtual work","variation","strong form","weak form","residual","linearization","tangent stiffness","Newton-Raphson","Bonet Wood"]},
+  {part:"Part II – Numerical Methods", title:"Finite Element Method (Introduction)", bullets:[
+    "The finite element method is a Galerkin discretisation of a weak form. On each element the unknown field is interpolated by shape functions, uʰ = Σ N_a a_a. Substituting into virtual work, and requiring the residual to vanish for every test function in the same space, produces a finite algebraic system.",
+    "Element contributions are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated at Gauss points and assembled into a global sparse matrix using the map from local to global degrees of freedom. Essential boundary conditions are then imposed on that system.",
+    "Accuracy is controlled by the mesh size h, the polynomial degree p, and the regularity of the solution. A crack tip, a sharp corner, or an incompressible constraint can destroy the textbook rates unless the interpolation is chosen for that pathology. The continuum theory does not by itself pick an element."
+  ], tags:["FEM","weak form","discretization","elements","Galerkin"]},
 
   // Interactive element chooser topic
   {part:"Part II – Numerical Methods", title:"Element Types & Families (Chooser)", interactive:"elementChooser", bullets:[
