@@ -1319,18 +1319,83 @@ const topics = [
     "A two-dimensional inclusion with a double interface (a jump on each side) is different. Then Ex can fall below Em over a range of angles, and the angle of the minimum depends on bond stiffness. A single-interface reduced model does not degrade, and its θn is independent of the interface. In a random packing the effective isotropic Poisson ratio is itself neutral at νm ≈ 0.25: it does not change with fibre volume fraction, and other matrices are pulled toward 0.25 as fibres are added.",
     "The figure is an RVE under remote tension along x. Turn orientation, Poisson ratio, volume fraction, contrast, diameter, interface, and packing. The plots follow the 2019 paper: Ex(θ), θn(ν) against Wang, Ex and G versus diameter, slip and strain with the sign change, single versus double interface, and Poisson neutrality at 0.25."
   ], tags:["fiber neutrality","rigid line inclusion","orientation","Poisson","Wang","imperfect interface"], scene:"fiberNeutrality3d", illustrations:"fiberNeutrality", sources:[{label:"Goudarzi & Simone, Fiber neutrality in fiber-reinforced composites, Int. J. Solids Struct. 156–157 (2019)", href:"https://doi.org/10.1016/j.ijsolstr.2018.07.023"},{label:"Wang, Zhang & Chou, Characteristics of the elastic field of a rigid line inhomogeneity, J. Appl. Mech. 52 (1985)", href:"https://doi.org/10.1115/1.3169158"},{label:"Goudarzi, Discrete fiber models beyond classical applications, TU Delft (2020)", href:"https://doi.org/10.4233/uuid:4741efe6-9a5e-4782-8cef-6d7ed83a3b30"}]},
-  {part:"Part IV – Applications in Engineering", title:"Composite Materials – Effective Properties", equations:[
-    {name:"Periodic jump", expr:"u(x⁺) − u(x⁻) = ε̄ (x⁺ − x⁻)", tex:"\\mathbf{u}(\\mathbf{x}^+) - \\mathbf{u}(\\mathbf{x}^-) = \\bar{\\boldsymbol{\\varepsilon}}\\,(\\mathbf{x}^+ - \\mathbf{x}^-)", note:"Strain-controlled PBC on partner nodes. The fluctuation is periodic; only the difference carries the macro strain. Faces, edges, and vertices each need their own links so corners are not over-constrained."},
-    {name:"Macro stress", expr:"⟨σ⟩ = (1/V) ∫_Ω σ dV", tex:"\\langle\\boldsymbol{\\sigma}\\rangle = \\dfrac{1}{V}\\int_\\Omega \\boldsymbol{\\sigma}\\,\\mathrm{d}V", note:"Hill–Mandel work conjugacy. On a periodic cell with no body force the same average is recovered from face resultants (∫ σ n dA), which is what a discrete reaction sum on the positive faces approximates."},
-    {name:"Effective stiffness", expr:"⟨σ⟩ = C̄ : ε̄", tex:"\\langle\\boldsymbol{\\sigma}\\rangle = \\bar{\\mathbb{C}}:\\bar{\\boldsymbol{\\varepsilon}}", note:"Six independent strain cases in 3D (three in 2D) fill the columns of C̄ in Voigt form. Inversion of the compliance gives Ex, Ey, Ez, G, and ν."},
-    {name:"Rule of mixtures (E₁)", expr:"E₁ ≈ Vf Ef + (1−Vf) Em", tex:"E_1 \\approx V_f E_f + (1-V_f) E_m", note:"First estimate along the fibres of a unidirectional ply. Transverse and shear moduli need a series, Halpin–Tsai, or an RVE solve — the rule of mixtures is too stiff there."}
-  ], bullets:[
-    "A composite is a continuum at the scale of a structure and a microstructure at the scale of fibres or grains. Rule of mixtures and Halpin–Tsai give quick ply estimates; classical lamination theory then rotates and stacks them.",
-    "For a periodic microstructure the honest route is an RVE under strain-controlled periodic boundary conditions. Partner nodes satisfy u⁺ − u⁻ = ε̄ (x⁺ − x⁻). That is not the same as prescribing u = ε̄ x on the whole boundary: only the jump is fixed, so a periodic fluctuation can still develop.",
-    "The full set on an axis-aligned brick ties faces first, then parallel edges, then vertices — otherwise corners are over-constrained or under-constrained. In 3D the lattice sizes are c, a, b along x, y, z; face pairs 1–3, 2–4, 6–5 carry Δu = ε̄ · L for each lattice vector L. Shear appears on two face pairs at once. The 2D set is the same idea on edges 1–3 and 2–4 plus vertex closure.",
-    "Six independent macro-strain cases in 3D (three in 2D) each produce a volume-average stress ⟨σ⟩ — equivalently, face resultants when there is no body force. Those columns assemble C̄; the compliance inverse is Ex, Ey, Ez, G, and ν.",
-    "The figure is the handwritten full set: numbered faces, edges, and vertices, live jump equations for the active ε̄, and neighboring cells so periodicity is visible. In code those partner ties are multi-point constraints — see Constrained FEM."
-  ], tags:["composites","homogenization","rule of mixtures","Halpin-Tsai","PBC","RVE","periodic boundary","effective moduli","MPC","constraints"], scene:"effectiveProperties", illustrations:"effectiveProps"},
+  {part:"Part IV – Applications in Engineering", title:"Composite Materials – Effective Properties",
+  lead:"This framework outlines the computational homogenization workflow used to extract macroscopic engineering properties (e.g., Young’s modulus, shear modulus, Poisson’s ratio) of a composite from a Representative Volume Element (RVE).",
+  bullets:[], flow:[
+    {
+      section:"1. Periodic Boundary Conditions (PBCs)",
+      lead:"To ensure the RVE models a continuous bulk material without artificial edge distortions, periodic boundary conditions are applied to opposite faces, edges, and vertices of the RVE.",
+      items:[
+        {
+          name:"Displacement Constraints",
+          tex:"\\Delta u_i = \\bar{\\varepsilon}_{ij}\\,\\Delta x_j",
+          body:"The displacement difference between corresponding points on opposite boundaries is constrained by the macroscopic strain tensor ε̄."
+        },
+        {
+          name:"Application",
+          body:"These constraints are defined across faces (1–6), edges (1–12), and vertices (1–8) in 3D (and 2D equivalents) to enforce periodicity under deformation."
+        }
+      ]
+    },
+    {
+      section:"2. Homogenization & Stiffness Tensor Calculation",
+      items:[
+        {
+          name:"1. Strain Application",
+          body:"Six unit macrostrain vectors (ε̄) are sequentially applied to the RVE using six independent loading conditions (e.g., pure axial stretch [0.1, 0, 0, 0, 0, 0]ᵀ or shear)."
+        },
+        {
+          name:"2. Stress Averaging",
+          tex:"\\bar{\\boldsymbol{\\sigma}} = \\dfrac{1}{V}\\int_V \\boldsymbol{\\sigma}\\,\\mathrm{d}V",
+          body:"For each applied macrostrain, the resulting local stress field σ is calculated and volume-averaged over the RVE volume V."
+        },
+        {
+          name:"3. Stiffness Matrix (Cᶜ)",
+          tex:"\\bar{\\boldsymbol{\\sigma}} = \\mathbb{C}^{c}\\bar{\\boldsymbol{\\varepsilon}}",
+          body:"Using Hooke’s Law, each loading condition isolates and extracts specific columns (Cᶜᵢ₁ through Cᶜᵢ₆) of the effective constitutive matrix Cᶜ."
+        }
+      ]
+    },
+    {
+      section:"3. Conversion to Macro Engineering Constants",
+      lead:"Once Cᶜ is derived, mechanical properties are extracted depending on fiber alignment.",
+      items:[
+        {
+          name:"Aligned Fibers (Transversely Isotropic)",
+          body:"The effective stiffness is reduced to five independent constants: Cᶜₓₓ, Cᶜᵧᵧ, Cᶜₓᵧ, Cᶜᵧ𝓏, and Gᶜᵧ𝓏."
+        },
+        {
+          name:"Axial Young’s Modulus",
+          tex:"E_{xx}^{c}=C_{xx}^{c}-\\dfrac{2(C_{xy}^{c})^2}{C_{yy}^{c}+C_{yz}^{c}}",
+          body:""
+        },
+        {
+          name:"Transverse Young’s Modulus",
+          tex:"E_{yy}^{c}=\\dfrac{(C_{yy}^{c}-C_{yz}^{c})\\left[C_{xx}^{c}C_{yy}^{c}+C_{xx}^{c}C_{yz}^{c}-2(C_{xy}^{c})^2\\right]}{C_{xx}^{c}C_{yy}^{c}-(C_{xy}^{c})^2}",
+          body:""
+        },
+        {
+          name:"Poisson’s Ratio",
+          tex:"\\nu_{xy}^{c}=\\dfrac{C_{xy}^{c}}{C_{yy}^{c}+C_{yz}^{c}}",
+          body:""
+        },
+        {
+          name:"Randomly Oriented Fibers (Isotropic)",
+          body:"The effective response is formulated through the Lamé parameters λᶜ and μᶜ."
+        },
+        {
+          name:"Shear Modulus",
+          tex:"G^{c}=\\mu^{c}",
+          body:""
+        },
+        {
+          name:"Young’s Modulus",
+          tex:"E^{c}=\\dfrac{\\mu^{c}(3\\lambda^{c}+2\\mu^{c})}{\\lambda^{c}+\\mu^{c}}",
+          body:""
+        }
+      ]
+    }
+  ], tags:["composites","homogenization","PBC","RVE","periodic boundary","effective stiffness","Young modulus","Poisson ratio","shear modulus","MPC","constraints"], scene:"effectiveProperties", sceneFirst:true},
   {part:"Part IV – Applications in Engineering", title:"Composite Materials – Failure Modes", bullets:[
     "Failure is rarely a single event. Fibres break, the matrix cracks, and plies separate. Hashin, Puck, and LaRC-type criteria distinguish those modes on a ply; the sequence depends on stacking sequence, notches, and the loading path.",
     "Continuum damage and cohesive interfaces are the usual numerical representations. A single equivalent-stress criterion on a homogenised ply is often too coarse to see delamination coming, because the interlaminar traction never appears as a degree of freedom."
@@ -1841,7 +1906,7 @@ function renderTopicScene(topic){
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
     fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
-    effectiveProperties: {src:'effective-properties.html', title:'Full PBC set on an RVE'},
+    effectiveProperties: {src:'effective-properties.html', title:'Periodic boundary conditions and strain extraction', tall:true},
     hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'},
     beamContact: {src:'contact-beam.html', title:'Double-cantilever ContactFEA', tall:true},
     lefmCenterCrack: {src:'lefm-center-crack.html', title:'Center crack and tip singularity', tall:true},
@@ -3207,7 +3272,7 @@ function renderEquationFlow(flow){
       ${(sec.items||[]).map(item => `
         <div class="eq-step">
           <h3>${escHtml(item.name)}</h3>
-          <div class="eq">\\[${item.tex || escHtml(item.expr || "")}\\]</div>
+          ${(item.tex || item.expr) ? `<div class="eq">\\[${item.tex || escHtml(item.expr)}\\]</div>` : ""}
           ${(item.body || item.note) ? `<p class="body">${escHtml(item.body || item.note)}</p>` : ""}
           ${item.bridge ? `<p class="bridge">${escHtml(item.bridge)}</p>` : ""}
         </div>`).join("")}

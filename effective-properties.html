@@ -3,573 +3,208 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Periodic Boundary Conditions on an RVE — Mechanics Reference</title>
-  <meta name="description" content="Full-set strain-controlled periodic boundary conditions in 2D and 3D: face, edge, and vertex jumps that encode the macro strain for homogenization." />
+  <title>Periodic Boundary Conditions and Strain Extraction — Mechanics Reference</title>
+  <meta name="description" content="Interactive 3D RVE showing six applied macrostrain cases, periodic boundary displacements, and effective stiffness extraction." />
   <link rel="canonical" href="https://mechanicsreference.com/effective-properties.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if(window.self!==window.top)document.documentElement.classList.add('embed')</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0d1117;--blue:#58a6ff;--green:#3fb950}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
-    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:46em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
-    .stage-row{display:grid;grid-template-columns:minmax(280px,1.25fr) minmax(280px,0.95fr);background:var(--plate)}
-    #stage{position:relative;height:min(54vh,480px)}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{position:relative;border:1px solid var(--rule);background:var(--plate);overflow:hidden}
+    #stage{position:relative;height:min(72vh,640px);min-height:500px}
     #stage canvas{display:block;width:100%;height:100%}
-    .eq-panel{
-      background:#fff;border-left:1px solid var(--rule);
-      padding:14px 16px;overflow:auto;max-height:min(54vh,480px);
-      font-size:0.86rem;color:var(--ink-soft);
+    #panel{
+      position:absolute;z-index:3;top:18px;left:18px;width:min(330px,calc(100% - 36px));
+      padding:15px 16px;border:1px solid #30363d;border-radius:8px;
+      background:rgba(22,27,34,.94);color:#c9d1d9;box-shadow:0 8px 24px rgba(0,0,0,.45);
+      backdrop-filter:blur(8px);
     }
-    .eq-panel h2{
-      margin:0 0 8px;font-size:0.72rem;font-weight:600;letter-spacing:.08em;
-      text-transform:uppercase;color:var(--accent);
+    #panel h2{margin:0 0 11px;padding-bottom:7px;border-bottom:1px solid #30363d;color:var(--blue);font-size:.95rem}
+    .control{margin:0 0 12px}
+    .control label{display:block;margin:0 0 5px;color:#9ba6b2;font-size:.76rem;font-weight:600}
+    select,input[type=range]{width:100%;font:inherit}
+    select{padding:7px 8px;border:1px solid #30363d;border-radius:4px;background:#0d1117;color:#c9d1d9;font-size:.75rem}
+    input[type=range]{accent-color:var(--green)}
+    .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;color:#c9d1d9;font-size:.78rem}
+    .formula{
+      margin:0;padding:10px;border:1px solid #30363d;border-radius:6px;background:#161b22;
+      color:#79c0ff;font:500 .72rem/1.55 "JetBrains Mono",ui-monospace,monospace;
     }
-    .eq-panel .master{
-      margin:0 0 12px;padding:8px 10px;background:#f7f6f2;border:1px solid var(--rule);
-      font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.78rem;color:var(--navy);line-height:1.5;
-    }
-    .eq-block{margin:0 0 12px}
-    .eq-block h3{margin:0 0 4px;font-size:0.78rem;font-weight:600;color:var(--navy)}
-    .eq-block ul{margin:0;padding:0;list-style:none}
-    .eq-block li{
-      font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.74rem;
-      padding:3px 0;border-bottom:1px solid #eee;line-height:1.45;
-    }
-    .eq-block li.on{color:var(--accent);font-weight:600}
-    .eq-block li.dim{opacity:0.32}
-    .eq-note{margin:8px 0 0;font-size:0.8rem;line-height:1.45}
-    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
-    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.82rem}
-    #formula{color:var(--navy);flex-basis:100%}
-    select,button{
-      font:inherit;font-weight:600;color:var(--navy);
-      background:#fff;border:1px solid var(--rule);padding:6px 10px;cursor:pointer;
-    }
-    button:hover,select:hover{border-color:var(--navy)}
-    button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-    input[type=range]{width:110px;vertical-align:middle}
-    .label{color:#f4efe6;font-size:12px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
-    .label.hot{color:#ffb070}
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
-    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    #readout{display:block;margin-top:5px;color:#8b949e}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1120px}
     html.embed,html.embed body{height:100%;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed .stage-row{flex:1;min-height:0}
-    html.embed #stage{height:auto}
-    html.embed .eq-panel{max-height:none}
-    html.embed #ui{background:#fff}
-    .prose{margin-top:36px}
-    .prose h2{
-      margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;
-      font-size:1.45rem;font-weight:600;color:var(--navy);
-    }
-    .prose p{margin:0 0 14px;max-width:44em;color:var(--ink-soft)}
-    .prose .eq{
-      margin:16px 0 20px;padding:14px 16px;background:#fff;border:1px solid var(--rule);
-      font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.86rem;color:var(--navy);
-      overflow-x:auto;line-height:1.7;
-    }
-    .prose ul{margin:0 0 16px;padding-left:1.2em;max-width:44em;color:var(--ink-soft)}
-    .prose li{margin:0 0 6px}
-    @media (max-width:900px){
-      .stage-row{grid-template-columns:1fr}
-      .eq-panel{border-left:0;border-top:1px solid var(--rule);max-height:240px}
-      #stage{height:min(42vh,340px)}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:650px){
       header,.wrap,footer{padding-left:18px;padding-right:18px}
       .brand-logo{height:44px}
+      #stage{min-height:590px}
+      #panel{top:12px;left:12px;width:calc(100% - 24px)}
     }
   </style>
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#composite-materials-effective-properties">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#composite-materials-effective-properties">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#composite-materials-effective-properties">Effective properties</a></p>
-      <h1>The full PBC set</h1>
-      <p class="standfirst">A periodic RVE is not loaded by gripping every boundary node to <i>ε̄ x</i>. Partner points on opposite sides are tied by a jump equal to the macro strain times the lattice vector. Faces first, then edges, then vertices — that is the full set. One independent <i>ε̄</i> case at a time; face reactions fill one column of <i>C̄</i>.</p>
+      <h1>Periodic boundary conditions and strain extraction</h1>
+      <p class="standfirst">Apply each independent macrostrain to the RVE. Opposite boundary points follow the periodic displacement jump, and the averaged stress supplies one column of the effective stiffness tensor.</p>
     </div>
     <div class="figure-shell">
-      <div class="stage-row">
-        <div id="stage"></div>
-        <aside class="eq-panel" id="eqPanel" aria-live="polite"></aside>
+      <div id="stage" aria-label="Interactive periodic RVE deformation">
+        <aside id="panel">
+          <h2>Periodic Boundary Conditions (PBCs)</h2>
+          <div class="control">
+            <label for="strainTensor">Applied macrostrain vector ε̄</label>
+            <select id="strainTensor">
+              <option value="exx">ε̄xx = [0.1, 0, 0, 0, 0, 0]ᵀ → Cᶜi1</option>
+              <option value="eyy">ε̄yy = [0, 0.1, 0, 0, 0, 0]ᵀ → Cᶜi2</option>
+              <option value="ezz">ε̄zz = [0, 0, 0.1, 0, 0, 0]ᵀ → Cᶜi3</option>
+              <option value="exy">ε̄xy = [0, 0, 0, 0.1, 0, 0]ᵀ → Cᶜi4</option>
+              <option value="exz">ε̄xz = [0, 0, 0, 0, 0.1, 0]ᵀ → Cᶜi5</option>
+              <option value="eyz">ε̄yz = [0, 0, 0, 0, 0, 0.1]ᵀ → Cᶜi6</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="magnitude">Displacement scaling (amplification)</label>
+            <input type="range" id="magnitude" min="0" max="40" step="1" value="20" />
+          </div>
+          <label class="toggle"><span>Highlight boundary vertices</span><input type="checkbox" id="showNodes" checked /></label>
+          <div class="formula" id="pbcFormula"></div>
+        </aside>
       </div>
-      <div id="ui">
-        <p id="formula">u<sub>i</sub><sup>P⁺</sup> − u<sub>i</sub><sup>P⁻</sup> − ε̄<sub>ij</sub> (x<sub>j</sub><sup>P⁺</sup> − x<sub>j</sub><sup>P⁻</sup>) = 0</p>
-        <button type="button" id="dim2" class="on">2D</button>
-        <button type="button" id="dim3">3D</button>
-        <label>ε̄ <select id="case"></select></label>
-        <label>layer
-          <select id="layer">
-            <option value="faces">faces / edges</option>
-            <option value="edges">edges</option>
-            <option value="verts">vertices</option>
-            <option value="all">all</option>
-          </select>
-        </label>
-        <label><input id="tiles" type="checkbox" checked /> neighbors</label>
-        <label>|ε̄| <input id="amp" type="range" min="0" max="30" value="14" /></label>
-        <p id="readout"></p>
-      </div>
-    </div>
-    <div class="page-copy prose">
-      <h2>Constrained FEM on the cell</h2>
-      <p>
-        The partner jumps in the figure are not Neumann loads and not a grip of every boundary node to <i>ε̄ x</i>.
-        They are linear multi-point constraints on the discrete displacement vector:
-      </p>
-      <div class="eq">
-        C u = g, &nbsp;&nbsp; with &nbsp; u⁺ − u⁻ = ε̄ (x⁺ − x⁻)
-      </div>
-      <p>
-        Each face, edge, and vertex pair contributes rows of <i>C</i>; the right-hand side <i>g</i> carries the macro strain times the lattice vector.
-        One independent <i>ε̄</i> case fills one column of <i>C̄</i> from the reactions on those constraints (or from a volume average of stress).
-      </p>
-      <p>
-        Three algebraic routes enforce the same rows: master–slave elimination (reduce to an unconstrained SPD system), Lagrange multipliers (exact constraints, indefinite saddle point, reactions as <i>λ</i>), or penalty / augmented Lagrangian (stay primal, approximate the jump).
-        Over-constraining corners — a closed master–slave loop — is the usual implementation bug; keep one reference vertex free of that cycle.
-      </p>
-      <p>
-        The same machinery covers ordinary Dirichlet supports, rigid ties, and mortar continuity.
-        See <a href="hub.html#constrained-fem">Constrained FEM</a> for the discrete catalogue, and keep this page for the periodic kinematics that feed <i>g</i>.
-      </p>
     </div>
   </main>
   <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#composite-materials-effective-properties">Composite materials – effective properties</a></span></div></footer>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-    const stage = document.getElementById('stage');
-    const eqPanel = document.getElementById('eqPanel');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 80);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-    const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    stage.appendChild(labels.domElement);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    scene.add(new THREE.AmbientLight(0xffffff, 1.3));
-    const key = new THREE.DirectionalLight(0xffffff, 1.55);
-    key.position.set(4, 6, 5); scene.add(key);
+    const stage=document.getElementById('stage');
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x0d1117);
+    const camera=new THREE.PerspectiveCamera(42,1,.1,100);
+    camera.position.set(3.5,2.8,4.8);
+    const renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    stage.prepend(renderer.domElement);
+    const controls=new OrbitControls(camera,renderer.domElement);
+    controls.enableDamping=true;
+    controls.target.set(.45,0,0);
+    controls.minDistance=2.5;
+    controls.maxDistance=10;
 
-    // Note: 3D uses c along x, a along y, b along z. 2D uses a along x, b along y.
-    const S3 = {c: 2.0, a: 1.55, b: 1.25};
-    const S2 = {a: 2.0, b: 1.5};
+    scene.add(new THREE.AmbientLight(0xffffff,.8));
+    const key=new THREE.DirectionalLight(0xffffff,1.2);
+    key.position.set(5,8,6);scene.add(key);
 
-    const root = new THREE.Group();
+    const root=new THREE.Group();
+    root.position.x=.62;
     scene.add(root);
-    const labelObjs = [];
+    const axes=new THREE.AxesHelper(1.5);
+    axes.position.set(-.85,-.85,-.85);
+    root.add(axes);
 
-    let mode = '2d', caseKey = 'exx', layer = 'faces', showTiles = true, amp = 0.14;
+    const size={x:1.65,y:1.65,z:1.65};
+    const geometry=new THREE.BoxGeometry(size.x,size.y,size.z,10,10,10);
+    const original=Float32Array.from(geometry.attributes.position.array);
+    const surface=new THREE.Mesh(geometry,new THREE.MeshPhongMaterial({
+      color:0x1f6feb,transparent:true,opacity:.17,side:THREE.DoubleSide,depthWrite:false
+    }));
+    const wire=new THREE.LineSegments(
+      new THREE.WireframeGeometry(geometry),
+      new THREE.LineBasicMaterial({color:0x58a6ff,transparent:true,opacity:.72})
+    );
+    root.add(surface,wire);
 
-    const cases2d = [
-      {key:'exx', label:'ε̄_xx', note:'extension x'},
-      {key:'eyy', label:'ε̄_yy', note:'extension y'},
-      {key:'exy', label:'ε̄_xy', note:'in-plane shear'}
-    ];
-    const cases3d = [
-      {key:'exx', label:'ε̄_xx', note:'extension x'},
-      {key:'eyy', label:'ε̄_yy', note:'extension y'},
-      {key:'ezz', label:'ε̄_zz', note:'extension z'},
-      {key:'exy', label:'ε̄_xy', note:'shear xy'},
-      {key:'eyz', label:'ε̄_yz', note:'shear yz'},
-      {key:'exz', label:'ε̄_xz', note:'shear xz'}
-    ];
+    const vertexGroup=new THREE.Group();
+    root.add(vertexGroup);
+    const vertexGeo=new THREE.SphereGeometry(.045,16,16);
+    const vertexMat=new THREE.MeshBasicMaterial({color:0xf78166});
+    const corners=[];
+    for(const x of [-size.x/2,size.x/2])
+      for(const y of [-size.y/2,size.y/2])
+        for(const z of [-size.z/2,size.z/2])corners.push([x,y,z]);
+    const nodes=corners.map(p=>{
+      const node=new THREE.Mesh(vertexGeo,vertexMat);
+      node.userData.original=p;vertexGroup.add(node);return node;
+    });
 
-    function eps() {
-      const e = {xx:0, yy:0, zz:0, xy:0, yz:0, xz:0};
-      e[{exx:'xx', eyy:'yy', ezz:'zz', exy:'xy', eyz:'yz', exz:'xz'}[caseKey]] = amp;
+    const formula=document.getElementById('pbcFormula');
+    const modeEl=document.getElementById('strainTensor');
+    const magEl=document.getElementById('magnitude');
+    const nodesEl=document.getElementById('showNodes');
+    const modes={
+      exx:{c:'xx',column:1,pbc:'uₓ¹ − uₓ³ = c ε̄ₓₓ'},
+      eyy:{c:'yy',column:2,pbc:'uᵧ² − uᵧ⁴ = a ε̄ᵧᵧ'},
+      ezz:{c:'zz',column:3,pbc:'u𝓏⁶ − u𝓏⁵ = b ε̄𝓏𝓏'},
+      exy:{c:'xy',column:4,pbc:'uₓ² − uₓ⁴ = a ε̄ₓᵧ'},
+      exz:{c:'xz',column:5,pbc:'uₓ⁶ − uₓ⁵ = b ε̄ₓ𝓏'},
+      eyz:{c:'yz',column:6,pbc:'uᵧ⁶ − uᵧ⁵ = b ε̄ᵧ𝓏'}
+    };
+
+    function strain(){
+      const e={xx:0,yy:0,zz:0,xy:0,xz:0,yz:0};
+      e[modes[modeEl.value].c]=+magEl.value/100;
       return e;
     }
-    function uOf(x, y, z, e) {
-      return new THREE.Vector3(
-        e.xx*x + e.xy*y + e.xz*z,
-        e.xy*x + e.yy*y + e.yz*z,
-        e.xz*x + e.yz*y + e.zz*z
-      );
+    function displacement(x,y,z,e){
+      return [
+        e.xx*x+e.xy*y+e.xz*z,
+        e.xy*x+e.yy*y+e.yz*z,
+        e.xz*x+e.yz*y+e.zz*z
+      ];
     }
-    function fmt(v) {
-      const s = (Math.abs(v) < 5e-4 ? 0 : v).toFixed(3);
-      return s === '-0.000' ? '0.000' : s;
-    }
-    function clearLabels() {
-      for (const o of labelObjs) { if (o.parent) o.parent.remove(o); o.element.remove(); }
-      labelObjs.length = 0;
-    }
-    function tag(text, pos, hot) {
-      const el = document.createElement('div');
-      el.className = 'label' + (hot ? ' hot' : '');
-      el.textContent = text;
-      const obj = new CSS2DObject(el);
-      obj.position.copy(pos);
-      root.add(obj);
-      labelObjs.push(obj);
-    }
-    function line(pts, color, opacity=1) {
-      const L = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints(pts),
-        new THREE.LineBasicMaterial({color, transparent: opacity<1, opacity})
-      );
-      root.add(L);
-      return L;
-    }
-    function dashed(pts, color) {
-      const L = new THREE.Line(
-        new THREE.BufferGeometry().setFromPoints(pts),
-        new THREE.LineDashedMaterial({color, dashSize:0.06, gapSize:0.04, transparent:true, opacity:0.7})
-      );
-      L.computeLineDistances();
-      root.add(L);
-    }
-    function arrow(from, delta, color) {
-      const L = delta.length();
-      if (L < 1e-5) return;
-      root.add(new THREE.ArrowHelper(
-        delta.clone().normalize(), from, L, color,
-        Math.min(0.13, L*0.35), Math.min(0.075, L*0.2)
-      ));
-    }
-    function plate(cx, cy, cz, sx, sy, sz, color, opacity) {
-      const m = new THREE.Mesh(
-        new THREE.BoxGeometry(sx, sy, sz),
-        new THREE.MeshStandardMaterial({
-          color, transparent:true, opacity, roughness:0.75, depthWrite:false, side:THREE.DoubleSide
-        })
-      );
-      m.position.set(cx, cy, cz);
-      root.add(m);
-    }
-    function dot(pos, color) {
-      const m = new THREE.Mesh(
-        new THREE.SphereGeometry(0.045, 14, 14),
-        new THREE.MeshStandardMaterial({color})
-      );
-      m.position.copy(pos);
-      root.add(m);
-    }
-
-    function active2(e) {
-      const s = new Set();
-      if (e.xx || e.xy) s.add('13');
-      if (e.xy || e.yy) s.add('24');
-      return s;
-    }
-    function active3(e) {
-      const s = new Set();
-      if (e.xx || e.xy || e.xz) s.add('13');
-      if (e.xy || e.yy || e.yz) s.add('24');
-      if (e.xz || e.yz || e.zz) s.add('65');
-      return s;
-    }
-
-    function renderEquations(e) {
-      if (mode === '2d') {
-        const {a, b} = S2;
-        const on = active2(e);
-        eqPanel.innerHTML = `
-          <h2>2D full set</h2>
-          <p class="master">u<sub>i</sub><sup>P⁺</sup> − u<sub>i</sub><sup>P⁻</sup> = ε̄<sub>ij</sub> (x<sub>j</sub><sup>P⁺</sup> − x<sub>j</sub><sup>P⁻</sup>)<br>
-          a (width) = ${a}, &nbsp; b (height) = ${b}</p>
-          <div class="eq-block"><h3>Edges</h3><ul>
-            <li class="${on.has('13')?'on':'dim'}">u<sub>x</sub><sup>1</sup> − u<sub>x</sub><sup>3</sup> − a ε̄<sub>xx</sub> = 0 &nbsp;⇒&nbsp; Δu<sub>x</sub> = ${fmt(a*e.xx)}</li>
-            <li class="${on.has('13')?'on':'dim'}">u<sub>y</sub><sup>1</sup> − u<sub>y</sub><sup>3</sup> − a ε̄<sub>yx</sub> = 0 &nbsp;⇒&nbsp; Δu<sub>y</sub> = ${fmt(a*e.xy)}</li>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>x</sub><sup>2</sup> − u<sub>x</sub><sup>4</sup> − b ε̄<sub>xy</sub> = 0 &nbsp;⇒&nbsp; Δu<sub>x</sub> = ${fmt(b*e.xy)}</li>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>y</sub><sup>2</sup> − u<sub>y</sub><sup>4</sup> − b ε̄<sub>yy</sub> = 0 &nbsp;⇒&nbsp; Δu<sub>y</sub> = ${fmt(b*e.yy)}</li>
-          </ul></div>
-          <div class="eq-block"><h3>Vertices</h3><ul>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>x</sub><sup>2</sup> − u<sub>x</sub><sup>1</sup> − b ε̄<sub>xy</sub> = 0</li>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>y</sub><sup>2</sup> − u<sub>y</sub><sup>1</sup> − b ε̄<sub>yy</sub> = 0</li>
-            <li class="${on.has('13')?'on':'dim'}">u<sub>x</sub><sup>2</sup> − u<sub>x</sub><sup>3</sup> − a ε̄<sub>xx</sub> = 0</li>
-            <li class="${on.has('13')?'on':'dim'}">u<sub>y</sub><sup>2</sup> − u<sub>y</sub><sup>3</sup> − a ε̄<sub>yx</sub> = 0</li>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>x</sub><sup>3</sup> − u<sub>x</sub><sup>4</sup> − b ε̄<sub>xy</sub> = 0</li>
-            <li class="${on.has('24')?'on':'dim'}">u<sub>y</sub><sup>3</sup> − u<sub>y</sub><sup>4</sup> − b ε̄<sub>yy</sub> = 0</li>
-          </ul></div>
-          <p class="eq-note">Edge 1 right (x=a), 3 left (x=0), 2 top (y=b), 4 bottom (y=0). Vertices: 1=(a,0), 2=(a,b), 3=(0,b), 4=(0,0). Orange equations are active for the selected ε̄.</p>`;
-        return;
+    function update(){
+      const e=strain(),pos=geometry.attributes.position;
+      for(let i=0;i<pos.count;i++){
+        const x=original[i*3],y=original[i*3+1],z=original[i*3+2];
+        const [ux,uy,uz]=displacement(x,y,z,e);
+        pos.setXYZ(i,x+ux,y+uy,z+uz);
       }
-      const {c, a, b} = S3;
-      const on = active3(e);
-      eqPanel.innerHTML = `
-        <h2>3D full set</h2>
-        <p class="master">u<sub>i</sub><sup>P⁺</sup> − u<sub>i</sub><sup>P⁻</sup> = ε̄<sub>ij</sub> (x<sub>j</sub><sup>P⁺</sup> − x<sub>j</sub><sup>P⁻</sup>)<br>
-        c (x) = ${c}, &nbsp; a (y) = ${a}, &nbsp; b (z) = ${b}</p>
-        <div class="eq-block"><h3>Faces</h3><ul>
-          <li class="${on.has('13')?'on':'dim'}">1−3 (Δx=c): Δu = (${fmt(c*e.xx)}, ${fmt(c*e.xy)}, ${fmt(c*e.xz)})</li>
-          <li class="${on.has('24')?'on':'dim'}">2−4 (Δy=a): Δu = (${fmt(a*e.xy)}, ${fmt(a*e.yy)}, ${fmt(a*e.yz)})</li>
-          <li class="${on.has('65')?'on':'dim'}">6−5 (Δz=b): Δu = (${fmt(b*e.xz)}, ${fmt(b*e.yz)}, ${fmt(b*e.zz)})</li>
-        </ul></div>
-        <div class="eq-block"><h3>Edges &amp; vertices</h3><ul>
-          <li class="${on.size?'on':'dim'}">Parallel edge pairs carry the same jump as their face pair</li>
-          <li class="${on.size?'on':'dim'}">Eight corners inherit both adjacent face jumps so the lattice closes</li>
-        </ul></div>
-        <p class="eq-note">Face 1 at x=c, 3 at x=0; 2 at y=a, 4 at y=0; 6 at z=b, 5 at z=0. Shear couples two face pairs at once. Use <em>layer</em> to show faces, edges, or vertices.</p>`;
+      pos.needsUpdate=true;geometry.computeVertexNormals();
+      wire.geometry.dispose();
+      wire.geometry=new THREE.WireframeGeometry(geometry);
+      nodes.forEach(node=>{
+        const [x,y,z]=node.userData.original,[ux,uy,uz]=displacement(x,y,z,e);
+        node.position.set(x+ux,y+uy,z+uz);
+      });
+      vertexGroup.visible=nodesEl.checked;
+      const m=modes[modeEl.value];
+      formula.innerHTML=`<b>Boundary jump</b><br>${m.pbc}<br><b>Extracted stiffness column</b><br>Cᶜ<sub>i${m.column}</sub> = σ̄<sub>i</sub> / ε̄<sub>${m.c}</sub><span id="readout">amplification = ${(+magEl.value/100).toFixed(2)}</span>`;
     }
-
-    function rebuildCaseSelect() {
-      const sel = document.getElementById('case');
-      const list = mode === '2d' ? cases2d : cases3d;
-      if (!list.some(c => c.key === caseKey)) caseKey = list[0].key;
-      sel.innerHTML = list.map(c =>
-        `<option value="${c.key}"${c.key===caseKey?' selected':''}>${c.label} · ${c.note}</option>`
-      ).join('');
-      document.getElementById('layer').disabled = false;
+    modeEl.addEventListener('change',update);
+    magEl.addEventListener('input',update);
+    nodesEl.addEventListener('change',update);
+    function resize(){
+      const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
+      camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
     }
-
-    function build() {
-      while (root.children.length) root.remove(root.children[0]);
-      clearLabels();
-      const e = eps();
-      renderEquations(e);
-
-      if (mode === '2d') {
-        const {a, b} = S2;
-        const P = (x, y, def=true) => {
-          const d = def ? uOf(x, y, 0, e) : new THREE.Vector3();
-          return new THREE.Vector3(x - a/2 + d.x, y - b/2 + d.y, 0);
-        };
-
-        if (showTiles) {
-          for (let ix=-1; ix<=1; ix++) for (let iy=-1; iy<=1; iy++) {
-            if (!ix && !iy) continue;
-            const pts = [[0,0],[a,0],[a,b],[0,b],[0,0]].map(([x,y]) => {
-              const X = x + ix*a, Y = y + iy*b;
-              const d = uOf(X, Y, 0, e);
-              return new THREE.Vector3(X - a/2 + d.x, Y - b/2 + d.y, -0.02);
-            });
-            line(pts, 0x5a6a82, 0.4);
-          }
-        }
-
-        // deformed cell
-        {
-          const corners = [[0,0],[a,0],[a,b],[0,b]].map(([x,y]) => P(x,y));
-          const shape = new THREE.Shape(corners.map(p => new THREE.Vector2(p.x, p.y)));
-          root.add(new THREE.Mesh(
-            new THREE.ShapeGeometry(shape),
-            new THREE.MeshStandardMaterial({color:0x7eabdc, transparent:true, opacity:0.22, roughness:0.85, side:THREE.DoubleSide})
-          ));
-          line([...corners, corners[0]], 0xe8e2d6);
-        }
-        dashed([[0,0],[a,0],[a,b],[0,b],[0,0]].map(([x,y]) => P(x,y,false)), 0x8a93ab);
-
-        const on = active2(e);
-        const showE = layer === 'faces' || layer === 'edges' || layer === 'all';
-        const showV = layer === 'verts' || layer === 'all';
-
-        if (showE) {
-          if (on.has('13')) {
-            line([P(a,0), P(a,b)], 0xf0a060);
-            line([P(0,0), P(0,b)], 0xf0a060);
-            arrow(P(0, b/2), new THREE.Vector3(a*e.xx, a*e.xy, 0), 0xef6b4a);
-          }
-          if (on.has('24')) {
-            line([P(0,b), P(a,b)], 0xf0a060);
-            line([P(0,0), P(a,0)], 0xf0a060);
-            arrow(P(a/2, 0), new THREE.Vector3(b*e.xy, b*e.yy, 0), 0xef6b4a);
-          }
-          tag('1', P(a, b/2).add(new THREE.Vector3(0.2,0,0)), on.has('13'));
-          tag('3', P(0, b/2).add(new THREE.Vector3(-0.2,0,0)), on.has('13'));
-          tag('2', P(a/2, b).add(new THREE.Vector3(0,0.2,0)), on.has('24'));
-          tag('4', P(a/2, 0).add(new THREE.Vector3(0,-0.2,0)), on.has('24'));
-        }
-
-        const verts = [{n:'1',x:a,y:0},{n:'2',x:a,y:b},{n:'3',x:0,y:b},{n:'4',x:0,y:0}];
-        for (const v of verts) {
-          const p = P(v.x, v.y);
-          dot(p, showV ? 0xf0a060 : 0xd8d4cb);
-          if (showV) tag(v.n, p.clone().add(new THREE.Vector3(0.14, 0.14, 0)), true);
-        }
-        tag('a', P(a/2, 0, false).add(new THREE.Vector3(0, -0.3, 0)), false);
-        tag('b', P(0, b/2, false).add(new THREE.Vector3(-0.3, 0, 0)), false);
-
-        camera.position.set(0.1, 0.05, 4.6);
-        controls.target.set(0,0,0);
-        document.getElementById('readout').textContent = `2D · ${caseKey} = ${amp.toFixed(2)} · three solves → C̄`;
-      } else {
-        const {c, a, b} = S3;
-        const P = (x, y, z, def=true) => {
-          const d = def ? uOf(x, y, z, e) : new THREE.Vector3();
-          return new THREE.Vector3(x - c/2 + d.x, y - a/2 + d.y, z - b/2 + d.z);
-        };
-
-        if (showTiles) {
-          const edges = [
-            [[0,0,0],[c,0,0]],[[c,0,0],[c,a,0]],[[c,a,0],[0,a,0]],[[0,a,0],[0,0,0]],
-            [[0,0,b],[c,0,b]],[[c,0,b],[c,a,b]],[[c,a,b],[0,a,b]],[[0,a,b],[0,0,b]],
-            [[0,0,0],[0,0,b]],[[c,0,0],[c,0,b]],[[c,a,0],[c,a,b]],[[0,a,0],[0,a,b]]
-          ];
-          for (let ix=-1; ix<=1; ix++) for (let iy=-1; iy<=1; iy++) for (let iz=-1; iz<=1; iz++) {
-            if (!ix && !iy && !iz) continue;
-            if (Math.abs(ix)+Math.abs(iy)+Math.abs(iz) > 1) continue;
-            for (const [A,B] of edges) {
-              const q = (pt) => {
-                const X=pt[0]+ix*c, Y=pt[1]+iy*a, Z=pt[2]+iz*b;
-                const d=uOf(X,Y,Z,e);
-                return new THREE.Vector3(X-c/2+d.x, Y-a/2+d.y, Z-b/2+d.z);
-              };
-              line([q(A), q(B)], 0x4a5a72, 0.32);
-            }
-          }
-        }
-
-        // deformed brick
-        {
-          const geo = new THREE.BoxGeometry(c, a, b);
-          const pos = geo.attributes.position;
-          for (let i=0; i<pos.count; i++) {
-            const x = pos.getX(i) + c/2, y = pos.getY(i) + a/2, z = pos.getZ(i) + b/2;
-            const d = uOf(x,y,z,e);
-            pos.setXYZ(i, pos.getX(i)+d.x, pos.getY(i)+d.y, pos.getZ(i)+d.z);
-          }
-          pos.needsUpdate = true;
-          geo.computeVertexNormals();
-          root.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-            color:0x7eabdc, transparent:true, opacity:0.18, roughness:0.85, depthWrite:false
-          })));
-          root.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({color:0xe8e2d6})));
-        }
-        {
-          const g = new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.BoxGeometry(c, a, b)),
-            new THREE.LineDashedMaterial({color:0x8a93ab, dashSize:0.07, gapSize:0.05, transparent:true, opacity:0.65})
-          );
-          g.computeLineDistances();
-          root.add(g);
-        }
-
-        const on = active3(e);
-        const showF = layer === 'faces' || layer === 'all';
-        const showE = layer === 'edges' || layer === 'all';
-        const showV = layer === 'verts' || layer === 'all';
-
-        const faces = [
-          {key:'13', id:'1', idM:'3', plus:[c,a/2,b/2], minus:[0,a/2,b/2],
-            size:[0.035, a*0.9, b*0.9], jump:new THREE.Vector3(c*e.xx, c*e.xy, c*e.xz),
-            offP:[0.22,0,0], offM:[-0.22,0,0]},
-          {key:'24', id:'2', idM:'4', plus:[c/2,a,b/2], minus:[c/2,0,b/2],
-            size:[c*0.9, 0.035, b*0.9], jump:new THREE.Vector3(a*e.xy, a*e.yy, a*e.yz),
-            offP:[0,0.22,0], offM:[0,-0.22,0]},
-          {key:'65', id:'6', idM:'5', plus:[c/2,a/2,b], minus:[c/2,a/2,0],
-            size:[c*0.9, a*0.9, 0.035], jump:new THREE.Vector3(b*e.xz, b*e.yz, b*e.zz),
-            offP:[0,0,0.22], offM:[0,0,-0.22]}
-        ];
-
-        for (const f of faces) {
-          const hot = on.has(f.key);
-          if (showF && hot) {
-            const pp = P(...f.plus), pm = P(...f.minus);
-            plate(pp.x, pp.y, pp.z, ...f.size, 0xf0a060, 0.5);
-            plate(pm.x, pm.y, pm.z, ...f.size, 0xf0a060, 0.28);
-            arrow(pm, f.jump, 0xef6b4a);
-          }
-          if (showF) {
-            tag(f.id, P(...f.plus).add(new THREE.Vector3(...f.offP)), hot);
-            tag(f.idM, P(...f.minus).add(new THREE.Vector3(...f.offM)), hot);
-          }
-        }
-
-        if (showE) {
-          const allEdges = [
-            [[0,0,0],[c,0,0]],[[c,0,0],[c,a,0]],[[c,a,0],[0,a,0]],[[0,a,0],[0,0,0]],
-            [[0,0,b],[c,0,b]],[[c,0,b],[c,a,b]],[[c,a,b],[0,a,b]],[[0,a,b],[0,0,b]],
-            [[0,0,0],[0,0,b]],[[c,0,0],[c,0,b]],[[c,a,0],[c,a,b]],[[0,a,0],[0,a,b]]
-          ];
-          for (const [A,B] of allEdges) {
-            // An edge is hot if it lies on an active face
-            const onFace13 = (A[0]===0 && B[0]===0) || (A[0]===c && B[0]===c);
-            const onFace24 = (A[1]===0 && B[1]===0) || (A[1]===a && B[1]===a);
-            const onFace65 = (A[2]===0 && B[2]===0) || (A[2]===b && B[2]===b);
-            const hot = (onFace13 && on.has('13')) || (onFace24 && on.has('24')) || (onFace65 && on.has('65'));
-            line([P(...A), P(...B)], hot ? 0xf0a060 : 0x6a7a92, hot ? 1 : 0.35);
-          }
-        }
-
-        if (showV) {
-          // Numbering as in a typical brick sketch: bottom 1–4, top 5–8
-          const V = [
-            {n:'1', p:[0,0,0]}, {n:'2', p:[c,0,0]}, {n:'3', p:[c,a,0]}, {n:'4', p:[0,a,0]},
-            {n:'5', p:[0,0,b]}, {n:'6', p:[c,0,b]}, {n:'7', p:[c,a,b]}, {n:'8', p:[0,a,b]}
-          ];
-          for (const v of V) {
-            const p = P(...v.p);
-            dot(p, 0xf0a060);
-            tag(v.n, p.clone().add(new THREE.Vector3(0.1,0.1,0.1)), true);
-          }
-        }
-
-        tag('c', P(c/2, 0, 0, false).add(new THREE.Vector3(0,-0.28,-0.12)), false);
-        tag('a', P(0, a/2, 0, false).add(new THREE.Vector3(-0.28,0,-0.12)), false);
-        tag('b', P(0, 0, b/2, false).add(new THREE.Vector3(-0.22,-0.22,0)), false);
-
-        camera.position.set(3.5, 2.7, 4.3);
-        controls.target.set(0,0,0);
-        document.getElementById('readout').textContent = `3D · ${caseKey} = ${amp.toFixed(2)} · six solves → C̄`;
-      }
-      controls.update();
-    }
-
-    document.getElementById('dim2').addEventListener('click', () => {
-      mode = '2d';
-      document.getElementById('dim2').classList.add('on');
-      document.getElementById('dim3').classList.remove('on');
-      rebuildCaseSelect(); build();
-    });
-    document.getElementById('dim3').addEventListener('click', () => {
-      mode = '3d';
-      document.getElementById('dim3').classList.add('on');
-      document.getElementById('dim2').classList.remove('on');
-      rebuildCaseSelect(); build();
-    });
-    document.getElementById('case').addEventListener('change', ev => { caseKey = ev.target.value; build(); });
-    document.getElementById('layer').addEventListener('change', ev => { layer = ev.target.value; build(); });
-    document.getElementById('tiles').addEventListener('change', ev => { showTiles = ev.target.checked; build(); });
-    document.getElementById('amp').addEventListener('input', ev => { amp = Number(ev.target.value)/100; build(); });
-
-    rebuildCaseSelect();
-    amp = Number(document.getElementById('amp').value)/100;
-    build();
-
-    function fit() {
-      const w = stage.clientWidth, h = stage.clientHeight;
-      camera.aspect = w / Math.max(h, 1);
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
-      labels.setSize(w, h);
-    }
-    fit();
-    new ResizeObserver(fit).observe(stage);
-    (function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); labels.render(scene, camera); })();
+    new ResizeObserver(resize).observe(stage);
+    resize();update();
+    (function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera)})();
   </script>
 </body>
 </html>
