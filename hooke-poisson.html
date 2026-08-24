@@ -3,82 +3,86 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hooke’s Law and Poisson Contraction — Mechanics Reference</title>
-  <meta name="description" content="Interactive Poisson contraction: uniaxial strain produces lateral strain −ν ε, with ν = −(lateral)/(longitudinal)." />
+  <title>Poisson’s Ratio — Mechanics Reference</title>
+  <meta name="description" content="Interactive diagram of longitudinal strain and Poisson contraction." />
   <link rel="canonical" href="https://mechanicsreference.com/hooke-poisson.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#5b9bd5}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--blue:#087eb8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
     .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff;overflow:hidden}
-    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:700 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:44em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);border-radius:22px;background:#fff;overflow:hidden}
+    #stage{position:relative;height:min(65vh,540px);min-height:370px;background:#fff}
     #stage canvas{display:block;width:100%;height:100%}
-    #ui{
-      display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;
-      padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft);
+    #diagram-title{
+      position:absolute;z-index:3;left:50%;top:24px;transform:translateX(-50%);
+      margin:0;color:#07577e;font:700 clamp(1.45rem,3vw,2.15rem)/1 "Source Serif 4",Georgia,serif;
+      letter-spacing:.025em;white-space:nowrap;pointer-events:none;
     }
-    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.84rem}
-    #formula{color:var(--navy)}
-    #ui label{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
-    input[type=range]{width:130px;accent-color:var(--navy)}
-    .label{
-      color:#dbeafe;font-size:12px;font-weight:700;letter-spacing:0.02em;
-      text-shadow:0 1px 4px #000;pointer-events:none;text-align:center;
-      font-family:"Source Sans 3",system-ui,sans-serif;line-height:1.25;white-space:pre-line;
+    #ratio{
+      position:absolute;z-index:3;left:50%;bottom:24px;transform:translateX(-50%);
+      display:flex;align-items:center;gap:10px;color:#07577e;font-weight:700;
+      white-space:nowrap;pointer-events:none;
     }
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
+    .fraction{display:inline-flex;flex-direction:column;text-align:center;line-height:1.15}
+    .fraction span:first-child{padding:0 12px 4px;border-bottom:2px solid currentColor}
+    .fraction span:last-child{padding:4px 12px 0}
+    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding:12px 16px;border-top:1px solid var(--rule);font-size:.88rem;color:var(--soft)}
+    #ui label{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-weight:600}
+    #readout{margin:0;font:500 .82rem "JetBrains Mono",ui-monospace,monospace;color:var(--navy)}
+    input[type=range]{width:150px;accent-color:var(--blue)}
+    .label{color:#07577e;font-size:13px;font-weight:700;line-height:1.05;text-align:center;white-space:pre-line;pointer-events:none}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
-    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed,html.embed body{height:100%;background:#fff}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
+    html.embed .figure-shell{height:100%;border:0;border-radius:0;display:flex;flex-direction:column}
     html.embed #stage{flex:1;height:auto;min-height:0}
-    html.embed #ui{background:#fff;flex-shrink:0}
-    @media (max-width:800px){
+    html.embed #ui{flex:none}
+    @media(max-width:700px){
       header,.wrap,footer{padding-left:18px;padding-right:18px}
       .brand-logo{height:44px}
-      input[type=range]{width:100px}
+      #stage{min-height:330px}
+      #diagram-title{top:18px}
+      #ratio{bottom:16px;font-size:.86rem}
+      input[type=range]{width:105px}
     }
   </style>
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#hooke-s-law">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#hooke-s-law">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#hooke-s-law">Hooke’s law</a></p>
-      <h1>Poisson contraction during uniaxial tension</h1>
-      <p class="standfirst">Poisson’s ratio is −(lateral strain)/(longitudinal strain). Pull the specimen along its length: the dashed outline is the undeformed shape, and the solid outline necks under lateral contraction −ν&nbsp;ε. As ν → ½ the volume change vanishes and a displacement-only mesh locks.</p>
+      <h1>Poisson contraction</h1>
+      <p class="standfirst">A uniaxial tensile load lengthens the specimen and produces transverse contraction. Change the longitudinal strain and Poisson’s ratio to see the coupled deformation.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage" aria-label="Interactive Poisson contraction diagram"></div>
+      <div id="stage" aria-label="Interactive Poisson’s ratio diagram">
+        <p id="diagram-title">POISSON’S RATIO</p>
+        <div id="ratio"><span>Poisson’s Ratio =</span><span class="fraction"><span>Lateral Strain</span><span>Longitudinal Strain</span></span></div>
+      </div>
       <div id="ui">
-        <p id="formula">ν = − ε<sub>lat</sub> / ε<sub>long</sub></p>
-        <label>ε<sub>long</sub> <input id="strain" type="range" min="-30" max="40" step="1" value="20" /></label>
-        <label>ν <input id="poisson" type="range" min="0" max="49" step="1" value="35" /></label>
+        <label>Longitudinal strain <input id="strain" type="range" min="0" max="40" step="1" value="20" /></label>
+        <label>Poisson’s ratio <input id="poisson" type="range" min="0" max="49" step="1" value="35" /></label>
         <p id="readout"></p>
       </div>
     </div>
@@ -87,175 +91,98 @@
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
     const stage = document.getElementById('stage');
     const strainEl = document.getElementById('strain');
     const poissonEl = document.getElementById('poisson');
     const readout = document.getElementById('readout');
-
+    const blue = 0x087eb8;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
+    scene.background = new THREE.Color(0xffffff);
+    const camera = new THREE.OrthographicCamera(-5,5,3,-3,.1,20);
+    camera.position.set(0,0,5);
 
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 0, 7.2);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    stage.prepend(renderer.domElement);
     const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+    labels.domElement.style.cssText='position:absolute;inset:0;pointer-events:none';
     stage.appendChild(labels.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.enablePan = false;
-    controls.minDistance = 4;
-    controls.maxDistance = 12;
-    controls.target.set(0, 0, 0);
+    const base={x:3.35,y:1.35};
+    const refEdges=new THREE.EdgesGeometry(new THREE.PlaneGeometry(base.x,base.y));
+    const reference=new THREE.LineSegments(refEdges,new THREE.LineDashedMaterial({color:0x28a8df,dashSize:.12,gapSize:.07}));
+    reference.computeLineDistances();
+    scene.add(reference);
 
-    const base = { x: 3.2, y: 1.45 };
+    const fillGeo=new THREE.PlaneGeometry(base.x,base.y,48,20);
+    const fill=new THREE.Mesh(fillGeo,new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide}));
+    fill.position.z=.01;
+    scene.add(fill);
+    const outlineGeo=new THREE.BufferGeometry();
+    const outline=new THREE.LineSegments(outlineGeo,new THREE.LineBasicMaterial({color:blue}));
+    outline.position.z=.02;
+    scene.add(outline);
 
-    const refGeo = new THREE.BoxGeometry(base.x, base.y, 0.001);
-    const refEdges = new THREE.EdgesGeometry(refGeo);
-    const refBlock = new THREE.LineSegments(
-      refEdges,
-      new THREE.LineDashedMaterial({ color: 0x6ea8d8, dashSize: 0.12, gapSize: 0.07 })
-    );
-    refBlock.computeLineDistances();
-    scene.add(refBlock);
-
-    const meshGeo = new THREE.PlaneGeometry(base.x, base.y, 40, 24);
-    const deformedMesh = new THREE.Mesh(
-      meshGeo,
-      new THREE.MeshBasicMaterial({
-        color: 0x2a4a6e,
-        transparent: true,
-        opacity: 0.35,
-        side: THREE.DoubleSide
-      })
-    );
-    scene.add(deformedMesh);
-
-    const outlineGeo = new THREE.BufferGeometry();
-    const outlineLine = new THREE.LineSegments(
-      outlineGeo,
-      new THREE.LineBasicMaterial({ color: 0x93c5fd })
-    );
-    scene.add(outlineLine);
-
-    function tag(text) {
-      const d = document.createElement('div');
-      d.className = 'label';
-      d.textContent = text;
-      return new CSS2DObject(d);
+    function tag(text){
+      const node=document.createElement('div');
+      node.className='label';
+      node.textContent=text;
+      return new CSS2DObject(node);
     }
+    const longL=tag('Longitudinal\nStrain'),longR=tag('Longitudinal\nStrain');
+    const latT=tag('Lateral Strain'),latB=tag('Lateral Strain');
+    scene.add(longL,longR,latT,latB);
 
-    const labelLongRight = tag('Longitudinal\nStrain');
-    const labelLongLeft = tag('Longitudinal\nStrain');
-    const labelLatTop = tag('Lateral Strain');
-    const labelLatBottom = tag('Lateral Strain');
-    scene.add(labelLongRight, labelLongLeft, labelLatTop, labelLatBottom);
+    const arrowL=new THREE.ArrowHelper(new THREE.Vector3(-1,0,0),new THREE.Vector3(),.72,blue,.21,.14);
+    const arrowR=new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(),.72,blue,.21,.14);
+    const arrowT=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),new THREE.Vector3(),.58,blue,.18,.13);
+    const arrowB=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.58,blue,.18,.13);
+    scene.add(arrowL,arrowR,arrowT,arrowB);
 
-    const arrowColor = 0x93c5fd;
-    const arrowLongRight = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(), 0.85, arrowColor, 0.2, 0.14);
-    const arrowLongLeft = new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(), 0.85, arrowColor, 0.2, 0.14);
-    const arrowLatTop = new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 0.55, arrowColor, 0.16, 0.12);
-    const arrowLatBottom = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.55, arrowColor, 0.16, 0.12);
-    scene.add(arrowLongRight, arrowLongLeft, arrowLatTop, arrowLatBottom);
-
-    function setArrow(helper, dir, origin, length) {
-      helper.setDirection(dir);
-      helper.position.copy(origin);
-      helper.setLength(length, Math.min(0.22, length * 0.35), Math.min(0.16, length * 0.25));
-      helper.visible = length > 0.04;
-    }
-
-    function profileFactor(u, ex) {
-      return 1 - (1 - u * u) * (1 - (1 + ex));
-    }
-
-    function updateDeformation() {
-      const ez = (+strainEl.value) / 100;
-      const nu = (+poissonEl.value) / 100;
-      const ex = -nu * ez;
-
-      const halfW = (base.x / 2) * (1 + ez);
-      const halfH0 = base.y / 2;
-
-      const pos = meshGeo.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const u = pos.getX(i) / (base.x / 2);
-        const v = pos.getY(i) / (base.y / 2);
-        const x = u * halfW;
-        const y = v * halfH0 * profileFactor(u, ex);
-        pos.setXYZ(i, x, y, 0);
+    function profile(u,lateral){return 1-(1-u*u)*lateral}
+    function update(){
+      const axial=+strainEl.value/100;
+      const nu=+poissonEl.value/100;
+      const lateral=nu*axial;
+      const visualLateral=Math.min(.38,lateral*3.2);
+      const halfW=base.x*(1+axial)/2;
+      const halfH=base.y/2;
+      const pos=fillGeo.attributes.position;
+      for(let i=0;i<pos.count;i++){
+        const u=pos.getX(i)/(base.x/2);
+        const v=pos.getY(i)/(base.y/2);
+        pos.setXYZ(i,u*halfW,v*halfH*profile(u,visualLateral),0);
       }
-      pos.needsUpdate = true;
-      meshGeo.computeBoundingSphere();
-
-      const steps = 40;
-      const top = [];
-      const bottom = [];
-      for (let i = 0; i <= steps; i++) {
-        const u = (i / steps) * 2 - 1;
-        const x = u * halfW;
-        const y = halfH0 * profileFactor(u, ex);
-        top.push(new THREE.Vector3(x, y, 0));
-        bottom.push(new THREE.Vector3(x, -y, 0));
+      pos.needsUpdate=true;
+      const top=[],bottom=[],points=[],steps=48;
+      for(let i=0;i<=steps;i++){
+        const u=i/steps*2-1,x=u*halfW,y=halfH*profile(u,visualLateral);
+        top.push(new THREE.Vector3(x,y,0));bottom.push(new THREE.Vector3(x,-y,0));
       }
+      for(let i=0;i<steps;i++)points.push(top[i],top[i+1],bottom[i],bottom[i+1]);
+      points.push(top[0],bottom[0],top[steps],bottom[steps]);
+      outlineGeo.setFromPoints(points);
 
-      const pts = [];
-      for (let i = 0; i < steps; i++) pts.push(top[i], top[i + 1]);
-      for (let i = 0; i < steps; i++) pts.push(bottom[i], bottom[i + 1]);
-      pts.push(top[0], bottom[0], top[steps], bottom[steps]);
-      outlineGeo.setFromPoints(pts);
-
-      const midH = halfH0 * (1 + ex);
-      const longLen = 0.75 + 0.35 * Math.min(1, Math.abs(ez) / 0.3);
-      const latLen = 0.45 + 0.35 * Math.min(1, Math.abs(ex) / 0.2);
-
-      const longSign = ez >= 0 ? 1 : -1;
-      const latSign = ex <= 0 ? 1 : -1;
-
-      setArrow(arrowLongRight, new THREE.Vector3(longSign, 0, 0), new THREE.Vector3(halfW, 0, 0), longLen);
-      setArrow(arrowLongLeft, new THREE.Vector3(-longSign, 0, 0), new THREE.Vector3(-halfW, 0, 0), longLen);
-      setArrow(arrowLatTop, new THREE.Vector3(0, -latSign, 0), new THREE.Vector3(0, midH + latLen * 0.15, 0), latLen);
-      setArrow(arrowLatBottom, new THREE.Vector3(0, latSign, 0), new THREE.Vector3(0, -midH - latLen * 0.15, 0), latLen);
-
-      labelLongRight.position.set(halfW + longLen + 0.55, 0, 0);
-      labelLongLeft.position.set(-(halfW + longLen + 0.55), 0, 0);
-      labelLatTop.position.set(0, midH + latLen + 0.35, 0);
-      labelLatBottom.position.set(0, -(midH + latLen + 0.35), 0);
-
-      const J = (1 + ez) * (1 + ex) * (1 + ex);
-      readout.textContent =
-        `εlong = ${ez.toFixed(2)}   ν = ${nu.toFixed(2)}   εlat = ${ex.toFixed(3)}   det(I+ε) ≈ ${J.toFixed(3)}`;
+      arrowL.position.set(-halfW-.05,0,.04);arrowR.position.set(halfW+.05,0,.04);
+      arrowT.position.set(0,halfH+.68,.04);arrowB.position.set(0,-halfH-.68,.04);
+      longL.position.set(-halfW-1.15,0,0);longR.position.set(halfW+1.15,0,0);
+      latT.position.set(0,halfH+1.42,0);latB.position.set(0,-halfH-1.42,0);
+      readout.textContent=`εlong = ${axial.toFixed(2)}   εlateral = ${(-lateral).toFixed(3)}   ν = ${nu.toFixed(2)}`;
     }
-
-    strainEl.addEventListener('input', updateDeformation);
-    poissonEl.addEventListener('input', updateDeformation);
-
-    function resize() {
-      const w = Math.max(1, stage.clientWidth);
-      const h = Math.max(1, stage.clientHeight);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
-      labels.setSize(w, h);
+    strainEl.addEventListener('input',update);
+    poissonEl.addEventListener('input',update);
+    function resize(){
+      const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight),aspect=w/h;
+      const viewH=6.1;
+      camera.left=-viewH*aspect/2;camera.right=viewH*aspect/2;
+      camera.top=viewH/2;camera.bottom=-viewH/2;camera.updateProjectionMatrix();
+      renderer.setSize(w,h,false);labels.setSize(w,h);
     }
     new ResizeObserver(resize).observe(stage);
-    resize();
-    updateDeformation();
-
-    (function loop() {
-      requestAnimationFrame(loop);
-      controls.update();
-      renderer.render(scene, camera);
-      labels.render(scene, camera);
-    })();
+    resize();update();
+    (function draw(){requestAnimationFrame(draw);renderer.render(scene,camera);labels.render(scene,camera)})();
   </script>
 </body>
 </html>

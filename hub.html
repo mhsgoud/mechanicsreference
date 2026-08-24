@@ -435,6 +435,21 @@
     .eq-card .eq .katex{font-size:1.1em}
     .eq-card p{margin:0;color:var(--ink-soft);font-size:0.98rem;line-height:1.65}
 
+    .topic-subsections{margin:2.2rem 0 0}
+    .topic-subsection{margin:0 0 1.8rem}
+    .topic-subsection h2{margin:0 0 0.7rem}
+    .topic-subsection ul{margin:0;padding:0;list-style:none}
+    .topic-subsection li{
+      position:relative;margin:0;padding:0.42rem 0 0.42rem 1.4rem;
+      color:var(--ink-soft);line-height:1.65;
+    }
+    .topic-subsection li::before{
+      content:"";position:absolute;left:0;top:1.08rem;width:6px;height:6px;
+      border:1.5px solid var(--ink-soft);border-radius:50%;
+    }
+    .topic-subsection li strong{color:var(--ink)}
+    .topic-subsection .inline-eq{white-space:nowrap}
+
     .eq-flow{margin:8px 0 28px}
     .eq-flow-section{margin:0 0 2.4rem}
     .eq-flow-section > h2{
@@ -958,46 +973,55 @@ const topics = [
     "Alternatively one works with S and E, which live on the reference placement and need no spatial rate. That is why many finite-strain elasticities are written there and pushed forward only for output.",
     "The figure spins a block that carries a constant uniaxial Cauchy stress along its own axis. Laboratory components change; the Jaumann rate does not."
   ], tags:["Jaumann","Green-Naghdi","objectivity","corotational"], scene:"objectiveRates"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Hooke’s Law", bullets:[
-    "Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
-    "Poisson contraction: a uniaxial tensile load produces a transverse strain ε_transverse = −ν ε_axial. As ν → ½ the bulk modulus diverges (K → ∞), modelling an incompressible solid with volumetric strain tr(ε) → 0. Standard displacement-based finite-element formulations then suffer volumetric locking, because the interpolation cannot satisfy the pointwise zero-volume-change constraint.",
-    "Anisotropy expands the two-parameter model to a fourth-order stiffness ℂ with σ = ℂ : ε — reduced from 81 components to at most 21 independent constants by major and minor symmetries. Linear elasticity is the first-order Taylor expansion of a hyperelastic stored energy W: accurate for metals below yield, and for polymers/rubbers only near λ ≈ 1. Under finite rotations — even with small strains — a frame-invariant (objective) stress–strain rate, or a conjugate pair such as the second Piola–Kirchhoff stress and Green–Lagrange strain, must be used.",
-    "The block is pulled in uniaxial tension. Lateral contraction is −ν ε; as ν approaches ½ the volume change vanishes and a displacement-only interpolation starts to lock."
-  ], flow:[
+  {part:"Part I – Fundamentals of Mechanics", title:"Hooke’s Law",
+  lead:"Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
+  bullets:[], flow:[
     {
-      section:"Constitutive equations",
+      section:"Constitutive Equations",
       lead:"For isotropic linear elastic solids, the relationship between the Cauchy stress tensor σ and the small strain tensor ε is parameterized by two independent elastic moduli (typically Lamé’s constants λ and μ):",
       items:[
         {
           name:"Lamé form",
           tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}",
-          body:"Stress from strain with Lamé’s constants — equivalently σ = ℂ : ε with an isotropic fourth-order stiffness.",
+          body:"",
           bridge:"In terms of Young’s modulus E and Poisson’s ratio ν, the inverted strain–stress formulation is:"
         },
         {
           name:"Compliance form (E, ν)",
           tex:"\\boldsymbol{\\varepsilon} = \\dfrac{1+\\nu}{E}\\boldsymbol{\\sigma} - \\dfrac{\\nu}{E}\\mathrm{tr}(\\boldsymbol{\\sigma})\\,\\mathbf{I}",
-          body:"The inverted relation used when stress is prescribed, as in uniaxial tension.",
+          body:"",
           bridge:"The fundamental elastic moduli interrelations are given by:"
         },
         {
           name:"Shear modulus",
           tex:"\\mu = \\dfrac{E}{2(1+\\nu)}",
-          body:"Lamé’s second parameter is the shear modulus G ≡ μ."
+          body:""
         },
         {
           name:"Bulk modulus",
           tex:"K = \\lambda + \\tfrac{2}{3}\\mu = \\dfrac{E}{3(1-2\\nu)}",
-          body:"K measures resistance to volumetric change. It diverges as ν → ½."
-        },
-        {
-          name:"Poisson’s ratio",
-          tex:"\\nu = -\\dfrac{\\varepsilon_{\\mathrm{lateral}}}{\\varepsilon_{\\mathrm{longitudinal}}}",
-          body:"Lateral contraction under uniaxial tension, defined so that ν is positive for ordinary materials."
+          body:""
         }
       ]
     }
-  ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking"], scene:"hookePoisson"},
+  ], subsections:[
+    {
+      heading:"Physical Phenomena & Numerical Implications",
+      items:[
+        {name:"Poisson Contraction", text:"Application of a uniaxial tensile load causes a transverse strain", tex:"\\varepsilon_{\\mathrm{transverse}}=-\\nu\\varepsilon_{\\mathrm{axial}}"},
+        {name:"Incompressibility Limit (ν → ½)", text:"As Poisson’s ratio approaches 0.5, the bulk modulus K approaches infinity (K → ∞), modeling an incompressible material where volumetric strain tr(ε) → 0."},
+        {name:"Volumetric Locking in FEM", text:"Standard displacement-based Finite Element formulations experience artificial stiffening (volumetric locking) near ν = 0.5 because displacement interpolations cannot satisfy the pointwise zero-volume-change constraint."}
+      ]
+    },
+    {
+      heading:"Anisotropy & Range of Validity",
+      items:[
+        {name:"Anisotropic Materials", text:"The two-parameter model expands to a fourth-order stiffness tensor ℂ such that σ = ℂ : ε, reduced from 81 components to at most 21 independent constants via major and minor symmetries."},
+        {name:"Small Strain Assumption", text:"Linear elasticity acts as a first-order Taylor series expansion of hyperelastic strain energy functions (W). It is accurate for metals below the yield point and polymers/rubbers only at near-zero stretches (λ ≈ 1)."},
+        {name:"Geometric Non-linearity", text:"Under finite rotations—even with small strains—a frame-invariant (objective) stress–strain rate formulation or conjugate stress–strain measure pair (e.g., Second Piola–Kirchhoff stress and Green–Lagrange strain) must be used."}
+      ]
+    }
+  ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking"], scene:"hookePoisson", sceneFirst:true},
   {part:"Part I – Fundamentals of Mechanics", title:"Hyperelasticity", bullets:[
     "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
     "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
@@ -1804,7 +1828,7 @@ function renderTopicScene(topic){
     vonMises: {src:'von-mises.html', title:'von Mises yield surface'},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
-    hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension', tall:true},
+    hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Objective rates'},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
@@ -3184,10 +3208,22 @@ function renderEquationFlow(flow){
         <div class="eq-step">
           <h3>${escHtml(item.name)}</h3>
           <div class="eq">\\[${item.tex || escHtml(item.expr || "")}\\]</div>
-          <p class="body">${escHtml(item.body || item.note || "")}</p>
+          ${(item.body || item.note) ? `<p class="body">${escHtml(item.body || item.note)}</p>` : ""}
           ${item.bridge ? `<p class="bridge">${escHtml(item.bridge)}</p>` : ""}
         </div>`).join("")}
     </section>`).join("")}</div>`;
+}
+
+function renderSubsections(sections){
+  if(!sections || !sections.length) return "";
+  return `<div class="topic-subsections">${sections.map(section => `
+    <section class="topic-subsection">
+      <h2>${escHtml(section.heading)}</h2>
+      <ul>${(section.items || []).map(item => `
+        <li><strong>${escHtml(item.name)}:</strong> ${escHtml(item.text)}${item.tex ? ` <span class="inline-eq">\\(${item.tex}\\).</span>` : ""}</li>
+      `).join("")}</ul>
+    </section>
+  `).join("")}</div>`;
 }
 
 function renderContent(topic){
@@ -3206,6 +3242,7 @@ function renderContent(topic){
     : "";
 
   const flowBlock = topic.flow ? renderEquationFlow(topic.flow) : "";
+  const subsectionBlock = renderSubsections(topic.subsections);
   const eqBlock = (!topic.flow && topic.equations && topic.equations.length)
     ? `<p class="section-label">Field equations</p>
       <div class="eq-list">${topic.equations.map(eq => `
@@ -3224,9 +3261,11 @@ function renderContent(topic){
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
       <div class="prose">${prose}</div>
+      ${topic.sceneFirst ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
-      ${sceneBlock}
+      ${subsectionBlock}
+      ${topic.sceneFirst ? "" : sceneBlock}
       ${illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
