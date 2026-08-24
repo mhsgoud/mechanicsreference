@@ -671,8 +671,8 @@
 
 // ---- Data model -----------------------------------------------------------
 const topics = [
-  // Part I – Fundamentals of Mechanics
-  {part:"Part I – Fundamentals of Mechanics", title:"Basic Equations", bullets:[
+  // Part I – Continuum Mechanics
+  {part:"Part I – Continuum Mechanics", title:"Basic Equations", bullets:[
     "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, momentum, and energy are conserved or balanced, a constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
     "The development below follows that order: kinematics, then stress, then the balance laws, then constitutive closure, then the passage to elastodynamics and to a discrete system on a mesh."
   ], flow:[
@@ -881,7 +881,7 @@ const topics = [
       ]
     }
   ], tags:["basic equations","continuum","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","elastodynamics","multiphase","Biot","thermoelasticity","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
-  {part:"Part I – Fundamentals of Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
     "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
     "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
     "Nonlinear computational mechanics means formulating those continuous governing equations and then solving them numerically—today almost always with the finite element method: approximate the continuum with nodes and elements, introduce shape functions for geometry and unknown fields, and replace the strong form with a weak integral statement (e.g. principle of virtual work or stationary potential energy).",
@@ -894,48 +894,48 @@ const topics = [
     "The figures below collect the elementary models used to introduce those ideas: a rigid bar on a spring, a column that buckles, one-dimensional strain measures, a truss joint, qualitative equilibrium paths, and a single Newton step.",
     "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
   ], tags:["continuum","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Kinematics of Deformation", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation", bullets:[
     "Deformation is a mapping from a reference placement X to the current placement x = χ(X). When displacement gradients are small, the symmetric gradient of the displacement is enough to measure strain.",
     "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Rigid translation never appears in F; rotation, stretch, and shear do.",
     "The right Cauchy–Green tensor C = Fᵀ F and the left Cauchy–Green tensor b = F Fᵀ are stretch without rotation. Their eigenvalues are the squared principal stretches.",
     "The figure runs through those cases on a homogeneous motion. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
   ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green"], scene:"deformationGradient"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
     "Vectors and second-order tensors are the language of the field equations. Components transform when the basis changes; the objects themselves do not. Index notation makes that bookkeeping compact: repeated indices are summed, and a comma denotes a derivative.",
     "The divergence theorem turns a volume integral of a derivative into a surface integral. For the Cauchy stress it reads ∫ ∇·σ dV = ∫ σ n dA, which is why the local momentum equation and the statement of traction on the boundary are the same balance.",
     "Coordinate transformations of a vector use a single rotation matrix; those of a stress or strain use the matrix on both sides. Principal directions are the eigenvectors of that tensor, independent of the basis in which it was first written."
   ], tags:["tensor","index notation","divergence theorem","transformation"]},
-  {part:"Part I – Fundamentals of Mechanics", title:"Polar Decomposition", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Polar Decomposition", bullets:[
     "Any invertible F factors uniquely as F = R U = V R, with R a rotation and U, V symmetric positive-definite stretches. U stretches in the reference placement, then R rotates; V stretches in the current placement after the same rotation.",
     "Neither order is more physical than the other. Both describe the same final map. Strain measures that are built from U or from C = U² are blind to R, which is the point: a rigid rotation must not look like stretch.",
     "In computation U is the unique positive square root of C. Iterative polar algorithms average a matrix with its inverse-transpose until the result is orthogonal; that limit is R.",
     "The figure runs the two factorisations side by side. They coincide on the same parallelogram: that common map is F."
   ], tags:["polar decomposition","stretch","rotation","right stretch","left stretch"], scene:"polarDecomposition"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Finite Strain Measures", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Finite Strain Measures", bullets:[
     "Change of squared length is the invariant that strain must capture. Green–Lagrange strain E = ½(C − I) = ½(FᵀF − I) lives on the reference placement. Almansi strain e = ½(I − b⁻¹) lives on the current placement. Both vanish in a rigid motion.",
     "In one dimension the same stretch λ = l/L gives engineering strain λ − 1, Green strain ½(λ² − 1), Almansi ½(1 − 1/λ²), and logarithmic (true) strain ln λ. They agree to first order as λ → 1 and disagree as soon as the stretch is finite.",
     "In terms of displacement, Green strain keeps the quadratic terms in ∇u written with respect to X; Almansi keeps them with respect to x. Dropping those products recovers the infinitesimal strain ε.",
     "The figure applies a pure rotation to both squares. Green strain stays zero. Drawing I + ε for the same motion shrinks the left square: infinitesimal strain has mistaken a rotation for stretch."
   ], tags:["Green-Lagrange","Almansi","logarithmic strain","engineering strain","stretch"], scene:"rotationStrain"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Principal Stretches and Invariants", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Principal Stretches and Invariants", bullets:[
     "The eigenvalues of U are the principal stretches λᵢ. The invariants of C (or of b) are I₁ = tr C, I₂ = ½[(tr C)² − tr(C²)], I₃ = det C = J². Isotropic hyperelastic laws are functions of those three numbers.",
     "Hydrostatic, or volumetric, strain is the part that changes volume; the deviator is the rest, which changes shape at constant volume. In the small-strain limit the split is ε = (tr ε/3) I + ε′. The same split on stress is the path to von Mises.",
     "A pure rotation leaves every invariant of C equal to that of I. A computation that reports strain after a large rotation but a small stretch has usually used a measure that still contains R.",
     "The two blocks split that idea: the left changes volume and keeps its shape; the right changes shape and keeps its volume."
   ], tags:["invariants","principal stretch","hydrostatic","deviatoric","J"], scene:"hydroDeviator"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Velocity Gradient and Material Derivative", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Velocity Gradient and Material Derivative", bullets:[
     "The spatial velocity gradient is L = ∇v = Ḟ F⁻¹. Its symmetric part D = ½(L + Lᵀ) is the rate of deformation; its skew part W = ½(L − Lᵀ) is the spin. Stretching lives in D; rigid spin lives in W.",
     "From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ. The second term is pure spin. The first is the stretching, rotated into the current placement.",
     "The material derivative of a spatial field is D(·)/Dt = ∂(·)/∂t + v · ∇(·). It is the rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it.",
     "The three crosses are D, W, and L = D + W. Stretching, spin, and simple shear."
   ], tags:["velocity gradient","rate of deformation","spin","material derivative"], scene:"velocityGradient"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Cauchy Stress and Traction", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Cauchy Stress and Traction", bullets:[
     "The traction t on a surface with outward unit normal n is force per current area. Cauchy’s theorem says it is linear in n: t = σ n. The tensor σ is the Cauchy stress.",
     "The normal component is n · σ n; the shear component is the remainder, t − (n · σ n) n. Both are scalars or vectors on that cut, not a replacement for the full tensor.",
     "Because t is defined on the current surface, the arrows move when the body deforms. Stresses pulled back to the reference placement are different tensors, used when the weak form is written on the undeformed mesh.",
     "Turn the cut in the figure. The stress tensor is fixed; the traction, and its split into normal and shear, are not."
   ], tags:["traction","Cauchy stress","normal stress","shear"], scene:"tractionCut"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Balance Laws & Conservation", equations:[
+  {part:"Part I – Continuum Mechanics", title:"Balance Laws & Conservation", equations:[
     {name:"Mass (spatial)", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Continuity. Referential: ρ₀ = ρ J."},
     {name:"Linear momentum (spatial)", expr:"∇ · σ + ρ b = ρ a", tex:"\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}", note:"Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."},
     {name:"Linear momentum (integral)", expr:"∫_∂Ω t dA + ∫_Ω ρ b dV = d/dt ∫_Ω ρ v dV", tex:"\\displaystyle\\int_{\\partial\\Omega}\\mathbf{t}\\,\\mathrm{d}A + \\int_{\\Omega}\\rho\\mathbf{b}\\,\\mathrm{d}V = \\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\Omega}\\rho\\mathbf{v}\\,\\mathrm{d}V", note:"Global statement on any part Ω. Localization plus the divergence theorem recovers the PDE."},
@@ -950,30 +950,30 @@ const topics = [
     "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Energy balance introduces temperature and heat flux; mechanical theories often close it later, after momentum and a constitutive law are already on the table.",
     "The figure is a body on a small support. Reactions and free-surface tractions close the global momentum balance while the local equation holds in the interior."
   ], tags:["balance","momentum","energy","mass","Cauchy","traction","Piola"], scene:"linearMomentum"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Constitutive Models", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Constitutive Models", bullets:[
     "Balance laws do not determine the stress. A constitutive model relates stress to the history of deformation: Hooke’s law for small elastic strain, hyperelasticity for finite elastic strain, viscoelasticity when rate matters, and plasticity when unloading leaves a permanent set.",
     "Every model is constrained by the same list of requirements. It must be independent of the observer (objectivity), it must not produce energy in a closed cycle unless that energy is accounted for as heat or as stored energy, and it must have a well-posed initial-boundary-value problem. The Clausius–Duhem inequality is the usual filter for the last two.",
     "The same momentum equation describes a fluid once Newton’s law of viscosity replaces Hooke’s law. The choice of model is the choice of what the material is allowed to forget: an elastic solid remembers only the current stretch; a plastic solid remembers a yield surface and a plastic strain; a fluid remembers nothing of the reference placement."
   ], tags:["elasticity","plasticity","viscoelasticity","hyperelasticity"]},
-  {part:"Part I – Fundamentals of Mechanics", title:"Work-Conjugate Stresses", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Work-Conjugate Stresses", bullets:[
     "Power per reference volume can be written in several equivalent ways. Cauchy stress is conjugate to the rate of deformation D, up to the factor J: τ : D with Kirchhoff stress τ = J σ. The first Piola–Kirchhoff stress P = J σ F⁻ᵀ is conjugate to Ḟ. The second Piola–Kirchhoff stress S = F⁻¹ P is conjugate to Ė.",
     "Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain, or an unrotated rate of σ with D, produces spurious dissipation in a rigid rotation.",
     "When stretches and rotations are both small, P, S, and σ coincide to first order. The distinction matters as soon as either is finite.",
     "The figure keeps the force on a face fixed. The Piola arrow is drawn on the reference square; the Cauchy arrow on the stretched square."
   ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"], scene:"workConjugates"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Principal Stresses and von Mises", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Principal Stresses and von Mises", bullets:[
     "The principal stresses are the eigenvalues of σ. The hydrostatic part is the mean (tr σ)/3; the deviator is σ′ = σ − (tr σ/3) I. Plasticity in metals is, to a first approximation, independent of the hydrostatic part.",
     "The von Mises equivalent stress is √(3/2 σ′ : σ′), the magnitude of the deviator scaled so that it equals |σ| in uniaxial tension. In principal-stress space the yield condition σ_vm = σ_y is a cylinder along the hydrostatic axis.",
     "The same split on strain separates change of volume from change of shape. In isotropic linear elasticity the deviators are related by ε′ = σ′ / (2G) and the spherical parts by the bulk modulus.",
     "The cylinder in the figure is that yield surface. A path along the diagonal never hits it; a path with enough shear does."
   ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"], scene:"vonMises"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Objective Rates", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Objective Rates", bullets:[
     "A constitutive law written in rate form must not invent stress when the body only rotates. The material derivative of Cauchy stress does invent such a stress, because the components change with the spinning basis.",
     "An objective rate subtracts that spin. The Jaumann rate uses W from the velocity gradient; Green–Naghdi uses Ṙ Rᵀ from the polar rotation. They agree at small stretch and differ in large shear.",
     "Alternatively one works with S and E, which live on the reference placement and need no spatial rate. That is why many finite-strain elasticities are written there and pushed forward only for output.",
     "The figure spins a block that carries a constant uniaxial Cauchy stress along its own axis. Laboratory components change; the Jaumann rate does not."
   ], tags:["Jaumann","Green-Naghdi","objectivity","corotational"], scene:"objectiveRates"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Hooke’s Law",
+  {part:"Part I – Continuum Mechanics", title:"Hooke’s Law",
   lead:"Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
   bullets:[], flow:[
     {
@@ -1022,23 +1022,23 @@ const topics = [
       ]
     }
   ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking"], scene:"hookePoisson", sceneFirst:true},
-  {part:"Part I – Fundamentals of Mechanics", title:"Hyperelasticity", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Hyperelasticity", bullets:[
     "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
     "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
     "The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser.",
     "The block is pulled in one direction and contracts in the other two so that J stays one — the kinematics every incompressible hyperelastic law has to live with."
   ], tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility"], scene:"principalStretches"},
-  {part:"Part I – Fundamentals of Mechanics", title:"Metal Plasticity", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Metal Plasticity", bullets:[
     "Below a yield stress the response is elastic. Beyond it, metals flow at nearly constant volume. The elastic strain is recoverable; the plastic strain is a history, not a state derived from the current stretch alone.",
     "J₂ plasticity yields when the von Mises stress reaches σ_y. The flow direction is the normal to that surface—associated flow. Isotropic hardening expands the cylinder; kinematic hardening translates it (the Bauschinger effect) by a backstress α.",
     "In three dimensions the additive split ε = εᵉ + εᵖ is the small-strain statement; finite strain uses a multiplicative split F = Fᵉ Fᵖ. The return map at each quadrature point is itself a small Newton problem."
   ], tags:["plasticity","J2","yield","hardening","Bauschinger","return map"]},
-  {part:"Part I – Fundamentals of Mechanics", title:"Fluids: Continuity and Navier–Stokes", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Fluids: Continuity and Navier–Stokes", bullets:[
     "Mass balance is the continuity equation ∂ρ/∂t + ∇·(ρ v) = 0. For a constant density it is ∇·v = 0, which is a constraint on the velocity, not an evolution for ρ.",
     "Newton’s law of viscosity, σ = −p I + 2μ D for an incompressible fluid, turns Cauchy’s first law into Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b, together with ∇·v = 0.",
     "The pressure is the Lagrange multiplier for incompressibility, analogous to the pressure in an incompressible solid. Mixed velocity–pressure elements, or a slightly compressible regularisation, are the discrete counterpart of the mixed u–p pairs used in rubber."
   ], tags:["Navier-Stokes","continuity","viscosity","incompressible"]},
-  {part:"Part I – Fundamentals of Mechanics", title:"Thermodynamics of Continua", bullets:[
+  {part:"Part I – Continuum Mechanics", title:"Thermodynamics of Continua", bullets:[
     "The first law balances internal energy with mechanical power and heat. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual constitutive closure for conduction.",
     "The second law, in the Clausius–Duhem form, restricts what a constitutive model may do. A hyperelastic W that depends only on C automatically satisfies it in an isothermal setting; a viscous or plastic model must dissipate.",
     "Thermal expansion couples the heat equation to momentum: strain contains a term α (θ − θ₀) I, and plastic work may heat the body. A staggered split is often enough; a monolithic coupling is needed when the time scales meet."
@@ -3202,7 +3202,7 @@ function partTopics(part){
   return topics.filter(t => t.part === part);
 }
 
-const PART_I = "Part I – Fundamentals of Mechanics";
+const PART_I = "Part I – Continuum Mechanics";
 
 const PART_I_ARC = {
   "Basic Equations": "Overview",
