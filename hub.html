@@ -1005,12 +1005,56 @@ const topics = [
     "The same split on strain separates change of volume from change of shape. In isotropic linear elasticity the deviators are related by ε′ = σ′ / (2G) and the spherical parts by the bulk modulus.",
     "The cylinder in the figure is that yield surface. A path along the diagonal never hits it; a path with enough shear does."
   ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"], scene:"vonMises"},
-  {part:"Part I – Continuum Mechanics", title:"Objective Rates", bullets:[
-    "A constitutive law written in rate form must not invent stress when the body only rotates. The material derivative of Cauchy stress does invent such a stress, because the components change with the spinning basis.",
-    "An objective rate subtracts that spin. The Jaumann rate uses W from the velocity gradient; Green–Naghdi uses Ṙ Rᵀ from the polar rotation. They agree at small stretch and differ in large shear.",
-    "Alternatively one works with S and E, which live on the reference placement and need no spatial rate. That is why many finite-strain elasticities are written there and pushed forward only for output.",
-    "The figure spins a block that carries a constant uniaxial Cauchy stress along its own axis. Laboratory components change; the Jaumann rate does not."
-  ], tags:["Jaumann","Green-Naghdi","objectivity","corotational"], scene:"objectiveRates"},
+  {part:"Part I – Continuum Mechanics", title:"Objective Rates",
+  lead:"The problem: a spinning astronaut can carry a rubber band at constant tension while a stationary camera records its direction changing at every instant.",
+  bullets:[
+    "Stress and strain tensors rotate with the material. A component-wise material derivative σ̇ in fixed laboratory axes therefore registers change during a pure rigid-body rotation even though the material state and the rubber-band tension are physically unchanged.",
+    "A constitutive equation driven directly by that non-objective rate can interpret rigid spin as deformation and generate artificial “ghost” stresses. Objectivity—or frame indifference—requires the constitutive response to be independent of the observer’s rigid motion."
+  ], flow:[
+    {
+      section:"The solution: objective rates",
+      lead:"An objective rate filters the observer-dependent rigid rotation from a tensor rate. It behaves like an observer rotating with the astronaut: a stress tensor that is constant in the material frame has zero objective rate.",
+      items:[
+        {
+          name:"Rigidly rotating stress",
+          tex:"\\boldsymbol{\\sigma}(t)=\\mathbf{Q}(t)\\boldsymbol{\\sigma}_0\\mathbf{Q}^{\\mathsf T}(t),\\qquad \\dot{\\boldsymbol{\\sigma}}=\\boldsymbol{\\Omega}\\boldsymbol{\\sigma}-\\boldsymbol{\\sigma}\\boldsymbol{\\Omega}\\ne\\mathbf{0}",
+          body:"Q is a rigid rotation and Ω = Q̇Qᵀ is its skew angular-velocity tensor. Laboratory components change even though σ₀ is constant.",
+          bridge:"A corotational rate subtracts exactly this transport term."
+        },
+        {
+          name:"Frame-indifferent requirement",
+          tex:"\\overset{\\circ}{\\boldsymbol{\\sigma}}=\\mathbf{0}\\quad\\text{for pure rigid rotation at constant material stress}",
+          body:"This zero-rate test is the minimum requirement for an objective stress update."
+        }
+      ]
+    },
+    {
+      section:"The big three objective rates",
+      lead:"Objective rates are not unique. Different rates transport stress using different measures of rotation and deformation, so they can predict different responses under large shear even though all pass the rigid-rotation test.",
+      items:[
+        {
+          name:"Zaremba–Jaumann (corotational) rate",
+          tex:"\\overset{\\nabla}{\\boldsymbol{\\sigma}}=\\dot{\\boldsymbol{\\sigma}}-\\mathbf{W}\\boldsymbol{\\sigma}+\\boldsymbol{\\sigma}\\mathbf{W},\\qquad \\mathbf{W}=\\tfrac12(\\mathbf{L}-\\mathbf{L}^{\\mathsf T})",
+          body:"The most common and inexpensive choice. It uses the continuum spin W, the skew part of the velocity gradient L. It is objective but can produce nonphysical stress oscillations when paired with some hypoelastic laws in extreme simple shear."
+        },
+        {
+          name:"Green–Naghdi rate",
+          tex:"\\overset{\\diamond}{\\boldsymbol{\\sigma}}=\\dot{\\boldsymbol{\\sigma}}-\\boldsymbol{\\Omega}\\boldsymbol{\\sigma}+\\boldsymbol{\\sigma}\\boldsymbol{\\Omega},\\qquad \\boldsymbol{\\Omega}=\\dot{\\mathbf{R}}\\mathbf{R}^{\\mathsf T}",
+          body:"This rate uses the rotation R from the polar decomposition F = RU. It follows the actual polar rotation rather than the local continuum spin; the two agree for rigid rotation but can differ during large deformation."
+        },
+        {
+          name:"Truesdell rate",
+          tex:"\\overset{\\triangle}{\\boldsymbol{\\sigma}}=\\dot{\\boldsymbol{\\sigma}}-\\mathbf{L}\\boldsymbol{\\sigma}-\\boldsymbol{\\sigma}\\mathbf{L}^{\\mathsf T}+\\mathrm{tr}(\\mathbf{L})\\boldsymbol{\\sigma}",
+          body:"The Truesdell rate is an objective convected rate related to the Lie transport of stress. Unlike a purely corotational rate, it accounts for stretching and volume change as well as rotation; it is naturally connected to pull-back and push-forward operations between current and reference configurations."
+        },
+        {
+          name:"Reference-configuration alternative",
+          tex:"\\mathbf{S}=J\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\mathbf{F}^{-\\mathsf T},\\qquad \\mathbf{S}=\\dfrac{\\partial W}{\\partial\\mathbf{E}}",
+          body:"Hyperelastic formulations often avoid an explicit spatial objective rate by using the second Piola–Kirchhoff stress S and Green–Lagrange strain E on the reference configuration, then pushing the result forward for output."
+        }
+      ]
+    }
+  ], tags:["Jaumann","Zaremba-Jaumann","Green-Naghdi","Truesdell","Lie derivative","objectivity","frame indifference","corotational","ghost stress","polar rotation"], scene:"objectiveRates", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Hooke’s Law",
   lead:"Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
   bullets:[], flow:[
@@ -1989,7 +2033,7 @@ function renderTopicScene(topic){
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
-    objectiveRates: {src:'objective-rates.html', title:'Objective rates'},
+    objectiveRates: {src:'objective-rates.html', title:'Standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
     cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking'},

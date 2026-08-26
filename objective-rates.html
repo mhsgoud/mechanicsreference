@@ -3,71 +3,111 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Objective Rates — Mechanics Reference</title>
-  <meta name="description" content="A spinning uniaxial stress: laboratory components of Cauchy stress change, while the Jaumann rate stays zero." />
+  <title>Objective Rates: Two Observers — Mechanics Reference</title>
+  <meta name="description" content="A rigidly rotating material block with constant local tension, compared in fixed global axes and rotating objective axes." />
   <link rel="canonical" href="https://mechanicsreference.com/objective-rates.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if(window.self!==window.top)document.documentElement.classList.add('embed')</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#111827;--red:#ff5b63;--green:#55df8a}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
-    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden}
+    #stage{position:relative;height:min(76vh,680px);min-height:570px}
     #stage canvas{display:block;width:100%;height:100%}
-    #ui{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
-    #formula,#readout{margin:0;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.84rem}
-    #formula{color:var(--navy)}
-    .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
-    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
-    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    #instructions{
+      position:absolute;z-index:3;top:18px;left:18px;width:min(370px,calc(100% - 36px));
+      padding:14px 16px;border:1px dashed #526174;border-radius:8px;
+      background:rgba(8,13,23,.9);color:#cbd5e1;box-shadow:0 6px 20px rgba(0,0,0,.4);
+    }
+    #instructions h2{margin:0 0 7px;color:#f8fafc;font-size:1rem}
+    #instructions p{margin:0 0 10px;font-size:.82rem;line-height:1.45}
+    #scene-controls{display:flex;align-items:center;gap:10px;font-size:.76rem}
+    #scene-controls button{border:1px solid #526174;border-radius:4px;background:#172033;color:#fff;padding:5px 10px;cursor:pointer}
+    #scene-controls label{display:flex;align-items:center;gap:6px}
+    #scene-controls input{width:100px;accent-color:#60a5fa}
+    #dashboards{position:absolute;z-index:3;left:18px;right:18px;bottom:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;pointer-events:none}
+    .panel{padding:12px 14px;border:1px solid #3b4657;border-radius:8px;background:rgba(8,13,23,.92);color:#e5e7eb;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+    .panel.global{border-top:3px solid var(--red)}
+    .panel.local{border-top:3px solid var(--green)}
+    .panel h3{margin:0 0 7px;padding-bottom:5px;border-bottom:1px solid #374151;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase}
+    .global h3,.false{color:var(--red)}
+    .local h3,.true{color:var(--green)}
+    .data{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 7px}
+    .datum{font:500 .76rem/1.35 "JetBrains Mono",ui-monospace,monospace}
+    .datum small{display:block;color:#8b98aa;font:600 .65rem "Source Sans 3",sans-serif}
+    .rate{font-size:.72rem;color:#aab4c2}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1120px}
     html.embed,html.embed body{height:100%;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed #stage{flex:1;height:auto}
-    html.embed #ui{background:#fff}
-    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #stage{min-height:720px}
+      #dashboards{grid-template-columns:1fr}
+      .data{grid-template-columns:repeat(2,1fr)}
+    }
   </style>
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#objective-rates">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#objective-rates">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#objective-rates">Objective rates</a></p>
-      <h1>A stress that only rotates</h1>
-      <p class="standfirst">The block carries a constant uniaxial Cauchy stress along its own axis and is spun as a rigid body. Laboratory components σ<sub>11</sub>, σ<sub>22</sub>, σ<sub>12</sub> change because the basis is fixed. The Jaumann rate ∇σ = σ̇ − Wσ + σW is identically zero: no constitutive response has occurred.</p>
+      <h1>Objective rates: the two observers</h1>
+      <p class="standfirst">The red arrows represent constant uniaxial tension attached to a rigidly rotating material block. Fixed global components change; components in the rotating material frame and the objective stress rate remain constant.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage"></div>
-      <div id="ui">
-        <p id="formula">∇σ = σ̇ − Wσ + σW = 0</p>
-        <span><span class="dot" style="background:#e39a4a"></span>material axis</span>
-        <span><span class="dot" style="background:#7eabdc"></span>lab x</span>
-        <p id="readout"></p>
+      <div id="stage" aria-label="Rigidly rotating block viewed in global and objective frames">
+        <aside id="instructions">
+          <h2>Why do we need objective rates?</h2>
+          <p>The block undergoes rigid rotation only. The fixed observer sees changing stress components; the observer rotating with the material sees constant tension and zero physical stress rate.</p>
+          <div id="scene-controls">
+            <button type="button" id="toggle">Pause</button>
+            <label>rotation speed <input type="range" id="speed" min="0" max="150" value="70" /></label>
+          </div>
+        </aside>
+        <div id="dashboards">
+          <section class="panel global">
+            <h3>Standard observer · global axes</h3>
+            <div class="data">
+              <div class="datum"><small>σxx</small><span id="sxx">1.00</span></div>
+              <div class="datum"><small>σyy</small><span id="syy">0.00</span></div>
+              <div class="datum"><small>σzz</small><span id="szz">0.00</span></div>
+              <div class="datum"><small>σxy</small><span id="sxy">0.00</span></div>
+            </div>
+            <div class="rate">ordinary component rate <strong class="false">σ̇ ≠ 0</strong></div>
+          </section>
+          <section class="panel local">
+            <h3>Objective observer · material axes</h3>
+            <div class="data">
+              <div class="datum"><small>σ′11</small><span>1.00</span></div>
+              <div class="datum"><small>σ′22</small><span>0.00</span></div>
+              <div class="datum"><small>σ′33</small><span>0.00</span></div>
+              <div class="datum"><small>σ′12</small><span>0.00</span></div>
+            </div>
+            <div class="rate">Jaumann / corotational rate <strong class="true">∇σ = 0</strong></div>
+          </section>
+        </div>
       </div>
     </div>
   </main>
@@ -75,66 +115,74 @@
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-    const stage = document.getElementById('stage');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-    camera.position.set(3.4, 2.6, 4.2);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-    const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    stage.appendChild(labels.domElement);
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
-    key.position.set(3, 5, 4); scene.add(key);
+    const stage=document.getElementById('stage');
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x111827);
+    const camera=new THREE.PerspectiveCamera(42,1,.1,100);
+    camera.position.set(6,3.8,7);
+    const renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    stage.prepend(renderer.domElement);
+    const controls=new OrbitControls(camera,renderer.domElement);
+    controls.enableDamping=true;
+    controls.target.set(.7,.45,0);
+    controls.minDistance=4;
+    controls.maxDistance=14;
 
-    const block = new THREE.Group();
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(2.2, 0.7, 0.7),
-      new THREE.MeshStandardMaterial({color:0xd89b54, transparent:true, opacity:0.28, roughness:0.75})
-    );
-    block.add(mesh);
-    block.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), new THREE.LineBasicMaterial({color:0xe39a4a})));
+    scene.add(new THREE.AmbientLight(0xffffff,1.15));
+    const key=new THREE.DirectionalLight(0xffffff,1.35);
+    key.position.set(5,8,6);scene.add(key);
+    const globalAxes=new THREE.AxesHelper(3.5);
+    globalAxes.position.set(-1.8,-.9,-1.2);
+    scene.add(globalAxes);
+
+    const block=new THREE.Group();
+    block.position.set(.7,.55,0);
     scene.add(block);
+    const geometry=new THREE.BoxGeometry(2.7,1.15,1.15);
+    block.add(new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
+      color:0x64748b,wireframe:true,transparent:true,opacity:.46,roughness:.75
+    })));
+    block.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:0xb9c4d2})));
+    block.add(new THREE.AxesHelper(2.15));
 
-    const matAxis = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 1.55, 0xe39a4a, 0.16, 0.09);
-    block.add(matAxis);
-    const labX = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(-2.4, 1.6, 0), 1.1, 0x7eabdc, 0.12, 0.07);
-    scene.add(labX);
+    const red=0xff4f64;
+    block.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(.15,0,0),2.35,red,.42,.28));
+    block.add(new THREE.ArrowHelper(new THREE.Vector3(-1,0,0),new THREE.Vector3(-.15,0,0),2.35,red,.42,.28));
 
-    function tag(text, parent, pos) {
-      const d = document.createElement('div'); d.className = 'label'; d.textContent = text;
-      const o = new CSS2DObject(d); o.position.copy(pos); parent.add(o);
+    const sxx=document.getElementById('sxx'),syy=document.getElementById('syy');
+    const szz=document.getElementById('szz'),sxy=document.getElementById('sxy');
+    const speed=document.getElementById('speed'),toggle=document.getElementById('toggle');
+    let running=true,phase=0,last=performance.now();
+    toggle.addEventListener('click',()=>{
+      running=!running;toggle.textContent=running?'Pause':'Resume';
+    });
+
+    function resize(){
+      const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
+      camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
     }
-    tag('σ material', block, new THREE.Vector3(1.7, 0.35, 0));
-    tag('lab x', labX, new THREE.Vector3(0.4, 0.2, 0));
+    new ResizeObserver(resize).observe(stage);
+    resize();
 
-    const readout = document.getElementById('readout');
-    const ω = 0.55;
-
-    function resize() {
-      const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
-      camera.aspect = w/h; camera.updateProjectionMatrix();
-      renderer.setSize(w,h,false); labels.setSize(w,h);
-    }
-    new ResizeObserver(resize).observe(stage); resize();
-
-    (function loop(t){
+    (function loop(now){
       requestAnimationFrame(loop);
-      const th = ω * t * 0.001;
-      block.rotation.z = th;
-      const c = Math.cos(th), s = Math.sin(th);
-      const s11 = c*c, s22 = s*s, s12 = c*s;
-      readout.textContent = `σ11 = ${s11.toFixed(2)}   σ22 = ${s22.toFixed(2)}   σ12 = ${s12.toFixed(2)}   |∇σ| = 0`;
-      controls.update(); renderer.render(scene,camera); labels.render(scene,camera);
-    })(0);
+      const dt=Math.min(.05,(now-last)/1000);last=now;
+      if(running)phase+=dt*(+speed.value/100);
+      block.rotation.set(
+        .58*Math.sin(phase*.63),
+        phase,
+        .42*Math.cos(phase*.47)
+      );
+      const n=new THREE.Vector3(1,0,0).applyEuler(block.rotation).normalize();
+      sxx.textContent=(n.x*n.x).toFixed(2);
+      syy.textContent=(n.y*n.y).toFixed(2);
+      szz.textContent=(n.z*n.z).toFixed(2);
+      sxy.textContent=(n.x*n.y).toFixed(2);
+      controls.update();renderer.render(scene,camera);
+    })(performance.now());
   </script>
 </body>
 </html>
