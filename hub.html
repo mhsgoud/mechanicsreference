@@ -435,6 +435,12 @@
     .eq-card .eq .katex{font-size:1.1em}
     .eq-card p{margin:0;color:var(--ink-soft);font-size:0.98rem;line-height:1.65}
 
+    .topic-story{margin:1.8rem 0 2.2rem}
+    .topic-story section{margin:0 0 2rem}
+    .topic-story h2{margin:0 0 .75rem}
+    .topic-story p{margin:0 0 .85rem;color:var(--ink-soft);line-height:1.72}
+    .topic-story p:last-child{margin-bottom:0}
+
     .topic-subsections{margin:2.2rem 0 0}
     .topic-subsection{margin:0 0 1.8rem}
     .topic-subsection h2{margin:0 0 0.7rem}
@@ -1006,14 +1012,28 @@ const topics = [
     "The cylinder in the figure is that yield surface. A path along the diagonal never hits it; a path with enough shear does."
   ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"], scene:"vonMises"},
   {part:"Part I – Continuum Mechanics", title:"Objective Rates",
-  lead:"The problem: a spinning astronaut can carry a rubber band at constant tension while a stationary camera records its direction changing at every instant.",
-  bullets:[
-    "Stress and strain tensors rotate with the material. A component-wise material derivative σ̇ in fixed laboratory axes therefore registers change during a pure rigid-body rotation even though the material state and the rubber-band tension are physically unchanged.",
-    "A constitutive equation driven directly by that non-objective rate can interpret rigid spin as deformation and generate artificial “ghost” stresses. Objectivity—or frame indifference—requires the constitutive response to be independent of the observer’s rigid motion."
+  lead:"Why a fixed observer can report changing stress when the material itself only rotates.",
+  bullets:[], story:[
+    {
+      heading:"The Problem: The Spinning Astronaut",
+      paragraphs:[
+        "Imagine an astronaut floating in space while holding a stretched rubber band. The tension in that rubber band is constant.",
+        "Now the astronaut starts spinning. A stationary camera records the rubber band pointing in a new direction every instant. A standard component-wise time derivative, calculated in the camera’s fixed global axes, declares that the directional stress components are changing rapidly.",
+        "This is the core difficulty: stress and strain tensors rotate with the material. The ordinary derivative σ̇ registers that change of orientation even when the actual material stress has not changed at all."
+      ]
+    },
+    {
+      heading:"The Solution: Objective Rates",
+      paragraphs:[
+        "An objective—or frame-indifferent—rate is a tensor time derivative that filters out rigid-body rotation. It behaves like an observer spinning with the astronaut.",
+        "By subtracting the transport caused by material rotation, the rate measures only true physical change. If the rubber-band tension remains constant while it spins, its objective stress rate is exactly zero.",
+        "A constitutive equation that is not objective can mistake rigid rotation for deformation and invent artificial “ghost” stresses whenever the material bends or rotates."
+      ]
+    }
   ], flow:[
     {
-      section:"The solution: objective rates",
-      lead:"An objective rate filters the observer-dependent rigid rotation from a tensor rate. It behaves like an observer rotating with the astronaut: a stress tensor that is constant in the material frame has zero objective rate.",
+      section:"The mathematical zero-rate test",
+      lead:"The astronaut story becomes the following tensor statement.",
       items:[
         {
           name:"Rigidly rotating stress",
@@ -1029,8 +1049,8 @@ const topics = [
       ]
     },
     {
-      section:"The big three objective rates",
-      lead:"Objective rates are not unique. Different rates transport stress using different measures of rotation and deformation, so they can predict different responses under large shear even though all pass the rigid-rotation test.",
+      section:"The Big Three Objective Rates",
+      lead:"There are infinitely many objective rates, which is why finite-element software may offer several choices. They differ in how they transport stress during large deformation and can predict different responses in large shear even though all pass the rigid-rotation test.",
       items:[
         {
           name:"Zaremba–Jaumann (corotational) rate",
@@ -1054,7 +1074,7 @@ const topics = [
         }
       ]
     }
-  ], tags:["Jaumann","Zaremba-Jaumann","Green-Naghdi","Truesdell","Lie derivative","objectivity","frame indifference","corotational","ghost stress","polar rotation"], scene:"objectiveRates", sceneFirst:true},
+  ], tags:["Jaumann","Zaremba-Jaumann","Green-Naghdi","Truesdell","Lie derivative","objectivity","frame indifference","corotational","ghost stress","polar rotation"], scene:"objectiveRates"},
   {part:"Part I – Continuum Mechanics", title:"Hooke’s Law",
   lead:"Generalized Hooke’s Law establishes the foundational constitutive relation in continuum mechanics for linear elastic materials under small deformations.",
   bullets:[], flow:[
@@ -2033,7 +2053,7 @@ function renderTopicScene(topic){
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
-    objectiveRates: {src:'objective-rates.html', title:'Standard versus objective observer', tall:true},
+    objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
     cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking'},
@@ -3430,6 +3450,16 @@ function renderSubsections(sections){
   `).join("")}</div>`;
 }
 
+function renderStorySections(sections){
+  if(!sections || !sections.length) return "";
+  return `<div class="topic-story">${sections.map(section => `
+    <section>
+      <h2>${escHtml(section.heading)}</h2>
+      ${(section.paragraphs || []).map(text => `<p>${escHtml(text)}</p>`).join("")}
+    </section>
+  `).join("")}</div>`;
+}
+
 function renderContent(topic){
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
   const lead = topicLead(topic);
@@ -3446,6 +3476,7 @@ function renderContent(topic){
     : "";
 
   const flowBlock = topic.flow ? renderEquationFlow(topic.flow) : "";
+  const storyBlock = renderStorySections(topic.story);
   const subsectionBlock = renderSubsections(topic.subsections);
   const eqBlock = (!topic.flow && topic.equations && topic.equations.length)
     ? `<p class="section-label">Field equations</p>
@@ -3465,6 +3496,7 @@ function renderContent(topic){
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
       <div class="prose">${prose}</div>
+      ${storyBlock}
       ${topic.sceneFirst ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
