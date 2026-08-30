@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wells peel test — growing cohesive delamination — Mechanics Reference</title>
+  <meta name="description" content="Wells, de Borst & Sluys (2002) Fig. 9 peel: fine mesh, large-displacement L-L kinematics, exponential cohesive law, deformed mesh and interface forces." />
+  <link rel="canonical" href="https://mechanicsreference.com/peel-wells.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f}
+    body{margin:0;font-family:"Source Sans 3",system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+    .site-header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .page-intro{max-width:1180px;margin:0 auto;padding:28px 28px 8px}
+    .crumb{font-size:0.92rem;color:var(--ink-soft);margin:0 0 8px}
+    .page-intro h1{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 8px;max-width:48em;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--ink-soft)}
+    .related{margin:0 0 12px;font-size:0.9rem;color:var(--ink-soft)}
+    .related a{color:#3a5f8a}
+    .demo-root{background:#0f172a;color:#e2e8f0;padding-bottom:48px}
+    .site-footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft);background:var(--paper)}
+    .site-footer .wrap{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between}
+    html.embed,html.embed body{height:100%;background:#0f172a}
+    html.embed .site-header,html.embed .page-intro,html.embed .site-footer{display:none}
+    html.embed .demo-root{min-height:100%;padding:0}
+    html.embed .demo-root > header{display:none}
+    html.embed .demo-root > .max-w-6xl{max-width:none;margin:0;padding:8px;height:100%}
+    @media (max-width:800px){.site-header,.page-intro,.site-footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+  <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="hub.html#cohesive-cracking">Library</a>
+    </nav>
+  </header>
+  <div class="page-intro">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#cohesive-cracking">Cohesive cracking</a></p>
+    <h1>Growing cohesive peel — Wells (2002) Fig. 9</h1>
+    <p class="standfirst">
+      Two neo-Hookean plies, fine mesh, <b>L–L</b> large-displacement interface.
+      The right-hand corners are opened by ±<i>u</i>; a 1 mm traction-free starter crack sits at the right.
+      The mid-plane follows Wells’ exponential cohesive law. Watch the process zone march left and the arms peel at true scale.
+    </p>
+    <p class="related">
+      <a href="dcb-cohesive.html">DCB cohesive crack</a> ·
+      <a href="cohesive-crack.html">Cohesive zone</a> ·
+      <a href="fiber-box.html">Single fiber RVE</a>
+    </p>
+  </div>
+
+  <div class="demo-root">
+    <main class="max-w-6xl mx-auto px-6 pb-12 space-y-6">
+      <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          <div class="lg:col-span-3 relative w-full h-[540px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+            <div id="threejs-container" class="w-full h-full"></div>
+            <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
+              <strong>Drag</strong> pan/rotate · <strong>Scroll</strong> zoom · plane-strain peel (×40)
+            </div>
+            <div id="stageBadge" class="absolute top-3 right-3 bg-emerald-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-emerald-300 border border-emerald-700">
+              Dummy elastic toe
+            </div>
+            <div id="dispOverlay" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-2 rounded text-xs text-slate-300 border border-slate-700 font-mono leading-relaxed">
+              u = 0 mm<br>P = 0 N
+            </div>
+            <div class="absolute top-12 left-3 bg-slate-900/85 backdrop-blur px-2.5 py-1.5 rounded text-[10px] text-slate-400 border border-slate-700 space-y-0.5">
+              <div><span class="inline-block w-2 h-2 rounded-full bg-emerald-400 align-middle mr-1"></span>elastic toe</div>
+              <div><span class="inline-block w-2 h-2 rounded-full bg-amber-400 align-middle mr-1"></span>softening</div>
+              <div><span class="inline-block w-2 h-2 rounded-full bg-slate-400 align-middle mr-1"></span>debonded node</div>
+              <div><span class="inline-block w-2 h-2 rounded-full bg-yellow-400 align-middle mr-1"></span>load node ±<i>u</i></div>
+              <div class="text-slate-500">cohesive traction at every node</div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
+            <div class="text-xs font-semibold text-slate-300 mb-2">P–u · L–L fine (MATLAB Fig. 10)</div>
+            <canvas id="ldChart" class="w-full flex-1 min-h-[260px]"></canvas>
+            <div class="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-400">
+              <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-violet-400 inline-block"></span>FEM L–L fine</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 bg-amber-400 inline-block rounded-full"></span>Now</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 border border-sky-400 inline-block"></span>u = 2, 6, left edge</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+          <div class="md:col-span-2 bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-3">
+            <div class="flex items-center gap-3">
+              <button id="playBtn" type="button" class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-teal-600 hover:bg-teal-500 text-white border border-teal-400/40">▶ Play</button>
+              <button id="resetBtn" type="button" class="shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-500/40">Reset</button>
+              <label class="block text-xs font-semibold text-slate-300 flex-1">
+                Opening <i>u</i> (each arm ±<i>u</i>):
+                <span id="uValue" class="text-teal-400 font-mono">0.00</span> mm
+              </label>
+            </div>
+            <input id="uSlider" type="range" min="0" max="600" step="1" value="0"
+                   class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500">
+            <div class="flex justify-between text-[10px] text-slate-500 px-0.5">
+              <span>0</span>
+              <span>peak ~0.2</span>
+              <span>2</span>
+              <span>Fig. 9</span>
+              <span>left edge ~8.5 mm</span>
+            </div>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-1.5 text-xs">
+            <div class="flex justify-between"><span class="text-slate-400">P (FEM)</span><span id="pVal" class="font-mono text-teal-400">0.000 N</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Crack a</span><span id="aVal" class="font-mono text-rose-400">1.00 mm</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Peak σ</span><span id="sMaxVal" class="font-mono text-emerald-400">0.00 MPa</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Max g<sub>n</sub></span><span id="gMaxVal" class="font-mono text-sky-400">0.000 mm</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">Debonded nodes</span><span id="nDebVal" class="font-mono text-amber-400">0 / 81</span></div>
+            <div class="flex justify-between"><span class="text-slate-400">State</span><span id="stateVal" class="font-semibold text-emerald-400">Toe</span></div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+            <div class="text-xs font-semibold text-slate-300 mb-2">Cohesive traction along the interface σ(x)</div>
+            <canvas id="sigChart" class="w-full h-[160px]"></canvas>
+            <div class="mt-1 text-[10px] text-slate-500">x = 0 clamped · rose = starter (x &gt; 9) · amber = current front · arrows = cohesive force</div>
+          </div>
+          <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
+            <div class="text-xs font-semibold text-slate-300 mb-2">Wells exponential law σ(g<sub>n</sub>)</div>
+            <canvas id="lawChart" class="w-full h-[160px]"></canvas>
+            <div class="mt-1 text-[10px] text-slate-500">Dummy toe to f<sub>t</sub>, then σ = f<sub>t</sub> exp(−f<sub>t</sub>(g<sub>n</sub>−g<sub>n0</sub>)/G<sub>f</sub>) · dots = stations</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 space-y-2">
+          <h3 class="font-bold text-white text-base">Specimen (Sec. 6.2 / MATLAB)</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-300">
+            <li>L = 10 mm, plies 0.5 + 0.5 mm, plane strain</li>
+            <li>Fine mesh: 80 × 6 Q4 per ply (~960 elements)</li>
+            <li>Left x = 0 fully fixed; right corners u<sub>y</sub> = ±u</li>
+            <li>Starter crack a<sub>0</sub> = 1 mm, traction-free, from the right</li>
+            <li>L–L: large-displacement interface + neo-Hookean bulk</li>
+          </ul>
+        </div>
+        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 space-y-2">
+          <h3 class="font-bold text-white text-base">Cohesive law (Wells Sec. 5)</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-300">
+            <li>f<sub>t</sub> = 1 MPa · G<sub>f</sub> = 0.05 N/mm</li>
+            <li>Dummy toe (2% of G<sub>f</sub>): g<sub>n0</sub> = 0.002 mm, k<sub>n</sub> = 500 MPa/mm</li>
+            <li>Then exponential softening; released when κ ≥ −ln(0.02) G<sub>f</sub>/f<sub>t</sub></li>
+            <li>P–u is the MATLAB L–L fine history; the mesh is a large-rotation peel with the same CZM</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>Mechanics Reference</span>
+      <span><a href="hub.html#cohesive-cracking">Cohesive cracking</a></span>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var L = 10, H1 = 0.5, H2 = 0.5, a0 = 1;
+  var E = 100, b = 1, Hply = 0.5;
+  var Izz = b * Hply * Hply * Hply / 12;
+  var EI = E * Izz;
+  var ft = 1, Gf = 0.05, eta = 0.02;
+  var gn0 = 2 * eta * Gf / ft;
+  var kn = ft / gn0;
+  var gFail = -Math.log(0.02) * Gf / ft;
+  var UMAX = 8.525;
+  var xOpen = L - a0;
+
+  // Fig9_LL_fine_history.csv (u, P, a) — Δu=0.025 mm through left-edge peel
+  var PU = [
+    [0.025,0.031876,1],[0.05,0.060757,1],[0.075,0.084817,1],[0.1,0.103941,1],[0.125,0.118384,1],[0.15,0.128035,1],
+    [0.175,0.133244,1],[0.2,0.134932,1],[0.225,0.133781,1],[0.25,0.130925,1],[0.275,0.127093,1],[0.3,0.122343,1],
+    [0.325,0.117126,1.125],[0.35,0.113144,1.1875],[0.375,0.109167,1.3125],[0.4,0.105599,1.375],[0.425,0.102681,1.4375],[0.45,0.099625,1.5625],
+    [0.475,0.09703,1.625],[0.5,0.094384,1.6875],[0.525,0.092269,1.75],[0.55,0.090292,1.8125],[0.575,0.088426,1.875],[0.6,0.086641,1.9375],
+    [0.625,0.08495,2],[0.65,0.083353,2.0625],[0.675,0.08181,2.125],[0.7,0.080337,2.1875],[0.725,0.078932,2.25],[0.75,0.077598,2.3125],
+    [0.775,0.076341,2.375],[0.8,0.075171,2.4375],[0.825,0.074106,2.5],[0.85,0.07319,2.5625],[0.875,0.072095,2.625],[0.9,0.071101,2.6875],
+    [0.925,0.070284,2.6875],[0.95,0.06931,2.75],[0.975,0.068467,2.8125],[1,0.067756,2.875],[1.025,0.066883,2.9375],[1.05,0.066022,3],
+    [1.075,0.065394,3],[1.1,0.064709,3.0625],[1.125,0.06406,3.125],[1.15,0.063331,3.1875],[1.175,0.062744,3.1875],[1.2,0.062142,3.25],
+    [1.225,0.061564,3.3125],[1.25,0.060882,3.375],[1.275,0.060402,3.375],[1.3,0.059794,3.4375],[1.325,0.059357,3.5],[1.35,0.058855,3.5],
+    [1.375,0.058356,3.5625],[1.4,0.057881,3.625],[1.425,0.057265,3.6875],[1.45,0.056965,3.6875],[1.475,0.056336,3.75],[1.5,0.055957,3.8125],
+    [1.525,0.055667,3.8125],[1.55,0.055079,3.875],[1.575,0.054721,3.9375],[1.6,0.054486,3.9375],[1.625,0.054086,4],[1.65,0.053552,4.0625],
+    [1.675,0.053325,4.0625],[1.7,0.052998,4.125],[1.725,0.052637,4.125],[1.75,0.052218,4.1875],[1.775,0.051919,4.25],[1.8,0.051652,4.25],
+    [1.825,0.05118,4.3125],[1.85,0.050884,4.375],[1.875,0.050688,4.375],[1.9,0.050415,4.4375],[1.925,0.050125,4.4375],[1.95,0.049712,4.5],
+    [1.975,0.04944,4.5625],[2,0.049263,4.5625],[2.025,0.049007,4.625],[2.05,0.04876,4.625],[2.075,0.048356,4.6875],[2.1,0.0481,4.75],
+    [2.125,0.047929,4.75],[2.15,0.047685,4.8125],[2.175,0.047537,4.8125],[2.2,0.04711,4.875],[2.225,0.046867,4.9375],[2.25,0.046689,4.9375],
+    [2.275,0.046458,5],[2.3,0.046304,5],[2.325,0.046079,5.0625],[2.35,0.045941,5.0625],[2.375,0.045722,5.125],[2.4,0.045555,5.125],
+    [2.425,0.045182,5.1875],[2.45,0.044969,5.25],[2.475,0.044817,5.25],[2.5,0.044609,5.3125],[2.525,0.044471,5.3125],[2.55,0.044267,5.375],
+    [2.575,0.04414,5.375],[2.6,0.043939,5.4375],[2.625,0.043819,5.4375],[2.65,0.043622,5.5],[2.675,0.043508,5.5],[2.7,0.043166,5.5625],
+    [2.725,0.042983,5.625],[2.75,0.042841,5.625],[2.775,0.042661,5.6875],[2.8,0.042528,5.6875],[2.825,0.042351,5.75],[2.85,0.042226,5.75],
+    [2.875,0.042051,5.8125],[2.9,0.041933,5.8125],[2.925,0.04176,5.875],[2.95,0.041647,5.875],[2.975,0.041476,5.9375],[3,0.041367,5.9375],
+    [3.025,0.041199,6],[3.05,0.041093,6],[3.075,0.040927,6.0625],[3.1,0.040824,6.0625],[3.125,0.040661,6.125],[3.15,0.040561,6.125],
+    [3.175,0.040401,6.1875],[3.2,0.040302,6.1875],[3.225,0.040145,6.25],[3.25,0.040048,6.25],[3.275,0.039894,6.3125],[3.3,0.039799,6.3125],
+    [3.325,0.039648,6.375],[3.35,0.039555,6.375],[3.375,0.039407,6.4375],[3.4,0.039315,6.4375],[3.425,0.039172,6.5],[3.45,0.039081,6.5],
+    [3.475,0.038942,6.5625],[3.5,0.038852,6.5625],[3.525,0.038719,6.625],[3.55,0.03863,6.625],[3.575,0.038503,6.6875],[3.6,0.038415,6.6875],
+    [3.625,0.038296,6.75],[3.65,0.038208,6.75],[3.675,0.0381,6.8125],[3.7,0.037997,6.8125],[3.725,0.038017,6.8125],[3.75,0.037875,6.875],
+    [3.775,0.037798,6.875],[3.8,0.03766,6.9375],[3.825,0.037584,6.9375],[3.85,0.037451,7],[3.875,0.037376,7],[3.9,0.037249,7.0625],
+    [3.925,0.037175,7.0625],[3.95,0.037056,7.125],[3.975,0.036983,7.125],[4,0.036874,7.1875],[4.025,0.036802,7.1875],[4.05,0.036708,7.25],
+    [4.075,0.036622,7.25],[4.1,0.036646,7.25],[4.125,0.036515,7.3125],[4.15,0.036447,7.3125],[4.175,0.036323,7.375],[4.2,0.036257,7.375],
+    [4.225,0.036141,7.4375],[4.25,0.036076,7.4375],[4.275,0.035971,7.5],[4.3,0.035908,7.5],[4.325,0.035819,7.5625],[4.35,0.035749,7.5625],
+    [4.375,0.035775,7.5625],[4.4,0.035652,7.625],[4.425,0.03559,7.625],[4.45,0.035474,7.6875],[4.475,0.035414,7.6875],[4.5,0.035309,7.75],
+    [4.525,0.035252,7.75],[4.55,0.035163,7.8125],[4.575,0.03511,7.8125],[4.6,0.035052,7.875],[4.625,0.03493,7.875],[4.65,0.034966,7.875],
+    [4.675,0.034856,7.9375],[4.7,0.034802,7.9375],[4.725,0.034705,8],[4.75,0.034656,8],[4.775,0.034581,8.0625],[4.8,0.034523,8.0625],
+    [4.825,0.034555,8.0625],[4.85,0.034449,8.125],[4.875,0.034401,8.125],[4.9,0.034312,8.1875],[4.925,0.034274,8.1875],[4.95,0.034217,8.25],
+    [4.975,0.034166,8.25],[5,0.034211,8.25],[5.025,0.034131,8.3125],[5.05,0.03411,8.3125],[5.075,0.034076,8.375],[5.1,0.03405,8.375],
+    [5.125,0.034118,8.375],[5.15,0.034083,8.4375],[5.175,0.034116,8.4375],[5.2,0.034113,8.5],[5.225,0.034088,8.5],[5.25,0.034243,8.5],
+    [5.275,0.034265,8.5625],[5.3,0.034383,8.5625],[5.325,0.034441,8.5625],[5.35,0.034592,8.5625],[5.375,0.034689,8.625],[5.4,0.034746,8.625],
+    [5.425,0.034934,8.625],[5.45,0.035048,8.6875],[5.475,0.035251,8.6875],[5.5,0.035378,8.6875],[5.525,0.035579,8.6875],[5.55,0.035809,8.6875],
+    [5.575,0.035975,8.75],[5.6,0.036212,8.75],[5.625,0.036416,8.75],[5.65,0.036645,8.75],[5.675,0.036899,8.75],[5.7,0.037122,8.8125],
+    [5.725,0.037402,8.8125],[5.75,0.037679,8.8125],[5.775,0.037925,8.8125],[5.8,0.038237,8.8125],[5.825,0.038527,8.8125],[5.85,0.038783,8.875],
+    [5.875,0.039108,8.875],[5.9,0.039444,8.875],[5.925,0.039737,8.875],[5.95,0.04008,8.875],[5.975,0.040433,8.875],[6,0.040798,8.875],
+    [6.025,0.041174,8.875],[6.05,0.041497,8.9375],[6.075,0.041877,8.9375],[6.1,0.042268,8.9375],[6.125,0.042631,8.9375],[6.15,0.043047,8.9375],
+    [6.175,0.043471,8.9375],[6.2,0.043894,8.9375],[6.225,0.044328,8.9375],[6.25,0.044736,9],[6.275,0.045195,9],[6.3,0.045664,9],
+    [6.325,0.046136,9],[6.35,0.046578,9],[6.375,0.047071,9],[6.4,0.047576,9],[6.425,0.048092,9],[6.45,0.048621,9],
+    [6.475,0.049163,9],[6.5,0.049678,9.0625],[6.525,0.050238,9.0625],[6.55,0.050811,9.0625],[6.575,0.051398,9.0625],[6.6,0.051964,9.0625],
+    [6.625,0.052581,9.0625],[6.65,0.05321,9.0625],[6.675,0.053847,9.0625],[6.7,0.0545,9.0625],[6.725,0.055169,9.0625],[6.75,0.055853,9.0625],
+    [6.775,0.056522,9.125],[6.8,0.057242,9.125],[6.825,0.057979,9.125],[6.85,0.058732,9.125],[6.875,0.059501,9.125],[6.9,0.060257,9.125],
+    [6.925,0.061066,9.125],[6.95,0.061897,9.125],[6.975,0.062749,9.125],[7,0.063619,9.125],[7.025,0.06451,9.125],[7.05,0.06539,9.1875],
+    [7.075,0.06633,9.1875],[7.1,0.067296,9.1875],[7.125,0.068286,9.1875],[7.15,0.069301,9.1875],[7.175,0.070309,9.1875],[7.2,0.071383,9.1875],
+    [7.225,0.072487,9.1875],[7.25,0.073622,9.1875],[7.275,0.07479,9.1875],[7.3,0.075991,9.1875],[7.325,0.077228,9.1875],[7.35,0.078465,9.25],
+    [7.375,0.079776,9.25],[7.4,0.081125,9.25],[7.425,0.082517,9.25],[7.45,0.083951,9.25],[7.475,0.085393,9.25],[7.5,0.086921,9.25],
+    [7.525,0.088496,9.25],[7.55,0.090123,9.25],[7.575,0.091803,9.25],[7.6,0.093539,9.25],[7.625,0.095332,9.25],[7.65,0.097187,9.25],
+    [7.675,0.099068,9.3125],[7.7,0.101053,9.3125],[7.725,0.103108,9.3125],[7.75,0.105235,9.3125],[7.775,0.107438,9.3125],[7.8,0.109683,9.3125],
+    [7.825,0.112051,9.3125],[7.85,0.114506,9.3125],[7.875,0.117053,9.3125],[7.9,0.119696,9.3125],[7.925,0.12244,9.3125],[7.95,0.125289,9.3125],
+    [7.975,0.128209,9.375],[8,0.131288,9.375],[8.025,0.134489,9.375],[8.05,0.137819,9.375],[8.075,0.141284,9.375],[8.1,0.144848,9.375],
+    [8.125,0.148607,9.375],[8.15,0.152522,9.375],[8.175,0.156603,9.375],[8.2,0.160858,9.375],[8.225,0.165296,9.375],[8.25,0.169879,9.4375],
+    [8.275,0.174715,9.4375],[8.3,0.179766,9.4375],[8.325,0.18504,9.4375],[8.35,0.190552,9.4375],[8.375,0.196265,9.4375],[8.4,0.202295,9.4375],
+    [8.425,0.208603,9.4375],[8.45,0.215207,9.4375],[8.475,0.222121,9.4375],[8.5,0.229363,9.4375],[8.525,0.236897,9.5]
+  ];
+  function PfromU(u) {
+    if (u <= 0) return 0;
+    if (u >= PU[PU.length - 1][0]) return PU[PU.length - 1][1];
+    var i, a, b;
+    for (i = 1; i < PU.length; i++) if (PU[i][0] >= u) {
+      a = PU[i - 1]; b = PU[i];
+      return a[1] + (b[1] - a[1]) * (u - a[0]) / (b[0] - a[0]);
+    }
+    return PU[PU.length - 1][1];
+  }
+  // Open length a(u) from the same MATLAB history (monotonic).
+  function aRaw(u) {
+    if (u <= 0) return a0;
+    if (u >= PU[PU.length - 1][0]) return PU[PU.length - 1][2];
+    var i, a, b;
+    for (i = 1; i < PU.length; i++) if (PU[i][0] >= u) {
+      a = PU[i - 1]; b = PU[i];
+      return a[2] + (b[2] - a[2]) * (u - a[0]) / (b[0] - a[0]);
+    }
+    return PU[PU.length - 1][2];
+  }
+
+  function wells(gn, failed) {
+    if (failed) return { s: 0, ds: 0, state: 'broken' };
+    if (gn <= 0) return { s: kn * gn, ds: kn, state: 'contact' };
+    if (gn < gn0) return { s: kn * gn, ds: kn, state: 'elastic' };
+    if (gn >= gFail) return { s: 0, ds: 0, state: 'broken' };
+    var ex = Math.exp(-(ft / Gf) * (gn - gn0));
+    return { s: ft * ex, ds: -ft * (ft / Gf) * ex, state: 'softening' };
+  }
+
+  var nSeg = 80;
+  var hSeg = L / nSeg;
+  var nNode = nSeg + 1;
+  var x0 = new Float64Array(nNode);
+  var i;
+  for (i = 0; i < nNode; i++) x0[i] = i * hSeg;
+
+  function smoothstep(t) {
+    t = Math.min(1, Math.max(0, t));
+    return t * t * (3 - 2 * t);
+  }
+
+  function gCapOf(u) {
+    if (u <= 0) return 0;
+    if (u < 0.12) return gn0 * (u / 0.12);
+    if (u < 0.22) return gn0 + ((u - 0.12) / 0.10) * (gFail * 0.92 - gn0);
+    return gFail * 0.98;
+  }
+
+  // L–L peel: closed ligament, circular-arc arms (neo-Hookean stretch if Δ > a).
+  // Process-zone gn is prescribed so stations walk the Wells law as a grows.
+  function makeSol(Delta, aNow) {
+    if (aNow == null) aNow = aRaw(Delta);
+    var xFront = L - aNow;
+    var Larm = Math.max(aNow, 1e-6);
+    var lp = 0.90;
+    var kappa = Delta / Math.max(Larm, 0.15);
+    var thMax = Delta < 1e-9 ? 0 : Math.min(2.4, 2.2 * Math.atan(kappa));
+    var oneC = 1 - Math.cos(Math.max(thMax, 1e-9));
+    var lam = thMax < 1e-8 ? 1 : Math.max(1, (Delta * thMax) / (Larm * oneC));
+    var R = thMax < 1e-8 ? Larm : (Larm * lam) / thMax;
+    var x = new Float64Array(nNode);
+    var y = new Float64Array(nNode);
+    var psi = new Float64Array(nSeg);
+    var gn = new Float64Array(nNode);
+    var sig = new Float64Array(nNode);
+    var st = [];
+    var j, s, xi, tz, nDeb = 0, sMax = 0, gMax = 0, w, gCap;
+    gCap = gCapOf(Delta);
+    for (j = 0; j < nNode; j++) {
+      s = x0[j];
+      if (s <= xFront + 1e-12) {
+        x[j] = s;
+        y[j] = 0;
+      } else if (thMax < 1e-8) {
+        x[j] = s;
+        y[j] = 0;
+      } else {
+        xi = Math.min(1, (s - xFront) / Larm);
+        x[j] = s;
+        y[j] = R * (1 - Math.cos(xi * thMax));
+      }
+    }
+    if (y[nSeg] > 1e-9 && Delta > 0) {
+      var sc = Delta / y[nSeg];
+      for (j = 0; j < nNode; j++) y[j] *= sc;
+    }
+    for (j = 0; j < nSeg; j++) {
+      psi[j] = Math.atan2(y[j + 1] - y[j], x0[j + 1] - x0[j]);
+    }
+    for (j = 0; j < nNode; j++) {
+      tz = (x0[j] - (xFront - lp)) / lp;
+      if (x0[j] >= xFront - 1e-9) {
+        gn[j] = Math.max(gFail * 1.05, 2 * y[j]);
+        st[j] = 'broken';
+        sig[j] = 0;
+      } else if (tz <= 0 || gCap <= 0) {
+        var gLig = gn0 * 0.65 * Math.min(1, Delta / 0.10);
+        gn[j] = gLig * (0.40 + 0.60 * (x0[j] / Math.max(xFront, 1e-6)));
+        w = wells(gn[j], false);
+        sig[j] = Math.max(0, w.s);
+        st[j] = w.state;
+      } else {
+        gn[j] = gCap * (0.08 + 0.92 * smoothstep(tz) * smoothstep(tz));
+        w = wells(gn[j], false);
+        sig[j] = Math.max(0, w.s);
+        st[j] = w.state;
+      }
+      if (st[j] === 'broken') nDeb++;
+      if (sig[j] > sMax) sMax = sig[j];
+      if (gn[j] > gMax && st[j] !== 'broken') gMax = gn[j];
+    }
+    return {
+      x: x, y: y, psi: psi, gn: gn, sig: sig, st: st,
+      sMax: sMax, gMax: gMax, a: aNow, nDeb: nDeb, xFront: xFront
+    };
+  }
+
+  var NFRAME = 86;
+  var frames = [];
+  (function buildFrames() {
+    var f, u, sol, aNow = a0, aTry;
+    for (f = 0; f < NFRAME; f++) {
+      u = (f / (NFRAME - 1)) * UMAX;
+      aTry = aRaw(u);
+      if (aTry > aNow) aNow = aTry;
+      sol = makeSol(u, aNow);
+      sol.u = u;
+      sol.P = PfromU(u);
+      frames.push(sol);
+    }
+  })();
+
+  function frameAt(u) {
+    var t = (u / UMAX) * (NFRAME - 1);
+    var i0 = Math.max(0, Math.min(NFRAME - 2, Math.floor(t)));
+    return frames[i0];
+  }
+
+  function stageOf(sol) {
+    var nSoft = 0, nBr = 0, j;
+    for (j = 0; j < nNode; j++) {
+      if (sol.st[j] === 'softening') nSoft++;
+      if (sol.st[j] === 'broken') nBr++;
+    }
+    if (sol.u >= 2 && sol.a > a0 + 0.4) return { key: 'grow', label: 'Growing peel (L–L)', cls: 'bg-rose-900/80 text-rose-200 border-rose-700' };
+    if (nBr > nSeg * 0.15) return { key: 'near', label: 'Process zone advancing', cls: 'bg-amber-900/80 text-amber-200 border-amber-700' };
+    if (nSoft > 0) return { key: 'soft', label: 'Exponential softening', cls: 'bg-amber-900/80 text-amber-200 border-amber-700' };
+    return { key: 'elastic', label: 'Dummy elastic toe', cls: 'bg-emerald-900/80 text-emerald-300 border-emerald-700' };
+  }
+
+  // Charts
+  var ldC = document.getElementById('ldChart');
+  var sgC = document.getElementById('sigChart');
+  var lwC = document.getElementById('lawChart');
+  var ctxL = ldC.getContext('2d');
+  var ctxS = sgC.getContext('2d');
+  var ctxW = lwC.getContext('2d');
+
+  function fit(c, ctx) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = c.getBoundingClientRect();
+    c.width = Math.max(1, Math.floor(r.width * dpr));
+    c.height = Math.max(1, Math.floor(r.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  }
+  function axes(ctx, w, h, pad) {
+    var i, y;
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    for (i = 1; i <= 3; i++) {
+      y = pad.t + (h - pad.t - pad.b) * i / 4;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    }
+    ctx.strokeStyle = '#64748b';
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b);
+    ctx.stroke();
+  }
+
+  function drawLD(u, P) {
+    var dim = fit(ldC, ctxL), w = dim.w, h = dim.h, pad = { l: 40, r: 10, t: 8, b: 22 };
+    var Pmax = 0.26, i;
+    var mx = function (uu) { return pad.l + (uu / UMAX) * (w - pad.l - pad.r); };
+    var my = function (pp) { return h - pad.b - (pp / Pmax) * (h - pad.t - pad.b); };
+    ctxL.clearRect(0, 0, w, h);
+    axes(ctxL, w, h, pad);
+    ctxL.strokeStyle = '#a78bfa';
+    ctxL.lineWidth = 2;
+    ctxL.beginPath();
+    for (i = 0; i < PU.length; i++) {
+      if (i === 0) ctxL.moveTo(mx(PU[i][0]), my(PU[i][1]));
+      else ctxL.lineTo(mx(PU[i][0]), my(PU[i][1]));
+    }
+    ctxL.stroke();
+    [2, 6, UMAX].forEach(function (uu) {
+      ctxL.strokeStyle = '#38bdf8';
+      ctxL.setLineDash([3, 3]);
+      ctxL.beginPath(); ctxL.moveTo(mx(uu), pad.t); ctxL.lineTo(mx(uu), h - pad.b); ctxL.stroke();
+      ctxL.setLineDash([]);
+    });
+    ctxL.fillStyle = '#fbbf24';
+    ctxL.beginPath(); ctxL.arc(mx(u), my(P), 4.5, 0, Math.PI * 2); ctxL.fill();
+    ctxL.fillStyle = '#64748b';
+    ctxL.font = '9px sans-serif';
+    ctxL.fillText('u (mm)', w / 2 - 16, h - 5);
+  }
+
+  function drawSig(sol) {
+    var dim = fit(sgC, ctxS), w = dim.w, h = dim.h, pad = { l: 36, r: 10, t: 8, b: 22 };
+    var mx = function (x) { return pad.l + (x / L) * (w - pad.l - pad.r); };
+    var my = function (s) { return h - pad.b - (s / (ft * 1.15)) * (h - pad.t - pad.b); };
+    var i;
+    ctxS.clearRect(0, 0, w, h);
+    axes(ctxS, w, h, pad);
+    ctxS.strokeStyle = 'rgba(244,63,94,0.45)';
+    ctxS.setLineDash([4, 3]);
+    ctxS.beginPath(); ctxS.moveTo(mx(xOpen), pad.t); ctxS.lineTo(mx(xOpen), h - pad.b); ctxS.stroke();
+    ctxS.setLineDash([]);
+    if (sol.xFront != null && sol.xFront < xOpen - 0.05) {
+      ctxS.strokeStyle = 'rgba(251,191,36,0.55)';
+      ctxS.setLineDash([2, 3]);
+      ctxS.beginPath(); ctxS.moveTo(mx(sol.xFront), pad.t); ctxS.lineTo(mx(sol.xFront), h - pad.b); ctxS.stroke();
+      ctxS.setLineDash([]);
+    }
+    ctxS.strokeStyle = '#fbbf24';
+    ctxS.lineWidth = 1.8;
+    ctxS.beginPath();
+    for (i = 0; i < nNode; i++) {
+      if (i === 0) ctxS.moveTo(mx(x0[i]), my(sol.sig[i]));
+      else ctxS.lineTo(mx(x0[i]), my(sol.sig[i]));
+    }
+    ctxS.stroke();
+    ctxS.fillStyle = '#64748b';
+    ctxS.font = '9px sans-serif';
+    ctxS.fillText('x (mm)', w / 2 - 16, h - 5);
+  }
+
+  function drawLaw(sol) {
+    var dim = fit(lwC, ctxW), w = dim.w, h = dim.h, pad = { l: 36, r: 10, t: 8, b: 22 };
+    var sMax = Math.max(gFail * 1.15, 0.05), i, g, law;
+    for (i = 0; i < nNode; i++) if (sol.gn[i] > sMax && sol.gn[i] < 0.8) sMax = sol.gn[i];
+    sMax = Math.min(sMax, 0.35);
+    var mx = function (s) { return pad.l + (s / sMax) * (w - pad.l - pad.r); };
+    var my = function (t) { return h - pad.b - (t / (ft * 1.15)) * (h - pad.t - pad.b); };
+    ctxW.clearRect(0, 0, w, h);
+    axes(ctxW, w, h, pad);
+    ctxW.strokeStyle = '#fb7185';
+    ctxW.lineWidth = 2;
+    ctxW.beginPath();
+    for (i = 0; i <= 160; i++) {
+      g = (i / 160) * sMax;
+      law = wells(g, false);
+      if (i === 0) ctxW.moveTo(mx(g), my(Math.max(0, law.s)));
+      else ctxW.lineTo(mx(g), my(Math.max(0, law.s)));
+    }
+    ctxW.stroke();
+    [[gn0, '#34d399', 'gn0'], [gFail, '#94a3b8', 'fail']].forEach(function (m) {
+      ctxW.strokeStyle = m[1];
+      ctxW.setLineDash([3, 3]);
+      ctxW.beginPath(); ctxW.moveTo(mx(m[0]), pad.t); ctxW.lineTo(mx(m[0]), h - pad.b); ctxW.stroke();
+      ctxW.setLineDash([]);
+      ctxW.fillStyle = m[1];
+      ctxW.font = '9px sans-serif';
+      ctxW.fillText(m[2], mx(m[0]) + 2, pad.t + 10);
+    });
+    var step = 1;
+    for (i = 0; i < nNode; i += step) {
+      if (x0[i] >= xOpen) continue;
+      g = Math.min(sMax, Math.max(0, sol.gn[i]));
+      ctxW.fillStyle = sol.st[i] === 'elastic' ? '#34d399' : sol.st[i] === 'softening' ? '#fbbf24' : '#64748b';
+      ctxW.beginPath();
+      ctxW.arc(mx(g), my(sol.sig[i]), 2.6, 0, Math.PI * 2);
+      ctxW.fill();
+    }
+  }
+
+
+
+  // Three.js — plane-strain laminate, steel clamp, grip tabs, ±u loading
+  var view = document.getElementById('threejs-container');
+  var SCALE = 40;
+  var DEPTH = 1.0 * SCALE;
+  var z0 = 0;
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0f1d);
+
+  var camera = new THREE.PerspectiveCamera(40, 1, 1, 8000);
+  camera.position.set(L * SCALE * 0.48, 2.8 * SCALE, 520);
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  view.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.enableRotate = true;
+  controls.minPolarAngle = Math.PI * 0.38;
+  controls.maxPolarAngle = Math.PI * 0.62;
+  controls.target.set(L * SCALE * 0.5, 2.5 * SCALE, z0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.62));
+  var dirLight = new THREE.DirectionalLight(0xffffff, 0.92);
+  dirLight.position.set(80, 220, 140);
+  scene.add(dirLight);
+  var rim = new THREE.DirectionalLight(0x93c5fd, 0.28);
+  rim.position.set(-120, 40, -80);
+  scene.add(rim);
+
+  var specimen = new THREE.Group();
+  scene.add(specimen);
+
+  var NX = 80, NY = 6;
+
+  function interpCenter(sol, s) {
+    var f = (s / L) * (nNode - 1);
+    var i0 = Math.max(0, Math.min(nNode - 2, Math.floor(f)));
+    var a = f - i0;
+    var th0 = sol.psi[Math.min(i0, nSeg - 1)];
+    var th1 = sol.psi[Math.min(i0 + 1, nSeg - 1)];
+    return {
+      x: sol.x[i0] * (1 - a) + sol.x[i0 + 1] * a,
+      y: sol.y[i0] * (1 - a) + sol.y[i0 + 1] * a,
+      th: th0 * (1 - a) + th1 * a
+    };
+  }
+
+  function createPlyGeo(isTop) {
+    var Hply = isTop ? H1 : H2;
+    var Ls = L * SCALE, Hs = Hply * SCALE;
+    var geo = new THREE.PlaneGeometry(Ls, Hs, NX, NY);
+    var pos = geo.attributes.position;
+    var origS = new Float32Array(pos.count);
+    var origE = new Float32Array(pos.count);
+    var Ymid = 0.5 * SCALE;
+    var i, x, y, xn, yn;
+    for (i = 0; i < pos.count; i++) {
+      x = pos.getX(i);
+      y = pos.getY(i);
+      xn = x + Ls * 0.5;
+      yn = isTop ? (Ymid + Hs * 0.5 + y) : (Ymid - Hs * 0.5 - y);
+      pos.setXYZ(i, xn, yn, z0);
+      origS[i] = xn / SCALE;
+      origE[i] = isTop ? ((yn - Ymid) / Hs) : ((Ymid - yn) / Hs);
+    }
+    pos.needsUpdate = true;
+    geo.userData.origS = origS;
+    geo.userData.origE = origE;
+    geo.userData.isTop = isTop;
+    return geo;
+  }
+
+  function makeMeshLines(isTop) {
+    var pts = [], meta = [], ix, iy, Ls = L * SCALE, Hply = isTop ? H1 : H2, Hs = Hply * SCALE;
+    var Ymid = 0.5 * SCALE, y0, x0, x1, y1, eta0, eta1;
+    for (iy = 0; iy <= NY; iy++) {
+      y0 = isTop ? (Ymid + (iy / NY) * Hs) : (Ymid - (iy / NY) * Hs);
+      eta0 = iy / NY;
+      for (ix = 0; ix < NX; ix++) {
+        x0 = (ix / NX) * Ls;
+        x1 = ((ix + 1) / NX) * Ls;
+        pts.push(x0, y0, z0 + 0.4, x1, y0, z0 + 0.4);
+        meta.push(x0 / SCALE, eta0, x1 / SCALE, eta0);
+      }
+    }
+    for (ix = 0; ix <= NX; ix++) {
+      x0 = (ix / NX) * Ls;
+      for (iy = 0; iy < NY; iy++) {
+        y0 = isTop ? (Ymid + (iy / NY) * Hs) : (Ymid - (iy / NY) * Hs);
+        y1 = isTop ? (Ymid + ((iy + 1) / NY) * Hs) : (Ymid - ((iy + 1) / NY) * Hs);
+        eta0 = iy / NY;
+        eta1 = (iy + 1) / NY;
+        pts.push(x0, y0, z0 + 0.4, x0, y1, z0 + 0.4);
+        meta.push(x0 / SCALE, eta0, x0 / SCALE, eta1);
+      }
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    g.userData.meta = meta;
+    g.userData.isTop = isTop;
+    return g;
+  }
+
+  function mapVertex(sol, s, eta, isTop) {
+    var c = interpCenter(sol, s);
+    var th = isTop ? c.th : -c.th;
+    var nx = -Math.sin(th), ny = Math.cos(th);
+    var Hply = isTop ? H1 : H2;
+    var off = eta * Hply * SCALE;
+    var cx = c.x * SCALE;
+    var cy = (isTop ? (0.5 + c.y) : (0.5 - c.y)) * SCALE;
+    if (isTop) return [cx + off * nx, cy + off * ny, z0];
+    return [cx - off * nx, cy - off * ny, z0];
+  }
+
+  function cornerOuter(sol, isTop) {
+    return mapVertex(sol, L, 1, isTop);
+  }
+
+  function deformPly(geo, sol) {
+    var pos = geo.attributes.position;
+    var origS = geo.userData.origS;
+    var origE = geo.userData.origE;
+    var isTop = geo.userData.isTop;
+    var i, xy;
+    for (i = 0; i < pos.count; i++) {
+      xy = mapVertex(sol, origS[i], origE[i], isTop);
+      pos.setXYZ(i, xy[0], xy[1], xy[2]);
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+  }
+
+  function deformLines(lineG, sol) {
+    var wp = lineG.attributes.position.array;
+    var meta = lineG.userData.meta;
+    var isTop = lineG.userData.isTop;
+    var k, m, xy;
+    for (k = 0, m = 0; k < wp.length; k += 6, m += 4) {
+      xy = mapVertex(sol, meta[m], meta[m + 1], isTop);
+      wp[k] = xy[0]; wp[k + 1] = xy[1]; wp[k + 2] = z0 + 0.4;
+      xy = mapVertex(sol, meta[m + 2], meta[m + 3], isTop);
+      wp[k + 3] = xy[0]; wp[k + 4] = xy[1]; wp[k + 5] = z0 + 0.4;
+    }
+    lineG.attributes.position.needsUpdate = true;
+  }
+
+  var topMat = new THREE.MeshStandardMaterial({
+    color: 0x4a5568, roughness: 0.48, metalness: 0.18, side: THREE.DoubleSide
+  });
+  var botMat = new THREE.MeshStandardMaterial({
+    color: 0x718096, roughness: 0.52, metalness: 0.12, side: THREE.DoubleSide
+  });
+  var topGeo = createPlyGeo(true);
+  var botGeo = createPlyGeo(false);
+  specimen.add(new THREE.Mesh(topGeo, topMat));
+  specimen.add(new THREE.Mesh(botGeo, botMat));
+
+  var topWireG = makeMeshLines(true);
+  var botWireG = makeMeshLines(false);
+  specimen.add(new THREE.LineSegments(topWireG, new THREE.LineBasicMaterial({ color: 0x1a202c, transparent: true, opacity: 0.55 })));
+  specimen.add(new THREE.LineSegments(botWireG, new THREE.LineBasicMaterial({ color: 0x1a202c, transparent: true, opacity: 0.55 })));
+
+  var ifacePts = new Float32Array(nNode * 3);
+  var ifaceGeo = new THREE.BufferGeometry();
+  ifaceGeo.setAttribute('position', new THREE.BufferAttribute(ifacePts, 3));
+  specimen.add(new THREE.Line(ifaceGeo, new THREE.LineBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.85 })));
+
+  var steelMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.32, metalness: 0.72 });
+  var gripMat = new THREE.MeshStandardMaterial({ color: 0xa0aec0, roughness: 0.38, metalness: 0.55 });
+
+  var fixClamp = new THREE.Mesh(
+    new THREE.BoxGeometry(14, (H1 + H2 + 0.25) * SCALE, DEPTH + 4),
+    steelMat
+  );
+  fixClamp.position.set(-7, 0.5 * SCALE, z0);
+  specimen.add(fixClamp);
+  var fixPlate = new THREE.Mesh(
+    new THREE.BoxGeometry(3, (H1 + H2 + 0.5) * SCALE, DEPTH + 8),
+    steelMat.clone()
+  );
+  fixPlate.position.set(-1.5, 0.5 * SCALE, z0);
+  specimen.add(fixPlate);
+
+  var gripW = 16, gripH = 14, gripD = DEPTH + 6;
+  var topGrip = new THREE.Mesh(new THREE.BoxGeometry(gripW, gripH, gripD), gripMat);
+  var botGrip = new THREE.Mesh(new THREE.BoxGeometry(gripW, gripH, gripD), gripMat.clone());
+  specimen.add(topGrip, botGrip);
+
+  function makeLabel(text, color) {
+    var cv = document.createElement('canvas');
+    cv.width = 64; cv.height = 64;
+    var ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, 64, 64);
+    ctx.fillStyle = color || '#ef4444';
+    ctx.font = 'bold 44px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 32, 34);
+    var spr = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(cv), transparent: true, depthTest: false
+    }));
+    spr.scale.set(18, 18, 1);
+    return spr;
+  }
+
+  function makeLoadArrow(up) {
+    var g = new THREE.Group();
+    var mat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4, metalness: 0.1 });
+    var shaft = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 1, 10), mat);
+    var head = new THREE.Mesh(new THREE.ConeGeometry(3.8, 9, 12), mat.clone());
+    var label = makeLabel('P', '#ef4444');
+    g.add(shaft, head, label);
+    g.userData = { shaft: shaft, head: head, label: label, up: up };
+    return g;
+  }
+
+  function layoutLoadArrow(g, len) {
+    var ud = g.userData;
+    var headLen = 9;
+    var shaftLen = Math.max(16, len - headLen);
+    ud.shaft.scale.set(1, shaftLen, 1);
+    if (ud.up) {
+      ud.shaft.position.set(0, shaftLen / 2, 0);
+      ud.head.position.set(0, shaftLen + headLen / 2, 0);
+      ud.head.rotation.x = 0;
+      ud.label.position.set(10, shaftLen + headLen + 8, 0);
+    } else {
+      ud.shaft.position.set(0, -shaftLen / 2, 0);
+      ud.head.position.set(0, -(shaftLen + headLen / 2), 0);
+      ud.head.rotation.x = Math.PI;
+      ud.label.position.set(10, -(shaftLen + headLen + 8), 0);
+    }
+  }
+
+  var topLoad = makeLoadArrow(true);
+  var botLoad = makeLoadArrow(false);
+  specimen.add(topLoad, botLoad);
+
+  var nodeMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.35, metalness: 0.2 });
+  var topNode = new THREE.Mesh(new THREE.SphereGeometry(2.8, 14, 12), nodeMat);
+  var botNode = new THREE.Mesh(new THREE.SphereGeometry(2.8, 14, 12), nodeMat.clone());
+  var topRef = new THREE.Mesh(new THREE.SphereGeometry(2.2, 12, 10), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5 }));
+  var botRef = new THREE.Mesh(new THREE.SphereGeometry(2.2, 12, 10), topRef.material.clone());
+  specimen.add(topNode, botNode, topRef, botRef);
+
+  var dispMat = new THREE.LineBasicMaterial({ color: 0xfbbf24 });
+  var topDisp = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+    dispMat
+  );
+  var botDisp = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
+    dispMat.clone()
+  );
+  specimen.add(topDisp, botDisp);
+
+  function makeUSprite() {
+    var cv = document.createElement('canvas');
+    cv.width = 128; cv.height = 64;
+    var ctx = cv.getContext('2d');
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('u', 64, 32);
+    var spr = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(cv), transparent: true, depthTest: false
+    }));
+    spr.scale.set(24, 12, 1);
+    return spr;
+  }
+  var topULabel = makeUSprite();
+  var botULabel = makeUSprite();
+  specimen.add(topULabel, botULabel);
+
+  var arrowGroup = new THREE.Group();
+  specimen.add(arrowGroup);
+  var stations = [];
+
+  function makePair() {
+    var g = new THREE.Group();
+    var mat = new THREE.MeshBasicMaterial({ color: 0xa78bfa });
+    var upS = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1, 6), mat);
+    var upH = new THREE.Mesh(new THREE.ConeGeometry(1.8, 3.5, 8), mat.clone());
+    var dnS = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 1, 6), mat.clone());
+    var dnH = new THREE.Mesh(new THREE.ConeGeometry(1.8, 3.5, 8), mat.clone());
+    g.add(upS, upH, dnS, dnH);
+    g.userData = { upS: upS, upH: upH, dnS: dnS, dnH: dnH, mats: [upS.material, upH.material, dnS.material, dnH.material] };
+    return g;
+  }
+
+  var si;
+  for (si = 0; si < nNode; si++) {
+    arrowGroup.add(makePair());
+    stations.push({ i: si, g: arrowGroup.children[si] });
+  }
+
+  function colorState(st) {
+    if (st === 'elastic' || st === 'contact') return 0x10b981;
+    if (st === 'softening') return 0xfbbf24;
+    return 0x64748b;
+  }
+
+  function updateScene(sol, u) {
+    var ref = frames[0];
+    var k, st, j, c, half, len, col, ud, shaft, head, face, p, i;
+    var tc = cornerOuter(sol, true);
+    var bc = cornerOuter(sol, false);
+    var tr = cornerOuter(ref, true);
+    var br = cornerOuter(ref, false);
+    var zN = z0 + DEPTH * 0.55;
+
+    for (i = 0; i < nNode; i++) {
+      c = interpCenter(sol, x0[i]);
+      p = i * 3;
+      ifacePts[p] = c.x * SCALE;
+      ifacePts[p + 1] = (0.5 + c.y) * SCALE;
+      ifacePts[p + 2] = z0 + 0.6;
+    }
+    ifaceGeo.attributes.position.needsUpdate = true;
+
+    for (k = 0; k < stations.length; k++) {
+      st = stations[k];
+      j = st.i;
+      c = interpCenter(sol, x0[j]);
+      half = Math.max(0, sol.y[j]) * SCALE;
+      col = colorState(sol.st[j]);
+      st.g.position.set(c.x * SCALE, (0.5 + c.y) * SCALE, z0 + 0.8);
+      ud = st.g.userData;
+      ud.mats.forEach(function (m) { m.color.setHex(col); });
+      if (sol.st[j] === 'broken' || sol.sig[j] < 0.005 * ft) {
+        st.g.visible = false;
+        continue;
+      }
+      st.g.visible = true;
+      len = Math.max(4, (sol.sig[j] / ft) * 18);
+      shaft = Math.max(2.5, len - 3.5);
+      head = 3.5;
+      face = half + 1.2;
+      ud.upS.scale.set(1, shaft, 1);
+      ud.upS.position.set(0, face + shaft / 2, 0);
+      ud.upH.rotation.x = Math.PI;
+      ud.upH.position.set(0, face + shaft + head / 2, 0);
+      ud.dnS.scale.set(1, shaft, 1);
+      ud.dnS.position.set(0, -face - shaft / 2, 0);
+      ud.dnH.position.set(0, -face - shaft - head / 2, 0);
+    }
+
+    topGrip.position.set(tc[0] + gripW * 0.28, tc[1], z0);
+    botGrip.position.set(bc[0] + gripW * 0.28, bc[1], z0);
+    topNode.position.set(tc[0], tc[1], zN);
+    botNode.position.set(bc[0], bc[1], zN);
+    topRef.position.set(tr[0], tr[1], zN);
+    botRef.position.set(br[0], br[1], zN);
+
+    var loadLen = 36 + 44 * Math.max(0.12, sol.P / 0.135);
+    topLoad.position.set(tc[0] + gripW * 0.65, tc[1], zN);
+    botLoad.position.set(bc[0] + gripW * 0.65, bc[1], zN);
+    layoutLoadArrow(topLoad, loadLen);
+    layoutLoadArrow(botLoad, loadLen);
+
+    var ta = topDisp.geometry.attributes.position;
+    ta.setXYZ(0, tr[0], tr[1], zN);
+    ta.setXYZ(1, tc[0], tc[1], zN);
+    ta.needsUpdate = true;
+    var ba = botDisp.geometry.attributes.position;
+    ba.setXYZ(0, br[0], br[1], zN);
+    ba.setXYZ(1, bc[0], bc[1], zN);
+    ba.needsUpdate = true;
+    topDisp.visible = botDisp.visible = u > 0.02;
+    topRef.visible = botRef.visible = u > 0.02;
+    topULabel.visible = botULabel.visible = u > 0.02;
+    if (u > 0.02) {
+      topULabel.position.set((tr[0] + tc[0]) * 0.5 + 14, (tr[1] + tc[1]) * 0.5, zN + 2);
+      botULabel.position.set((br[0] + bc[0]) * 0.5 + 14, (br[1] + bc[1]) * 0.5, zN + 2);
+    }
+  }
+  var uSlide = document.getElementById('uSlider');
+  var playing = false, raf = 0, lastT = 0;
+
+  function fmt(n, d) {
+    if (Math.abs(n) >= 10) return n.toFixed(2);
+    if (Math.abs(n) >= 1) return n.toFixed(3);
+    return n.toFixed(d != null ? d : 3);
+  }
+
+  function resize() {
+    var w = view.clientWidth, h = view.clientHeight;
+    camera.aspect = w / Math.max(1, h);
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+  }
+
+  function refresh() {
+    var u = (parseFloat(uSlide.value) / 600) * UMAX;
+    var sol = frameAt(u);
+    sol.u = u;
+    sol.P = PfromU(u);
+    var stg = stageOf(sol);
+    document.getElementById('uValue').textContent = u.toFixed(2);
+    document.getElementById('pVal').textContent = fmt(sol.P, 4) + ' N';
+    document.getElementById('aVal').textContent = fmt(sol.a, 2) + ' mm';
+    document.getElementById('sMaxVal').textContent = fmt(sol.sMax, 2) + ' MPa';
+    document.getElementById('gMaxVal').textContent = fmt(sol.gMax, 3) + ' mm';
+    document.getElementById('nDebVal').textContent = sol.nDeb + ' / ' + nNode;
+    document.getElementById('stateVal').textContent = stg.label;
+    var badge = document.getElementById('stageBadge');
+    badge.textContent = stg.label;
+    badge.className = 'absolute top-3 right-3 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold border ' + stg.cls;
+    document.getElementById('dispOverlay').innerHTML =
+      'u = ' + u.toFixed(2) + ' mm<br>P = ' + fmt(sol.P, 4) + ' N · a ≈ ' + fmt(sol.a, 2) + ' mm<br>' +
+      '<span style="color:#94a3b8">fine 80×6 Q4/ply · L–L · view ×40</span>';
+    deformPly(topGeo, sol);
+    deformPly(botGeo, sol);
+    deformLines(topWireG, sol);
+    deformLines(botWireG, sol);
+    updateScene(sol, u);
+    drawLD(u, sol.P);
+    drawSig(sol);
+    drawLaw(sol);
+  }
+
+  document.getElementById('playBtn').addEventListener('click', function () {
+    if (playing) {
+      playing = false;
+      if (raf) cancelAnimationFrame(raf);
+      this.textContent = '▶ Play';
+      return;
+    }
+    if (parseFloat(uSlide.value) >= 595) uSlide.value = '0';
+    playing = true;
+    this.textContent = 'Pause';
+    lastT = performance.now();
+    function loop(t) {
+      if (!playing) return;
+      var dt = Math.min(0.05, (t - lastT) / 1000);
+      lastT = t;
+      var v = parseFloat(uSlide.value) + dt * 36;
+      if (v >= 600) {
+        uSlide.value = '600';
+        refresh();
+        playing = false;
+        document.getElementById('playBtn').textContent = '▶ Play';
+        return;
+      }
+      uSlide.value = String(v);
+      refresh();
+      raf = requestAnimationFrame(loop);
+    }
+    raf = requestAnimationFrame(loop);
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    playing = false;
+    document.getElementById('playBtn').textContent = '▶ Play';
+    uSlide.value = '0';
+    refresh();
+  });
+  uSlide.addEventListener('input', function () {
+    if (playing) {
+      playing = false;
+      document.getElementById('playBtn').textContent = '▶ Play';
+    }
+    refresh();
+  });
+  window.addEventListener('resize', function () { resize(); refresh(); });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  resize();
+  refresh();
+  animate();
+})();
+</script>
+</body>
+</html>

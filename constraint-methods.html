@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Penalty, Lagrange multipliers and Nitsche — Mechanics Reference</title>
+<meta name="description" content="Three ways to tie two finite element meshes together: the penalty method, Lagrange multipliers, and Nitsche's method. An interactive two-block Q4 model solved live in the browser, with interface gap, accuracy, and conditioning compared." />
+<link rel="canonical" href="https://mechanicsreference.com/constraint-methods.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+<style>
+:root{
+  --paper:#f7f6f2;--ink:#1c2430;--muted:#3d4756;--rule:#d8d4cb;
+  --navy:#1e3a5f;--plate:#0f172a;--accent:#c45c26;
+  --pen:#ea580c;--lag:#0f766e;--nit:#0284c7;--ref:#64748b;
+}
+*{box-sizing:border-box}html,body{margin:0}html{scrollbar-gutter:stable}
+body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+a{color:#3a5f8a}
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:20px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--rule)}
+.logo{height:52px;width:auto}
+nav{margin-left:auto;display:flex;gap:4px}
+nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 56px}
+.crumb{padding:28px 0 8px;font-size:.92rem;color:var(--muted)}
+h1{margin:0 0 12px;font:600 clamp(1.75rem,3.8vw,2.4rem)/1.2 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.lede{margin:0 0 10px;max-width:52em;font:1.1rem/1.5 "Source Serif 4",Georgia,serif;color:var(--muted)}
+.links{margin:0 0 22px;font-size:.9rem;color:var(--muted)}
+.links a{margin-right:.75rem}
+
+.shell{border:1px solid var(--rule);background:#fff;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(340px,1.6fr) minmax(300px,.95fr);background:var(--plate)}
+#view{position:relative;height:min(68vh,660px);min-height:440px;background:#0e1624;overflow:hidden}
+#view canvas{display:block;width:100%;height:100%}
+.hint{position:absolute;top:12px;right:12px;z-index:4;pointer-events:none;font-size:.7rem;letter-spacing:.04em;padding:6px 10px;background:rgba(8,12,20,.55);color:#94a3b8;backdrop-filter:blur(8px);border:1px solid rgba(148,163,184,.18)}
+.chips{position:absolute;left:12px;top:12px;z-index:4;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(300px,46%)}
+.chip{padding:9px 12px;background:rgba(8,12,20,.62);border:1px solid rgba(148,163,184,.2);color:#e2e8f0;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.chip b{display:block;font:600 .84rem/1.2 "Source Serif 4",Georgia,serif}
+.chip span{display:block;margin-top:3px;font:500 .74rem/1.35 "JetBrains Mono",ui-monospace,monospace;color:#cbd5e1}
+.chip.c-m{border-left:3px solid #94a3b8}
+.chip.c-m.pen{border-left-color:var(--pen)}.chip.c-m.pen b{color:#fdba74}
+.chip.c-m.lag{border-left-color:#2dd4bf}.chip.c-m.lag b{color:#5eead4}
+.chip.c-m.nit{border-left-color:var(--nit)}.chip.c-m.nit b{color:#7dd3fc}
+.chip.c-gap{font-size:.75rem;border-left:3px solid #64748b}
+.chip.c-gap.ok{border-left-color:#34d399;color:#6ee7b7}
+.chip.c-gap.bad{border-left-color:#fb7185;color:#fda4af;font-weight:700}
+.label3d{font:700 12px/1.2 "Source Sans 3",system-ui,sans-serif;color:#f8fafc;text-shadow:0 1px 8px #000,0 0 18px rgba(0,0,0,.6);white-space:nowrap;pointer-events:none;letter-spacing:.04em}
+.label3d.a{color:#fed7aa}.label3d.b{color:#bae6fd}.label3d.i{color:#fca5a5}
+.cbar{position:absolute;right:12px;bottom:12px;z-index:4;display:flex;gap:8px;align-items:stretch;padding:8px 10px;background:rgba(8,12,20,.62);border:1px solid rgba(148,163,184,.2);backdrop-filter:blur(10px);color:#cbd5e1;font:500 .62rem/1.2 "JetBrains Mono",ui-monospace,monospace;pointer-events:none}
+.cbar-title{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;font:600 .62rem "Source Sans 3",sans-serif}
+.cbar-grad{width:10px;border-radius:1px;background:linear-gradient(to top,#3b82f6,#e2e8f0,#ea580c)}
+.cbar-labs{display:flex;flex-direction:column;justify-content:space-between;text-align:right;min-width:3.6em}
+
+.side{display:flex;flex-direction:column;background:#fff;border-left:1px solid var(--rule);min-height:0;overflow:auto}
+.verdict{padding:14px 14px 12px;border-bottom:1px solid var(--rule);background:#fff8f1}
+.verdict p{margin:0;font:600 1.02rem/1.35 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.verdict span{display:block;margin-top:6px;font:400 .82rem/1.4 "Source Sans 3",sans-serif;color:var(--muted)}
+.board{padding:12px 14px 10px;border-bottom:1px solid var(--rule)}
+.board h3{margin:0 0 8px;font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+table.live{width:100%;border-collapse:collapse;font:500 .72rem/1.35 "JetBrains Mono",ui-monospace,monospace}
+table.live th,table.live td{padding:5px 4px;text-align:right;border-bottom:1px solid #eeeae3}
+table.live th{color:var(--muted);font:600 .65rem/1.2 "Source Sans 3",sans-serif;letter-spacing:.03em}
+table.live th:first-child,table.live td:first-child{text-align:left}
+table.live tr.on td{background:#fff8f1}
+table.live td.m{font:600 .74rem/1.2 "Source Sans 3",sans-serif}
+td.m i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.good{color:#0f766e}.warn{color:#b45309}.bad{color:#9f1239;font-weight:700}
+.plot{flex:1 1 150px;min-height:158px;display:flex;flex-direction:column;padding:9px 12px 4px;border-bottom:1px solid var(--rule);overflow:hidden}
+.plot:last-child{border-bottom:0}
+.plot h3{margin:0 0 2px;font-size:.72rem;font-weight:600;color:var(--navy)}
+.plot p.sub{margin:0 0 4px;font-size:.68rem;color:var(--muted)}
+.cwrap{position:relative;flex:1 1 0;min-height:96px}
+.cwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.leg{margin:3px 0 4px;font-size:.63rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:3px 10px}
+.sw{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:3px;background:currentColor}
+.sw.dash{height:0;border-top:2px dashed currentColor;background:transparent}
+.sw.d{width:7px;height:7px;border-radius:50%}
+
+#bar{display:flex;flex-wrap:wrap;align-items:center;gap:9px 14px;padding:12px 16px;border-top:1px solid var(--rule);font-size:.84rem;color:var(--muted);background:#fff}
+#eq{margin:0;flex-basis:100%;font:600 .9rem/1.45 "Source Sans 3",sans-serif;color:var(--navy)}
+.seg{display:inline-flex;border:1px solid var(--rule)}
+.seg button{border:0;border-right:1px solid var(--rule);padding:7px 13px}
+.seg button:last-child{border-right:0}
+button,select{font:inherit;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--rule);padding:6px 11px;cursor:pointer}
+button:hover,select:hover{border-color:var(--navy)}
+button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+button.on.pen{background:var(--pen);border-color:var(--pen)}
+button.on.lag{background:var(--lag);border-color:var(--lag)}
+button.on.nit{background:var(--nit);border-color:var(--nit)}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=range]{width:150px;vertical-align:middle;accent-color:var(--navy)}
+input[type=range]:disabled{opacity:.4}
+label.chk{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{padding:4px 9px;font-size:.78rem}
+details.more{flex-basis:100%;font-size:.82rem}
+details.more summary{cursor:pointer;font-weight:600;color:var(--navy)}
+details.more .more-row{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:9px;align-items:center}
+
+.figwrap{margin-top:34px}
+.figwrap h2{margin:0 0 8px;font:600 1.4rem/1.25 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.figcap{margin:0 0 16px;max-width:54em;font:1.02rem/1.5 "Source Serif 4",Georgia,serif;color:var(--muted)}
+.fig{background:#fff;border:1px solid var(--rule)}
+.fig-plots{display:grid;grid-template-columns:1fr 1fr 1fr}
+.fig-cell{padding:11px 13px 9px;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--rule)}
+.fig-cell:last-child{border-right:0}
+.fig-cell h3{margin:0 0 4px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.fig-cell p.sub{margin:0 0 6px;font-size:.72rem;color:var(--muted);min-height:2.6em}
+.fig-cell canvas{width:100%;height:220px;display:block}
+#sweepnote{padding:8px 13px;font:500 .72rem "JetBrains Mono",ui-monospace,monospace;color:var(--muted);border-top:1px solid var(--rule)}
+
+.prose{margin-top:40px}
+.prose h2{margin:34px 0 10px;font:600 1.45rem/1.25 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.prose h3{margin:22px 0 8px;font:600 1.08rem/1.3 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.prose p{margin:0 0 14px;max-width:50em;color:var(--muted)}
+.prose ul{max-width:50em;color:var(--muted);padding-left:1.2em}
+.prose li{margin:0 0 7px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:18px 0 22px}
+.card{padding:16px 18px;background:#fff;border:1px solid var(--rule);border-top:3px solid var(--rule)}
+.card.pen{border-top-color:var(--pen)}
+.card.lag{border-top-color:var(--lag)}
+.card.nit{border-top-color:var(--nit)}
+.card h3{margin:0 0 8px;font:600 1.05rem/1.3 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.card ul{margin:0;padding-left:1.15em;color:var(--muted);font-size:.94rem}
+.card li{margin:0 0 6px}
+table.cmp{width:100%;border-collapse:collapse;font-size:.86rem;margin:14px 0 10px;background:#fff}
+table.cmp th,table.cmp td{border:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+table.cmp th{color:var(--navy);font-weight:600;background:#faf9f6}
+table.cmp td:first-child{font-weight:600;color:var(--navy)}
+.note{margin:18px 0;padding:13px 16px;background:#fff;border:1px solid var(--rule);border-left:3px solid var(--accent);font-size:.94rem;color:var(--muted);max-width:50em}
+code{font:500 .88em "JetBrains Mono",ui-monospace,monospace;background:#f0ede6;padding:1px 5px}
+footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--muted)}
+footer .inner{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+@media(max-width:1000px){
+  .fig-plots{grid-template-columns:1fr}
+  .fig-cell{border-right:0;border-bottom:1px solid var(--rule)}
+  .grid3{grid-template-columns:1fr}
+}
+@media(max-width:960px){
+  .row{grid-template-columns:1fr}
+  .side{border-left:0;border-top:1px solid var(--rule);max-height:420px}
+  #view{height:min(48vh,420px)}
+  header,.wrap,footer{padding-left:18px;padding-right:18px}
+  .logo{height:44px}
+}
+
+/* Embedded in an iframe on the hub: no page furniture, and the shell has to
+   live inside whatever height it is given rather than setting its own. */
+html.embed,html.embed body{height:100%;background:var(--plate)}
+html.embed header,html.embed .page,html.embed footer,html.embed .prose,html.embed .figwrap{display:none}
+html.embed .wrap{max-width:none;height:100%;padding:0}
+html.embed .shell{height:100%;border:0;display:flex;flex-direction:column}
+html.embed .row{flex:1 1 auto;min-height:0}
+html.embed #view{height:auto;min-height:0}
+html.embed .side{max-height:none;border-top:0}
+html.embed .verdict{padding:11px 12px 9px}
+html.embed .verdict p{font-size:.96rem}
+html.embed .board{padding:9px 12px 7px}
+html.embed .plot{min-height:126px;padding:7px 11px 3px}
+html.embed .cwrap{min-height:64px}
+html.embed #bar{padding:9px 12px;gap:7px 12px}
+html.embed #eq{font:600 .82rem/1.4 "Source Sans 3",sans-serif}
+html.embed details.more{display:none}
+@media(min-width:660px){
+  html.embed .row{grid-template-columns:minmax(0,1.5fr) minmax(292px,.95fr)}
+  html.embed .side{border-left:1px solid var(--rule)}
+}
+</style>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header>
+  <a href="./"><img class="logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+  <nav aria-label="Site">
+    <a href="./">Home</a>
+    <a href="hub.html#constrained-fem">Library</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="page">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#constrained-fem">Constrained FEM</a></p>
+    <h1>Penalty, Lagrange multipliers, and Nitsche</h1>
+    <p class="lede">
+      Two elastic blocks meet on a shared line, but the meshes do not share nodes — every node on the seam
+      is duplicated. Something has to tie them back together. These are the three standard ways to do it,
+      solved live in your browser on the same mesh, so the differences are measured rather than asserted.
+    </p>
+    <p class="links">
+      <a href="hub.html#constrained-fem">Constrained FEM</a>
+      <a href="hub.html#boundary-conditions-loads">Boundary conditions</a>
+      <a href="hub.html#contact-and-friction">Contact</a>
+      <a href="hub.html#solving-linear-systems">Linear systems</a>
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="row">
+      <div id="view">
+        <div class="hint">drag to orbit · scroll to zoom</div>
+        <div class="chips">
+          <div class="chip c-m" id="chipMethod"><b>—</b><span>—</span></div>
+          <div class="chip c-gap" id="chipGap">—</div>
+        </div>
+        <div class="cbar" id="cbar">
+          <div class="cbar-title" id="cbarTitle">σxx</div>
+          <div class="cbar-grad"></div>
+          <div class="cbar-labs"><span id="cbarMax">—</span><span id="cbarMid">—</span><span id="cbarMin">—</span></div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="verdict" id="verdict">
+          <p>—</p>
+          <span>—</span>
+        </div>
+
+        <div class="board">
+          <h3>All three, same mesh, right now</h3>
+          <table class="live">
+            <thead>
+              <tr><th>method</th><th>max ‖⟦u⟧‖</th><th>error</th><th>size</th><th>cond</th></tr>
+            </thead>
+            <tbody id="liveBody"></tbody>
+          </table>
+        </div>
+
+        <div class="plot">
+          <h3>Displacement jump along the seam</h3>
+          <p class="sub">⟦u⟧ = u<sub>A</sub> − u<sub>B</sub> at each tied node pair. Axis rescales; watch the exponent.</p>
+          <div class="cwrap"><canvas id="cJump"></canvas></div>
+          <div class="leg">
+            <span style="color:var(--pen)"><i class="sw"></i>penalty</span>
+            <span style="color:var(--nit)"><i class="sw"></i>Nitsche</span>
+            <span style="color:var(--lag)"><i class="sw"></i>Lagrange</span>
+          </div>
+        </div>
+
+        <div class="plot">
+          <h3>Interface traction recovered</h3>
+          <p class="sub">Given a good θ, all three return the same traction t<sub>x</sub> on the seam.</p>
+          <div class="cwrap"><canvas id="cTrac"></canvas></div>
+          <div class="leg">
+            <span style="color:var(--pen)"><i class="sw"></i>−α⟦u⟧</span>
+            <span style="color:var(--lag)"><i class="sw"></i>λ</span>
+            <span style="color:var(--nit)"><i class="sw"></i>Nitsche flux</span>
+            <span style="color:#1c2430"><i class="sw dash"></i>σxx, conforming</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="bar">
+      <p id="eq">—</p>
+
+      <div class="seg" role="group" aria-label="Constraint method">
+        <button type="button" id="mPen" class="on pen">Penalty</button>
+        <button type="button" id="mLag">Lagrange</button>
+        <button type="button" id="mNit">Nitsche</button>
+      </div>
+
+      <label>interface stiffness θ = 10<sup id="thLabel">0</sup>
+        <input id="thSlide" type="range" min="-200" max="1600" step="25" value="0" />
+      </label>
+
+      <label>stiffness ratio E₂/E₁ = <span id="ctLabel">1</span>
+        <input id="ctSlide" type="range" min="0" max="300" step="25" value="0" />
+      </label>
+
+      <label>display scale ×<span id="scLabel">18</span>
+        <input id="scSlide" type="range" min="1" max="40" value="18" />
+      </label>
+
+      <div class="presets">
+        <button type="button" id="pWeak">Weak tie</button>
+        <button type="button" id="pGood">Good tie</button>
+        <button type="button" id="pTooStiff">Too stiff</button>
+      </div>
+
+      <details class="more">
+        <summary>More controls</summary>
+        <div class="more-row">
+          <label>load
+            <select id="loadSel">
+              <option value="stretch" selected>uniaxial stretch</option>
+              <option value="bend">shear panel</option>
+            </select>
+          </label>
+          <label>colour by
+            <select id="fieldSel">
+              <option value="umag" selected>|u| — shows the jump</option>
+              <option value="sxx">σxx</option>
+              <option value="syy">σyy</option>
+              <option value="sxy">σxy</option>
+              <option value="vm">von Mises</option>
+            </select>
+          </label>
+          <label>mesh
+            <input id="reSlide" type="range" min="1" max="5" value="3" />
+            <span id="reLabel">7×9</span>
+          </label>
+          <label class="chk"><input id="cbMesh" type="checkbox" checked /> element edges</label>
+          <label class="chk"><input id="cbUndef" type="checkbox" checked /> undeformed outline</label>
+          <label class="chk"><input id="cbSeam" type="checkbox" checked /> seam node markers</label>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="figwrap">
+    <h2>Sweeping the interface stiffness</h2>
+    <p class="figcap">
+      The whole model is re-solved at every θ on the axis, on the mesh you have selected, and compared with the
+      <b>conforming reference</b>: the identical mesh with the seam nodes merged, which is what the tie is trying to reproduce.
+      Lagrange has no θ, so it is a horizontal line. The shaded band is where the Nitsche matrix stops being positive definite.
+    </p>
+    <div class="fig">
+      <div class="fig-plots">
+        <div class="fig-cell">
+          <h3>A · accuracy</h3>
+          <p class="sub">Relative displacement error against the conforming reference. Lower is better.</p>
+          <canvas id="cErr"></canvas>
+        </div>
+        <div class="fig-cell">
+          <h3>B · conditioning</h3>
+          <p class="sub">Estimated condition number of the matrix that actually gets factorised.</p>
+          <canvas id="cCond"></canvas>
+        </div>
+        <div class="fig-cell">
+          <h3>C · the trade-off</h3>
+          <p class="sub">Accuracy plotted against conditioning. Down and to the left is better.</p>
+          <canvas id="cTrade"></canvas>
+        </div>
+      </div>
+      <div id="sweepnote">—</div>
+    </div>
+  </div>
+
+  <div class="prose">
+    <h2>One constraint, three ways to enforce it</h2>
+    <p>
+      The model above is two rectangular blocks of plane-strain Q4 elements meeting at \(x = W/2\). The two meshes line up
+      geometrically, but the nodes on the seam are <em>duplicated</em>: node \(a\) belongs to the left block, node \(b\) to
+      the right block, and nothing in the assembled stiffness matrix connects them. Solve as-is and you get two
+      independent bodies. What we want is the displacement to be continuous across the seam,
+    </p>
+    <p style="text-align:center">\[ [\![\mathbf u]\!] \;=\; \mathbf u_A - \mathbf u_B \;=\; \mathbf 0 \qquad\text{on }\Gamma, \]</p>
+    <p>
+      which in discrete form is a set of linear rows acting on the degrees of freedom, \(\mathbf C\mathbf u = \mathbf g\),
+      with \(\mathbf g = \mathbf 0\) here. That is the same algebraic object as a fixed support, a rigid tie, a periodic
+      boundary condition, or a mortar continuity condition. How you enforce those rows is the entire subject.
+    </p>
+    <p>
+      This matters well beyond two glued rectangles. Non-matching meshes between parts of an assembly, embedded and cut-cell
+      methods where the boundary does not follow element faces, contact between bodies, and weakly imposed Dirichlet data are
+      all the same question wearing different clothes.
+    </p>
+
+    <div class="grid3">
+      <div class="card pen">
+        <h3>Penalty</h3>
+        <ul>
+          <li>Add a stiff spring across the seam and stay on the original unknowns.</li>
+          <li>Simplest to implement — a few lines of assembly.</li>
+          <li>Matrix stays symmetric positive definite.</li>
+          <li>The constraint is <em>never</em> satisfied exactly.</li>
+          <li>Accuracy and conditioning pull in opposite directions.</li>
+        </ul>
+      </div>
+      <div class="card lag">
+        <h3>Lagrange multipliers</h3>
+        <ul>
+          <li>Add unknowns λ whose job is to enforce the rows exactly.</li>
+          <li>The tie is satisfied to machine precision, at any mesh.</li>
+          <li>λ comes out of the solve as the interface traction.</li>
+          <li>The system grows and becomes indefinite.</li>
+          <li>The multiplier space must be inf–sup stable.</li>
+        </ul>
+      </div>
+      <div class="card nit">
+        <h3>Nitsche</h3>
+        <ul>
+          <li>Penalty plus two consistency terms from integration by parts.</li>
+          <li>No extra unknowns; same sparsity as penalty.</li>
+          <li>Variationally consistent — the exact solution satisfies it.</li>
+          <li>Accurate at a modest parameter, so conditioning stays sane.</li>
+          <li>Below a critical β it loses positive definiteness.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>The penalty method</h2>
+    <p>
+      Append a quadratic term to the potential energy that charges for any opening of the seam. For a tied node pair
+      the term is \(\tfrac12\alpha\,\lVert\mathbf u_A - \mathbf u_B\rVert^2\), and its second derivative is a small
+      \(4\times4\) block scattered into the global matrix:
+    </p>
+    <p style="text-align:center">\[ \mathbf K \;\leftarrow\; \mathbf K + \alpha\begin{bmatrix}\mathbf I & -\mathbf I\\ -\mathbf I & \mathbf I\end{bmatrix},\qquad\text{globally}\qquad (\mathbf K + \alpha\,\mathbf C^{\mathsf T}\mathbf C)\,\mathbf u = \mathbf f + \alpha\,\mathbf C^{\mathsf T}\mathbf g. \]</p>
+    <p>
+      Nothing about the unknown vector changes, and if \(\mathbf K\) was positive definite it stays positive definite —
+      you can keep using Cholesky or conjugate gradients. That is why the penalty method is everywhere.
+    </p>
+    <p>
+      The cost is that \(\alpha\) is a lie you tell the model. The seam is not tied; it is glued with a very stiff spring,
+      and the residual opening is \(O(1/\alpha)\). Drag θ in the figure and watch the jump fall by exactly one decade per
+      decade of θ, with the error following. So push \(\alpha\) up. But the condition number rises one decade per decade too,
+      and once \(\kappa\) approaches \(1/\varepsilon_{\text{mach}} \approx 10^{16}\) the arithmetic stops delivering the digits
+      the formulation promises. Panel A shows the resulting valley: the error falls, bottoms out around \(\theta \sim 10^{6}\),
+      and then <em>climbs back up</em>. Past the bottom you are paying in round-off for a constraint you cannot actually resolve.
+    </p>
+    <div class="note">
+      <b>Choosing α is not scale-free.</b> A bare number like <code>1e6</code> is meaningless — it must carry units of
+      stiffness. Here the slider sets \(\alpha = \theta\,E_{\max}\) per tied node, which is the nodal equivalent of an
+      interface stiffness \(\gamma = \theta\,E_{\max}/h\) spread over the seam. Scaling with the stiffest neighbouring
+      material and with the local mesh size is what makes the same θ behave the same way on a coarse and a fine mesh.
+    </div>
+
+    <h2>Lagrange multipliers</h2>
+    <p>
+      Instead of approximating the constraint, add unknowns that enforce it. Make the potential stationary with respect to
+      both \(\mathbf u\) and a new vector \(\boldsymbol\lambda\), one multiplier per constraint row:
+    </p>
+    <p style="text-align:center">\[ \Pi(\mathbf u,\boldsymbol\lambda) = \tfrac12\mathbf u^{\mathsf T}\mathbf K\mathbf u - \mathbf u^{\mathsf T}\mathbf f + \boldsymbol\lambda^{\mathsf T}(\mathbf C\mathbf u - \mathbf g) \;\Longrightarrow\; \begin{bmatrix}\mathbf K & \mathbf C^{\mathsf T}\\ \mathbf C & \mathbf 0\end{bmatrix}\begin{bmatrix}\mathbf u\\ \boldsymbol\lambda\end{bmatrix} = \begin{bmatrix}\mathbf f\\ \mathbf g\end{bmatrix}. \]</p>
+    <p>
+      The bottom block row <em>is</em> the constraint, so it holds exactly — the reported jump is at the level of machine
+      round-off, and it stays there no matter how the mesh or the materials change. There is no parameter to choose.
+      The multipliers are not bookkeeping either: \(\boldsymbol\lambda\) is the reaction that enforces the tie, so dividing
+      it by the tributary length of each node recovers the interface traction. In the traction panel it lands on top of the
+      \(\sigma_{xx}\) recovered independently from the volume elements.
+    </p>
+    <p>
+      What you give up is the character of the matrix. The zero block on the diagonal makes the system a
+      <em>saddle point</em> problem: symmetric but indefinite. With \(m\) constraint rows the augmented matrix has exactly
+      \(m\) negative eigenvalues, which the live table reports. A Cholesky factorisation will fail on it, and conjugate
+      gradients is not applicable — you need LDLᵀ with pivoting, MINRES, or a block-preconditioned Krylov method. The system
+      is also larger, by two unknowns per tied node here.
+    </p>
+    <p>
+      One more caveat that this example is too well-behaved to show: the multiplier space cannot be chosen freely. If λ is
+      richer than the trace of the displacement space can support, the discrete inf–sup (LBB) condition fails and the
+      constraint over-determines the problem, producing locking or a singular system. With matching meshes and one multiplier
+      per node pair, as here, the pairing is stable. On genuinely non-matching meshes it is the central difficulty, and it is
+      what mortar methods exist to solve.
+    </p>
+
+    <h2>Nitsche's method</h2>
+    <p>
+      Nitsche's method keeps the penalty term but repairs what makes penalty wrong. Derive the weak form honestly: integrating
+      by parts over two subdomains leaves a flux term on the seam, \(\int_\Gamma [\![\mathbf v]\!]\cdot\langle\boldsymbol\sigma(\mathbf u)\mathbf n\rangle\),
+      which the penalty method simply discards. Put it back, add its symmetric twin so the matrix stays symmetric, and keep a
+      stabilising penalty:
+    </p>
+    <p style="text-align:center">\[ a_N(\mathbf u,\mathbf v) = \underbrace{\int_\Omega \boldsymbol\sigma(\mathbf u):\boldsymbol\varepsilon(\mathbf v)\,d\Omega}_{\text{volume}} \;-\; \underbrace{\int_\Gamma [\![\mathbf v]\!]\cdot\langle\boldsymbol\sigma(\mathbf u)\mathbf n\rangle\,d\Gamma}_{\text{consistency}} \;-\; \underbrace{\int_\Gamma [\![\mathbf u]\!]\cdot\langle\boldsymbol\sigma(\mathbf v)\mathbf n\rangle\,d\Gamma}_{\text{symmetry}} \;+\; \underbrace{\gamma\int_\Gamma [\![\mathbf u]\!]\cdot[\![\mathbf v]\!]\,d\Gamma}_{\text{stabilisation}} \]</p>
+    <p>
+      with \(\langle\cdot\rangle\) the average across the seam and \(\gamma = \beta\,E_{\max}/h\). The name for what the extra
+      terms buy is <b>variational consistency</b>: substitute the exact solution and the identity holds, because the exact
+      solution has zero jump (killing the last two terms) and continuous traction (the first seam term balancing the volume
+      integration by parts). The penalty method fails this test for every finite \(\alpha\).
+    </p>
+    <p>
+      That is not an abstraction, and the figure will show it to you. Set the stiffness ratio to 1 and the load to uniaxial
+      stretch. Now the exact solution — uniform strain in each block — lies inside the Q4 space, so a consistent method must
+      reproduce it exactly. Nitsche returns it to fourteen digits at <em>every</em> β it remains stable at, with a condition
+      number around \(10^4\); penalty at the same parameter is wrong in the second decimal place, and would need
+      \(\kappa\sim10^{16}\) to catch up — by which point round-off has already taken the digits back. Add a stiffness contrast
+      or switch to the shear panel and neither method is exact any more, but Nitsche stays roughly an order of magnitude more
+      accurate at equal θ, and it gets there on a better-conditioned matrix. That is the comparison in panel C.
+    </p>
+    <p>
+      Nitsche's price is β. The two consistency terms are not sign-definite, so they can eat the coercivity of the volume term;
+      the penalty term is what holds the form coercive, and it only does so above a critical \(\beta_{\text{crit}}\) determined
+      by a discrete trace inequality. Below it the matrix acquires negative eigenvalues. A direct solver may still hand you a
+      plausible-looking answer — the live table will show it doing exactly that — but the formulation has lost its stability
+      guarantee and Cholesky and CG are off the table. The useful part is that \(\beta_{\text{crit}}\) depends on the element
+      type and polynomial degree, <em>not</em> on \(h\): refine the mesh in the controls and watch the shaded band stay put.
+      That is why a fixed, modest β such as the 64 used in the source scripts is safe across a mesh study, whereas a penalty
+      α must be re-argued every time.
+    </p>
+
+    <h2>Which one to reach for</h2>
+    <table class="cmp">
+      <thead><tr><th>&nbsp;</th><th>Penalty</th><th>Lagrange</th><th>Nitsche</th></tr></thead>
+      <tbody>
+        <tr><td>Constraint satisfied</td><td>approximately, \(O(1/\alpha)\)</td><td>exactly</td><td>approximately, but consistently</td></tr>
+        <tr><td>Extra unknowns</td><td>none</td><td>one per constraint row</td><td>none</td></tr>
+        <tr><td>Matrix character</td><td>symmetric positive definite</td><td>symmetric indefinite (saddle point)</td><td>SPD if \(\beta>\beta_{\text{crit}}\)</td></tr>
+        <tr><td>Free parameter</td><td>α — and the answer depends on it</td><td>none</td><td>β — mesh-independent, easy to pick</td></tr>
+        <tr><td>Conditioning</td><td>grows like α</td><td>modest</td><td>modest at working β</td></tr>
+        <tr><td>Interface traction</td><td>\(-\alpha[\![\mathbf u]\!]\): a tiny difference times a huge number</td><td>λ, straight out of the solve</td><td>\(\langle\boldsymbol\sigma\mathbf n\rangle-\gamma[\![\mathbf u]\!]\)</td></tr>
+        <tr><td>Main failure mode</td><td>round-off when α is pushed</td><td>inf–sup instability, indefinite solve</td><td>β below the coercivity threshold</td></tr>
+        <tr><td>Sensible default for</td><td>quick ties, contact, explicit dynamics</td><td>exact ties, reactions, mortar</td><td>embedded/cut meshes, weak Dirichlet, DG</td></tr>
+      </tbody>
+    </table>
+    <p>
+      In practice the augmented Lagrangian method sits between the first two: iterate the penalty solve while updating a
+      multiplier estimate, and the constraint converges to machine precision without ever needing \(\alpha\) large enough to
+      wreck the conditioning. It is the standard choice in contact mechanics, where the constraint set is an inequality that
+      changes from iteration to iteration and the exactness of Lagrange is wanted without a growing indefinite system.
+    </p>
+
+    <h2>What is actually being computed</h2>
+    <p>
+      Everything on this page is solved in your browser when you move a control — there is no precomputed data. Each update
+      assembles the plane-strain Q4 stiffness for both blocks, applies the interface treatment, eliminates the prescribed
+      degrees of freedom, and factorises the result with LU and partial pivoting. Alongside it the same mesh is solved with
+      the seam nodes merged, which is the conforming discretisation the tie is trying to reproduce and the reference every
+      error is measured against. The condition number comes from Hager's 1-norm estimator applied to the LU factors, and the
+      eigenvalue signs from the diagonal of an LDLᵀ factorisation, which is why the table can state whether a matrix is
+      positive definite rather than guessing.
+    </p>
+    <p>
+      The formulation follows a set of MATLAB research scripts one-for-one — <code>PFEM_two_block_penalty.m</code>,
+      <code>PFEM_two_block_lagrange.m</code>, <code>PFEM_two_block_nitsche.m</code> and the
+      <code>assemble_interface_*</code> routines they call. The mesh generator duplicates the seam nodes exactly the way
+      <code>meshTwoBlocksQ4.m</code> does, the Nitsche terms use the same \(\mathbf n=[1,0]\) convention and the same
+      \(\gamma=\beta E_{\max}/h\) scaling, and the geometry is a rectangle split in half with the left edge held and the right
+      edge driven. Two things are deliberately different: the aspect ratio is landscape so the seam reads clearly on screen,
+      and the default load is a stretch rather than a compression so the seam opens toward you instead of interpenetrating.
+    </p>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>Mechanics Reference</span>
+    <span><a href="hub.html#constrained-fem">Constrained FEM</a> · <a href="hub.html">Library</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================================
+     1.  Dense linear algebra
+     ========================================================================= */
+
+  function norm1(A, n) {
+    var m = 0, i, j, s;
+    for (j = 0; j < n; j++) { s = 0; for (i = 0; i < n; i++) s += Math.abs(A[i * n + j]); if (s > m) m = s; }
+    return m;
+  }
+
+  function luFactor(A, n) {
+    var piv = new Int32Array(n), i, j, k, p, maxv, tmp, v, m, akk;
+    for (i = 0; i < n; i++) piv[i] = i;
+    for (k = 0; k < n; k++) {
+      p = k; maxv = Math.abs(A[k * n + k]);
+      for (i = k + 1; i < n; i++) { v = Math.abs(A[i * n + k]); if (v > maxv) { maxv = v; p = i; } }
+      if (maxv === 0) A[k * n + k] = 1e-300;
+      if (p !== k) {
+        for (j = 0; j < n; j++) { tmp = A[k * n + j]; A[k * n + j] = A[p * n + j]; A[p * n + j] = tmp; }
+        tmp = piv[k]; piv[k] = piv[p]; piv[p] = tmp;
+      }
+      akk = A[k * n + k];
+      for (i = k + 1; i < n; i++) {
+        m = A[i * n + k] / akk;
+        A[i * n + k] = m;
+        if (m !== 0) for (j = k + 1; j < n; j++) A[i * n + j] -= m * A[k * n + j];
+      }
+    }
+    return { LU: A, piv: piv, n: n };
+  }
+
+  function luSolve(F, b) {
+    var n = F.n, LU = F.LU, piv = F.piv, x = new Float64Array(n), i, k, s;
+    for (i = 0; i < n; i++) x[i] = b[piv[i]];
+    for (i = 1; i < n; i++) { s = x[i]; for (k = 0; k < i; k++) s -= LU[i * n + k] * x[k]; x[i] = s; }
+    for (i = n - 1; i >= 0; i--) { s = x[i]; for (k = i + 1; k < n; k++) s -= LU[i * n + k] * x[k]; x[i] = s / LU[i * n + i]; }
+    return x;
+  }
+
+  function luSolveT(F, b) {
+    var n = F.n, LU = F.LU, piv = F.piv, i, k, s;
+    var z = new Float64Array(n), w = new Float64Array(n), x = new Float64Array(n);
+    for (i = 0; i < n; i++) { s = b[i]; for (k = 0; k < i; k++) s -= LU[k * n + i] * z[k]; z[i] = s / LU[i * n + i]; }
+    for (i = n - 1; i >= 0; i--) { s = z[i]; for (k = i + 1; k < n; k++) s -= LU[k * n + i] * w[k]; w[i] = s; }
+    for (i = 0; i < n; i++) x[piv[i]] = w[i];
+    return x;
+  }
+
+  /* Hager's 1-norm estimator for cond_1(A) */
+  function condEst1(F, normA) {
+    var n = F.n, x = new Float64Array(n), xi = new Float64Array(n), i, it, y, z, ny, zmax, jmax, ztx, a, est = 0;
+    for (i = 0; i < n; i++) x[i] = 1 / n;
+    for (it = 0; it < 5; it++) {
+      y = luSolve(F, x);
+      ny = 0; for (i = 0; i < n; i++) ny += Math.abs(y[i]);
+      est = ny;
+      for (i = 0; i < n; i++) xi[i] = y[i] >= 0 ? 1 : -1;
+      z = luSolveT(F, xi);
+      zmax = -1; jmax = 0;
+      for (i = 0; i < n; i++) { a = Math.abs(z[i]); if (a > zmax) { zmax = a; jmax = i; } }
+      ztx = 0; for (i = 0; i < n; i++) ztx += z[i] * x[i];
+      if (zmax <= ztx) break;
+      for (i = 0; i < n; i++) x[i] = 0;
+      x[jmax] = 1;
+    }
+    return normA * est;
+  }
+
+  /* LDL^T without pivoting -> eigenvalue signs (Sylvester's law of inertia) */
+  function inertia(A, n) {
+    var L = new Float64Array(n * n), d = new Float64Array(n), i, j, k, s;
+    for (j = 0; j < n; j++) {
+      s = A[j * n + j];
+      for (k = 0; k < j; k++) s -= L[j * n + k] * L[j * n + k] * d[k];
+      d[j] = s;
+      L[j * n + j] = 1;
+      for (i = j + 1; i < n; i++) {
+        s = A[i * n + j];
+        for (k = 0; k < j; k++) s -= L[i * n + k] * L[j * n + k] * d[k];
+        L[i * n + j] = Math.abs(d[j]) < 1e-300 ? 0 : s / d[j];
+      }
+    }
+    var pos = 0, neg = 0;
+    for (i = 0; i < n; i++) { if (d[i] > 0) pos++; else if (d[i] < 0) neg++; }
+    return { pos: pos, neg: neg };
+  }
+
+  /* =========================================================================
+     2.  Q4 element machinery
+     ========================================================================= */
+
+  var G1 = 1 / Math.sqrt(3);
+  var GP = [[-G1, -G1], [G1, -G1], [G1, G1], [-G1, G1]];
+
+  function q4N(xi, eta) {
+    return [0.25 * (1 - xi) * (1 - eta), 0.25 * (1 + xi) * (1 - eta),
+            0.25 * (1 + xi) * (1 + eta), 0.25 * (1 - xi) * (1 + eta)];
+  }
+  function q4dN(xi, eta) {
+    return [[-0.25 * (1 - eta), -0.25 * (1 - xi)], [0.25 * (1 - eta), -0.25 * (1 + xi)],
+            [0.25 * (1 + eta), 0.25 * (1 + xi)], [-0.25 * (1 + eta), 0.25 * (1 - xi)]];
+  }
+  /* plane strain: returns [D11, D12, D33] */
+  function Dmat(E, nu) {
+    var c = E / ((1 + nu) * (1 - 2 * nu));
+    return [c * (1 - nu), c * nu, c * (0.5 - nu)];
+  }
+  function q4B(xe, ye, xi, eta) {
+    var dN = q4dN(xi, eta), a, J00 = 0, J01 = 0, J10 = 0, J11 = 0;
+    for (a = 0; a < 4; a++) {
+      J00 += xe[a] * dN[a][0]; J01 += xe[a] * dN[a][1];
+      J10 += ye[a] * dN[a][0]; J11 += ye[a] * dN[a][1];
+    }
+    var det = J00 * J11 - J01 * J10;
+    var i00 = J11 / det, i01 = -J01 / det, i10 = -J10 / det, i11 = J00 / det;
+    var B = new Float64Array(24);
+    for (a = 0; a < 4; a++) {
+      var dx = dN[a][0] * i00 + dN[a][1] * i10;
+      var dy = dN[a][0] * i01 + dN[a][1] * i11;
+      B[2 * a] = dx;
+      B[8 + 2 * a + 1] = dy;
+      B[16 + 2 * a] = dy;
+      B[16 + 2 * a + 1] = dx;
+    }
+    return { B: B, det: det };
+  }
+
+  /* =========================================================================
+     3.  Meshes
+     ========================================================================= */
+
+  function meshRegion(x0, x1, y0, y1, nnx, nny) {
+    var node = [], el = [], i, j, n0;
+    for (j = 0; j < nny; j++)
+      for (i = 0; i < nnx; i++)
+        node.push([x0 + (x1 - x0) * i / (nnx - 1), y0 + (y1 - y0) * j / (nny - 1)]);
+    for (j = 0; j < nny - 1; j++)
+      for (i = 0; i < nnx - 1; i++) { n0 = j * nnx + i; el.push([n0, n0 + 1, n0 + 1 + nnx, n0 + nnx]); }
+    return { node: node, el: el };
+  }
+
+  /* two blocks meeting at x = W/2 with duplicated seam nodes */
+  function meshTwoBlocks(W, H, nnx, nny) {
+    var L = meshRegion(0, W / 2, 0, H, nnx, nny);
+    var R = meshRegion(W / 2, W, 0, H, nnx, nny);
+    var nL = L.node.length, i, j, k, e;
+    var node = L.node.concat(R.node), el = L.el.slice();
+    for (i = 0; i < R.el.length; i++) { e = R.el[i]; el.push([e[0] + nL, e[1] + nL, e[2] + nL, e[3] + nL]); }
+    var blockId = [];
+    for (i = 0; i < L.el.length; i++) blockId.push(1);
+    for (i = 0; i < R.el.length; i++) blockId.push(2);
+    var pairs = [];
+    for (j = 0; j < nny; j++) pairs.push([j * nnx + (nnx - 1), nL + j * nnx]);
+    var edges = [];
+    for (k = 0; k < nny - 1; k++) edges.push([k * (nnx - 1) + (nnx - 2), L.el.length + k * (nnx - 1)]);
+    return { node: node, el: el, blockId: blockId, pairs: pairs, edges: edges,
+             nL: nL, nnx: nnx, nny: nny, W: W, H: H };
+  }
+
+  /* the conforming reference: same elements, seam nodes merged */
+  function meshMerged(W, H, nnx, nny) {
+    var M = meshRegion(0, W, 0, H, 2 * nnx - 1, nny), blockId = [], i, c;
+    for (i = 0; i < M.el.length; i++) {
+      c = 0.25 * (M.node[M.el[i][0]][0] + M.node[M.el[i][1]][0] + M.node[M.el[i][2]][0] + M.node[M.el[i][3]][0]);
+      blockId.push(c < W / 2 ? 1 : 2);
+    }
+    return { node: M.node, el: M.el, blockId: blockId, nnx: 2 * nnx - 1, nny: nny, W: W, H: H };
+  }
+
+  function mergedIndex(M, k) {
+    var nnx = M.nnx, nxm = 2 * nnx - 1, i, j, kk;
+    if (k < M.nL) { j = Math.floor(k / nnx); i = k % nnx; }
+    else { kk = k - M.nL; j = Math.floor(kk / nnx); i = (kk % nnx) + nnx - 1; }
+    return j * nxm + i;
+  }
+
+  /* =========================================================================
+     4.  Assembly
+     ========================================================================= */
+
+  function assembleVolume(M, mats, ndof) {
+    var K = new Float64Array(ndof * ndof);
+    var iel, q, a, p, r, sctr, xe, ye, D, ke, bd, B, det, s1, s2, s3, sB;
+    for (iel = 0; iel < M.el.length; iel++) {
+      sctr = M.el[iel];
+      xe = [M.node[sctr[0]][0], M.node[sctr[1]][0], M.node[sctr[2]][0], M.node[sctr[3]][0]];
+      ye = [M.node[sctr[0]][1], M.node[sctr[1]][1], M.node[sctr[2]][1], M.node[sctr[3]][1]];
+      D = mats[M.blockId[iel] - 1];
+      ke = new Float64Array(64);
+      for (q = 0; q < 4; q++) {
+        bd = q4B(xe, ye, GP[q][0], GP[q][1]); B = bd.B; det = bd.det;
+        for (p = 0; p < 8; p++) {
+          s1 = D[0] * B[p] + D[1] * B[8 + p];
+          s2 = D[1] * B[p] + D[0] * B[8 + p];
+          s3 = D[2] * B[16 + p];
+          for (r = 0; r < 8; r++) ke[p * 8 + r] += (B[r] * s1 + B[8 + r] * s2 + B[16 + r] * s3) * det;
+        }
+      }
+      sB = [];
+      for (a = 0; a < 4; a++) { sB.push(2 * sctr[a]); sB.push(2 * sctr[a] + 1); }
+      for (p = 0; p < 8; p++) for (r = 0; r < 8; r++) K[sB[p] * ndof + sB[r]] += ke[p * 8 + r];
+    }
+    return K;
+  }
+
+  var PEN_BLK = [1, 0, -1, 0, 0, 1, 0, -1, -1, 0, 1, 0, 0, -1, 0, 1];
+  function addPenalty(K, ndof, pairs, alpha) {
+    var k, na, nb, d, p, r;
+    for (k = 0; k < pairs.length; k++) {
+      na = pairs[k][0]; nb = pairs[k][1];
+      d = [2 * na, 2 * na + 1, 2 * nb, 2 * nb + 1];
+      for (p = 0; p < 4; p++) for (r = 0; r < 4; r++) K[d[p] * ndof + d[r]] += alpha * PEN_BLK[p * 4 + r];
+    }
+  }
+
+  function addNitsche(K, ndof, M, mats, Es, beta) {
+    var gw = [1, 1], gx = [-G1, G1], e, iq, a, i, p, r;
+    for (e = 0; e < M.edges.length; e++) {
+      var ielL = M.edges[e][0], ielR = M.edges[e][1];
+      var sL = M.el[ielL], sR = M.el[ielR];
+      var DL = mats[M.blockId[ielL] - 1], DR = mats[M.blockId[ielR] - 1];
+      var EL = Es[M.blockId[ielL] - 1], ER = Es[M.blockId[ielR] - 1];
+      var xL = [], yL = [], xR = [], yR = [];
+      for (a = 0; a < 4; a++) {
+        xL.push(M.node[sL[a]][0]); yL.push(M.node[sL[a]][1]);
+        xR.push(M.node[sR[a]][0]); yR.push(M.node[sR[a]][1]);
+      }
+      var dxE = xL[2] - xL[1], dyE = yL[2] - yL[1];
+      var hEdge = Math.sqrt(dxE * dxE + dyE * dyE);
+      var gam = beta * Math.max(EL, ER) / hEdge;
+
+      var sctr = [];
+      for (a = 0; a < 4; a++) { sctr.push(2 * sL[a]); sctr.push(2 * sL[a] + 1); }
+      for (a = 0; a < 4; a++) { sctr.push(2 * sR[a]); sctr.push(2 * sR[a] + 1); }
+
+      for (iq = 0; iq < 2; iq++) {
+        var eta = gx[iq];
+        var NL = q4N(1, eta), NR = q4N(-1, eta);
+        var bL = q4B(xL, yL, 1, eta), bR = q4B(xR, yR, -1, eta);
+        var dNl = q4dN(1, eta), tx = 0, ty = 0;
+        for (a = 0; a < 4; a++) { tx += xL[a] * dNl[a][1]; ty += yL[a] * dNl[a][1]; }
+        var Jline = Math.sqrt(tx * tx + ty * ty);
+
+        var Jmp = new Float64Array(32), Tu = new Float64Array(32);
+        for (a = 0; a < 4; a++) {
+          Jmp[2 * a] = NL[a];
+          Jmp[16 + 2 * a + 1] = NL[a];
+          Jmp[8 + 2 * a] = -NR[a];
+          Jmp[16 + 8 + 2 * a + 1] = -NR[a];
+        }
+        for (i = 0; i < 8; i++) {
+          Tu[i] = 0.5 * (DL[0] * bL.B[i] + DL[1] * bL.B[8 + i]);
+          Tu[16 + i] = 0.5 * (DL[2] * bL.B[16 + i]);
+          Tu[8 + i] = 0.5 * (DR[0] * bR.B[i] + DR[1] * bR.B[8 + i]);
+          Tu[16 + 8 + i] = 0.5 * (DR[2] * bR.B[16 + i]);
+        }
+        var wgt = gw[iq] * Jline;
+        for (p = 0; p < 16; p++) {
+          for (r = 0; r < 16; r++) {
+            var v = gam * (Jmp[p] * Jmp[r] + Jmp[16 + p] * Jmp[16 + r])
+                  - (Jmp[p] * Tu[r] + Jmp[16 + p] * Tu[16 + r])
+                  - (Tu[p] * Jmp[r] + Tu[16 + p] * Jmp[16 + r]);
+            K[sctr[p] * ndof + sctr[r]] += wgt * v;
+          }
+        }
+      }
+    }
+  }
+
+  /* =========================================================================
+     5.  Boundary conditions and solve
+     ========================================================================= */
+
+  function makeBC(M, load, uPre) {
+    var idx = [], val = [], i, tol = 1e-9 * M.W, W = M.W;
+    for (i = 0; i < M.node.length; i++) {
+      var x = M.node[i][0], y = M.node[i][1];
+      if (Math.abs(x) < tol) {
+        if (load === 'bend') { idx.push(2 * i); val.push(0); idx.push(2 * i + 1); val.push(0); }
+        else {
+          idx.push(2 * i); val.push(0);
+          if (Math.abs(y) < tol) { idx.push(2 * i + 1); val.push(0); }
+        }
+      } else if (Math.abs(x - W) < tol) {
+        if (load === 'bend') { idx.push(2 * i); val.push(0); idx.push(2 * i + 1); val.push(uPre); }
+        else { idx.push(2 * i); val.push(uPre); }
+      }
+    }
+    return { idx: idx, val: val };
+  }
+
+  function solveSystem(K, ndofTot, bc, want) {
+    var isFix = new Uint8Array(ndofTot), uFix = new Float64Array(ndofTot), i, j;
+    for (i = 0; i < bc.idx.length; i++) { isFix[bc.idx[i]] = 1; uFix[bc.idx[i]] = bc.val[i]; }
+    var map = new Int32Array(ndofTot), nf = 0;
+    for (i = 0; i < ndofTot; i++) map[i] = isFix[i] ? -1 : nf++;
+    var A = new Float64Array(nf * nf), b = new Float64Array(nf), mi, s, kij;
+    for (i = 0; i < ndofTot; i++) {
+      mi = map[i];
+      if (mi < 0) continue;
+      s = 0;
+      for (j = 0; j < ndofTot; j++) {
+        kij = K[i * ndofTot + j];
+        if (kij === 0) continue;
+        if (map[j] >= 0) A[mi * nf + map[j]] = kij; else s -= kij * uFix[j];
+      }
+      b[mi] = s;
+    }
+    var nA = want ? norm1(A, nf) : 0;
+    var inrt = want ? inertia(A, nf) : null;
+    var F = luFactor(A, nf);
+    var xf = luSolve(F, b);
+    var u = new Float64Array(ndofTot);
+    for (i = 0; i < ndofTot; i++) u[i] = map[i] >= 0 ? xf[map[i]] : uFix[i];
+    return { u: u, cond: want ? condEst1(F, nA) : 0, nfree: nf, inertia: inrt };
+  }
+
+  /* =========================================================================
+     6.  Stress recovery and drivers
+     ========================================================================= */
+
+  function recoverStress(M, u, mats) {
+    var nn = M.node.length;
+    var sxx = new Float64Array(nn), syy = new Float64Array(nn), sxy = new Float64Array(nn), cnt = new Float64Array(nn);
+    var iel, q, a, sctr, xe, ye, D, bd, B, ex, ey, gxy, i, ax, ay, as, ux, uy;
+    for (iel = 0; iel < M.el.length; iel++) {
+      sctr = M.el[iel];
+      xe = [M.node[sctr[0]][0], M.node[sctr[1]][0], M.node[sctr[2]][0], M.node[sctr[3]][0]];
+      ye = [M.node[sctr[0]][1], M.node[sctr[1]][1], M.node[sctr[2]][1], M.node[sctr[3]][1]];
+      D = mats[M.blockId[iel] - 1];
+      ax = 0; ay = 0; as = 0;
+      for (q = 0; q < 4; q++) {
+        bd = q4B(xe, ye, GP[q][0], GP[q][1]); B = bd.B;
+        ex = 0; ey = 0; gxy = 0;
+        for (a = 0; a < 4; a++) {
+          ux = u[2 * sctr[a]]; uy = u[2 * sctr[a] + 1];
+          ex += B[2 * a] * ux;
+          ey += B[8 + 2 * a + 1] * uy;
+          gxy += B[16 + 2 * a] * ux + B[16 + 2 * a + 1] * uy;
+        }
+        ax += D[0] * ex + D[1] * ey;
+        ay += D[1] * ex + D[0] * ey;
+        as += D[2] * gxy;
+      }
+      ax /= 4; ay /= 4; as /= 4;
+      for (a = 0; a < 4; a++) { i = sctr[a]; sxx[i] += ax; syy[i] += ay; sxy[i] += as; cnt[i] += 1; }
+    }
+    for (i = 0; i < nn; i++) if (cnt[i] > 0) { sxx[i] /= cnt[i]; syy[i] /= cnt[i]; sxy[i] /= cnt[i]; }
+    return { sxx: sxx, syy: syy, sxy: sxy };
+  }
+
+  function maxGap(u, pairs) {
+    var v = 0, k, a, b, dx, dy;
+    for (k = 0; k < pairs.length; k++) {
+      a = pairs[k][0]; b = pairs[k][1];
+      dx = u[2 * a] - u[2 * b]; dy = u[2 * a + 1] - u[2 * b + 1];
+      v = Math.max(v, Math.sqrt(dx * dx + dy * dy));
+    }
+    return v;
+  }
+
+  var P = { W: 4, H: 2, nu: 0.2, E1: 100 };
+
+  function solveMethod(M, mats, Es, method, theta, bc, want) {
+    var ndof = 2 * M.node.length, out = {};
+    if (method === 'lagrange') {
+      var np = M.pairs.length, m = 2 * np, nt = ndof + m, i, j, k;
+      var Ka = new Float64Array(nt * nt);
+      var Kv = assembleVolume(M, mats, ndof);
+      for (i = 0; i < ndof; i++) for (j = 0; j < ndof; j++) Ka[i * nt + j] = Kv[i * ndof + j];
+      for (k = 0; k < np; k++) {
+        var na = M.pairs[k][0], nb = M.pairs[k][1];
+        var rx = ndof + 2 * k, ry = ndof + 2 * k + 1;
+        Ka[rx * nt + 2 * na] = 1; Ka[rx * nt + 2 * nb] = -1;
+        Ka[ry * nt + 2 * na + 1] = 1; Ka[ry * nt + 2 * nb + 1] = -1;
+        Ka[(2 * na) * nt + rx] = 1; Ka[(2 * nb) * nt + rx] = -1;
+        Ka[(2 * na + 1) * nt + ry] = 1; Ka[(2 * nb + 1) * nt + ry] = -1;
+      }
+      var s = solveSystem(Ka, nt, bc, want);
+      out.u = s.u.subarray(0, ndof);
+      out.lambda = s.u.subarray(ndof);
+      out.cond = s.cond; out.n = s.nfree; out.inertia = s.inertia;
+    } else {
+      var K = assembleVolume(M, mats, ndof);
+      if (method === 'penalty') addPenalty(K, ndof, M.pairs, theta * Math.max(Es[0], Es[1]));
+      else addNitsche(K, ndof, M, mats, Es, theta);
+      var s2 = solveSystem(K, ndof, bc, want);
+      out.u = s2.u; out.lambda = null; out.cond = s2.cond; out.n = s2.nfree; out.inertia = s2.inertia;
+    }
+    out.gap = maxGap(out.u, M.pairs);
+    return out;
+  }
+
+  function relError(M, u, ref) {
+    var num = 0, den = 0, k, im, dx, dy;
+    for (k = 0; k < M.node.length; k++) {
+      im = mergedIndex(M, k);
+      dx = u[2 * k] - ref.u[2 * im];
+      dy = u[2 * k + 1] - ref.u[2 * im + 1];
+      num += dx * dx + dy * dy;
+      den += ref.u[2 * im] * ref.u[2 * im] + ref.u[2 * im + 1] * ref.u[2 * im + 1];
+    }
+    return Math.sqrt(num / Math.max(den, 1e-300));
+  }
+
+  /* =========================================================================
+     7.  State
+     ========================================================================= */
+
+  var MESHES = [[5, 5], [6, 7], [7, 9], [9, 11], [11, 13]];
+
+  var S = {
+    method: 'penalty',
+    logTheta: 0,
+    contrast: 1,
+    refine: 3,
+    scale: 18,
+    load: 'stretch',
+    field: 'umag',
+    showMesh: true, showUndef: true, showSeam: true
+  };
+
+  var cache = null;   /* mesh/material/load dependent */
+  var cur = null;     /* current solutions */
+  var sweep = null;   /* sweep results */
+
+  function uPre() { return S.load === 'bend' ? 0.1 : 0.05; }
+
+  /* The shear panel moves an order of magnitude more than the stretch, so the
+     honest "×N" exaggeration has to start from a different N. */
+  var SCALE_DEFAULT = { stretch: 18, bend: 5 };
+
+  function buildCache() {
+    var mk = MESHES[S.refine - 1], nnx = mk[0], nny = mk[1];
+    var E1 = P.E1, E2 = P.E1 * S.contrast;
+    var mats = [Dmat(E1, P.nu), Dmat(E2, P.nu)], Es = [E1, E2];
+    var M = meshTwoBlocks(P.W, P.H, nnx, nny);
+    var bc = makeBC(M, S.load, uPre());
+    var R = meshMerged(P.W, P.H, nnx, nny);
+    var bcR = makeBC(R, S.load, uPre());
+    var sR = solveSystem(assembleVolume(R, mats, 2 * R.node.length), 2 * R.node.length, bcR, true);
+    var lag = solveMethod(M, mats, Es, 'lagrange', 0, bc, true);
+    cache = {
+      key: [S.refine, S.contrast, S.load].join('|'),
+      M: M, R: R, mats: mats, Es: Es, bc: bc,
+      ref: { u: sR.u, cond: sR.cond, n: sR.nfree },
+      lag: lag, lagErr: relError(M, lag.u, { u: sR.u }),
+      hEdge: P.H / (nny - 1)
+    };
+    sweep = null;
+  }
+
+  function ensureCache() {
+    var key = [S.refine, S.contrast, S.load].join('|');
+    if (!cache || cache.key !== key) buildCache();
+  }
+
+  function computeCurrent() {
+    ensureCache();
+    var C = cache, th = Math.pow(10, S.logTheta);
+    var pen = solveMethod(C.M, C.mats, C.Es, 'penalty', th, C.bc, true);
+    var nit = solveMethod(C.M, C.mats, C.Es, 'nitsche', th, C.bc, true);
+    cur = {
+      theta: th,
+      penalty: { s: pen, err: relError(C.M, pen.u, C.ref) },
+      nitsche: { s: nit, err: relError(C.M, nit.u, C.ref) },
+      lagrange: { s: C.lag, err: C.lagErr }
+    };
+    cur.active = cur[S.method];
+    cur.stress = recoverStress(C.M, cur.active.s.u, C.mats);
+  }
+
+  /* =========================================================================
+     8.  Three.js scene
+     ========================================================================= */
+
+  var view = document.getElementById('view');
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0e1624);
+  var camera = new THREE.PerspectiveCamera(34, 1, 0.05, 200);
+  camera.position.set(2.62, 1.62, 8.1);
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  view.appendChild(renderer.domElement);
+
+  var labelRenderer = new THREE.CSS2DRenderer();
+  labelRenderer.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+  view.appendChild(labelRenderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.07;
+  controls.target.set(2.0, 1.0, 0);
+  controls.minDistance = 2;
+  controls.maxDistance = 24;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+  var dl = new THREE.DirectionalLight(0xffffff, 0.5);
+  dl.position.set(1.5, 2.4, 4);
+  scene.add(dl);
+  var dl2 = new THREE.DirectionalLight(0x93c5fd, 0.18);
+  dl2.position.set(-2, -1, 2);
+  scene.add(dl2);
+
+  var solidGeo = new THREE.BufferGeometry();
+  var solidMat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+  var solidMesh = new THREE.Mesh(solidGeo, solidMat);
+  scene.add(solidMesh);
+
+  var wireGeo = new THREE.BufferGeometry();
+  var wireMesh = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0x0b1220, transparent: true, opacity: 0.34 }));
+  scene.add(wireMesh);
+
+  var ghostGeo = new THREE.BufferGeometry();
+  var ghostMesh = new THREE.LineSegments(ghostGeo, new THREE.LineDashedMaterial({ color: 0x64748b, dashSize: 0.07, gapSize: 0.05, transparent: true, opacity: 0.75 }));
+  scene.add(ghostMesh);
+
+  var gapGeo = new THREE.BufferGeometry();
+  var gapMesh = new THREE.LineSegments(gapGeo, new THREE.LineBasicMaterial({ color: 0xf43f5e }));
+  scene.add(gapMesh);
+
+  var seamGroup = new THREE.Group();
+  scene.add(seamGroup);
+  var seamA = [], seamB = [];
+  var sphGeo = new THREE.SphereGeometry(1, 10, 8);
+  var seamMatA = new THREE.MeshLambertMaterial({ color: 0xfb923c });
+  var seamMatB = new THREE.MeshLambertMaterial({ color: 0x38bdf8 });
+
+  function mkLabel(cls, text) {
+    var d = document.createElement('div');
+    d.className = 'label3d ' + cls;
+    d.textContent = text;
+    var o = new THREE.CSS2DObject(d);
+    scene.add(o);
+    return { el: d, obj: o };
+  }
+  var labA = mkLabel('a', 'Block A'), labB = mkLabel('b', 'Block B'), labI = mkLabel('i', 'seam');
+
+  var THICK = 0.22;
+
+  function colorRamp(t, out) {
+    /* blue -> pale -> orange */
+    var r, g, b;
+    if (t < 0.5) { var s = t * 2; r = 0.23 + s * (0.886 - 0.23); g = 0.51 + s * (0.906 - 0.51); b = 0.965 + s * (0.91 - 0.965); }
+    else { var s2 = (t - 0.5) * 2; r = 0.886 + s2 * (0.918 - 0.886); g = 0.906 + s2 * (0.345 - 0.906); b = 0.91 + s2 * (0.047 - 0.91); }
+    out[0] = r; out[1] = g; out[2] = b;
+  }
+
+  function fieldValues(M, u, st) {
+    var n = M.node.length, v = new Float64Array(n), i;
+    if (S.field === 'sxx') for (i = 0; i < n; i++) v[i] = st.sxx[i];
+    else if (S.field === 'syy') for (i = 0; i < n; i++) v[i] = st.syy[i];
+    else if (S.field === 'sxy') for (i = 0; i < n; i++) v[i] = st.sxy[i];
+    else if (S.field === 'vm') {
+      for (i = 0; i < n; i++) {
+        var sx = st.sxx[i], sy = st.syy[i], sz = P.nu * (sx + sy), t = st.sxy[i];
+        v[i] = Math.sqrt(0.5 * ((sx - sy) * (sx - sy) + (sy - sz) * (sy - sz) + (sz - sx) * (sz - sx)) + 3 * t * t);
+      }
+    } else for (i = 0; i < n; i++) v[i] = Math.sqrt(u[2 * i] * u[2 * i] + u[2 * i + 1] * u[2 * i + 1]);
+    return v;
+  }
+
+  var FACES = [
+    [0, 1, 2], [0, 2, 3],           /* front  (f0..f3) */
+    [4, 6, 5], [4, 7, 6],           /* back   (b0..b3) */
+    [0, 4, 5], [0, 5, 1],
+    [1, 5, 6], [1, 6, 2],
+    [2, 6, 7], [2, 7, 3],
+    [3, 7, 4], [3, 4, 0]
+  ];
+
+  function rebuildScene() {
+    var C = cache, M = C.M, u = cur.active.s.u, sc = S.scale;
+    var nEl = M.el.length, i, a, e, k;
+
+    var vals = fieldValues(M, u, cur.stress);
+    var vmin = Infinity, vmax = -Infinity;
+    for (i = 0; i < vals.length; i++) { if (vals[i] < vmin) vmin = vals[i]; if (vals[i] > vmax) vmax = vals[i]; }
+    if (!isFinite(vmin) || !isFinite(vmax)) { vmin = 0; vmax = 1; }
+    /* A nearly uniform field must look uniform. Without a floor on the range,
+       min-max scaling turns round-off into a full-contrast rainbow. */
+    var ref = Math.max(Math.abs(vmin), Math.abs(vmax), 1e-30);
+    if (vmax - vmin < 0.08 * ref) {
+      var mid = 0.5 * (vmin + vmax);
+      vmin = mid - 0.04 * ref; vmax = mid + 0.04 * ref;
+    }
+
+    var pos = new Float32Array(nEl * 36 * 3);
+    var col = new Float32Array(nEl * 36 * 3);
+    var wp = new Float32Array(nEl * 8 * 3);
+    var rgb = [0, 0, 0];
+    var px = 0, cx = 0, wi = 0;
+
+    for (e = 0; e < nEl; e++) {
+      var s = M.el[e];
+      var X = [], Y = [], CO = [];
+      for (a = 0; a < 4; a++) {
+        var nd = s[a];
+        X.push(M.node[nd][0] + sc * u[2 * nd]);
+        Y.push(M.node[nd][1] + sc * u[2 * nd + 1]);
+        colorRamp((vals[nd] - vmin) / (vmax - vmin), rgb);
+        CO.push([rgb[0], rgb[1], rgb[2]]);
+      }
+      /* 8 corner vertices: 0-3 front (+z), 4-7 back (-z) */
+      var VX = [X[0], X[1], X[2], X[3], X[0], X[1], X[2], X[3]];
+      var VY = [Y[0], Y[1], Y[2], Y[3], Y[0], Y[1], Y[2], Y[3]];
+      var VZ = [THICK / 2, THICK / 2, THICK / 2, THICK / 2, -THICK / 2, -THICK / 2, -THICK / 2, -THICK / 2];
+      var VC = [CO[0], CO[1], CO[2], CO[3], CO[0], CO[1], CO[2], CO[3]];
+
+      for (i = 0; i < FACES.length; i++) {
+        for (k = 0; k < 3; k++) {
+          var vi = FACES[i][k];
+          pos[px++] = VX[vi]; pos[px++] = VY[vi]; pos[px++] = VZ[vi];
+          col[cx++] = VC[vi][0]; col[cx++] = VC[vi][1]; col[cx++] = VC[vi][2];
+        }
+      }
+      /* front-face wireframe */
+      for (i = 0; i < 4; i++) {
+        var j = (i + 1) % 4;
+        wp[wi++] = X[i]; wp[wi++] = Y[i]; wp[wi++] = THICK / 2 + 0.006;
+        wp[wi++] = X[j]; wp[wi++] = Y[j]; wp[wi++] = THICK / 2 + 0.006;
+      }
+    }
+
+    solidGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    solidGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    solidGeo.computeVertexNormals();
+    solidGeo.computeBoundingSphere();
+
+    wireGeo.setAttribute('position', new THREE.BufferAttribute(wp, 3));
+    wireGeo.computeBoundingSphere();
+    wireMesh.visible = S.showMesh;
+
+    /* undeformed outline of each block */
+    if (S.showUndef) {
+      var gp = [], W = P.W, H = P.H;
+      function rect(x0, x1) {
+        var c = [[x0, 0], [x1, 0], [x1, H], [x0, H]];
+        for (var q = 0; q < 4; q++) {
+          var r0 = c[q], r1 = c[(q + 1) % 4];
+          gp.push(r0[0], r0[1], THICK / 2, r1[0], r1[1], THICK / 2);
+        }
+      }
+      rect(0, W / 2); rect(W / 2, W);
+      ghostGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(gp), 3));
+      ghostMesh.computeLineDistances();
+      ghostGeo.computeBoundingSphere();
+    }
+    ghostMesh.visible = S.showUndef;
+
+    /* seam markers and gap segments */
+    var np = M.pairs.length;
+    while (seamA.length < np) {
+      var mA = new THREE.Mesh(sphGeo, seamMatA), mB = new THREE.Mesh(sphGeo, seamMatB);
+      seamGroup.add(mA); seamGroup.add(mB); seamA.push(mA); seamB.push(mB);
+    }
+    for (i = 0; i < seamA.length; i++) { seamA[i].visible = false; seamB[i].visible = false; }
+    var gseg = new Float32Array(np * 6);
+    var rad = Math.min(0.055, 0.42 * P.H / (M.nny - 1));
+    var seamTop = -Infinity;
+    for (k = 0; k < np; k++) {
+      var na = M.pairs[k][0], nb = M.pairs[k][1];
+      var ax = M.node[na][0] + sc * u[2 * na], ay = M.node[na][1] + sc * u[2 * na + 1];
+      var bx = M.node[nb][0] + sc * u[2 * nb], by = M.node[nb][1] + sc * u[2 * nb + 1];
+      if (S.showSeam) {
+        seamA[k].visible = true; seamB[k].visible = true;
+        seamA[k].position.set(ax, ay, THICK / 2 + 0.02); seamA[k].scale.setScalar(rad);
+        seamB[k].position.set(bx, by, THICK / 2 + 0.02); seamB[k].scale.setScalar(rad);
+      }
+      gseg[6 * k] = ax; gseg[6 * k + 1] = ay; gseg[6 * k + 2] = THICK / 2 + 0.012;
+      gseg[6 * k + 3] = bx; gseg[6 * k + 4] = by; gseg[6 * k + 5] = THICK / 2 + 0.012;
+      if (ay > seamTop) seamTop = ay;
+      if (by > seamTop) seamTop = by;
+    }
+    gapGeo.setAttribute('position', new THREE.BufferAttribute(gseg, 3));
+    gapGeo.computeBoundingSphere();
+
+    /* labels: blocks below, seam above, so neither collides with the chips.
+       The seam label clears the deformed top of the seam, which under shear
+       rises well above the undeformed edge. */
+    labA.obj.position.set(P.W * 0.25, -0.36, 0);
+    labB.obj.position.set(P.W * 0.75, -0.36, 0);
+    labI.obj.position.set(P.W * 0.5, Math.max(P.H, seamTop) + 0.34, 0);
+    labA.el.textContent = 'Block A  ·  E₁ = ' + P.E1;
+    labB.el.textContent = 'Block B  ·  E₂ = ' + fmtNum(P.E1 * S.contrast);
+    labI.el.textContent = 'seam Γ · ' + M.pairs.length + ' tied pairs';
+
+    /* colour bar */
+    document.getElementById('cbarTitle').textContent =
+      S.field === 'sxx' ? 'σxx' : S.field === 'syy' ? 'σyy' : S.field === 'sxy' ? 'σxy' : S.field === 'vm' ? 'von Mises' : '|u|';
+    document.getElementById('cbarMax').textContent = fmtSig(vmax);
+    document.getElementById('cbarMid').textContent = fmtSig(0.5 * (vmin + vmax));
+    document.getElementById('cbarMin').textContent = fmtSig(vmin);
+  }
+
+  /* =========================================================================
+     9.  Formatting helpers
+     ========================================================================= */
+
+  function fmtSig(v) {
+    if (!isFinite(v)) return '—';
+    var a = Math.abs(v);
+    if (a === 0) return '0';
+    if (a < 1e-3 || a >= 1e5) return v.toExponential(1);
+    return v.toPrecision(3).replace(/\.?0+$/, '');
+  }
+  function fmtExp(v) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    return v.toExponential(1).replace('e+', 'e').replace('e-0', 'e-').replace('e0', 'e');
+  }
+  function fmtNum(v) {
+    if (v >= 1e5) return v.toExponential(0);
+    return String(Math.round(v));
+  }
+
+  /* =========================================================================
+     10.  Side panel
+     ========================================================================= */
+
+  var METHODS = [
+    { key: 'penalty', name: 'Penalty', col: 'var(--pen)' },
+    { key: 'lagrange', name: 'Lagrange', col: 'var(--lag)' },
+    { key: 'nitsche', name: 'Nitsche', col: 'var(--nit)' }
+  ];
+
+  function updatePanel() {
+    var body = document.getElementById('liveBody'), html = '';
+    METHODS.forEach(function (m) {
+      var r = cur[m.key], s = r.s;
+      var spd = s.inertia && s.inertia.neg === 0;
+      var cls = m.key === S.method ? ' class="on"' : '';
+      var errCls = r.err < 1e-10 ? 'good' : r.err < 1e-3 ? '' : 'bad';
+      var condCls = s.cond > 1e14 ? 'bad' : s.cond > 1e10 ? 'warn' : '';
+      var sizeTxt = String(s.n) + (m.key === 'lagrange' ? '<span class="bad" title="indefinite: ' + s.inertia.neg + ' negative eigenvalues">*</span>' : (spd ? '' : '<span class="bad" title="not positive definite: ' + s.inertia.neg + ' negative eigenvalues">*</span>'));
+      html += '<tr' + cls + '>' +
+        '<td class="m"><i style="background:' + m.col + '"></i>' + m.name + '</td>' +
+        '<td>' + fmtExp(s.gap) + '</td>' +
+        '<td class="' + errCls + '">' + fmtExp(r.err) + '</td>' +
+        '<td>' + sizeTxt + '</td>' +
+        '<td class="' + condCls + '">' + fmtExp(s.cond) + '</td>' +
+        '</tr>';
+    });
+    body.innerHTML = html;
+
+    /* chips */
+    var a = cur.active, s = a.s;
+    var chip = document.getElementById('chipMethod');
+    chip.className = 'chip c-m ' + (S.method === 'penalty' ? 'pen' : S.method === 'lagrange' ? 'lag' : 'nit');
+    var mname = S.method === 'penalty' ? 'Penalty' : S.method === 'lagrange' ? 'Lagrange multipliers' : 'Nitsche';
+    var pstr = S.method === 'lagrange' ? 'no parameter'
+      : S.method === 'penalty' ? ('α = ' + fmtExp(cur.theta * Math.max(cache.Es[0], cache.Es[1])) + ' per node')
+      : ('β = ' + fmtSig(cur.theta) + ',  γ = ' + fmtExp(cur.theta * Math.max(cache.Es[0], cache.Es[1]) / cache.hEdge));
+    chip.innerHTML = '<b>' + mname + '</b><span>' + pstr + '</span>';
+
+    var cg = document.getElementById('chipGap');
+    var rel = s.gap / Math.max(uPre(), 1e-30);
+    var good = rel < 1e-6;
+    cg.className = 'chip c-gap ' + (good ? 'ok' : rel > 1e-2 ? 'bad' : '');
+    cg.innerHTML = 'max seam opening ‖⟦u⟧‖ = ' + fmtExp(s.gap) +
+      '  (' + fmtExp(rel) + ' of the applied ' + uPre() + ')';
+
+    /* verdict */
+    var vp = document.querySelector('#verdict p'), vs = document.querySelector('#verdict span');
+    var spdNow = s.inertia && s.inertia.neg === 0;
+    if (S.method === 'lagrange') {
+      vp.textContent = 'The seam is closed exactly.';
+      vs.innerHTML = 'The constraint rows are part of the system, so ⟦u⟧ is zero to round-off at any mesh and any material ratio. ' +
+        'The price is on the right of the table: ' + (s.n - cur.penalty.s.n) + ' extra unknowns and a symmetric <b>indefinite</b> matrix with exactly ' +
+        s.inertia.neg + ' negative eigenvalues — one per constraint row. Cholesky and CG cannot be used on it.';
+    } else if (S.method === 'penalty') {
+      if (cur.theta < 10) {
+        vp.textContent = 'The tie is too soft — the blocks are visibly coming apart.';
+        vs.innerHTML = 'At this α the spring across the seam is comparable to the elements it connects, so it stretches. The opening is ' +
+          fmtExp(rel) + ' of the applied displacement and the answer is wrong by ' + fmtExp(cur.penalty.err) + '. Raise θ.';
+      } else if (cur.penalty.s.cond > 1e13) {
+        vp.textContent = 'Past the sweet spot — you are now losing digits to round-off.';
+        vs.innerHTML = 'The gap keeps shrinking, but κ ≈ ' + fmtExp(s.cond) + ' is close to 1/ε<sub>mach</sub>, so the solve itself is no longer reliable: ' +
+          'the error has climbed back to ' + fmtExp(cur.penalty.err) + '. This is the right-hand wall of the valley in panel A.';
+      } else {
+        vp.textContent = 'A workable penalty — small gap, conditioning still tolerable.';
+        vs.innerHTML = 'Error ' + fmtExp(cur.penalty.err) + ' at κ ≈ ' + fmtExp(s.cond) + '. Compare the Nitsche row: it reaches ' +
+          fmtExp(cur.nitsche.err) + ' on the same mesh at the same θ, because it is variationally consistent and penalty is not.';
+      }
+    } else {
+      if (!spdNow) {
+        vp.textContent = 'β is below the coercivity threshold.';
+        vs.innerHTML = 'The Nitsche matrix now has ' + s.inertia.neg + ' negative eigenvalues, so it is no longer positive definite. ' +
+          'A direct solver still returns an answer — error ' + fmtExp(cur.nitsche.err) + ' — but the stability guarantee is gone and Cholesky or CG would fail. Raise β.';
+      } else if (cur.nitsche.err < 1e-11) {
+        vp.textContent = 'Exact — this is what variational consistency means.';
+        vs.innerHTML = 'The exact solution of this load case lies inside the Q4 space, so a consistent method must reproduce it. Nitsche does, to ' +
+          fmtExp(cur.nitsche.err) + ', at β = ' + fmtSig(cur.theta) + '. Penalty at the same parameter is off by ' + fmtExp(cur.penalty.err) + '.';
+      } else {
+        vp.textContent = 'Accurate at a modest β, so conditioning stays low.';
+        vs.innerHTML = 'Error ' + fmtExp(cur.nitsche.err) + ' at κ ≈ ' + fmtExp(s.cond) + ', against ' + fmtExp(cur.penalty.err) +
+          ' for penalty at the same θ. Panel C plots exactly this trade.';
+      }
+    }
+
+    /* equation line */
+    var eq = document.getElementById('eq');
+    if (S.method === 'penalty') eq.innerHTML = '(K + α CᵀC) u = f + α Cᵀg  —  one stiff spring per tied node pair, no new unknowns, never exact.';
+    else if (S.method === 'lagrange') eq.innerHTML = '[K Cᵀ; C 0] {u; λ} = {f; g}  —  the constraint is a block row, so it holds exactly; λ is the interface traction.';
+    else eq.innerHTML = 'a(u,v) − ∫⟦v⟧⟨σ(u)n⟩ − ∫⟦u⟧⟨σ(v)n⟩ + γ∫⟦u⟧⟦v⟧  —  penalty plus the consistency terms the penalty method throws away.';
+  }
+
+  /* =========================================================================
+     11.  Charts
+     ========================================================================= */
+
+  function setupCanvas(cv) {
+    var r = cv.getBoundingClientRect();
+    var dpr = Math.min(devicePixelRatio || 1, 2);
+    var w = Math.max(80, Math.round(r.width)), h = Math.max(60, Math.round(r.height));
+    cv.width = w * dpr; cv.height = h * dpr;
+    var g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    return { g: g, w: w, h: h };
+  }
+
+  function axes(g, w, h, pad, xlab, ylab) {
+    g.strokeStyle = '#cbd5e1'; g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(pad.l, pad.t); g.lineTo(pad.l, h - pad.b); g.lineTo(w - pad.r, h - pad.b);
+    g.stroke();
+    g.fillStyle = '#64748b'; g.font = '10px "Source Sans 3",sans-serif';
+    g.textAlign = 'center';
+    if (xlab) g.fillText(xlab, (pad.l + w - pad.r) / 2, h - 3);
+    if (ylab) {
+      g.save(); g.translate(7, (pad.t + h - pad.b) / 2); g.rotate(-Math.PI / 2);
+      g.font = '9px "Source Sans 3",sans-serif';
+      g.fillText(ylab, 0, 0); g.restore();
+    }
+  }
+
+  function logTicks(g, w, h, pad, lo, hi, horiz) {
+    g.fillStyle = '#94a3b8';
+    g.font = (horiz ? '9px' : '8px') + ' "JetBrains Mono",monospace';
+    g.strokeStyle = '#eef2f7';
+    /* Thin the decades to whatever the box can actually fit: these plots are
+       64 px tall inside the hub iframe and 220 px tall on the page. */
+    var span = horiz ? (w - pad.l - pad.r) : (h - pad.t - pad.b);
+    var room = Math.max(2, Math.floor(span / (horiz ? 44 : 15)));
+    var d, step = Math.max(1, Math.ceil((hi - lo) / room));
+    for (d = Math.ceil(lo / step) * step; d <= hi; d += step) {
+      var t = (d - lo) / (hi - lo);
+      if (horiz) {
+        var x = pad.l + t * (w - pad.l - pad.r);
+        g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, h - pad.b); g.stroke();
+        g.textAlign = 'center';
+        g.fillText('1e' + d, x, h - pad.b + 11);
+      } else {
+        var y = h - pad.b - t * (h - pad.t - pad.b);
+        g.beginPath(); g.moveTo(pad.l, y); g.lineTo(w - pad.r, y); g.stroke();
+        g.textAlign = 'right';
+        g.fillText('1e' + d, pad.l - 3, y + 3);
+      }
+    }
+  }
+
+  var TH_LO = -2, TH_HI = 16;
+
+  function drawSweepChart(id, ykey, ylab, ylo, yhi) {
+    var cv = document.getElementById(id), c = setupCanvas(cv), g = c.g, w = c.w, h = c.h;
+    var pad = { l: 34, r: 8, t: 8, b: 22 };
+    if (!sweep || !sweep.pts.length) {
+      g.fillStyle = '#94a3b8'; g.font = '11px "Source Sans 3",sans-serif'; g.textAlign = 'center';
+      g.fillText('computing…', w / 2, h / 2);
+      return;
+    }
+    logTicks(g, w, h, pad, TH_LO, TH_HI, true);
+    logTicks(g, w, h, pad, ylo, yhi, false);
+
+    function X(lt) { return pad.l + (lt - TH_LO) / (TH_HI - TH_LO) * (w - pad.l - pad.r); }
+    function Y(v) {
+      var lv = Math.log10(Math.max(v, Math.pow(10, ylo - 1)));
+      lv = Math.max(ylo, Math.min(yhi, lv));
+      return h - pad.b - (lv - ylo) / (yhi - ylo) * (h - pad.t - pad.b);
+    }
+
+    /* shaded band where Nitsche is not SPD — only the low-θ run, not the
+       isolated points where round-off flips a pivot at huge θ */
+    var bandEnd = null, i;
+    for (i = 0; i < sweep.pts.length; i++) {
+      if (!sweep.pts[i].nitSpd) bandEnd = sweep.pts[i].lt; else break;
+    }
+    if (bandEnd !== null) {
+      g.fillStyle = 'rgba(244,63,94,.08)';
+      g.fillRect(pad.l, pad.t, X(bandEnd) - pad.l, h - pad.t - pad.b);
+      g.strokeStyle = 'rgba(244,63,94,.35)'; g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(X(bandEnd), pad.t); g.lineTo(X(bandEnd), h - pad.b); g.stroke();
+      g.setLineDash([]);
+      g.fillStyle = '#e11d48'; g.font = '8px "Source Sans 3",sans-serif'; g.textAlign = 'left';
+      g.fillText('Nitsche not SPD', pad.l + 2, pad.t + 9);
+    }
+
+    function line(key, col) {
+      g.strokeStyle = col; g.lineWidth = 1.7; g.beginPath();
+      for (i = 0; i < sweep.pts.length; i++) {
+        var p = sweep.pts[i];
+        if (i === 0) g.moveTo(X(p.lt), Y(p[key])); else g.lineTo(X(p.lt), Y(p[key]));
+      }
+      g.stroke();
+    }
+    line('pen' + ykey, '#ea580c');
+    line('nit' + ykey, '#0284c7');
+
+    /* Lagrange: horizontal reference */
+    var lv = ykey === 'Err' ? sweep.lagErr : sweep.lagCond;
+    g.strokeStyle = '#0f766e'; g.lineWidth = 1.5; g.setLineDash([5, 3]);
+    g.beginPath(); g.moveTo(pad.l, Y(lv)); g.lineTo(w - pad.r, Y(lv)); g.stroke();
+    g.setLineDash([]);
+
+    /* current-θ markers */
+    var lt = S.logTheta;
+    g.strokeStyle = '#1e3a5f'; g.lineWidth = 1; g.setLineDash([2, 2]);
+    g.beginPath(); g.moveTo(X(lt), pad.t); g.lineTo(X(lt), h - pad.b); g.stroke();
+    g.setLineDash([]);
+    if (cur) {
+      var pv = ykey === 'Err' ? cur.penalty.err : cur.penalty.s.cond;
+      var nv = ykey === 'Err' ? cur.nitsche.err : cur.nitsche.s.cond;
+      [[pv, '#ea580c'], [nv, '#0284c7']].forEach(function (d) {
+        g.fillStyle = d[1];
+        g.beginPath(); g.arc(X(lt), Y(d[0]), 3.4, 0, 6.2832); g.fill();
+        g.strokeStyle = '#fff'; g.lineWidth = 1; g.stroke();
+      });
+    }
+    axes(g, w, h, pad, 'interface stiffness θ', ylab);
+  }
+
+  function drawTrade() {
+    var cv = document.getElementById('cTrade'), c = setupCanvas(cv), g = c.g, w = c.w, h = c.h;
+    var pad = { l: 34, r: 8, t: 8, b: 22 };
+    if (!sweep || !sweep.pts.length) {
+      g.fillStyle = '#94a3b8'; g.font = '11px "Source Sans 3",sans-serif'; g.textAlign = 'center';
+      g.fillText('computing…', w / 2, h / 2);
+      return;
+    }
+    var xlo = 2, xhi = 20, ylo = -16, yhi = 0, i;
+    logTicks(g, w, h, pad, xlo, xhi, true);
+    logTicks(g, w, h, pad, ylo, yhi, false);
+    function X(v) {
+      var lv = Math.max(xlo, Math.min(xhi, Math.log10(Math.max(v, 1))));
+      return pad.l + (lv - xlo) / (xhi - xlo) * (w - pad.l - pad.r);
+    }
+    function Y(v) {
+      var lv = Math.max(ylo, Math.min(yhi, Math.log10(Math.max(v, 1e-17))));
+      return h - pad.b - (lv - ylo) / (yhi - ylo) * (h - pad.t - pad.b);
+    }
+    function curve(ck, ek, col) {
+      g.strokeStyle = col; g.lineWidth = 1.7; g.beginPath();
+      for (i = 0; i < sweep.pts.length; i++) {
+        var p = sweep.pts[i];
+        if (i === 0) g.moveTo(X(p[ck]), Y(p[ek])); else g.lineTo(X(p[ck]), Y(p[ek]));
+      }
+      g.stroke();
+    }
+    curve('penCond', 'penErr', '#ea580c');
+    curve('nitCond', 'nitErr', '#0284c7');
+    g.fillStyle = '#0f766e';
+    g.beginPath(); g.arc(X(sweep.lagCond), Y(Math.max(sweep.lagErr, 1e-16)), 4.5, 0, 6.2832); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 1.2; g.stroke();
+    g.fillStyle = '#0f766e'; g.font = '9px "Source Sans 3",sans-serif'; g.textAlign = 'left';
+    g.fillText('Lagrange', X(sweep.lagCond) + 7, Y(Math.max(sweep.lagErr, 1e-16)) + 3);
+
+    if (cur) {
+      [[cur.penalty.s.cond, cur.penalty.err, '#ea580c'], [cur.nitsche.s.cond, cur.nitsche.err, '#0284c7']].forEach(function (d) {
+        g.fillStyle = d[2];
+        g.beginPath(); g.arc(X(d[0]), Y(d[1]), 3.4, 0, 6.2832); g.fill();
+        g.strokeStyle = '#fff'; g.lineWidth = 1; g.stroke();
+      });
+    }
+    axes(g, w, h, pad, 'condition number κ', 'relative error');
+  }
+
+  /* small side-panel plots ------------------------------------------------ */
+
+  function drawJump() {
+    var cv = document.getElementById('cJump'), c = setupCanvas(cv), g = c.g, w = c.w, h = c.h;
+    var pad = { l: 40, r: 8, t: 8, b: 18 };
+    var M = cache.M, np = M.pairs.length, k;
+    var series = [
+      { u: cur.penalty.s.u, col: '#ea580c' },
+      { u: cur.nitsche.s.u, col: '#0284c7' },
+      { u: cur.lagrange.s.u, col: '#0f766e' }
+    ];
+    var vmax = 1e-18;
+    series.forEach(function (s) {
+      for (k = 0; k < np; k++) {
+        var a = M.pairs[k][0], b = M.pairs[k][1];
+        var d = Math.abs(s.u[2 * a] - s.u[2 * b]);
+        if (d > vmax) vmax = d;
+      }
+    });
+    var hi = Math.ceil(Math.log10(vmax)), lo = hi - 16;
+    logTicks(g, w, h, pad, lo, hi, false);
+    function X(i) { return pad.l + i / Math.max(1, np - 1) * (w - pad.l - pad.r); }
+    function Y(v) {
+      var lv = Math.max(lo, Math.min(hi, Math.log10(Math.max(Math.abs(v), 1e-300))));
+      return h - pad.b - (lv - lo) / (hi - lo) * (h - pad.t - pad.b);
+    }
+    series.forEach(function (s) {
+      g.strokeStyle = s.col; g.lineWidth = 1.6; g.beginPath();
+      for (k = 0; k < np; k++) {
+        var a = M.pairs[k][0], b = M.pairs[k][1];
+        var d = s.u[2 * a] - s.u[2 * b];
+        if (k === 0) g.moveTo(X(k), Y(d)); else g.lineTo(X(k), Y(d));
+      }
+      g.stroke();
+    });
+    axes(g, w, h, pad, 'position along the seam', '|⟦u⟧ₓ|');
+  }
+
+  function drawTraction() {
+    var cv = document.getElementById('cTrac'), c = setupCanvas(cv), g = c.g, w = c.w, h = c.h;
+    var pad = { l: 40, r: 8, t: 8, b: 18 };
+    var M = cache.M, np = M.pairs.length, k;
+    var hy = P.H / (M.nny - 1), Emax = Math.max(cache.Es[0], cache.Es[1]);
+    var alpha = cur.theta * Emax, gam = cur.theta * Emax / cache.hEdge;
+
+    var stPen = recoverStress(M, cur.penalty.s.u, cache.mats);
+    var stNit = recoverStress(M, cur.nitsche.s.u, cache.mats);
+    var stLag = recoverStress(M, cur.lagrange.s.u, cache.mats);
+
+    var tPen = [], tLag = [], tNit = [], tVol = [], ys = [];
+    for (k = 0; k < np; k++) {
+      var a = M.pairs[k][0], b = M.pairs[k][1];
+      var trib = (k === 0 || k === np - 1) ? hy / 2 : hy;
+      ys.push(M.node[a][1]);
+      tPen.push(-alpha * (cur.penalty.s.u[2 * a] - cur.penalty.s.u[2 * b]) / trib);
+      tLag.push(-cur.lagrange.s.lambda[2 * k] / trib);
+      tNit.push(0.5 * (stNit.sxx[a] + stNit.sxx[b]) - gam * (cur.nitsche.s.u[2 * a] - cur.nitsche.s.u[2 * b]));
+      tVol.push(0.5 * (stLag.sxx[a] + stLag.sxx[b]));
+    }
+    var vmin = Infinity, vmax = -Infinity;
+    [tPen, tLag, tNit, tVol].forEach(function (arr) {
+      arr.forEach(function (v) { if (isFinite(v)) { if (v < vmin) vmin = v; if (v > vmax) vmax = v; } });
+    });
+    if (!isFinite(vmin)) { vmin = 0; vmax = 1; }
+    var sp = (vmax - vmin) || 1;
+    vmin -= 0.12 * sp; vmax += 0.12 * sp;
+
+    g.strokeStyle = '#eef2f7'; g.lineWidth = 1;
+    var t;
+    for (t = 0; t <= 4; t++) {
+      var yy = pad.t + t / 4 * (h - pad.t - pad.b);
+      g.beginPath(); g.moveTo(pad.l, yy); g.lineTo(w - pad.r, yy); g.stroke();
+    }
+    g.fillStyle = '#94a3b8'; g.font = '9px "JetBrains Mono",monospace'; g.textAlign = 'right';
+    g.fillText(fmtSig(vmax), pad.l - 4, pad.t + 4);
+    g.fillText(fmtSig(vmin), pad.l - 4, h - pad.b + 3);
+
+    function X(i) { return pad.l + i / Math.max(1, np - 1) * (w - pad.l - pad.r); }
+    function Y(v) { return h - pad.b - (v - vmin) / (vmax - vmin) * (h - pad.t - pad.b); }
+
+    function poly(arr, col, dash) {
+      g.strokeStyle = col; g.lineWidth = dash ? 1.4 : 1.6;
+      g.setLineDash(dash ? [4, 3] : []);
+      g.beginPath();
+      for (k = 0; k < np; k++) { if (k === 0) g.moveTo(X(k), Y(arr[k])); else g.lineTo(X(k), Y(arr[k])); }
+      g.stroke(); g.setLineDash([]);
+    }
+    poly(tVol, '#1c2430', true);
+    poly(tPen, '#ea580c', false);
+    poly(tNit, '#0284c7', false);
+    poly(tLag, '#0f766e', false);
+    axes(g, w, h, pad, 'position along the seam', 'tₓ');
+  }
+
+  /* =========================================================================
+     12.  Sweep (chunked so the UI stays responsive)
+     ========================================================================= */
+
+  var sweepTimer = null;
+
+  function startSweep() {
+    if (sweepTimer) { clearTimeout(sweepTimer); sweepTimer = null; }
+    ensureCache();
+    var C = cache;
+    var N = 25, list = [], i;
+    for (i = 0; i < N; i++) list.push(TH_LO + (TH_HI - TH_LO) * i / (N - 1));
+    var mine = { pts: [], lagErr: Math.max(C.lagErr, 1e-16), lagCond: C.lag.cond, done: false, total: N };
+    sweep = mine;
+    document.getElementById('sweepnote').textContent =
+      'solving ' + (2 * N) + ' systems on the ' + C.M.nnx + '×' + C.M.nny + ' node mesh…';
+
+    var idx = 0;
+    function step() {
+      if (sweep !== mine) return;   /* a newer sweep superseded this one */
+      var t0 = Date.now();
+      while (idx < list.length && Date.now() - t0 < 45) {
+        var lt = list[idx], th = Math.pow(10, lt);
+        var pen = solveMethod(C.M, C.mats, C.Es, 'penalty', th, C.bc, true);
+        var nit = solveMethod(C.M, C.mats, C.Es, 'nitsche', th, C.bc, true);
+        mine.pts.push({
+          lt: lt,
+          penErr: Math.max(relError(C.M, pen.u, C.ref), 1e-17),
+          nitErr: Math.max(relError(C.M, nit.u, C.ref), 1e-17),
+          penCond: pen.cond, nitCond: nit.cond,
+          nitSpd: nit.inertia.neg === 0
+        });
+        idx++;
+      }
+      drawBigCharts();
+      if (idx < list.length) {
+        document.getElementById('sweepnote').textContent =
+          'solving… ' + idx + ' / ' + list.length + ' values of θ';
+        sweepTimer = setTimeout(step, 0);
+      } else {
+        mine.done = true;
+        sweepTimer = null;
+        finishSweepNote();
+      }
+    }
+    sweepTimer = setTimeout(step, 0);
+  }
+
+  function finishSweepNote() {
+    var best = null, i, p;
+    for (i = 0; i < sweep.pts.length; i++) {
+      p = sweep.pts[i];
+      if (!best || p.penErr < best.penErr) best = p;
+    }
+    var nitAt = null;
+    for (i = 0; i < sweep.pts.length; i++) if (sweep.pts[i].nitSpd) { nitAt = sweep.pts[i]; break; }
+    var txt = 'Penalty is at its best near θ = ' + fmtExp(Math.pow(10, best.lt)) +
+      ' (error ' + fmtExp(best.penErr) + ', κ ≈ ' + fmtExp(best.penCond) + '); beyond that round-off takes over. ';
+    if (nitAt) {
+      txt += 'Nitsche already reaches ' + fmtExp(nitAt.nitErr) + ' at θ = ' + fmtSig(Math.pow(10, nitAt.lt)) +
+        ' with κ ≈ ' + fmtExp(nitAt.nitCond) + ', ';
+      txt += (nitAt.lt > TH_LO)
+        ? 'and loses positive definiteness just below that. '
+        : 'and stays positive definite across the whole range. ';
+    }
+    txt += 'Lagrange: error ' + fmtExp(sweep.lagErr) + ' at κ ≈ ' + fmtExp(sweep.lagCond) + ', with no parameter at all.';
+    document.getElementById('sweepnote').textContent = txt;
+  }
+
+  function drawBigCharts() {
+    drawSweepChart('cErr', 'Err', 'relative error', -16, 0);
+    drawSweepChart('cCond', 'Cond', 'condition number', 2, 20);
+    drawTrade();
+  }
+
+  /* =========================================================================
+     13.  Update pipeline
+     ========================================================================= */
+
+  var pending = false;
+  function requestUpdate(full) {
+    if (full) {
+      sweep = null;
+      if (sweepTimer) { clearTimeout(sweepTimer); sweepTimer = null; }
+    }
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(function () {
+      pending = false;
+      update(full);
+    });
+  }
+
+  function update(full) {
+    computeCurrent();
+    rebuildScene();
+    updatePanel();
+    drawJump();
+    drawTraction();
+    if (!sweep) startSweep(); else drawBigCharts();
+  }
+
+  /* =========================================================================
+     14.  UI wiring
+     ========================================================================= */
+
+  var thSlide = document.getElementById('thSlide');
+  var ctSlide = document.getElementById('ctSlide');
+  var scSlide = document.getElementById('scSlide');
+  var reSlide = document.getElementById('reSlide');
+
+  function setMethod(m) {
+    S.method = m;
+    var map = { penalty: ['mPen', 'pen'], lagrange: ['mLag', 'lag'], nitsche: ['mNit', 'nit'] };
+    ['penalty', 'lagrange', 'nitsche'].forEach(function (k) {
+      var b = document.getElementById(map[k][0]);
+      b.className = (k === m) ? 'on ' + map[k][1] : '';
+    });
+    thSlide.disabled = (m === 'lagrange');
+    requestUpdate(false);
+  }
+  document.getElementById('mPen').addEventListener('click', function () { setMethod('penalty'); });
+  document.getElementById('mLag').addEventListener('click', function () { setMethod('lagrange'); });
+  document.getElementById('mNit').addEventListener('click', function () { setMethod('nitsche'); });
+
+  thSlide.addEventListener('input', function () {
+    S.logTheta = +thSlide.value / 100;
+    document.getElementById('thLabel').textContent = (Math.round(S.logTheta * 100) / 100);
+    requestUpdate(false);
+  });
+
+  ctSlide.addEventListener('input', function () {
+    S.contrast = Math.pow(10, +ctSlide.value / 100);
+    var c = S.contrast;
+    document.getElementById('ctLabel').textContent = c < 10 ? c.toFixed(2).replace(/\.?0+$/, '') : fmtNum(c);
+    requestUpdate(true);
+  });
+
+  function setScale(v) {
+    S.scale = v;
+    scSlide.value = v;
+    document.getElementById('scLabel').textContent = v;
+  }
+  scSlide.addEventListener('input', function () {
+    setScale(+scSlide.value);
+    rebuildScene();
+  });
+
+  reSlide.addEventListener('input', function () {
+    S.refine = +reSlide.value;
+    var mk = MESHES[S.refine - 1];
+    document.getElementById('reLabel').textContent = mk[0] + '×' + mk[1];
+    requestUpdate(true);
+  });
+
+  document.getElementById('loadSel').addEventListener('change', function (e) {
+    S.load = e.target.value;
+    setScale(SCALE_DEFAULT[S.load] || 18);
+    requestUpdate(true);
+  });
+  document.getElementById('fieldSel').addEventListener('change', function (e) {
+    S.field = e.target.value;
+    rebuildScene();
+  });
+  document.getElementById('cbMesh').addEventListener('change', function (e) { S.showMesh = e.target.checked; rebuildScene(); });
+  document.getElementById('cbUndef').addEventListener('change', function (e) { S.showUndef = e.target.checked; rebuildScene(); });
+  document.getElementById('cbSeam').addEventListener('change', function (e) { S.showSeam = e.target.checked; rebuildScene(); });
+
+  function setTheta(lt) {
+    S.logTheta = lt;
+    thSlide.value = Math.round(lt * 100);
+    document.getElementById('thLabel').textContent = lt;
+  }
+  document.getElementById('pWeak').addEventListener('click', function () {
+    if (S.method === 'lagrange') setMethod('penalty');
+    setTheta(-1); requestUpdate(false);
+  });
+  document.getElementById('pGood').addEventListener('click', function () {
+    if (S.method === 'lagrange') setMethod('penalty');
+    setTheta(6); requestUpdate(false);
+  });
+  document.getElementById('pTooStiff').addEventListener('click', function () {
+    if (S.method === 'lagrange') setMethod('penalty');
+    setTheta(15); requestUpdate(false);
+  });
+
+  /* =========================================================================
+     15.  Render loop and resize
+     ========================================================================= */
+
+  function resize() {
+    var w = Math.max(1, view.clientWidth), h = Math.max(1, view.clientHeight);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+    labelRenderer.setSize(w, h);
+  }
+  new ResizeObserver(resize).observe(view);
+  resize();
+
+  var figwrap = document.querySelector('.figwrap');
+  if (figwrap) new ResizeObserver(function () { if (sweep) drawBigCharts(); }).observe(figwrap);
+  var sideObs = new ResizeObserver(function () { if (cur) { drawJump(); drawTraction(); } });
+  [].forEach.call(document.querySelectorAll('.side .cwrap'), function (e) { sideObs.observe(e); });
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  })();
+
+  /* go */
+  setMethod('penalty');
+})();
+</script>
+</body>
+</html>

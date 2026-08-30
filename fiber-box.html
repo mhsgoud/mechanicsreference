@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Single fiber RVE under tension — Mechanics Reference</title>
+<meta name="description" content="Unit cube of matrix with one embedded fiber under uniaxial tension. Left face clamped, right face ux prescribed; nonlinear cohesive interface, not a pull-out test." />
+<link rel="canonical" href="https://mechanicsreference.com/fiber-box.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+<style>
+:root{
+  --paper:#f7f6f2;--ink:#1c2430;--muted:#3d4756;--rule:#d8d4cb;
+  --navy:#1e3a5f;--plate:#0f172a;--accent:#c45c26;
+  --fem:#a78bfa;--mat:#94a3b8;--lin:#22d3ee;--dR:#fb7185;--now:#fbbf24;
+}
+*{box-sizing:border-box}html,body{margin:0}html{scrollbar-gutter:stable}
+body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+a{color:#3a5f8a}
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:20px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--rule)}
+.logo{height:52px;width:auto}
+nav{margin-left:auto;display:flex;gap:4px}
+nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 56px}
+.crumb{padding:28px 0 8px;font-size:.92rem;color:var(--muted)}
+h1{margin:0 0 12px;font:600 clamp(1.75rem,3.8vw,2.4rem)/1.2 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.lede{margin:0 0 10px;max-width:48em;font:1.1rem/1.5 "Source Serif 4",Georgia,serif;color:var(--muted)}
+.links{margin:0 0 22px;font-size:.9rem;color:var(--muted)}
+.links a{margin-right:.75rem}
+.shell{border:1px solid var(--rule);background:#fff;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(300px,1.4fr) minmax(280px,.95fr);background:var(--plate)}
+#view{position:relative;height:min(56vh,520px);min-height:360px}
+#view canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;pointer-events:none;font-size:.72rem;line-height:1.45;padding:7px 10px;background:rgba(15,23,42,.9);color:#cbd5e1;border:1px solid #334155}
+.hud.tl{top:10px;left:10px}
+.hud.tr{top:10px;right:10px;font-weight:600}
+.hud.bl{bottom:10px;left:10px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.68rem}
+.hud.tr.elastic{color:#34d399;border-color:#065f46}
+.hud.tr.soft{color:#fbbf24;border-color:#92400e}
+.hud.tr.near{color:#fb7185;border-color:#9f1239}
+.hud.tr.dead{color:#94a3b8;border-color:#475569}
+.side{display:flex;flex-direction:column;background:#fff;border-left:1px solid var(--rule);min-height:0}
+.plot{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 12px 4px;border-bottom:1px solid var(--rule)}
+.plot:last-child{border-bottom:0}
+.plot h3{margin:0 0 2px;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.plot canvas{flex:1;width:100%;min-height:110px}
+.leg{margin:2px 0 4px;font-size:.65rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 10px}
+.sw{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:3px;background:currentColor}
+.sw.d{width:7px;height:7px;border-radius:50%}
+.sw.dash{height:0;border-top:2px dashed currentColor;background:transparent}
+#bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--rule);font-size:.86rem;color:var(--muted);background:#fff}
+#eq,#out{margin:0;font:500 .76rem/1.45 "JetBrains Mono",ui-monospace,monospace}
+#eq{color:var(--navy);flex-basis:100%}
+#out{flex-basis:100%}
+button,select{font:inherit;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--rule);padding:6px 11px;cursor:pointer}
+button:hover,select:hover{border-color:var(--navy)}
+button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+button.play{background:#0f766e;color:#fff;border-color:#0f766e}
+button.play.on{background:#115e59}
+input[type=range]{width:150px;vertical-align:middle;accent-color:var(--navy)}
+label.chk{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem}
+.prose{margin-top:36px}
+.prose h2{margin:28px 0 10px;font:600 1.4rem/1.25 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.prose h2:first-child{margin-top:0}
+.prose p{margin:0 0 14px;max-width:46em;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0 20px}
+.card{padding:16px 18px;background:#fff;border:1px solid var(--rule)}
+.card h3{margin:0 0 8px;font:600 1.02rem/1.3 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.card ul{margin:0;padding-left:1.15em;color:var(--muted)}
+.card li{margin:0 0 6px}
+.eqbox{margin:14px 0 18px;padding:14px 16px;background:#fff;border:1px solid var(--rule);font:500 .84rem/1.75 "JetBrains Mono",ui-monospace,monospace;color:var(--navy);overflow-x:auto}
+footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--muted)}
+footer .inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between}
+html.embed,html.embed body{height:100%;background:var(--plate)}
+html.embed header,html.embed .page,html.embed footer,html.embed .prose{display:none}
+html.embed .wrap{max-width:none;height:100%;padding:0}
+html.embed .shell{height:100%;border:0;display:flex;flex-direction:column}
+html.embed .row{flex:1;min-height:0}
+html.embed #view{height:auto}
+@media(max-width:960px){
+  .row{grid-template-columns:1fr}
+  .side{border-left:0;border-top:1px solid var(--rule);max-height:360px}
+  #view{height:min(44vh,380px)}
+  .grid2{grid-template-columns:1fr}
+  header,.wrap,footer{padding-left:18px;padding-right:18px}
+  .logo{height:44px}
+}
+</style>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header>
+  <a href="./"><img class="logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+  <nav aria-label="Site">
+    <a href="./">Home</a>
+    <a href="hub.html#embedded-fiber-models">Library</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="page">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#embedded-fiber-models">Embedded fibers</a></p>
+    <h1>Single fiber in a box under tension</h1>
+    <p class="lede">
+      A unit cube of matrix is stretched in <i>x</i>. One fiber sits entirely inside the box — it does not reach the faces and is not pulled at a tip.
+      Load enters through the matrix; the cohesive interface then loads the fiber. Right-face <i>u<sub>x</sub></i> is taken to 0.5, the MatFib ramp that drives slip past the tail along almost the whole fiber. The force plot is the extra left-face reaction relative to matrix-only.
+    </p>
+    <p class="links">
+      <a href="fiber-pullout.html">Fiber pull-out</a>
+      <a href="fiber-interface.html">Inclined fiber interface</a>
+      <a href="random-fibers.html">Random fibres</a>
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="row">
+      <div id="view">
+        <div class="hud tl">Drag rotate · scroll zoom · right-drag pan</div>
+        <div id="badge" class="hud tr elastic">Rising branch</div>
+        <div id="overlay" class="hud bl">u<sub>x</sub> = 0<br>R<sub>x</sub> = 0</div>
+      </div>
+      <aside class="side">
+        <div class="plot">
+          <h3>Fiber contribution ΔR<sub>x</sub></h3>
+          <canvas id="cForce"></canvas>
+          <div class="leg">
+            <span style="color:var(--fem)"><i class="sw"></i>cohesive</span>
+            <span style="color:var(--lin)"><i class="sw dash"></i>linear bond</span>
+            <span style="color:var(--now)"><i class="sw d"></i>now</span>
+          </div>
+        </div>
+        <div class="plot">
+          <h3>Slip and traction along fiber</h3>
+          <canvas id="cProf"></canvas>
+          <div class="leg">
+            <span style="color:#38bdf8"><i class="sw"></i>slip s<sub>τ</sub></span>
+            <span style="color:var(--now)"><i class="sw"></i>τ<sub>τ</sub></span>
+            <span style="color:var(--fem)"><i class="sw dash"></i>tips</span>
+          </div>
+        </div>
+        <div class="plot">
+          <h3>Bond law τ(s)</h3>
+          <canvas id="cLaw"></canvas>
+          <div class="leg">
+            <span style="color:var(--dR)"><i class="sw"></i>τ(s)</span>
+            <span style="color:#38bdf8"><i class="sw d"></i>stations</span>
+            <span>s<sub>peak</sub> · tail</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="bar">
+      <p id="eq">E<sub>f</sub>A<sub>f</sub> u<sub>f</sub>″ = b<sub>w</sub> τ(u<sub>f</sub> − εx) · u<sub>f</sub>′(tips) = 0 · left face fixed, right u<sub>x</sub> → 0.5 (full debond)</p>
+      <button type="button" class="play" id="btnPlay">Play</button>
+      <button type="button" id="btnReset">Reset</button>
+      <label>u<sub>x</sub>
+        <input id="uSlide" type="range" min="0" max="250" value="0" />
+        <span id="uLabel">0.0000</span>
+      </label>
+      <label>law
+        <select id="lawSel">
+          <option value="smooth" selected>smooth exp (C∞)</option>
+          <option value="v2">piecewise linear (v2)</option>
+        </select>
+      </label>
+      <label>view
+        <select id="viewMode">
+          <option value="cut">cutaway + bond</option>
+          <option value="mesh">matrix mesh</option>
+          <option value="full">full cube</option>
+        </select>
+      </label>
+      <label>color
+        <select id="colorMode">
+          <option value="state">bond state</option>
+          <option value="tau">traction τ</option>
+          <option value="slip">slip s</option>
+        </select>
+      </label>
+      <label>scale
+        <input id="visSlide" type="range" min="5" max="30" value="10" />
+      </label>
+      <label class="chk"><input id="showArrows" type="checkbox" checked /> τ arrows</label>
+      <label class="chk"><input id="showGhost" type="checkbox" checked /> undeformed</label>
+      <p id="out"></p>
+    </div>
+  </div>
+
+  <div class="page prose">
+    <h2>Not a pull-out test</h2>
+    <p>
+      Pull-out drives the fiber tip while the matrix is held. Here the opposite happens, matching
+      MatFib’s <code>FinalProgram_full_1F_NonlinearInterface</code>: the matrix cube is loaded,
+      and the fiber is an interior inclusion. Endpoints are
+      (0.21, ½, ½) → (0.81, ½, ½). Face <i>x</i> = 0 is fully fixed; face <i>x</i> = 1 has prescribed
+      <i>u<sub>x</sub></i> → 0.5 with <i>u<sub>y</sub></i>, <i>u<sub>z</sub></i> free.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <h3>Discretization (MATLAB)</h3>
+        <ul>
+          <li>Unit cube, structured H8 matrix</li>
+          <li>Fiber as 3-D truss bars, 20 segments</li>
+          <li>Newton–Cotes interface along the fiber</li>
+          <li><i>E<sub>m</sub></i> = 1, <i>ν</i> = 0, <i>E<sub>f</sub></i> = 10<sup>4</sup>, <i>d</i> = 0.01</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What you are watching</h3>
+        <ul>
+          <li><b>Matrix only</b> — cube stiffness with no fiber</li>
+          <li><b>Linear bond</b> — constant <i>k<sub>t</sub></i> = 100, Cox shear-lag</li>
+          <li><b>Cohesive</b> — same 1-D fiber, nonlinear τ(<i>s</i>)</li>
+          <li>At <i>u<sub>x</sub></i> = 0.5 the fiber is unloaded: Δ<i>R<sub>x</sub></i> → 0, rings grey</li>
+        </ul>
+      </div>
+    </div>
+    <div class="eqbox">
+      smooth: τ(s) = A s exp(−B s²)&nbsp;&nbsp;&nbsp;A = e f<sub>t</sub>²/G<sub>f</sub>&nbsp;&nbsp;B = (f<sub>t</sub>/G<sub>f</sub>)² e/2<br>
+      v2: τ = f<sub>t</sub> s/a<sub>0</sub> (toe), then linear softening to w<sub>c</sub> = 2 G<sub>f</sub>/f<sub>t</sub>
+    </div>
+    <h2>Why the tips go first</h2>
+    <p>
+      Far-field matrix motion is <i>u<sub>m</sub></i> = <i>ε x</i> with <i>ε</i> = <i>u<sub>x</sub></i>/<i>L</i>.
+      The fiber is orders of magnitude stiffer, so its strain is smaller and more uniform.
+      Relative slip <i>s</i> = <i>u<sub>f</sub></i> − <i>u<sub>m</sub></i> therefore peaks at the ends
+      (Cox shear-lag). Traction-free tips force <i>N</i> = 0 there; axial force builds toward the
+      mid-fiber. Once |<i>s</i>| passes the peak of the bond law, softening fronts march inward from
+      both tips — the same progressive debonding the MATLAB NR solve records on the 3-D mesh.
+    </p>
+    <p>
+      This page solves that 1-D embedded-fiber problem live (bars + nodal Newton–Cotes bond,
+      displacement-controlled NR), which is the reduced model of the 3-D H8 + bar assembly.
+      Matrix compliance around the fiber is omitted, so the cohesive curve is a slightly stiffer
+      cousin of the MATLAB RVE reaction. The MATLAB run at <i>u<sub>x</sub></i> = 0.5 reports
+      34/40 Gauss points in the tail and <i>R<sub>x</sub></i> equal to the matrix-only value;
+      only a vanishing core at mid-fiber still sits below the tail threshold (slip is kinematically
+      zero there). After that, Δ<i>R<sub>x</sub></i> is gone and the cube behaves as matrix-only.
+    </p>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>Mechanics Reference</span>
+    <span><a href="hub.html#embedded-fiber-models">Embedded fibers</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // FinalProgram_full_1F_NonlinearInterface defaults
+  var L = 1;
+  var X1 = 0.21, X2 = 0.81, YF = 0.5, ZF = 0.5;
+  var Lf = X2 - X1, Xc = 0.5 * (X1 + X2);
+  var dFib = 0.01;
+  var bw = Math.PI * dFib;
+  var Af = Math.PI * dFib * dFib / 4;
+  var Ef = 10000;
+  var Em = 1;
+  var ktLin = 100;
+  var a0 = 0.001;
+  var ft = ktLin * a0;
+  var wc = 0.02;
+  var Gf = 0.5 * ft * wc;
+  var UMAX = 0.5;
+  var NX = 41;
+  var NST = 21;
+  var NCURVE = 120;
+  var NELEM = NX - 1;
+  var ea = Ef * Af;
+  var hSeg = Lf / NELEM;
+  var E = Math.E;
+  var Bsm = (ft / Gf) * (ft / Gf) * E / 2;
+  var Asm = E * ft * ft / Gf;
+  var sPeak = 1 / Math.sqrt(2 * Bsm);
+  var Area = L * L;
+
+  var x = new Float64Array(NX);
+  var um = new Float64Array(NX);
+  var uf = new Float64Array(NX);
+  var nodeW = new Float64Array(NX);
+  var i;
+  for (i = 0; i < NX; i++) {
+    x[i] = X1 + (i / (NX - 1)) * Lf;
+    nodeW[i] = (i === 0 || i === NX - 1) ? 0.5 * hSeg * bw : hSeg * bw;
+  }
+
+  var lawMode = 'smooth';
+
+  function tauLaw(s) {
+    if (lawMode === 'v2') {
+      var a = Math.abs(s), sg = s >= 0 ? 1 : -1;
+      if (a >= wc) return 0;
+      if (a < a0) return s * ft / a0;
+      return sg * ft * (wc - a) / (wc - a0);
+    }
+    return Asm * s * Math.exp(-Bsm * s * s);
+  }
+  function dtauLaw(s) {
+    if (lawMode === 'v2') {
+      var a = Math.abs(s);
+      if (a >= wc) return 0;
+      if (a < a0) return ft / a0;
+      return -ft / (wc - a0);
+    }
+    var ex = Math.exp(-Bsm * s * s);
+    return Asm * ex * (1 - 2 * Bsm * s * s);
+  }
+  function stateOf(s) {
+    var a = Math.abs(s);
+    if (lawMode === 'v2') {
+      if (a >= wc) return 3;
+      if (a >= a0) return 2;
+      return 1;
+    }
+    if (a < sPeak) return 1;
+    if (a < 3 * sPeak) return 2;
+    return 3;
+  }
+
+  function triSolve(a, b, c, r) {
+    var n = r.length, k, m, u = new Float64Array(n);
+    var bb = new Float64Array(b);
+    var rr = new Float64Array(r);
+    for (k = 1; k < n; k++) {
+      m = a[k] / bb[k - 1];
+      bb[k] -= m * c[k - 1];
+      rr[k] -= m * rr[k - 1];
+    }
+    u[n - 1] = rr[n - 1] / bb[n - 1];
+    for (k = n - 2; k >= 0; k--) u[k] = (rr[k] - c[k] * u[k + 1]) / bb[k];
+    return u;
+  }
+
+  function solveFiber(eps, uStart) {
+    var n = NX, k, it, jn, tau, dtau, rn, du, un, imid;
+    var a = new Float64Array(n);
+    var b = new Float64Array(n);
+    var c = new Float64Array(n);
+    var r = new Float64Array(n);
+    var ke = ea / hSeg;
+    imid = (n - 1) >> 1;
+    if (uStart) {
+      for (k = 0; k < n; k++) uf[k] = uStart[k];
+    } else {
+      for (k = 0; k < n; k++) uf[k] = eps * x[k];
+    }
+    for (k = 0; k < n; k++) um[k] = eps * x[k];
+    // Symmetry: mid-fiber slip is zero (odd Cox profile). Pins the rigid mode
+    // once the bond tail no longer constrains a free fiber.
+    uf[imid] = um[imid];
+
+    for (it = 0; it < 40; it++) {
+      for (k = 0; k < n; k++) {
+        a[k] = 0; b[k] = 0; c[k] = 0; r[k] = 0;
+      }
+      for (k = 0; k < NELEM; k++) {
+        a[k + 1] -= ke;
+        b[k] += ke;
+        b[k + 1] += ke;
+        c[k] -= ke;
+        r[k] += ke * (uf[k] - uf[k + 1]);
+        r[k + 1] += ke * (uf[k + 1] - uf[k]);
+      }
+      for (k = 0; k < n; k++) {
+        jn = uf[k] - um[k];
+        tau = tauLaw(jn);
+        dtau = dtauLaw(jn);
+        r[k] += nodeW[k] * tau;
+        b[k] += nodeW[k] * dtau;
+      }
+      a[imid] = 0;
+      c[imid] = 0;
+      b[imid] = 1;
+      r[imid] = uf[imid] - um[imid];
+      rn = 0;
+      for (k = 0; k < n; k++) rn += r[k] * r[k];
+      if (Math.sqrt(rn) < 1e-10) break;
+      du = triSolve(a, b, c, r);
+      un = 0;
+      for (k = 0; k < n; k++) {
+        uf[k] -= du[k];
+        un += du[k] * du[k];
+      }
+      uf[imid] = um[imid];
+      if (Math.sqrt(un) < 1e-12) break;
+    }
+
+    var slip = new Float64Array(n);
+    var tauA = new Float64Array(n);
+    var st = new Uint8Array(n);
+    var maxSlip = 0, nDeb = 0, iMax = 0, Nmid;
+    var imid = (n - 1) >> 1;
+    for (k = 0; k < n; k++) {
+      slip[k] = uf[k] - um[k];
+      tauA[k] = tauLaw(slip[k]);
+      st[k] = stateOf(slip[k]);
+      if (Math.abs(slip[k]) > Math.abs(maxSlip)) {
+        maxSlip = slip[k];
+        iMax = k;
+      }
+      if (st[k] >= 3) nDeb++;
+    }
+    Nmid = ea * (uf[imid + 1] - uf[imid - 1]) / (x[imid + 1] - x[imid - 1]);
+    var RxM = Em * Area * eps;
+    return {
+      uf: Float64Array.from(uf),
+      um: Float64Array.from(um),
+      slip: slip,
+      tau: tauA,
+      state: st,
+      Nmid: Nmid,
+      Rx: RxM + Nmid,
+      RxM: RxM,
+      maxSlip: maxSlip,
+      nDeb: nDeb,
+      iMax: iMax
+    };
+  }
+
+  function solveLinear(eps) {
+    var n = NX, k;
+    var a = new Float64Array(n);
+    var b = new Float64Array(n);
+    var c = new Float64Array(n);
+    var r = new Float64Array(n);
+    var ke = ea / hSeg;
+    for (k = 0; k < NELEM; k++) {
+      a[k + 1] -= ke;
+      b[k] += ke;
+      b[k + 1] += ke;
+      c[k] -= ke;
+    }
+    for (k = 0; k < n; k++) {
+      b[k] += nodeW[k] * ktLin;
+      r[k] = nodeW[k] * ktLin * (eps * x[k]);
+    }
+    var ul = triSolve(a, b, c, r);
+    var imid = (n - 1) >> 1;
+    var Nmid = ea * (ul[imid + 1] - ul[imid - 1]) / (x[imid + 1] - x[imid - 1]);
+    return Em * Area * eps + Nmid;
+  }
+
+  var curveC = [];
+  var curveL = [];
+  var snap = [];
+
+  function rebuildCurves() {
+    curveC = [];
+    curveL = [];
+    snap = [];
+    var prev = null, ci, eps, sol;
+    for (ci = 0; ci <= NCURVE; ci++) {
+      eps = (ci / NCURVE) * UMAX;
+      sol = solveFiber(eps, prev);
+      prev = sol.uf;
+      curveC.push({ u: eps * L, F: sol.Nmid });
+      curveL.push({ u: eps * L, F: solveLinear(eps) - Em * Area * eps });
+      snap.push(sol);
+    }
+  }
+  rebuildCurves();
+
+  function stageOf(sol) {
+    var k, n1 = 0, n2 = 0, n3 = 0;
+    for (k = 0; k < NX; k++) {
+      if (sol.state[k] === 1) n1++;
+      else if (sol.state[k] === 2) n2++;
+      else n3++;
+    }
+    if (n3 > NX * 0.7) return { key: 'dead', label: 'Whole fiber debonded' };
+    if (n3 > 0) return { key: 'near', label: 'Tips debonded' };
+    if (n2 > 0) return { key: 'soft', label: 'Softening from tips' };
+    return { key: 'elastic', label: 'Rising branch' };
+  }
+
+  var cForce = document.getElementById('cForce');
+  var cProf = document.getElementById('cProf');
+  var cLaw = document.getElementById('cLaw');
+  var ctxF = cForce.getContext('2d');
+  var ctxP = cProf.getContext('2d');
+  var ctxL = cLaw.getContext('2d');
+
+  function fit(canvas, ctx) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.floor(r.width * dpr));
+    canvas.height = Math.max(1, Math.floor(r.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  }
+  function axes(ctx, w, h, pad) {
+    var i, y;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    for (i = 1; i <= 3; i++) {
+      y = pad.t + (h - pad.t - pad.b) * i / 4;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(w - pad.r, y);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, h - pad.b);
+    ctx.lineTo(w - pad.r, h - pad.b);
+    ctx.stroke();
+  }
+  function poly(ctx, pts, mx, my, color, dash, lw) {
+    var i, p, X, Y;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw || 1.7;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    for (i = 0; i < pts.length; i++) {
+      p = pts[i];
+      X = mx(p.u != null ? p.u : p.x);
+      Y = my(p.F != null ? p.F : p.y);
+      if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawForce(ux, dRnow) {
+    var dim = fit(cForce, ctxF);
+    var w = dim.w, h = dim.h;
+    var pad = { l: 44, r: 10, t: 8, b: 22 };
+    var FmaxC = 1e-12, FmaxL = 1e-12, i;
+    for (i = 0; i < curveL.length; i++) {
+      if (curveL[i].F > FmaxL) FmaxL = curveL[i].F;
+      if (curveC[i].F > FmaxC) FmaxC = curveC[i].F;
+    }
+    // Cohesive ΔR collapses after full debond; don't let the linear path squash that peak.
+    var Fmax = Math.max(FmaxC * 1.35, FmaxL * 0.06);
+    var mx = function (u) { return pad.l + (u / UMAX) * (w - pad.l - pad.r); };
+    var my = function (F) { return h - pad.b - (F / Fmax) * (h - pad.t - pad.b); };
+    ctxF.clearRect(0, 0, w, h);
+    axes(ctxF, w, h, pad);
+    poly(ctxF, curveL, mx, my, '#22d3ee', [5, 3.5], 1.4);
+    poly(ctxF, curveC, mx, my, '#a78bfa', null, 2.1);
+    ctxF.fillStyle = '#fbbf24';
+    ctxF.beginPath();
+    ctxF.arc(mx(ux), my(Math.max(0, dRnow)), 4.5, 0, Math.PI * 2);
+    ctxF.fill();
+    ctxF.strokeStyle = '#fff';
+    ctxF.lineWidth = 1;
+    ctxF.stroke();
+    ctxF.fillStyle = '#64748b';
+    ctxF.font = '9px sans-serif';
+    ctxF.fillText('u_x (right face)', w / 2 - 28, h - 5);
+  }
+
+  function drawProf(sol) {
+    var dim = fit(cProf, ctxP);
+    var w = dim.w, h = dim.h;
+    var pad = { l: 36, r: 10, t: 8, b: 22 };
+    var sMax = Math.max(wc, sPeak * 4), tMax = ft * 1.15, i;
+    for (i = 0; i < NX; i++) {
+      if (Math.abs(sol.slip[i]) > sMax) sMax = Math.abs(sol.slip[i]);
+      if (Math.abs(sol.tau[i]) > tMax) tMax = Math.abs(sol.tau[i]);
+    }
+    var mx = function (xx) { return pad.l + ((xx - X1) / Lf) * (w - pad.l - pad.r); };
+    var mys = function (s) { return pad.t + (h - pad.t - pad.b) * 0.5 - (s / sMax) * (h - pad.t - pad.b) * 0.46; };
+    var myt = function (t) { return pad.t + (h - pad.t - pad.b) * 0.5 - (t / tMax) * (h - pad.t - pad.b) * 0.46; };
+    ctxP.clearRect(0, 0, w, h);
+    axes(ctxP, w, h, pad);
+    ctxP.strokeStyle = '#cbd5e1';
+    ctxP.setLineDash([3, 3]);
+    ctxP.beginPath();
+    ctxP.moveTo(pad.l, mys(0));
+    ctxP.lineTo(w - pad.r, mys(0));
+    ctxP.stroke();
+    var sTail = lawMode === 'v2' ? wc : 3 * sPeak;
+    ctxP.strokeStyle = 'rgba(167,139,250,0.55)';
+    ctxP.beginPath();
+    ctxP.moveTo(pad.l, mys(sTail));
+    ctxP.lineTo(w - pad.r, mys(sTail));
+    ctxP.moveTo(pad.l, mys(-sTail));
+    ctxP.lineTo(w - pad.r, mys(-sTail));
+    ctxP.stroke();
+    ctxP.setLineDash([]);
+    var slip = [], tau = [];
+    for (i = 0; i < NX; i++) {
+      slip.push({ x: x[i], y: sol.slip[i] });
+      tau.push({ x: x[i], y: sol.tau[i] });
+    }
+    poly(ctxP, slip, mx, mys, '#38bdf8');
+    poly(ctxP, tau, mx, myt, '#fbbf24');
+    ctxP.fillStyle = '#64748b';
+    ctxP.font = '9px sans-serif';
+    ctxP.fillText('x along fiber', w / 2 - 24, h - 5);
+  }
+
+  function drawLaw(sol) {
+    var dim = fit(cLaw, ctxL);
+    var w = dim.w, h = dim.h;
+    var pad = { l: 36, r: 10, t: 8, b: 22 };
+    var sMax = Math.max(wc * 1.2, sPeak * 5), tAbs = ft * 1.2, i;
+    for (i = 0; i < NX; i++) {
+      if (Math.abs(sol.slip[i]) > sMax) sMax = Math.abs(sol.slip[i]);
+    }
+    sMax *= 1.08;
+    var mx = function (s) { return pad.l + ((s + sMax) / (2 * sMax)) * (w - pad.l - pad.r); };
+    var my = function (t) { return pad.t + (h - pad.t - pad.b) * 0.5 - (t / tAbs) * (h - pad.t - pad.b) * 0.46; };
+    var s, law = [];
+    ctxL.clearRect(0, 0, w, h);
+    axes(ctxL, w, h, pad);
+    ctxL.strokeStyle = '#cbd5e1';
+    ctxL.setLineDash([3, 3]);
+    ctxL.beginPath();
+    ctxL.moveTo(pad.l, my(0));
+    ctxL.lineTo(w - pad.r, my(0));
+    ctxL.moveTo(mx(0), pad.t);
+    ctxL.lineTo(mx(0), h - pad.b);
+    ctxL.stroke();
+    ctxL.setLineDash([]);
+    for (i = 0; i <= 200; i++) {
+      s = -sMax + (i / 200) * 2 * sMax;
+      law.push({ x: s, y: tauLaw(s) });
+    }
+    poly(ctxL, law, mx, my, '#fb7185', null, 2);
+    var marks = lawMode === 'v2'
+      ? [[a0, '#34d399', 'a0'], [-a0, '#34d399', ''], [wc, '#94a3b8', 'wc'], [-wc, '#94a3b8', '']]
+      : [[sPeak, '#34d399', 'speak'], [-sPeak, '#34d399', ''], [3 * sPeak, '#94a3b8', 'tail'], [-3 * sPeak, '#94a3b8', '']];
+    for (i = 0; i < marks.length; i++) {
+      ctxL.strokeStyle = marks[i][1];
+      ctxL.setLineDash([3, 3]);
+      ctxL.beginPath();
+      ctxL.moveTo(mx(marks[i][0]), pad.t);
+      ctxL.lineTo(mx(marks[i][0]), h - pad.b);
+      ctxL.stroke();
+      ctxL.setLineDash([]);
+      if (marks[i][2]) {
+        ctxL.fillStyle = marks[i][1];
+        ctxL.font = '9px sans-serif';
+        ctxL.fillText(marks[i][2], mx(marks[i][0]) + 2, pad.t + 10);
+      }
+    }
+    var step = Math.max(1, Math.floor(NX / 22));
+    for (i = 0; i < NX; i += step) {
+      ctxL.fillStyle = '#38bdf8';
+      ctxL.beginPath();
+      ctxL.arc(mx(Math.max(-sMax, Math.min(sMax, sol.slip[i]))), my(sol.tau[i]), 2.8, 0, Math.PI * 2);
+      ctxL.fill();
+    }
+  }
+
+  // Three.js
+  var view = document.getElementById('view');
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0f172a);
+  scene.fog = new THREE.Fog(0x0f172a, 5.5, 11);
+
+  var camera = new THREE.PerspectiveCamera(42, 1, 0.02, 30);
+  camera.position.set(2.05, 1.28, 2.15);
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  view.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(0.55, 0.42, 0.48);
+  controls.minDistance = 0.8;
+  controls.maxDistance = 6;
+
+  scene.add(new THREE.AmbientLight(0xb8c4d8, 0.55));
+  var keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
+  keyLight.position.set(2.5, 4, 3);
+  scene.add(keyLight);
+  var fillLight = new THREE.DirectionalLight(0x88aacc, 0.35);
+  fillLight.position.set(-2, 1, -1);
+  scene.add(fillLight);
+
+  var root = new THREE.Group();
+  scene.add(root);
+
+  var grid = new THREE.GridHelper(2.4, 12, 0x334155, 0x1e293b);
+  grid.position.set(0.5, -0.02, 0.5);
+  root.add(grid);
+
+  var matCut = new THREE.MeshPhysicalMaterial({
+    color: 0x9aadc2, transparent: true, opacity: 0.28, roughness: 0.5, metalness: 0.05,
+    side: THREE.DoubleSide, depthWrite: false
+  });
+  var matFull = matCut.clone();
+  matFull.opacity = 0.14;
+
+  var fullCube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), matFull);
+  fullCube.position.set(0.5, 0.5, 0.5);
+  root.add(fullCube);
+
+  var cutBox = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 1), matCut);
+  cutBox.position.set(0.5, 0.25, 0.5);
+  root.add(cutBox);
+
+  var edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
+  var edgeMat = new THREE.LineBasicMaterial({ color: 0x94a3b8 });
+  var edgeFull = new THREE.LineSegments(edgeGeo, edgeMat);
+  edgeFull.position.set(0.5, 0.5, 0.5);
+  root.add(edgeFull);
+
+  var ghostEdge = new THREE.LineSegments(
+    edgeGeo.clone(),
+    new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.55 })
+  );
+  ghostEdge.position.set(0.5, 0.5, 0.5);
+  root.add(ghostEdge);
+
+  var meshLines = new THREE.Group();
+  root.add(meshLines);
+  (function buildMesh() {
+    var n = 5, hh = 1 / n, pts = [], i, j;
+    for (i = 0; i <= n; i++) {
+      for (j = 0; j <= n; j++) {
+        pts.push(0, j * hh, i * hh, 1, j * hh, i * hh);
+        pts.push(j * hh, 0, i * hh, j * hh, 1, i * hh);
+        pts.push(j * hh, i * hh, 0, j * hh, i * hh, 1);
+      }
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    geo.userData.rest = pts.slice();
+    meshLines.userData.geo = geo;
+    meshLines.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+      color: 0x64748b, transparent: true, opacity: 0.5
+    })));
+  })();
+
+  var fixG = new THREE.Group();
+  root.add(fixG);
+  for (var iy = 0; iy < 5; iy++) {
+    for (var iz = 0; iz < 5; iz++) {
+      var tri = new THREE.Mesh(
+        new THREE.ConeGeometry(0.032, 0.055, 3),
+        new THREE.MeshBasicMaterial({ color: 0x64748b })
+      );
+      tri.rotation.z = Math.PI / 2;
+      tri.position.set(-0.038, 0.15 + iy * 0.175, 0.15 + iz * 0.175);
+      fixG.add(tri);
+    }
+  }
+  var fixPlate = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.4, side: THREE.DoubleSide })
+  );
+  fixPlate.rotation.y = Math.PI / 2;
+  fixPlate.position.set(-0.001, 0.5, 0.5);
+  fixG.add(fixPlate);
+
+  var fiberR = 0.022;
+  var fibMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.32, metalness: 0.28 });
+  var fibSegs = [];
+  var fibGroup = new THREE.Group();
+  root.add(fibGroup);
+  var cylGeo = new THREE.CylinderGeometry(fiberR, fiberR, 1, 14, 1);
+  for (i = 0; i < NELEM; i++) {
+    var cyl = new THREE.Mesh(cylGeo, fibMat);
+    fibGroup.add(cyl);
+    fibSegs.push(cyl);
+  }
+  var tipGeo = new THREE.SphereGeometry(fiberR * 1.35, 12, 10);
+  var tipL = new THREE.Mesh(tipGeo, new THREE.MeshStandardMaterial({ color: 0x7dd3fc, roughness: 0.35 }));
+  var tipR = new THREE.Mesh(tipGeo, tipL.material);
+  root.add(tipL, tipR);
+
+  var matLineGeo = new THREE.BufferGeometry();
+  var matLinePos = new Float32Array(NX * 3);
+  matLineGeo.setAttribute('position', new THREE.BufferAttribute(matLinePos, 3));
+  var matLine = new THREE.Line(matLineGeo, new THREE.LineDashedMaterial({
+    color: 0xe879f9, dashSize: 0.03, gapSize: 0.02, transparent: true, opacity: 0.9
+  }));
+  root.add(matLine);
+
+  var arrowGroup = new THREE.Group();
+  root.add(arrowGroup);
+  var stations = [];
+
+  function makeArrow() {
+    var g = new THREE.Group();
+    var mat = new THREE.MeshBasicMaterial({ color: 0x34d399 });
+    var headMat = mat.clone();
+    var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 1, 6), mat);
+    var head = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.028, 8), headMat);
+    g.add(shaft, head);
+    g.userData = { shaft: shaft, head: head, mat: mat, headMat: headMat };
+    return g;
+  }
+
+  for (var si = 0; si < NST; si++) {
+    var t0 = si / (NST - 1);
+    var x0 = X1 + t0 * Lf;
+    var ring = new THREE.Mesh(
+      new THREE.TorusGeometry(fiberR * 1.7, 0.007, 8, 20),
+      new THREE.MeshStandardMaterial({ color: 0x34d399, emissive: 0x06241a, roughness: 0.4 })
+    );
+    ring.rotation.y = Math.PI / 2;
+    ring.position.set(x0, YF, ZF);
+    root.add(ring);
+    var arr = makeArrow();
+    arr.position.set(x0, YF, ZF);
+    arrowGroup.add(arr);
+    stations.push({ t: t0, x0: x0, ring: ring, arr: arr });
+  }
+
+  var pullGroup = new THREE.Group();
+  root.add(pullGroup);
+  var pullMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+  var pulls = [];
+  for (iy = 0; iy < 3; iy++) {
+    for (var pz = 0; pz < 3; pz++) {
+      var sh = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1, 8), pullMat);
+      var hd = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.055, 10), pullMat.clone());
+      pullGroup.add(sh, hd);
+      pulls.push({
+        sh: sh, hd: hd,
+        y: 0.22 + iy * 0.28,
+        z: 0.22 + pz * 0.28
+      });
+    }
+  }
+
+  var origin = new THREE.Vector3(-0.08, -0.08, -0.08);
+  root.add(new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), origin, 0.28, 0xe2e8f0, 0.05, 0.03));
+  root.add(new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), origin, 0.28, 0xe2e8f0, 0.05, 0.03));
+  root.add(new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), origin, 0.28, 0xe2e8f0, 0.05, 0.03));
+
+  var _q = new THREE.Quaternion();
+  var _y = new THREE.Vector3(0, 1, 0);
+  var _d = new THREE.Vector3();
+
+  function hexLerp(a, b, t) {
+    var ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
+    var br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
+    return (((ar + (br - ar) * t) | 0) << 16) | (((ag + (bg - ag) * t) | 0) << 8) | ((ab + (bb - ab) * t) | 0);
+  }
+  function colorStation(slip, tau, st, mode) {
+    var a = Math.abs(slip);
+    if (mode === 'slip') return hexLerp(0x1e3a5f, 0x38bdf8, Math.min(1, a / Math.max(sPeak * 3, wc)));
+    if (mode === 'tau') return hexLerp(0x1e293b, 0xfbbf24, Math.min(1, Math.abs(tau) / ft));
+    if (st >= 3) return 0x64748b;
+    if (st === 2) return hexLerp(0xfbbf24, 0xfb7185, 0.55);
+    return hexLerp(0x065f46, 0x34d399, Math.min(1, Math.abs(tau) / ft));
+  }
+
+  function sampleSol(sol, xx) {
+    var tt = (xx - X1) / Lf;
+    var f = tt * (NX - 1);
+    var i0 = Math.max(0, Math.min(NX - 2, Math.floor(f)));
+    var a = f - i0;
+    return {
+      uf: sol.uf[i0] * (1 - a) + sol.uf[i0 + 1] * a,
+      um: sol.um[i0] * (1 - a) + sol.um[i0 + 1] * a,
+      slip: sol.slip[i0] * (1 - a) + sol.slip[i0 + 1] * a,
+      tau: sol.tau[i0] * (1 - a) + sol.tau[i0 + 1] * a,
+      state: a < 0.5 ? sol.state[i0] : sol.state[i0 + 1]
+    };
+  }
+
+  function setViewMode(mode) {
+    fullCube.visible = mode === 'full';
+    cutBox.visible = mode !== 'full';
+    meshLines.visible = mode === 'mesh';
+    cutBox.material.opacity = mode === 'mesh' ? 0.08 : 0.28;
+  }
+
+  function placeSeg(mesh, ax, ay, az, bx, by, bz) {
+    var dx = bx - ax, dy = by - ay, dz = bz - az;
+    var len = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-8;
+    mesh.position.set((ax + bx) * 0.5, (ay + by) * 0.5, (az + bz) * 0.5);
+    mesh.scale.set(1, len, 1);
+    _d.set(dx, dy, dz).normalize();
+    mesh.quaternion.setFromUnitVectors(_y, _d);
+  }
+
+  function updateScene(sol, ux, vis) {
+    var sx = 1 + vis * ux;
+    fullCube.scale.set(sx, 1, 1);
+    fullCube.position.set(0.5 * sx, 0.5, 0.5);
+    cutBox.scale.set(sx, 1, 1);
+    cutBox.position.set(0.5 * sx, 0.25, 0.5);
+    edgeFull.scale.set(sx, 1, 1);
+    edgeFull.position.set(0.5 * sx, 0.5, 0.5);
+    ghostEdge.visible = document.getElementById('showGhost').checked;
+    arrowGroup.visible = document.getElementById('showArrows').checked;
+
+    var geo = meshLines.userData.geo;
+    var rest = geo.userData.rest;
+    var pos = geo.attributes.position.array;
+    var pi;
+    for (pi = 0; pi < rest.length; pi += 3) {
+      pos[pi] = rest[pi] * sx;
+      pos[pi + 1] = rest[pi + 1];
+      pos[pi + 2] = rest[pi + 2];
+    }
+    geo.attributes.position.needsUpdate = true;
+
+    var i0, xa, xb, ua, ub, sa;
+    for (i0 = 0; i0 < NELEM; i0++) {
+      ua = vis * sol.uf[i0];
+      ub = vis * sol.uf[i0 + 1];
+      placeSeg(fibSegs[i0],
+        x[i0] + ua, YF, ZF,
+        x[i0 + 1] + ub, YF, ZF);
+    }
+    tipL.position.set(x[0] + vis * sol.uf[0], YF, ZF);
+    tipR.position.set(x[NX - 1] + vis * sol.uf[NX - 1], YF, ZF);
+
+    for (i0 = 0; i0 < NX; i0++) {
+      matLinePos[i0 * 3] = x[i0] + vis * sol.um[i0];
+      matLinePos[i0 * 3 + 1] = YF;
+      matLinePos[i0 * 3 + 2] = ZF;
+    }
+    matLineGeo.attributes.position.needsUpdate = true;
+    matLine.computeLineDistances();
+
+    var cmode = document.getElementById('colorMode').value;
+    var smp, col, dx, len, tauA;
+    for (i0 = 0; i0 < NST; i0++) {
+      sa = stations[i0];
+      smp = sampleSol(sol, sa.x0);
+      col = colorStation(smp.slip, smp.tau, smp.state, cmode);
+      dx = vis * smp.uf;
+      sa.ring.position.set(sa.x0 + dx, YF, ZF);
+      sa.ring.material.color.setHex(col);
+      tauA = Math.abs(smp.tau);
+      len = 0.035 + 0.2 * (tauA / ft);
+      sa.arr.position.set(sa.x0 + dx, YF, ZF);
+      sa.arr.userData.shaft.scale.set(1, len, 1);
+      sa.arr.userData.shaft.position.set(0, fiberR + len / 2, 0);
+      sa.arr.userData.head.position.set(0, fiberR + len + 0.014, 0);
+      sa.arr.userData.mat.color.setHex(col);
+      sa.arr.userData.headMat.color.setHex(col);
+      sa.arr.visible = tauA > ft * 0.03;
+      sa.arr.rotation.set(0, 0, smp.tau >= 0 ? 0 : Math.PI);
+    }
+
+    var plen = 0.14 + 0.22 * (ux / UMAX);
+    var xFace = sx;
+    for (i0 = 0; i0 < pulls.length; i0++) {
+      var p = pulls[i0];
+      p.sh.scale.set(1, plen, 1);
+      p.sh.rotation.z = -Math.PI / 2;
+      p.sh.position.set(xFace + plen / 2, p.y, p.z);
+      p.hd.rotation.z = -Math.PI / 2;
+      p.hd.position.set(xFace + plen + 0.028, p.y, p.z);
+    }
+  }
+
+  var uSlide = document.getElementById('uSlide');
+  var uLabel = document.getElementById('uLabel');
+  var btnPlay = document.getElementById('btnPlay');
+  var btnReset = document.getElementById('btnReset');
+  var badge = document.getElementById('badge');
+  var overlay = document.getElementById('overlay');
+  var out = document.getElementById('out');
+
+  var playing = false;
+  var rafPlay = 0;
+  var lastT = 0;
+
+  function fmt(n, d) {
+    if (Math.abs(n) >= 100) return n.toFixed(1);
+    if (Math.abs(n) >= 10) return n.toFixed(2);
+    if (Math.abs(n) >= 1) return n.toFixed(3);
+    return n.toFixed(d != null ? d : 4);
+  }
+
+  function interpSnap(ux) {
+    var t = (ux / UMAX) * NCURVE;
+    var i0 = Math.max(0, Math.min(NCURVE - 1, Math.floor(t)));
+    var a = t - i0;
+    if (a < 1e-9) return snap[i0];
+    var eps = ux / L;
+    return solveFiber(eps, snap[i0].uf);
+  }
+
+  function resize() {
+    var w = view.clientWidth;
+    var h = view.clientHeight;
+    camera.aspect = w / Math.max(1, h);
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+  }
+
+  function visScale() {
+    return parseFloat(document.getElementById('visSlide').value) / 10;
+  }
+
+  function refresh() {
+    var ux = (parseFloat(uSlide.value) / 250) * UMAX;
+    uLabel.textContent = ux.toFixed(4);
+    var sol = interpSnap(ux);
+    var st = stageOf(sol);
+    var vis = visScale();
+
+    badge.textContent = st.label;
+    badge.className = 'hud tr ' + st.key;
+    overlay.innerHTML =
+      'u<sub>x</sub> = ' + ux.toFixed(4) + '<br>' +
+      'R<sub>x</sub> = ' + fmt(sol.Rx, 4) + ' · ΔR<sub>fiber</sub> = ' + fmt(sol.Nmid, 4) + '<br>' +
+      '<span style="color:#94a3b8">display ×' + vis.toFixed(1) + ' displacement</span>';
+
+    out.textContent =
+      'R_mat=' + fmt(sol.RxM, 4) +
+      '  R_lin=' + fmt(solveLinear(ux / L), 4) +
+      '  peak |s|=' + fmt(Math.abs(sol.maxSlip), 4) +
+      '  N_mid=' + fmt(sol.Nmid, 4) +
+      '  debond nodes=' + sol.nDeb + '/' + NX +
+      '  f_t=' + fmt(ft, 3) + '  G_f=' + fmt(Gf, 4);
+
+    setViewMode(document.getElementById('viewMode').value);
+    updateScene(sol, ux, vis);
+    drawForce(ux, sol.Nmid);
+    drawProf(sol);
+    drawLaw(sol);
+  }
+
+  function stopPlay() {
+    playing = false;
+    if (rafPlay) cancelAnimationFrame(rafPlay);
+    rafPlay = 0;
+    btnPlay.textContent = 'Play';
+    btnPlay.classList.remove('on');
+  }
+
+  function playLoop(t) {
+    if (!playing) return;
+    var dt = Math.min(0.05, (t - lastT) / 1000);
+    lastT = t;
+    var v = parseFloat(uSlide.value) + dt * 22;
+    if (v >= 250) {
+      uSlide.value = '250';
+      refresh();
+      stopPlay();
+      return;
+    }
+    uSlide.value = String(v);
+    refresh();
+    rafPlay = requestAnimationFrame(playLoop);
+  }
+
+  btnPlay.addEventListener('click', function () {
+    if (playing) { stopPlay(); return; }
+    if (parseFloat(uSlide.value) >= 249) { uSlide.value = '0'; refresh(); }
+    playing = true;
+    btnPlay.textContent = 'Pause';
+    btnPlay.classList.add('on');
+    lastT = performance.now();
+    rafPlay = requestAnimationFrame(playLoop);
+  });
+  btnReset.addEventListener('click', function () {
+    stopPlay();
+    uSlide.value = '0';
+    refresh();
+  });
+  uSlide.addEventListener('input', function () {
+    if (playing) stopPlay();
+    refresh();
+  });
+  document.getElementById('lawSel').addEventListener('change', function () {
+    lawMode = document.getElementById('lawSel').value;
+    rebuildCurves();
+    refresh();
+  });
+  ['viewMode', 'colorMode', 'showArrows', 'showGhost', 'visSlide'].forEach(function (id) {
+    document.getElementById(id).addEventListener('change', refresh);
+    document.getElementById(id).addEventListener('input', refresh);
+  });
+  window.addEventListener('resize', function () { resize(); refresh(); });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  resize();
+  setViewMode('cut');
+  refresh();
+  animate();
+})();
+</script>
+</body>
+</html>

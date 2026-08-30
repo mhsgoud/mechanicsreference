@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solid elements vs beam elements — Mechanics Reference</title>
+<meta name="description" content="Side-by-side: a plane-stress solid mesh versus a beam model of the same cantilever. Reduced Timoshenko matches the solid; full integration locks when the strip is thin." />
+<link rel="canonical" href="https://mechanicsreference.com/beam-solid-reduced.html" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+<style>
+:root{
+  --paper:#f7f6f2;--ink:#1c2430;--muted:#3d4756;--rule:#d8d4cb;
+  --navy:#1e3a5f;--plate:#0f172a;--accent:#c45c26;
+  --eb:#e8c547;--red:#38bdf8;--full:#e879f9;--q4:#f87171;--b8:#34d399;--an:#4ade80;
+}
+*{box-sizing:border-box}html,body{margin:0}html{scrollbar-gutter:stable}
+body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+a{color:#3a5f8a}
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:20px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--rule)}
+.logo{height:52px;width:auto}
+nav{margin-left:auto;display:flex;gap:4px}
+nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 56px}
+.crumb{padding:28px 0 8px;font-size:.92rem;color:var(--muted)}
+h1{margin:0 0 12px;font:600 clamp(1.75rem,3.8vw,2.4rem)/1.2 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.lede{margin:0 0 10px;max-width:50em;font:1.1rem/1.5 "Source Serif 4",Georgia,serif;color:var(--muted)}
+.links{margin:0 0 22px;font-size:.9rem;color:var(--muted)}
+.links a{margin-right:.75rem}
+.shell{border:1px solid var(--rule);background:#fff;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(340px,1.7fr) minmax(260px,.85fr);background:var(--plate)}
+#view{position:relative;height:min(70vh,720px);min-height:460px;background:#0e1624;overflow:hidden}
+#view canvas{display:block;width:100%;height:100%}
+.hint{position:absolute;top:12px;right:12px;z-index:4;pointer-events:none;font-size:.7rem;letter-spacing:.04em;padding:6px 10px;background:rgba(8,12,20,.55);color:#94a3b8;backdrop-filter:blur(8px);border:1px solid rgba(148,163,184,.18)}
+.chips{position:absolute;left:12px;top:12px;z-index:4;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(340px,68%)}
+.chip{padding:9px 12px;background:rgba(8,12,20,.62);border:1px solid rgba(148,163,184,.2);color:#e2e8f0;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.28)}
+.chip b{display:block;font:600 .84rem/1.2 "Source Serif 4",Georgia,serif}
+.chip span{display:block;margin-top:3px;font:500 .74rem/1.35 "JetBrains Mono",ui-monospace,monospace;color:#cbd5e1}
+.chip.c-solid{border-left:3px solid #e07a5f}
+.chip.c-solid b{color:#fdba74}
+.chip.c-beam{border-left:3px solid #38bdf8}
+.chip.c-beam b{color:#7dd3fc}
+.chip.c-match{font-size:.75rem;border-left:3px solid #64748b}
+.chip.c-match.ok{border-left-color:#34d399;color:#6ee7b7}
+.chip.c-match.bad{border-left-color:#fb7185;color:#fda4af;font-weight:700}
+.label3d{font:700 12px/1.2 "Source Sans 3",system-ui,sans-serif;color:#f8fafc;text-shadow:0 1px 8px #000,0 0 18px rgba(0,0,0,.6);white-space:nowrap;pointer-events:none;letter-spacing:.04em}
+.label3d.solid{color:#fed7aa}
+.label3d.beam{color:#bae6fd}
+.cbar{position:absolute;right:12px;bottom:12px;z-index:4;display:flex;gap:8px;align-items:stretch;padding:8px 10px;background:rgba(8,12,20,.62);border:1px solid rgba(148,163,184,.2);backdrop-filter:blur(10px);color:#cbd5e1;font:500 .62rem/1.2 "JetBrains Mono",ui-monospace,monospace;pointer-events:none}
+.cbar-title{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;font:600 .62rem "Source Sans 3",sans-serif}
+.cbar-grad{width:10px;border-radius:1px;background:linear-gradient(to top,#3b82f6,#e2e8f0,#ea580c)}
+.cbar-labs{display:flex;flex-direction:column;justify-content:space-between;text-align:right;min-width:3.2em}
+.side{display:flex;flex-direction:column;background:#fff;border-left:1px solid var(--rule);min-height:0;overflow:auto}
+.verdict{padding:14px 14px 12px;border-bottom:1px solid var(--rule);background:#fff8f1}
+.verdict p{margin:0;font:600 1.02rem/1.35 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.verdict span{display:block;margin-top:6px;font:400 .82rem/1.4 "Source Sans 3",sans-serif;color:var(--muted)}
+.board{padding:10px 14px 8px;border-bottom:1px solid var(--rule)}
+.mrow{display:grid;grid-template-columns:14px 1fr auto;gap:6px 8px;align-items:center;margin:0 0 9px;font-size:.78rem}
+.mrow .name{color:var(--ink);font-weight:600;line-height:1.2}
+.mrow .sub{color:var(--muted);font-weight:400;font-size:.7rem}
+.mrow .num{font:600 .84rem/1 "JetBrains Mono",ui-monospace,monospace;color:var(--navy);text-align:right}
+.mrow .bar{grid-column:1/-1;height:7px;background:#eeeae3;position:relative}
+.mrow .bar>i{display:block;height:100%;background:currentColor}
+.mrow .tag{grid-column:1/-1;font-size:.7rem;margin-top:-4px}
+.mrow .tag.ok{color:#0f766e}
+.mrow .tag.bad{color:#9f1239;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%}
+.plot{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 12px 2px;border-bottom:1px solid var(--rule)}
+.plot:last-child{border-bottom:0}
+.plot h3{margin:0 0 2px;font-size:.72rem;font-weight:600;color:var(--navy)}
+.plot p.hint{margin:0 0 4px;font-size:.68rem;color:var(--muted)}
+.plot canvas{flex:1;width:100%;min-height:100px}
+.leg{margin:2px 0 4px;font-size:.62rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.sw{display:inline-block;width:12px;height:2px;vertical-align:middle;margin-right:3px;background:currentColor}
+.sw.d{width:7px;height:7px;border-radius:50%}
+.sw.dash{height:0;border-top:2px dashed currentColor;background:transparent}
+#bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 16px;border-top:1px solid var(--rule);font-size:.84rem;color:var(--muted);background:#fff}
+#eq{margin:0;flex-basis:100%;font:600 .9rem/1.4 "Source Sans 3",sans-serif;color:var(--navy)}
+#out{display:none}
+details.more{flex-basis:100%;font-size:.82rem}
+details.more summary{cursor:pointer;font-weight:600;color:var(--navy)}
+details.more .more-row{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:8px;align-items:center}
+button,select{font:inherit;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--rule);padding:6px 11px;cursor:pointer}
+button:hover,select:hover{border-color:var(--navy)}
+button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+button.play{background:#0f766e;color:#fff;border-color:#0f766e}
+button.play.on{background:#115e59}
+input[type=range]{width:140px;vertical-align:middle;accent-color:var(--navy)}
+label.chk{display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:.82rem}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{padding:4px 8px;font-size:.78rem}
+.prose{margin-top:36px}
+.prose h2{margin:28px 0 10px;font:600 1.4rem/1.25 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.prose h2:first-child{margin-top:0}
+.prose p{margin:0 0 14px;max-width:48em;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0 20px}
+.card{padding:16px 18px;background:#fff;border:1px solid var(--rule)}
+.card h3{margin:0 0 8px;font:600 1.02rem/1.3 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.card ul{margin:0;padding-left:1.15em;color:var(--muted)}
+.card li{margin:0 0 6px}
+.eqbox{margin:14px 0 18px;padding:14px 16px;background:#fff;border:1px solid var(--rule);font:500 .82rem/1.75 "JetBrains Mono",ui-monospace,monospace;color:var(--navy);overflow-x:auto}
+table.cmp{width:100%;border-collapse:collapse;font:500 .78rem/1.45 "JetBrains Mono",ui-monospace,monospace;margin:12px 0 8px}
+table.cmp th,table.cmp td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:right}
+table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+table.cmp th{color:var(--navy);font-weight:600}
+.figwrap{margin-top:28px}
+.figwrap h2{margin:0 0 8px;font:600 1.4rem/1.25 "Source Serif 4",Georgia,serif;color:var(--navy)}
+.figcap{margin:0 0 16px;max-width:52em;font:1.02rem/1.5 "Source Serif 4",Georgia,serif;color:var(--muted)}
+.fig{background:#fff;border:1px solid var(--rule)}
+.fig-plots{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--rule)}
+.fig-cell{padding:10px 12px 8px;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--rule)}
+.fig-cell:last-child{border-right:0}
+.fig-cell h3,.fig-shapes h3{margin:0 0 6px;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.fig-cell canvas{width:100%;height:200px;display:block}
+.fig-shapes{padding:10px 12px 8px}
+.fig-shapes canvas{width:100%;height:240px;display:block;background:#fbfaf7}
+.fig .leg{margin:8px 0 4px;font-size:.72rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px}
+html.embed .figwrap{display:none}
+@media(max-width:960px){
+  .fig-plots{grid-template-columns:1fr}
+  .fig-cell{border-right:0;border-bottom:1px solid var(--rule)}
+  .fig-cell canvas{height:180px}
+  .fig-shapes canvas{height:420px}
+}
+footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--muted)}
+footer .inner{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between}
+html.embed,html.embed body{height:100%;background:var(--plate)}
+html.embed header,html.embed .page,html.embed footer,html.embed .prose{display:none}
+html.embed .wrap{max-width:none;height:100%;padding:0}
+html.embed .shell{height:100%;border:0;display:flex;flex-direction:column}
+html.embed .row{flex:1;min-height:0}
+html.embed #view{height:auto}
+@media(max-width:960px){
+  .row{grid-template-columns:1fr}
+  .side{border-left:0;border-top:1px solid var(--rule);max-height:380px}
+  #view{height:min(46vh,400px)}
+  .grid2{grid-template-columns:1fr}
+  header,.wrap,footer{padding-left:18px;padding-right:18px}
+  .logo{height:44px}
+}
+</style>
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header>
+  <a href="./"><img class="logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+  <nav aria-label="Site">
+    <a href="./">Home</a>
+    <a href="hub.html#mixed-methods-and-locking">Library</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="page">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#mixed-methods-and-locking">Mixed methods and locking</a></p>
+    <h1>Solid elements versus beam elements</h1>
+    <p class="lede">
+      Same cantilever, side view. <b>Top</b> is the solid Q4 mesh (a 2-D continuum with thickness).
+      <b>Bottom</b> is a <i>1-D</i> beam — a line, not a brick. Numbers are MATLAB tip drops from the same script.
+    </p>
+    <p class="links">
+      <a href="hub.html#mixed-methods-and-locking">Why locking happens</a>
+      <a href="hub.html#numerical-integration-gauss-quadrature">Gauss points</a>
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="row">
+      <div id="view">
+        <div class="hint">drag to orbit · scroll to zoom</div>
+        <div class="chips">
+          <div class="chip c-solid"><b>Top — solid Q4 (2-D continuum)</b><span id="capSolid">MATLAB |w| = —</span></div>
+          <div class="chip c-beam"><b id="capBeamTitle">Bottom — 1-D reduced Timoshenko</b><span id="capBeam">MATLAB |w| = —</span></div>
+          <div class="chip c-match" id="capMatch">—</div>
+        </div>
+        <div class="cbar" id="cbar">
+          <div class="cbar-title">σxx</div>
+          <div class="cbar-grad"></div>
+          <div class="cbar-labs"><span id="cbarMax">—</span><span>0</span><span id="cbarMin">—</span></div>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="verdict" id="verdict">
+          <p>Top = 2-D solid mesh. Bottom = 1-D beam axis. Numbers are MATLAB.</p>
+          <span>Euler / Timoshenko are line elements. They are drawn as a wire with nodes, not as a solid of thickness h. Tip |w| is from out_beam_solid_reduced.</span>
+        </div>
+        <div class="board" id="board">
+          <div class="mrow" style="color:var(--q4)">
+            <i class="dot" style="background:var(--q4)"></i>
+            <div><div class="name">Solid (top)</div><div class="sub">Q4 plane-stress mesh</div></div>
+            <div class="num" id="nQ4">—</div>
+            <div class="bar"><i id="bQ4" style="width:100%"></i></div>
+            <div class="tag ok" id="tQ4">MATLAB Q4 tip</div>
+          </div>
+          <div class="mrow" id="rowBeam" style="color:var(--red)">
+            <i class="dot" style="background:var(--red)"></i>
+            <div><div class="name">Beam (bottom)</div><div class="sub" id="beamSub">1-D reduced Timoshenko</div></div>
+            <div class="num" id="nBeam">—</div>
+            <div class="bar"><i id="bBeam"></i></div>
+            <div class="tag" id="tBeam">—</div>
+          </div>
+        </div>
+        <div class="plot">
+          <h3>Tip drop versus how thin the strip is</h3>
+          <p class="hint">Solid (red) vs the three beam models. They should sit on top of each other if the beam is valid.</p>
+          <canvas id="cDefl"></canvas>
+          <div class="leg">
+            <span style="color:var(--q4)"><i class="sw"></i>solid</span>
+            <span style="color:var(--red)"><i class="sw"></i>reduced</span>
+            <span style="color:var(--full)"><i class="sw dash"></i>full int.</span>
+            <span style="color:var(--eb)"><i class="sw"></i>no shear</span>
+            <span style="color:var(--navy)"><i class="sw d"></i>now</span>
+          </div>
+        </div>
+        <div class="plot">
+          <h3>Does a finer beam mesh fix locking?</h3>
+          <p class="hint">Purple climbs slowly. Blue is already right. Adding elements is a bad cure.</p>
+          <canvas id="cLock"></canvas>
+          <div class="leg">
+            <span style="color:var(--red)"><i class="sw"></i>reduced</span>
+            <span style="color:var(--full)"><i class="sw dash"></i>full int.</span>
+            <span style="color:var(--q4)"><i class="sw dash"></i>solid</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="bar">
+      <p id="eq">Top = Q4 continuum. Bottom = 1-D beam axis. |w| from MATLAB.</p>
+      <label>Bottom beam
+        <select id="beamKindBar">
+          <option value="reduced" selected>Reduced Timoshenko</option>
+          <option value="full">Full-int. Timoshenko (locks)</option>
+          <option value="eb">Euler–Bernoulli</option>
+        </select>
+      </label>
+      <button type="button" id="btnThin">Thin strip</button>
+      <button type="button" id="btnThick">Thick strip</button>
+      <label>thickness 1/<span id="hlLabel">8</span>
+        <input id="hlSlide" type="range" min="2" max="50" value="8" />
+      </label>
+      <label>beam elements
+        <input id="nSlide" type="range" min="1" max="32" value="10" />
+        <span id="nLabel">10</span>
+      </label>
+      <label>display scale
+        <input id="scSlide" type="range" min="4" max="40" value="16" />
+      </label>
+      <details class="more">
+        <summary>More</summary>
+        <div class="more-row">
+          <button type="button" class="play" id="btnPlay">Sweep thickness</button>
+          <button type="button" id="btnReset">Reset</button>
+          <label>load
+            <select id="bcSel">
+              <option value="cantilever" selected>cantilever, tip push</option>
+              <option value="ss">supported both ends, uniform load</option>
+            </select>
+          </label>
+          <label class="chk"><input id="showGhost" type="checkbox" checked /> undeformed outline</label>
+          <label class="chk"><input id="showMesh" type="checkbox" checked /> solid mesh lines</label>
+        </div>
+      </details>
+      <p id="out"></p>
+    </div>
+  </div>
+
+  <div class="figwrap">
+    <h2>Agreement versus thickness</h2>
+    <p class="figcap">
+      Same strip, same load, MATLAB tip values. <b>Reduced Timoshenko</b> tracks the solid Q4 from slender to thick.
+      Full two-point shear locks when the beam is thin (panel C climbs toward 90%). Euler–Bernoulli has no shear, so it peels off when the beam is thick.
+      Panel D overlays the solid mesh and the 1-D beam axis at four thicknesses (motion scaled the same way in each panel). The navy dashed line is the slider’s current <i>h/L</i>.
+    </p>
+    <div class="fig">
+      <div class="fig-plots">
+        <div class="fig-cell">
+          <h3>A · tip drop |w|</h3>
+          <canvas id="cW"></canvas>
+        </div>
+        <div class="fig-cell">
+          <h3>B · |w| / |w|<sub>Bernoulli</sub></h3>
+          <canvas id="cNrm"></canvas>
+        </div>
+        <div class="fig-cell">
+          <h3>C · |difference from solid Q4|</h3>
+          <canvas id="cErr"></canvas>
+        </div>
+      </div>
+      <div class="leg" style="padding:8px 12px;border-bottom:1px solid var(--rule)">
+        <span style="color:#c2410c"><i class="sw"></i>solid Q4</span>
+        <span style="color:#0284c7"><i class="sw"></i>reduced Timoshenko</span>
+        <span style="color:#c026d3"><i class="sw dash"></i>full-int. Timoshenko</span>
+        <span style="color:#ca8a04"><i class="sw"></i>Euler–Bernoulli</span>
+        <span style="color:#16a34a"><i class="sw dash"></i>analytical Timoshenko</span>
+        <span style="color:#1e3a5f"><i class="sw dash"></i>current h/L</span>
+      </div>
+      <div class="fig-shapes">
+        <h3>D · deformed shapes at four thicknesses — solid mesh and 1-D beam</h3>
+        <canvas id="cShapes"></canvas>
+        <div class="leg">
+          <span style="color:#9a3412"><i class="sw"></i>solid Q4</span>
+          <span style="color:#0284c7"><i class="sw"></i>reduced Timoshenko</span>
+          <span style="color:#a21caf"><i class="sw dash"></i>full-int. Timoshenko</span>
+          <span style="color:#a16207"><i class="sw"></i>Euler–Bernoulli</span>
+          <span style="color:#64748b"><i class="sw dash"></i>undeformed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page prose">
+    <h2>What you are comparing</h2>
+    <p>
+      <b>Top — solid elements.</b> The strip is a 2-D continuum: Q4 quads along the length and through the thickness. No beam theory. This is the reference.
+    </p>
+    <p>
+      <b>Bottom — 1-D beam elements.</b> Euler–Bernoulli and Timoshenko are lines: deflection <i>w(x)</i> and rotation <i>θ(x)</i> only. The picture is that axis (nodes + a short tick for <i>θ</i>), not a solid of height <i>h</i>. Default is reduced Timoshenko (1-point shear). Tip values are MATLAB’s.
+    </p>
+    <div class="grid2">
+      <div class="card">
+        <h3>When they should match</h3>
+        <ul>
+          <li><b>Reduced Timoshenko</b> (1-point shear) tracks the solid from thin to thick.</li>
+          <li>That is the beam you want if the job is to replace a solid mesh.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>When they should not</h3>
+        <ul>
+          <li><b>Full-integration Timoshenko</b> on a thin strip: the beam stays straight (shear locking).</li>
+          <li><b>Euler–Bernoulli</b> on a thick strip: the beam is too stiff because it has no shear.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="eqbox">
+      Thin truth ≈ P L³ / (3 EI)&nbsp;&nbsp;·&nbsp;&nbsp;thick adds P L / (G A<sub>s</sub>) of shear drop<br>
+      Locking: two-point shear on a linear Timoshenko element&nbsp;&nbsp;·&nbsp;&nbsp;Fix: one-point shear
+    </div>
+
+    <h2>MATLAB numbers (same script)</h2>
+    <p class="note">Cantilever tip drop from <code>out_beam_solid_reduced/cantilever_vs_hL.dat</code>. Larger number = more bending.</p>
+    <table class="cmp" id="tblCant">
+      <thead>
+        <tr><th>h/L</th><th>|w|<sub>EB</sub></th><th>|w|<sub>red</sub></th><th>|w|<sub>full</sub></th><th>|w|<sub>Q4</sub></th><th>|w|<sub>an.TS</sub></th><th>nrm<sub>Q4</sub></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>Finer mesh, still locked (thin strip 1/50)</h2>
+    <p class="note">Full integration at 32 elements is still only about half the true drop. Reduced is already fine at 4 elements.</p>
+    <table class="cmp" id="tblLock">
+      <thead>
+        <tr><th>n</th><th>|w|<sub>EB</sub></th><th>|w|<sub>red</sub></th><th>|w|<sub>full</sub></th><th>|w|<sub>an.TS</sub></th><th>|w|<sub>Q4</sub></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>3-D solid bricks agree too</h2>
+    <p class="note">A few 3-D hex meshes (B8) from the same script. They sit next to the 2-D solid, not next to the locked beam.</p>
+    <table class="cmp" id="tbl3d">
+      <thead>
+        <tr><th>h/L</th><th>|w|<sub>EB</sub></th><th>|w|<sub>red</sub></th><th>|w|<sub>Q4</sub></th><th>|w|<sub>B8</sub></th><th>ndof Q4</th><th>ndof B8</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+</main>
+<footer><div class="inner"><span>Mechanics Reference</span><span><a href="hub.html#mixed-methods-and-locking">Mixed methods and locking</a></span></div></footer>
+
+<script>
+(function () {
+  var P = { E: 1e6, nu: 0.3, L: 1, b: 1, kappa: 5 / 6, Ptip: -1e3, qss: -2e3 };
+
+  /* MATLAB compare_beam_solid_reduced tables */
+  var CANT = [
+    { hL: 0.02, wEB: -500, wRed: -498.906, wFull: -55.4938, wQ4: -487.412, wAnEB: -500, wAnTS: -500.156, nrmQ4: 0.974825 },
+    { hL: 0.04, wEB: -62.5, wRed: -62.4217, wFull: -20.8371, wQ4: -62.0544, wAnEB: -62.5, wAnTS: -62.578, nrmQ4: 0.992870 },
+    { hL: 0.0625, wEB: -16.384, wRed: -16.3930, wFull: -9.02708, wQ4: -16.2878, wAnEB: -16.384, wAnTS: -16.4339, nrmQ4: 0.994128 },
+    { hL: 0.1, wEB: -4, wRed: -4.0212, wFull: -3.05275, wQ4: -3.99159, wAnEB: -4, wAnTS: -4.0312, nrmQ4: 0.997898 },
+    { hL: 0.125, wEB: -2.048, wRed: -2.06784, wFull: -1.72012, wQ4: -2.05121, wAnEB: -2.048, wAnTS: -2.07296, nrmQ4: 1.00157 },
+    { hL: 1 / 6, wEB: -0.864, wRed: -0.88056, wFull: -0.79140, wQ4: -0.87240, wAnEB: -0.864, wAnTS: -0.88272, nrmQ4: 1.00973 },
+    { hL: 0.25, wEB: -0.256, wRed: -0.26784, wFull: -0.25538, wQ4: -0.26524, wAnEB: -0.256, wAnTS: -0.26848, nrmQ4: 1.03609 },
+    { hL: 1 / 3, wEB: -0.108, wRed: -0.11709, wFull: -0.11407, wQ4: -0.11580, wAnEB: -0.108, wAnTS: -0.11736, nrmQ4: 1.07218 },
+    { hL: 0.5, wEB: -0.032, wRed: -0.03816, wFull: -0.037756, wQ4: -0.037494, wAnEB: -0.032, wAnTS: -0.03824, nrmQ4: 1.17170 }
+  ];
+  var SS = [
+    { hL: 0.02, wEB: -39.0625, wRed: -38.4765, wFull: -4.30376, wQ4: -38.1223, wAnEB: -39.0625, wAnTS: -39.1015 },
+    { hL: 0.04, wEB: -4.88281, wRed: -4.82419, wFull: -1.61935, wQ4: -4.86457, wAnEB: -4.88281, wAnTS: -4.90231 },
+    { hL: 0.0625, wEB: -1.28, wRed: -1.272, wFull: -0.70433, wQ4: -1.28250, wAnEB: -1.28, wAnTS: -1.29248 },
+    { hL: 0.1, wEB: -0.3125, wRed: -0.3153, wFull: -0.24066, wQ4: -0.31806, wAnEB: -0.3125, wAnTS: -0.3203 },
+    { hL: 0.125, wEB: -0.16, wRed: -0.16368, wFull: -0.13688, wQ4: -0.16531, wAnEB: -0.16, wAnTS: -0.16624 },
+    { hL: 1 / 6, wEB: -0.0675, wRed: -0.0711, wFull: -0.06423, wQ4: -0.07211, wAnEB: -0.0675, wAnTS: -0.07218 },
+    { hL: 0.25, wEB: -0.02, wRed: -0.0228, wFull: -0.02184, wQ4: -0.023715, wAnEB: -0.02, wAnTS: -0.02312 },
+    { hL: 1 / 3, wEB: -0.0084375, wRed: -0.0106425, wFull: -0.010410, wQ4: -0.011632, wAnEB: -0.0084375, wAnTS: -0.0107775 },
+    { hL: 0.5, wEB: -0.0025, wRed: -0.00402, wFull: -0.003989, wQ4: -0.005119, wAnEB: -0.0025, wAnTS: -0.00406 }
+  ];
+  var LOCK = [
+    { n: 1, wEB: -500, wRed: -375.156, wFull: -0.62342, wAnTS: -500.156, wQ4: -487.412 },
+    { n: 2, wEB: -500, wRed: -468.906, wFull: -2.48438, wAnTS: -500.156, wQ4: -487.412 },
+    { n: 4, wEB: -500, wRed: -492.344, wFull: -9.79160, wAnTS: -500.156, wQ4: -487.412 },
+    { n: 8, wEB: -500, wRed: -498.203, wFull: -36.9937, wAnTS: -500.156, wQ4: -487.412 },
+    { n: 16, wEB: -500, wRed: -499.668, wFull: -121.103, wAnTS: -500.156, wQ4: -487.412 },
+    { n: 32, wEB: -500, wRed: -500.034, wFull: -280.592, wAnTS: -500.156, wQ4: -487.412 }
+  ];
+  var SPOT = [
+    { hL: 0.05, wEB: -32, wRed: -32.0574, wQ4: -31.7868, wB8: -30.8573, ndofQ4: 2898, ndofB8: 6075 },
+    { hL: 0.125, wEB: -2.048, wRed: -2.07264, wQ4: -2.05121, wB8: -1.97934, ndofQ4: 1170, ndofB8: 2475 },
+    { hL: 0.25, wEB: -0.256, wRed: -0.26844, wQ4: -0.26524, wB8: -0.25548, ndofQ4: 738, ndofB8: 1575 }
+  ];
+
+  function fmt(x, d) {
+    var a = Math.abs(x);
+    if (!isFinite(x)) return '—';
+    if (a >= 100) return x.toFixed(1);
+    if (a >= 1) return x.toFixed(d == null ? 3 : d);
+    if (a >= 0.01) return x.toFixed(4);
+    return x.toExponential(3);
+  }
+  function fillTable(id, rows, cols) {
+    var tb = document.querySelector('#' + id + ' tbody');
+    tb.innerHTML = rows.map(function (r) {
+      return '<tr>' + cols.map(function (c) { return '<td>' + c(r) + '</td>'; }).join('') + '</tr>';
+    }).join('');
+  }
+  fillTable('tblCant', CANT, [
+    function (r) {
+      var inv = 1 / r.hL;
+      return Math.abs(inv - Math.round(inv)) < 0.05 ? '1/' + Math.round(inv) : r.hL.toFixed(4);
+    },
+    function (r) { return fmt(Math.abs(r.wEB)); },
+    function (r) { return fmt(Math.abs(r.wRed)); },
+    function (r) { return fmt(Math.abs(r.wFull)); },
+    function (r) { return fmt(Math.abs(r.wQ4)); },
+    function (r) { return fmt(Math.abs(r.wAnTS)); },
+    function (r) { return r.nrmQ4.toFixed(4); }
+  ]);
+  fillTable('tblLock', LOCK, [
+    function (r) { return String(r.n); },
+    function (r) { return fmt(Math.abs(r.wEB)); },
+    function (r) { return fmt(Math.abs(r.wRed)); },
+    function (r) { return fmt(Math.abs(r.wFull)); },
+    function (r) { return fmt(Math.abs(r.wAnTS)); },
+    function (r) { return fmt(Math.abs(r.wQ4)); }
+  ]);
+  fillTable('tbl3d', SPOT, [
+    function (r) { return r.hL.toFixed(3); },
+    function (r) { return fmt(Math.abs(r.wEB)); },
+    function (r) { return fmt(Math.abs(r.wRed)); },
+    function (r) { return fmt(Math.abs(r.wQ4)); },
+    function (r) { return fmt(Math.abs(r.wB8)); },
+    function (r) { return String(r.ndofQ4); },
+    function (r) { return String(r.ndofB8); }
+  ]);
+
+  function lerpTab(tab, hL, key) {
+    if (hL <= tab[0].hL) return tab[0][key];
+    if (hL >= tab[tab.length - 1].hL) return tab[tab.length - 1][key];
+    var i;
+    for (i = 0; i < tab.length - 1; i++) {
+      if (hL >= tab[i].hL && hL <= tab[i + 1].hL) {
+        var t = (Math.log(hL) - Math.log(tab[i].hL)) / (Math.log(tab[i + 1].hL) - Math.log(tab[i].hL));
+        var a = tab[i][key], b = tab[i + 1][key];
+        if (a === 0 || b === 0 || a * b < 0) return a + t * (b - a);
+        var sa = a < 0 ? -1 : 1;
+        return sa * Math.exp(Math.log(Math.abs(a)) * (1 - t) + Math.log(Math.abs(b)) * t);
+      }
+    }
+    return tab[tab.length - 1][key];
+  }
+
+  function IA(h) { return { A: P.b * h, I: P.b * h * h * h / 12 }; }
+  function Gmod() { return P.E / (2 * (1 + P.nu)); }
+  function GAs(h) { return Gmod() * P.kappa * P.b * h; }
+
+  function gauss1(n) {
+    if (n === 1) return { w: [2], x: [0] };
+    var a = 1 / Math.sqrt(3);
+    return { w: [1, 1], x: [-a, a] };
+  }
+  function shapeLin(xi, L) {
+    return { N: [(1 - xi) / 2, (1 + xi) / 2], dNdx: [-1 / L, 1 / L] };
+  }
+
+  function cholesky(A, b, n) {
+    var i, j, k, s, L = A;
+    for (i = 0; i < n; i++) {
+      for (j = 0; j <= i; j++) {
+        s = L[i * n + j];
+        for (k = 0; k < j; k++) s -= L[i * n + k] * L[j * n + k];
+        if (i === j) {
+          if (s < 1e-30) s = 1e-30;
+          L[i * n + i] = Math.sqrt(s);
+        } else L[i * n + j] = s / L[j * n + j];
+      }
+    }
+    var y = new Float64Array(n), x = new Float64Array(n);
+    for (i = 0; i < n; i++) {
+      s = b[i];
+      for (k = 0; k < i; k++) s -= L[i * n + k] * y[k];
+      y[i] = s / L[i * n + i];
+    }
+    for (i = n - 1; i >= 0; i--) {
+      s = y[i];
+      for (k = i + 1; k < n; k++) s -= L[k * n + i] * x[k];
+      x[i] = s / L[i * n + i];
+    }
+    return x;
+  }
+
+  function solveDense(K, f, fix) {
+    var ndof = f.length, i, j, nfree = 0;
+    var isFix = new Uint8Array(ndof);
+    for (i = 0; i < fix.length; i++) isFix[fix[i]] = 1;
+    var map = new Int32Array(ndof);
+    for (i = 0; i < ndof; i++) map[i] = isFix[i] ? -1 : nfree++;
+    var A = new Float64Array(nfree * nfree);
+    var rhs = new Float64Array(nfree);
+    for (i = 0; i < ndof; i++) {
+      if (map[i] < 0) continue;
+      rhs[map[i]] = f[i];
+      for (j = 0; j < ndof; j++) {
+        if (map[j] < 0) continue;
+        A[map[i] * nfree + map[j]] += K[i * ndof + j];
+      }
+    }
+    var uf = cholesky(A, rhs, nfree);
+    var u = new Float64Array(ndof);
+    for (i = 0; i < ndof; i++) if (map[i] >= 0) u[i] = uf[map[i]];
+    return u;
+  }
+
+  function assembleBeam(kind, nEl, h, bc) {
+    var nn = nEl + 1, ndof = 2 * nn;
+    var K = new Float64Array(ndof * ndof);
+    var f = new Float64Array(ndof);
+    var L = P.L, Le = L / nEl;
+    var I = IA(h).I, A = IA(h).A, EI = P.E * I, gas = GAs(h);
+    var q = bc === 'ss' ? P.qss : 0;
+    var iel, n1, n2, sctr, a, b, ke, fe, g, sh, Bb, Bs, jac, wt, i;
+    var gb = gauss1(2), gs = gauss1(kind === 'full' ? 2 : 1);
+
+    function add4(s, ke, fe) {
+      var p, q, I, J;
+      for (p = 0; p < 4; p++) {
+        f[s[p]] += fe[p];
+        for (q = 0; q < 4; q++) K[s[p] * ndof + s[q]] += ke[p * 4 + q];
+      }
+    }
+
+    for (iel = 0; iel < nEl; iel++) {
+      n1 = iel; n2 = iel + 1;
+      sctr = [2 * n1, 2 * n1 + 1, 2 * n2, 2 * n2 + 1];
+      ke = new Float64Array(16);
+      if (kind === 'eb') {
+        ke = [
+          12, 6 * Le, -12, 6 * Le,
+          6 * Le, 4 * Le * Le, -6 * Le, 2 * Le * Le,
+          -12, -6 * Le, 12, -6 * Le,
+          6 * Le, 2 * Le * Le, -6 * Le, 4 * Le * Le
+        ].map(function (v) { return v * EI / (Le * Le * Le); });
+        fe = [6, Le, 6, -Le].map(function (v) { return q * Le / 12 * v; });
+      } else {
+        jac = Le / 2;
+        for (g = 0; g < gb.x.length; g++) {
+          sh = shapeLin(gb.x[g], Le);
+          Bb = [0, sh.dNdx[0], 0, sh.dNdx[1]];
+          wt = EI * gb.w[g] * jac;
+          for (a = 0; a < 4; a++) for (b = 0; b < 4; b++) ke[a * 4 + b] += wt * Bb[a] * Bb[b];
+        }
+        for (g = 0; g < gs.x.length; g++) {
+          sh = shapeLin(gs.x[g], Le);
+          Bs = [sh.dNdx[0], -sh.N[0], sh.dNdx[1], -sh.N[1]];
+          wt = gas * gs.w[g] * jac;
+          for (a = 0; a < 4; a++) for (b = 0; b < 4; b++) ke[a * 4 + b] += wt * Bs[a] * Bs[b];
+        }
+        fe = kind === 'eb' ? null : [q * Le / 2, 0, q * Le / 2, 0];
+      }
+      add4(sctr, ke, fe);
+    }
+    if (bc === 'cantilever') f[2 * nn - 2] += P.Ptip;
+    var fix = bc === 'cantilever' ? [0, 1] : [0, 2 * nn - 2];
+    var u = solveDense(K, f, fix);
+    var ip = bc === 'cantilever' ? nn - 1 : (nn >> 1);
+    var xs = [], ws = [], ths = [];
+    for (i = 0; i < nn; i++) {
+      xs.push(i * Le);
+      ws.push(u[2 * i]);
+      ths.push(u[2 * i + 1]);
+    }
+    return { xs: xs, ws: ws, ths: ths, wProbe: u[2 * ip], u: u, nEl: nEl, kind: kind };
+  }
+
+  function hermiteSample(sol, nSamp) {
+    var xs = [], ws = [], ths = [], e, t, xi, L, w1, th1, w2, th2, N1, N2, N3, N4, dN1, dN2, dN3, dN4, x0;
+    var nEl = sol.nEl, Le = P.L / nEl;
+    var per = Math.max(2, Math.round(nSamp / nEl));
+    for (e = 0; e < nEl; e++) {
+      w1 = sol.ws[e]; th1 = sol.ths[e]; w2 = sol.ws[e + 1]; th2 = sol.ths[e + 1];
+      x0 = sol.xs[e];
+      for (t = 0; t < per; t++) {
+        xi = t / per;
+        N1 = 1 - 3 * xi * xi + 2 * xi * xi * xi;
+        N2 = Le * (xi - 2 * xi * xi + xi * xi * xi);
+        N3 = 3 * xi * xi - 2 * xi * xi * xi;
+        N4 = Le * (-xi * xi + xi * xi * xi);
+        dN1 = (-6 * xi + 6 * xi * xi) / Le;
+        dN2 = 1 - 4 * xi + 3 * xi * xi;
+        dN3 = (6 * xi - 6 * xi * xi) / Le;
+        dN4 = -2 * xi + 3 * xi * xi;
+        xs.push(x0 + xi * Le);
+        ws.push(N1 * w1 + N2 * th1 + N3 * w2 + N4 * th2);
+        ths.push(dN1 * w1 + dN2 * th1 + dN3 * w2 + dN4 * th2);
+      }
+    }
+    xs.push(sol.xs[nEl]); ws.push(sol.ws[nEl]); ths.push(sol.ths[nEl]);
+    return { xs: xs, ws: ws, ths: ths };
+  }
+
+  function linSample(sol, nSamp) {
+    var xs = [], ws = [], ths = [], i, t, n = sol.xs.length;
+    var per = Math.max(2, Math.round(nSamp / (n - 1)));
+    for (i = 0; i < n - 1; i++) {
+      for (t = 0; t < per; t++) {
+        var a = t / per;
+        xs.push(sol.xs[i] * (1 - a) + sol.xs[i + 1] * a);
+        ws.push(sol.ws[i] * (1 - a) + sol.ws[i + 1] * a);
+        ths.push(sol.ths[i] * (1 - a) + sol.ths[i + 1] * a);
+      }
+    }
+    xs.push(sol.xs[n - 1]); ws.push(sol.ws[n - 1]); ths.push(sol.ths[n - 1]);
+    return { xs: xs, ws: ws, ths: ths };
+  }
+
+  /* ---- Q4 plane stress (visualisation mesh) ---- */
+  function q4N(xi, eta) {
+    return [
+      0.25 * (1 - xi) * (1 - eta),
+      0.25 * (1 + xi) * (1 - eta),
+      0.25 * (1 + xi) * (1 + eta),
+      0.25 * (1 - xi) * (1 + eta)
+    ];
+  }
+  function q4dNdxi(xi, eta) {
+    return [
+      [-0.25 * (1 - eta), -0.25 * (1 - xi)],
+      [0.25 * (1 - eta), -0.25 * (1 + xi)],
+      [0.25 * (1 + eta), 0.25 * (1 + xi)],
+      [-0.25 * (1 + eta), 0.25 * (1 - xi)]
+    ];
+  }
+
+  function meshRect(L, h, neL, neH) {
+    var nx = neL + 1, ny = neH + 1, node = [], el = [], i, j, n0;
+    for (j = 0; j < ny; j++) {
+      for (i = 0; i < nx; i++) node.push([i * L / neL, -h / 2 + j * h / neH]);
+    }
+    for (j = 0; j < neH; j++) {
+      for (i = 0; i < neL; i++) {
+        n0 = j * nx + i;
+        el.push([n0, n0 + 1, n0 + 1 + nx, n0 + nx]);
+      }
+    }
+    return { node: node, el: el, nx: nx, ny: ny, neL: neL, neH: neH };
+  }
+
+  function solveQ4(h, bc) {
+    var neH = 8;
+    var neL = Math.max(20, Math.min(40, Math.round(neH * P.L / Math.max(h, 0.05))));
+    var M = meshRect(P.L, h, neL, neH);
+    var nn = M.node.length, ndof = 2 * nn;
+    var K = new Float64Array(ndof * ndof);
+    var f = new Float64Array(ndof);
+    var Dfac = P.E / (1 - P.nu * P.nu);
+    var D11 = Dfac, D12 = Dfac * P.nu, D33 = Dfac * 0.5 * (1 - P.nu);
+    var gp = 1 / Math.sqrt(3);
+    var Q = [[-gp, -gp], [gp, -gp], [gp, gp], [-gp, gp]];
+    var iel, q, a, b, sctr, xe, ye, N, dN, J00, J01, J10, J11, det, i00, i01, i10, i11, i;
+    var dNx = new Float64Array(4), dNy = new Float64Array(4);
+    var B = new Float64Array(24);
+    var ke, sB, p, r, strain, sx;
+    var sxN = new Float64Array(nn), wN = new Float64Array(nn);
+
+    for (iel = 0; iel < M.el.length; iel++) {
+      sctr = M.el[iel];
+      xe = [M.node[sctr[0]][0], M.node[sctr[1]][0], M.node[sctr[2]][0], M.node[sctr[3]][0]];
+      ye = [M.node[sctr[0]][1], M.node[sctr[1]][1], M.node[sctr[2]][1], M.node[sctr[3]][1]];
+      ke = new Float64Array(64);
+      for (q = 0; q < 4; q++) {
+        N = q4N(Q[q][0], Q[q][1]);
+        dN = q4dNdxi(Q[q][0], Q[q][1]);
+        J00 = J01 = J10 = J11 = 0;
+        for (a = 0; a < 4; a++) {
+          J00 += xe[a] * dN[a][0]; J01 += xe[a] * dN[a][1];
+          J10 += ye[a] * dN[a][0]; J11 += ye[a] * dN[a][1];
+        }
+        det = J00 * J11 - J01 * J10;
+        i00 = J11 / det; i01 = -J01 / det; i10 = -J10 / det; i11 = J00 / det;
+        for (a = 0; a < 4; a++) {
+          dNx[a] = dN[a][0] * i00 + dN[a][1] * i10;
+          dNy[a] = dN[a][0] * i01 + dN[a][1] * i11;
+        }
+        for (a = 0; a < 4; a++) {
+          B[0 * 8 + 2 * a] = dNx[a]; B[0 * 8 + 2 * a + 1] = 0;
+          B[1 * 8 + 2 * a] = 0; B[1 * 8 + 2 * a + 1] = dNy[a];
+          B[2 * 8 + 2 * a] = dNy[a]; B[2 * 8 + 2 * a + 1] = dNx[a];
+        }
+        /* DB then B^T DB * det (W=1) */
+        for (p = 0; p < 8; p++) {
+          var s1 = D11 * B[p] + D12 * B[8 + p];
+          var s2 = D12 * B[p] + D11 * B[8 + p];
+          var s3 = D33 * B[16 + p];
+          for (r = 0; r < 8; r++) {
+            ke[p * 8 + r] += (B[r] * s1 + B[8 + r] * s2 + B[16 + r] * s3) * det;
+          }
+        }
+      }
+      sB = [];
+      for (a = 0; a < 4; a++) { sB.push(2 * sctr[a]); sB.push(2 * sctr[a] + 1); }
+      for (p = 0; p < 8; p++) for (r = 0; r < 8; r++) K[sB[p] * ndof + sB[r]] += ke[p * 8 + r];
+    }
+
+    /* edge traction */
+    var tol = 1e-9 * Math.max(P.L, h);
+    if (bc === 'cantilever') {
+      var ty = P.Ptip / h;
+      for (iel = 0; iel < M.el.length; iel++) {
+        sctr = M.el[iel];
+        /* +x edge is nodes 1-2 (SE-NE) if those x == L */
+        if (Math.abs(M.node[sctr[1]][0] - P.L) < tol && Math.abs(M.node[sctr[2]][0] - P.L) < tol) {
+          var he = Math.abs(M.node[sctr[2]][1] - M.node[sctr[1]][1]);
+          f[2 * sctr[1] + 1] += ty * he / 2;
+          f[2 * sctr[2] + 1] += ty * he / 2;
+        }
+      }
+    } else {
+      var tq = P.qss;
+      for (iel = 0; iel < M.el.length; iel++) {
+        sctr = M.el[iel];
+        if (Math.abs(M.node[sctr[2]][1] - h / 2) < tol && Math.abs(M.node[sctr[3]][1] - h / 2) < tol) {
+          var le = Math.abs(M.node[sctr[2]][0] - M.node[sctr[3]][0]);
+          f[2 * sctr[2] + 1] += tq * le / 2;
+          f[2 * sctr[3] + 1] += tq * le / 2;
+        }
+      }
+    }
+
+    var fix = [];
+    if (bc === 'cantilever') {
+      for (i = 0; i < nn; i++) if (Math.abs(M.node[i][0]) < tol) { fix.push(2 * i); fix.push(2 * i + 1); }
+    } else {
+      var iL = -1, iR = -1;
+      for (i = 0; i < nn; i++) {
+        if (Math.abs(M.node[i][0]) < tol && Math.abs(M.node[i][1]) < tol) iL = i;
+        if (Math.abs(M.node[i][0] - P.L) < tol && Math.abs(M.node[i][1]) < tol) iR = i;
+      }
+      if (iL >= 0) { fix.push(2 * iL); fix.push(2 * iL + 1); }
+      if (iR >= 0) fix.push(2 * iR + 1);
+    }
+    var u = solveDense(K, f, fix);
+
+    var yMid = [], sxMid = [];
+    for (iel = 0; iel < M.el.length; iel++) {
+      sctr = M.el[iel];
+      xe = [M.node[sctr[0]][0], M.node[sctr[1]][0], M.node[sctr[2]][0], M.node[sctr[3]][0]];
+      ye = [M.node[sctr[0]][1], M.node[sctr[1]][1], M.node[sctr[2]][1], M.node[sctr[3]][1]];
+      var ue = [];
+      for (a = 0; a < 4; a++) { ue.push(u[2 * sctr[a]]); ue.push(u[2 * sctr[a] + 1]); }
+      for (q = 0; q < 4; q++) {
+        N = q4N(Q[q][0], Q[q][1]);
+        dN = q4dNdxi(Q[q][0], Q[q][1]);
+        J00 = J01 = J10 = J11 = 0;
+        for (a = 0; a < 4; a++) {
+          J00 += xe[a] * dN[a][0]; J01 += xe[a] * dN[a][1];
+          J10 += ye[a] * dN[a][0]; J11 += ye[a] * dN[a][1];
+        }
+        det = J00 * J11 - J01 * J10;
+        i00 = J11 / det; i01 = -J01 / det; i10 = -J10 / det; i11 = J00 / det;
+        var gx = 0, gy = 0, ex = 0, ey = 0, gxy = 0;
+        for (a = 0; a < 4; a++) {
+          dNx[a] = dN[a][0] * i00 + dN[a][1] * i10;
+          dNy[a] = dN[a][0] * i01 + dN[a][1] * i11;
+          gx += N[a] * xe[a]; gy += N[a] * ye[a];
+          ex += dNx[a] * ue[2 * a];
+          ey += dNy[a] * ue[2 * a + 1];
+          gxy += dNy[a] * ue[2 * a] + dNx[a] * ue[2 * a + 1];
+        }
+        sx = D11 * ex + D12 * ey;
+        for (a = 0; a < 4; a++) { sxN[sctr[a]] += sx; wN[sctr[a]] += 1; }
+        if (Math.abs(gx - P.L / 2) < 0.55 * (P.L / neL)) {
+          yMid.push(gy); sxMid.push(sx);
+        }
+      }
+    }
+    var sxNode = new Float64Array(nn);
+    for (i = 0; i < nn; i++) sxNode[i] = wN[i] ? sxN[i] / wN[i] : 0;
+
+    var ic = 0, best = 1e9, d2;
+    var xt = bc === 'ss' ? P.L / 2 : P.L;
+    for (i = 0; i < nn; i++) {
+      d2 = (M.node[i][0] - xt) * (M.node[i][0] - xt) + M.node[i][1] * M.node[i][1];
+      if (d2 < best) { best = d2; ic = i; }
+    }
+    return {
+      M: M, u: u, sxNode: sxNode, yMid: yMid, sxMid: sxMid,
+      wProbe: u[2 * ic + 1], neL: neL, neH: neH, ndof: ndof
+    };
+  }
+
+  /* ---- Three.js: studio side view, solid mesh vs 1-D beam ---- */
+  var view = document.getElementById('view');
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0e1624);
+  scene.fog = new THREE.Fog(0x0e1624, 2.4, 7.5);
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.04, 30);
+  camera.position.set(0.95, 0.28, 1.42);
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  view.appendChild(renderer.domElement);
+
+  var labelRenderer = new THREE.CSS2DRenderer();
+  labelRenderer.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+  view.appendChild(labelRenderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.target.set(0.46, 0.02, 0);
+  controls.minDistance = 0.7;
+  controls.maxDistance = 5;
+  controls.maxPolarAngle = Math.PI * 0.72;
+  var camLocked = false;
+  controls.addEventListener('start', function () { camLocked = true; });
+
+  scene.add(new THREE.HemisphereLight(0xc5d4e8, 0x1a1520, 0.42));
+  var key = new THREE.DirectionalLight(0xfff1e0, 1.35);
+  key.position.set(1.4, 2.6, 2.2);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.near = 0.3;
+  key.shadow.camera.far = 9;
+  key.shadow.camera.left = -2;
+  key.shadow.camera.right = 2;
+  key.shadow.camera.top = 1.6;
+  key.shadow.camera.bottom = -1.6;
+  key.shadow.bias = -0.00035;
+  scene.add(key);
+  var fill = new THREE.DirectionalLight(0x93c5fd, 0.32);
+  fill.position.set(-2.2, 0.6, 1.1);
+  scene.add(fill);
+  var rim = new THREE.DirectionalLight(0xfdbA74, 0.38);
+  rim.position.set(0.4, 1.1, -2.4);
+  scene.add(rim);
+
+  var floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(8, 8),
+    new THREE.MeshStandardMaterial({ color: 0x121a26, roughness: 0.92, metalness: 0.04 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+  var grid = new THREE.GridHelper(4.5, 18, 0x243044, 0x1a2434);
+  grid.material.transparent = true;
+  grid.material.opacity = 0.45;
+  scene.add(grid);
+  var back = new THREE.Mesh(
+    new THREE.PlaneGeometry(6, 4),
+    new THREE.MeshStandardMaterial({ color: 0x152033, roughness: 1, metalness: 0 })
+  );
+  back.position.set(0.4, 0.7, -0.55);
+  back.receiveShadow = true;
+  scene.add(back);
+  var clamp = new THREE.Mesh(
+    new THREE.BoxGeometry(0.055, 1, 0.28),
+    new THREE.MeshStandardMaterial({ color: 0x3a4a5e, roughness: 0.42, metalness: 0.38 })
+  );
+  clamp.position.set(-0.03, 0, 0);
+  clamp.castShadow = true;
+  clamp.receiveShadow = true;
+  scene.add(clamp);
+
+  var gSolid = new THREE.Group();
+  var gBeam = new THREE.Group();
+  scene.add(gSolid, gBeam);
+
+  var mats = {
+    q4: new THREE.MeshStandardMaterial({
+      vertexColors: THREE.VertexColors, roughness: 0.46, metalness: 0.06,
+      flatShading: true, side: THREE.DoubleSide
+    }),
+    beam: new THREE.MeshStandardMaterial({
+      color: 0x38bdf8, roughness: 0.28, metalness: 0.28,
+      emissive: 0x0369a1, emissiveIntensity: 0.22
+    }),
+    node: new THREE.MeshStandardMaterial({
+      color: 0xe0f2fe, roughness: 0.22, metalness: 0.55,
+      emissive: 0x38bdf8, emissiveIntensity: 0.18
+    }),
+    tick: new THREE.MeshStandardMaterial({
+      color: 0x7dd3fc, roughness: 0.3, metalness: 0.35,
+      emissive: 0x0284c7, emissiveIntensity: 0.15
+    }),
+    ghost: new THREE.MeshStandardMaterial({
+      color: 0x64748b, transparent: true, opacity: 0.1,
+      depthWrite: false, side: THREE.DoubleSide
+    }),
+    ghostTube: new THREE.MeshStandardMaterial({
+      color: 0x64748b, transparent: true, opacity: 0.28, depthWrite: false
+    }),
+    wall: new THREE.MeshStandardMaterial({ color: 0x3d4f66, roughness: 0.5, metalness: 0.28 }),
+    tooth: new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.4, metalness: 0.2 }),
+    gold: new THREE.MeshStandardMaterial({
+      color: 0xfbbf24, roughness: 0.32, metalness: 0.35,
+      emissive: 0xb45309, emissiveIntensity: 0.2
+    }),
+    edge: new THREE.LineBasicMaterial({ color: 0x1c1917, transparent: true, opacity: 0.55 }),
+    mid: new THREE.LineBasicMaterial({ color: 0xffedd5, transparent: true, opacity: 0.85 }),
+    ghostEdge: new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.4 })
+  };
+
+  var meshQ4 = new THREE.Mesh(new THREE.BufferGeometry(), mats.q4);
+  meshQ4.castShadow = true;
+  meshQ4.receiveShadow = true;
+  var edgeQ4 = new THREE.LineSegments(new THREE.BufferGeometry(), mats.edge);
+  var midQ4 = new THREE.Line(new THREE.BufferGeometry(), mats.mid);
+  var ghostS = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mats.ghost);
+  var ghostSE = new THREE.LineSegments(new THREE.BufferGeometry(), mats.ghostEdge);
+  var meshBeam = new THREE.Mesh(new THREE.BufferGeometry(), mats.beam);
+  meshBeam.castShadow = true;
+  var ghostTube = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.007, 0.007, 1, 10),
+    mats.ghostTube
+  );
+  ghostTube.rotation.z = Math.PI / 2;
+  ghostTube.position.set(P.L / 2, 0, 0);
+  var nodesB = new THREE.Group();
+  var ticksB = new THREE.Group();
+  var nodeGeo = new THREE.SphereGeometry(0.018, 16, 12);
+  var tickGeo = new THREE.CylinderGeometry(0.0038, 0.0038, 1, 8);
+  gSolid.add(meshQ4, edgeQ4, midQ4, ghostS, ghostSE);
+  gBeam.add(meshBeam, ghostTube, nodesB, ticksB);
+
+  var fixS = new THREE.Group(); var loadS = new THREE.Group();
+  var fixB = new THREE.Group(); var loadB = new THREE.Group();
+  gSolid.add(fixS, loadS);
+  gBeam.add(fixB, loadB);
+
+  function makeTag(cls, text) {
+    var d = document.createElement('div');
+    d.className = 'label3d ' + cls;
+    d.textContent = text;
+    return new THREE.CSS2DObject(d);
+  }
+  var tagS = makeTag('solid', 'Solid Q4');
+  var tagB = makeTag('beam', '1-D reduced Timoshenko');
+  gSolid.add(tagS);
+  gBeam.add(tagB);
+
+  function visDepth(h) {
+    return Math.min(0.15, Math.max(0.085, 0.55 * h + 0.055));
+  }
+
+  function stressRGB(t) {
+    t = Math.max(-1, Math.min(1, t));
+    if (t < 0) {
+      var u = t + 1;
+      return [0.18 + 0.72 * u, 0.32 + 0.58 * u, 0.78 + 0.16 * u];
+    }
+    return [1, 1 - 0.62 * t, 1 - 0.84 * t];
+  }
+
+  function beamKine(x, y, th, w, sf) {
+    return { x: x + sf * (-y * th), y: y + sf * w };
+  }
+
+  function lerpBeam(samp, x) {
+    var n = samp.xs.length, i, a;
+    if (x <= samp.xs[0]) return { th: samp.ths[0], w: samp.ws[0] };
+    if (x >= samp.xs[n - 1]) return { th: samp.ths[n - 1], w: samp.ws[n - 1] };
+    for (i = 0; i < n - 1; i++) {
+      if (x >= samp.xs[i] && x <= samp.xs[i + 1]) {
+        a = (x - samp.xs[i]) / Math.max(1e-18, samp.xs[i + 1] - samp.xs[i]);
+        return {
+          th: samp.ths[i] * (1 - a) + samp.ths[i + 1] * a,
+          w: samp.ws[i] * (1 - a) + samp.ws[i + 1] * a
+        };
+      }
+    }
+    return { th: samp.ths[n - 1], w: samp.ws[n - 1] };
+  }
+
+  function buildQ4Solid(q4, h, sf, depth) {
+    var M = q4.M, nn = M.node.length, i, a, sctr, hz = depth / 2, tol = 1e-8 * P.L;
+    var pos = new Float32Array(nn * 2 * 3);
+    var col = new Float32Array(nn * 2 * 3);
+    var smax = 1e-12;
+    for (i = 0; i < nn; i++) smax = Math.max(smax, Math.abs(q4.sxNode[i]));
+    for (i = 0; i < nn; i++) {
+      var ux = sf * q4.u[2 * i], uy = sf * q4.u[2 * i + 1];
+      var rgb = stressRGB(q4.sxNode[i] / smax);
+      for (a = 0; a < 2; a++) {
+        var p = (i * 2 + a) * 3;
+        pos[p] = M.node[i][0] + ux;
+        pos[p + 1] = M.node[i][1] + uy;
+        pos[p + 2] = a ? hz : -hz;
+        col[p] = rgb[0]; col[p + 1] = rgb[1]; col[p + 2] = rgb[2];
+      }
+    }
+    var idx = [], eidx = [];
+    function v(ii, k) { return ii * 2 + k; }
+    for (i = 0; i < M.el.length; i++) {
+      sctr = M.el[i];
+      var n0 = sctr[0], n1 = sctr[1], n2 = sctr[2], n3 = sctr[3];
+      idx.push(v(n0, 1), v(n1, 1), v(n2, 1), v(n0, 1), v(n2, 1), v(n3, 1));
+      idx.push(v(n0, 0), v(n2, 0), v(n1, 0), v(n0, 0), v(n3, 0), v(n2, 0));
+      eidx.push(v(n0, 1), v(n1, 1), v(n1, 1), v(n2, 1), v(n2, 1), v(n3, 1), v(n3, 1), v(n0, 1));
+      var x0 = M.node[n0][0], x1 = M.node[n1][0], y0 = M.node[n0][1], y3 = M.node[n3][1];
+      if (x0 < tol && M.node[n3][0] < tol) {
+        idx.push(v(n0, 0), v(n0, 1), v(n3, 1), v(n0, 0), v(n3, 1), v(n3, 0));
+      }
+      if (Math.abs(x1 - P.L) < tol && Math.abs(M.node[n2][0] - P.L) < tol) {
+        idx.push(v(n1, 1), v(n1, 0), v(n2, 0), v(n1, 1), v(n2, 0), v(n2, 1));
+      }
+      if (y0 < -h / 2 + tol && M.node[n1][1] < -h / 2 + tol) {
+        idx.push(v(n0, 0), v(n1, 0), v(n1, 1), v(n0, 0), v(n1, 1), v(n0, 1));
+      }
+      if (y3 > h / 2 - tol && M.node[n2][1] > h / 2 - tol) {
+        idx.push(v(n3, 1), v(n2, 1), v(n2, 0), v(n3, 1), v(n2, 0), v(n3, 0));
+      }
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    var epos = new Float32Array(pos);
+    var egeo = new THREE.BufferGeometry();
+    egeo.setAttribute('position', new THREE.BufferAttribute(epos, 3));
+    egeo.setIndex(eidx);
+    var midPts = [], nx = M.nx, iy, ix, nMid = Math.floor(M.ny / 2);
+    for (ix = 0; ix < nx; ix++) {
+      iy = nMid * nx + ix;
+      midPts.push(new THREE.Vector3(
+        M.node[iy][0] + sf * q4.u[2 * iy],
+        M.node[iy][1] + sf * q4.u[2 * iy + 1],
+        hz + 0.002
+      ));
+    }
+    return {
+      geo: geo, egeo: egeo, smax: smax,
+      mid: new THREE.BufferGeometry().setFromPoints(midPts)
+    };
+  }
+
+  function buildTube(samp, sf, radius) {
+    var pts = [], i, n = samp.xs.length;
+    for (i = 0; i < n; i++) pts.push(new THREE.Vector3(samp.xs[i], sf * samp.ws[i], 0));
+    if (pts.length < 2) pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(P.L, 0, 0)];
+    var curve = new THREE.CatmullRomCurve3(pts);
+    return new THREE.TubeGeometry(curve, Math.max(72, n * 6), radius, 14, false);
+  }
+
+  function fillNodes(sol, sf) {
+    while (nodesB.children.length) nodesB.remove(nodesB.children[0]);
+    var i, m;
+    for (i = 0; i < sol.xs.length; i++) {
+      m = new THREE.Mesh(nodeGeo, mats.node);
+      m.position.set(sol.xs[i], sf * sol.ws[i], 0);
+      m.castShadow = true;
+      nodesB.add(m);
+    }
+  }
+
+  function fillTicks(sol, sf) {
+    while (ticksB.children.length) ticksB.remove(ticksB.children[0]);
+    var half = 0.04 * P.L, i, p0, p1, m, len, dir = new THREE.Vector3(), yUp = new THREE.Vector3(0, 1, 0);
+    for (i = 0; i < sol.xs.length; i++) {
+      p0 = beamKine(sol.xs[i], -half, sol.ths[i], sol.ws[i], sf);
+      p1 = beamKine(sol.xs[i], half, sol.ths[i], sol.ws[i], sf);
+      dir.set(p1.x - p0.x, p1.y - p0.y, 0);
+      len = dir.length();
+      if (len < 1e-8) continue;
+      dir.multiplyScalar(1 / len);
+      m = new THREE.Mesh(tickGeo, mats.tick);
+      m.scale.set(1, len, 1);
+      m.position.set(0.5 * (p0.x + p1.x), 0.5 * (p0.y + p1.y), 0);
+      m.quaternion.setFromUnitVectors(yUp, dir);
+      ticksB.add(m);
+    }
+  }
+
+  function setGhost(mesh, edges, L, h, depth) {
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.BoxGeometry(L, h, depth);
+    mesh.position.set(L / 2, 0, 0);
+    edges.geometry.dispose();
+    edges.geometry = new THREE.EdgesGeometry(mesh.geometry);
+    edges.position.copy(mesh.position);
+  }
+
+  function clearGroup(group) {
+    while (group.children.length) {
+      var ch = group.children[0];
+      group.remove(ch);
+      if (ch.geometry && ch.geometry !== tickGeo && ch.geometry !== nodeGeo) ch.geometry.dispose();
+    }
+  }
+
+  function addArrow(group, from, dir, len, colorMat) {
+    dir = dir.clone().normalize();
+    var quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    var shaftLen = len * 0.72, headLen = len * 0.28;
+    var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.0055, 0.0055, shaftLen, 8), colorMat);
+    shaft.quaternion.copy(quat);
+    shaft.position.copy(from).add(dir.clone().multiplyScalar(shaftLen * 0.5));
+    shaft.castShadow = true;
+    var head = new THREE.Mesh(new THREE.ConeGeometry(0.016, headLen, 10), colorMat);
+    head.quaternion.copy(quat);
+    head.position.copy(from).add(dir.clone().multiplyScalar(shaftLen + headLen * 0.45));
+    head.castShadow = true;
+    group.add(shaft, head);
+  }
+
+  function fillFix(group, h, depth) {
+    clearGroup(group);
+    var ny = 4, nz = 2, j, k;
+    var geo = new THREE.ConeGeometry(0.014, 0.038, 5);
+    for (j = 0; j < ny; j++) {
+      for (k = 0; k < nz; k++) {
+        var m = new THREE.Mesh(geo, mats.tooth);
+        m.rotation.z = Math.PI / 2;
+        m.position.set(-0.052, -h / 2 + h * (j + 0.5) / ny, -depth / 2 + depth * (k + 0.5) / nz);
+        m.castShadow = true;
+        group.add(m);
+      }
+    }
+  }
+
+  function fillLoads(group, h, sf, bc, q4, depth) {
+    clearGroup(group);
+    var n = 3, i, y, x, tip, arrLen = 0.15 * P.L, z = depth / 2 + 0.012;
+    var down = new THREE.Vector3(0, -1, 0);
+    if (bc === 'cantilever') {
+      for (i = 0; i < n; i++) {
+        y = -h / 2 + h * (i + 0.5) / n;
+        tip = sampleFace(q4, P.L, y, sf);
+        addArrow(group, new THREE.Vector3(tip.x, tip.y + arrLen + 0.02, z), down, arrLen, mats.gold);
+      }
+    } else {
+      for (i = 0; i < 6; i++) {
+        x = (i + 0.5) / 6 * P.L;
+        tip = sampleFace(q4, x, h / 2, sf);
+        addArrow(group, new THREE.Vector3(tip.x, tip.y + arrLen + 0.02, z), down, arrLen * 0.85, mats.gold);
+      }
+    }
+  }
+
+  function fillFix1D(group) {
+    clearGroup(group);
+    var m = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 10), mats.tooth);
+    m.position.set(-0.01, 0, 0);
+    m.castShadow = true;
+    group.add(m);
+  }
+
+  function fillLoad1D(group, samp, sf, bc) {
+    clearGroup(group);
+    var x = bc === 'ss' ? P.L / 2 : P.L;
+    var s = lerpBeam(samp, x);
+    var y = sf * s.w;
+    var arrLen = 0.16 * P.L;
+    addArrow(group, new THREE.Vector3(x, y + arrLen + 0.02, 0), new THREE.Vector3(0, -1, 0), arrLen, mats.gold);
+  }
+
+  function sampleFace(q4, x, y, sf) {
+    var best = 1e9, i, d, ix = 0;
+    for (i = 0; i < q4.M.node.length; i++) {
+      d = Math.abs(q4.M.node[i][0] - x) + Math.abs(q4.M.node[i][1] - y);
+      if (d < best) { best = d; ix = i; }
+    }
+    return { x: q4.M.node[ix][0] + sf * q4.u[2 * ix], y: q4.M.node[ix][1] + sf * q4.u[2 * ix + 1] };
+  }
+
+  function layoutStudio(rowGap, h) {
+    var yBot = -rowGap * 0.5 - Math.max(h * 0.55, 0.12) - 0.18;
+    floor.position.y = yBot;
+    grid.position.y = yBot + 0.002;
+    var H = rowGap + h + 0.42;
+    clamp.scale.set(1, H, 1);
+    clamp.position.set(-0.032, 0, 0);
+    back.position.set(0.45, 0.15, -0.52);
+  }
+
+  function fitCam(rowGap, h, wVis) {
+    if (camLocked) return;
+    var halfH = rowGap * 0.5 + h * 0.5 + wVis + 0.18;
+    var halfW = 0.58 * P.L;
+    var r = Math.sqrt(halfW * halfW + halfH * halfH);
+    var fov = camera.fov * Math.PI / 180;
+    var dist = (r / Math.tan(fov * 0.5)) * 1.18;
+    controls.target.set(P.L * 0.46, 0.02, 0);
+    var dir = new THREE.Vector3(0.42, 0.22, 1).normalize().multiplyScalar(Math.max(dist, 1.25));
+    camera.position.copy(controls.target).add(dir);
+  }
+
+  /* ---- plots ---- */
+  var cDefl = document.getElementById('cDefl');
+  var cLock = document.getElementById('cLock');
+  var ctxD = cDefl.getContext('2d');
+  var ctxL = cLock.getContext('2d');
+
+  function fit(canvas, ctx) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var r = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.floor(r.width * dpr));
+    canvas.height = Math.max(1, Math.floor(r.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: r.width, h: r.height };
+  }
+  function axes(ctx, w, h, pad) {
+    var i, y;
+    ctx.strokeStyle = '#e8e4dc';
+    ctx.lineWidth = 1;
+    for (i = 1; i <= 3; i++) {
+      y = pad.t + (h - pad.t - pad.b) * i / 4;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+    }
+    ctx.strokeStyle = '#94a3b8';
+    ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
+  }
+  function series(ctx, pts, mx, my, color, dash, lw) {
+    var i;
+    ctx.strokeStyle = color; ctx.lineWidth = lw || 1.7; ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    for (i = 0; i < pts.length; i++) {
+      if (i === 0) ctx.moveTo(mx(pts[i][0]), my(pts[i][1]));
+      else ctx.lineTo(mx(pts[i][0]), my(pts[i][1]));
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  function marks(ctx, pts, mx, my, color) {
+    var i;
+    ctx.fillStyle = color;
+    for (i = 0; i < pts.length; i++) {
+      ctx.beginPath();
+      ctx.arc(mx(pts[i][0]), my(pts[i][1]), 2.6, 0, 6.28);
+      ctx.fill();
+    }
+  }
+  function dot(ctx, x, y, color) {
+    ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.28); ctx.fill();
+  }
+
+  function drawDefl(hL, bc) {
+    var tab = bc === 'ss' ? SS : CANT;
+    var dim = fit(cDefl, ctxD), w = dim.w, h = dim.h;
+    var pad = { l: 42, r: 8, t: 8, b: 22 };
+    var ymax = 0, i;
+    for (i = 0; i < tab.length; i++) ymax = Math.max(ymax, Math.abs(tab[i].wEB), Math.abs(tab[i].wQ4), Math.abs(tab[i].wAnTS));
+    var mx = function (x) { return pad.l + ((x - 0.02) / (0.5 - 0.02)) * (w - pad.l - pad.r); };
+    var my = function (y) { return h - pad.b - (y / (ymax * 1.08)) * (h - pad.t - pad.b); };
+    ctxD.clearRect(0, 0, w, h);
+    axes(ctxD, w, h, pad);
+    series(ctxD, tab.map(function (r) { return [r.hL, Math.abs(r.wEB)]; }), mx, my, '#e8c547');
+    series(ctxD, tab.map(function (r) { return [r.hL, Math.abs(r.wRed)]; }), mx, my, '#38bdf8');
+    series(ctxD, tab.map(function (r) { return [r.hL, Math.abs(r.wFull)]; }), mx, my, '#e879f9', [5, 3], 1.4);
+    series(ctxD, tab.map(function (r) { return [r.hL, Math.abs(r.wQ4)]; }), mx, my, '#f87171', [], 2);
+    series(ctxD, tab.map(function (r) { return [r.hL, Math.abs(r.wAnTS)]; }), mx, my, '#4ade80', [2, 3], 1.5);
+    var wQ = Math.abs(lerpTab(tab, hL, 'wQ4'));
+    dot(ctxD, mx(hL), my(wQ), '#1e3a5f');
+    ctxD.fillStyle = '#5c6574'; ctxD.font = '11px Source Sans 3, sans-serif';
+    ctxD.fillText('h/L', w - 28, h - 6);
+  }
+
+  function lockingSweep(h, bc) {
+    var ns = [1, 2, 4, 8, 16, 32], out = [], i;
+    for (i = 0; i < ns.length; i++) {
+      out.push({
+        n: ns[i],
+        wEB: assembleBeam('eb', ns[i], h, bc).wProbe,
+        wRed: assembleBeam('reduced', ns[i], h, bc).wProbe,
+        wFull: assembleBeam('full', ns[i], h, bc).wProbe
+      });
+    }
+    return out;
+  }
+
+  function drawLock(nEl, sweep, wQ, wAn, rec) {
+    var dim = fit(cLock, ctxL), w = dim.w, h = dim.h;
+    var pad = { l: 42, r: 8, t: 8, b: 22 };
+    var ymax = 1e-9, i;
+    for (i = 0; i < sweep.length; i++) {
+      ymax = Math.max(ymax, Math.abs(sweep[i].wEB), Math.abs(sweep[i].wRed), Math.abs(wQ), Math.abs(wAn));
+    }
+    ymax *= 1.08;
+    var mx = function (x) { return pad.l + (Math.log(x) - Math.log(1)) / (Math.log(32) - Math.log(1)) * (w - pad.l - pad.r); };
+    var my = function (y) { return h - pad.b - (y / ymax) * (h - pad.t - pad.b); };
+    ctxL.clearRect(0, 0, w, h);
+    axes(ctxL, w, h, pad);
+    series(ctxL, sweep.map(function (r) { return [r.n, Math.abs(r.wEB)]; }), mx, my, '#e8c547');
+    series(ctxL, sweep.map(function (r) { return [r.n, Math.abs(r.wRed)]; }), mx, my, '#38bdf8');
+    series(ctxL, sweep.map(function (r) { return [r.n, Math.abs(r.wFull)]; }), mx, my, '#e879f9', [5, 3], 1.5);
+    ctxL.strokeStyle = '#f87171'; ctxL.setLineDash([4, 3]);
+    ctxL.beginPath(); ctxL.moveTo(pad.l, my(Math.abs(wQ))); ctxL.lineTo(w - pad.r, my(Math.abs(wQ))); ctxL.stroke();
+    ctxL.setLineDash([2, 3]); ctxL.strokeStyle = '#4ade80';
+    ctxL.beginPath(); ctxL.moveTo(pad.l, my(Math.abs(wAn))); ctxL.lineTo(w - pad.r, my(Math.abs(wAn))); ctxL.stroke();
+    ctxL.setLineDash([]);
+    var cur = null;
+    for (i = 0; i < sweep.length; i++) if (sweep[i].n === nEl) cur = sweep[i];
+    if (!cur) {
+      cur = {
+        wEB: assembleBeam('eb', nEl, rec * P.L, document.getElementById('bcSel').value).wProbe,
+        wRed: assembleBeam('reduced', nEl, rec * P.L, document.getElementById('bcSel').value).wProbe,
+        wFull: assembleBeam('full', nEl, rec * P.L, document.getElementById('bcSel').value).wProbe
+      };
+    }
+    dot(ctxL, mx(nEl), my(Math.abs(cur.wEB)), '#e8c547');
+    dot(ctxL, mx(nEl), my(Math.abs(cur.wRed)), '#38bdf8');
+    dot(ctxL, mx(nEl), my(Math.abs(cur.wFull)), '#e879f9');
+    ctxL.fillStyle = '#5c6574'; ctxL.font = '11px Source Sans 3, sans-serif';
+    ctxL.fillText('beam elements →', w / 2 - 40, h - 6);
+  }
+
+  /* ---- agreement figure (MATLAB tables + live shapes) ---- */
+  var cW = document.getElementById('cW');
+  var cNrm = document.getElementById('cNrm');
+  var cErr = document.getElementById('cErr');
+  var cShapes = document.getElementById('cShapes');
+  var ctxW = cW.getContext('2d');
+  var ctxN = cNrm.getContext('2d');
+  var ctxE = cErr.getContext('2d');
+  var ctxSh = cShapes.getContext('2d');
+  var shapeCache = {};
+
+  function logX(x, x0, x1, pad, w) {
+    return pad.l + (Math.log(x) - Math.log(x0)) / (Math.log(x1) - Math.log(x0)) * (w - pad.l - pad.r);
+  }
+  function logY(y, y0, y1, pad, h) {
+    return pad.t + (1 - (Math.log(y) - Math.log(y0)) / (Math.log(y1) - Math.log(y0))) * (h - pad.t - pad.b);
+  }
+  function linX(x, x0, x1, pad, w) {
+    return pad.l + (x - x0) / (x1 - x0) * (w - pad.l - pad.r);
+  }
+  function linY(y, y0, y1, pad, h) {
+    return pad.t + (1 - (y - y0) / (y1 - y0)) * (h - pad.t - pad.b);
+  }
+  function ticksLog(a, b) {
+    var out = [], e0 = Math.floor(Math.log10(a)), e1 = Math.ceil(Math.log10(b)), e, m, v;
+    for (e = e0; e <= e1; e++) {
+      for (m = 1; m <= 9; m++) {
+        v = m * Math.pow(10, e);
+        if (v >= a * 0.999 && v <= b * 1.001) out.push({ v: v, major: m === 1 });
+      }
+    }
+    return out;
+  }
+  function niceLbl(v) {
+    if (v >= 100) return v.toFixed(0);
+    if (v >= 1) return String(v);
+    var inv = 1 / v;
+    if (Math.abs(inv - Math.round(inv)) < 0.03) return '1/' + Math.round(inv);
+    return v.toPrecision(2);
+  }
+  function framePlot(ctx, w, h, pad, xlab, ylab) {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#e8e4dc';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#1e3a5f';
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, h - pad.b);
+    ctx.lineTo(w - pad.r, h - pad.b);
+    ctx.stroke();
+    ctx.fillStyle = '#5c6574';
+    ctx.font = '11px Source Sans 3, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(xlab, w - pad.r, h - 6);
+    ctx.save();
+    ctx.translate(12, (pad.t + h - pad.b) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText(ylab, 0, 0);
+    ctx.restore();
+  }
+
+  function drawW(tab, hNow) {
+    var dim = fit(cW, ctxW), w = dim.w, h = dim.h;
+    var pad = { l: 48, r: 10, t: 10, b: 28 };
+    var i, ymax = 1e-9, ymin = 1e9;
+    for (i = 0; i < tab.length; i++) {
+      ymax = Math.max(ymax, Math.abs(tab[i].wEB), Math.abs(tab[i].wQ4), Math.abs(tab[i].wAnTS), Math.abs(tab[i].wFull));
+      ymin = Math.min(ymin, Math.abs(tab[i].wEB), Math.abs(tab[i].wQ4), Math.abs(tab[i].wRed));
+    }
+    ymin = Math.max(ymin * 0.6, 1e-3);
+    ymax *= 1.25;
+    var x0 = 0.018, x1 = 0.55;
+    framePlot(ctxW, w, h, pad, 'h/L', '|w|');
+    var mx = function (x) { return logX(x, x0, x1, pad, w); };
+    var my = function (y) { return logY(Math.max(y, ymin), ymin, ymax, pad, h); };
+    ctxW.strokeStyle = '#e8e4dc';
+    ticksLog(x0, x1).forEach(function (t) {
+      var x = mx(t.v);
+      ctxW.globalAlpha = t.major ? 1 : 0.45;
+      ctxW.beginPath(); ctxW.moveTo(x, pad.t); ctxW.lineTo(x, h - pad.b); ctxW.stroke();
+    });
+    ticksLog(ymin, ymax).forEach(function (t) {
+      var y = my(t.v);
+      ctxW.globalAlpha = t.major ? 1 : 0.45;
+      ctxW.beginPath(); ctxW.moveTo(pad.l, y); ctxW.lineTo(w - pad.r, y); ctxW.stroke();
+      if (t.major) {
+        ctxW.globalAlpha = 1;
+        ctxW.fillStyle = '#5c6574';
+        ctxW.font = '10px JetBrains Mono, ui-monospace, monospace';
+        ctxW.textAlign = 'right';
+        ctxW.fillText(niceLbl(t.v), pad.l - 5, y + 3);
+      }
+    });
+    ctxW.globalAlpha = 1;
+    ctxW.fillStyle = '#5c6574';
+    ctxW.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctxW.textAlign = 'center';
+    [0.02, 0.05, 0.1, 0.25, 0.5].forEach(function (v) {
+      ctxW.fillText(niceLbl(v), mx(v), h - pad.b + 14);
+    });
+    series(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wAnTS)]; }), mx, my, '#16a34a', [2, 3], 1.4);
+    series(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wEB)]; }), mx, my, '#ca8a04', [], 1.5);
+    series(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wFull)]; }), mx, my, '#c026d3', [5, 3], 1.5);
+    series(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wRed)]; }), mx, my, '#0284c7', [], 2);
+    series(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wQ4)]; }), mx, my, '#c2410c', [], 2.2);
+    marks(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wQ4)]; }), mx, my, '#c2410c');
+    marks(ctxW, tab.map(function (r) { return [r.hL, Math.abs(r.wRed)]; }), mx, my, '#0284c7');
+    ctxW.strokeStyle = '#1e3a5f';
+    ctxW.setLineDash([3, 3]);
+    ctxW.beginPath(); ctxW.moveTo(mx(hNow), pad.t); ctxW.lineTo(mx(hNow), h - pad.b); ctxW.stroke();
+    ctxW.setLineDash([]);
+    dot(ctxW, mx(hNow), my(Math.abs(lerpTab(tab, hNow, 'wQ4'))), '#1e3a5f');
+  }
+
+  function drawNrm(tab, hNow) {
+    var dim = fit(cNrm, ctxN), w = dim.w, h = dim.h;
+    var pad = { l: 42, r: 10, t: 10, b: 28 };
+    var i, ymax = 1.02;
+    for (i = 0; i < tab.length; i++) {
+      ymax = Math.max(ymax, Math.abs(tab[i].wRed / tab[i].wEB), Math.abs(tab[i].wQ4 / tab[i].wEB), Math.abs(tab[i].wAnTS / tab[i].wEB), Math.abs(tab[i].wFull / tab[i].wEB));
+    }
+    ymax = Math.max(ymax * 1.06, 1.2);
+    var ymin = 0;
+    framePlot(ctxN, w, h, pad, 'h/L', 'w / w_Bernoulli');
+    var mx = function (x) { return linX(x, 0.02, 0.5, pad, w); };
+    var my = function (y) { return linY(y, ymin, ymax, pad, h); };
+    ctxN.strokeStyle = '#e8e4dc';
+    var gy;
+    for (gy = 0.25; gy < ymax; gy += 0.25) {
+      ctxN.beginPath(); ctxN.moveTo(pad.l, my(gy)); ctxN.lineTo(w - pad.r, my(gy)); ctxN.stroke();
+    }
+    ctxN.strokeStyle = '#94a3b8';
+    ctxN.beginPath(); ctxN.moveTo(pad.l, my(1)); ctxN.lineTo(w - pad.r, my(1)); ctxN.stroke();
+    ctxN.fillStyle = '#5c6574';
+    ctxN.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctxN.textAlign = 'right';
+    [0, 0.5, 1].forEach(function (v) { ctxN.fillText(String(v), pad.l - 5, my(v) + 3); });
+    ctxN.textAlign = 'center';
+    [0.02, 0.125, 0.25, 0.5].forEach(function (v) { ctxN.fillText(niceLbl(v), mx(v), h - pad.b + 14); });
+    series(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wAnTS / r.wEB)]; }), mx, my, '#16a34a', [2, 3], 1.4);
+    series(ctxN, tab.map(function (r) { return [r.hL, 1]; }), mx, my, '#ca8a04', [], 1.5);
+    series(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wFull / r.wEB)]; }), mx, my, '#c026d3', [5, 3], 1.5);
+    series(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wRed / r.wEB)]; }), mx, my, '#0284c7', [], 2);
+    series(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wQ4 / r.wEB)]; }), mx, my, '#c2410c', [], 2.2);
+    marks(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wQ4 / r.wEB)]; }), mx, my, '#c2410c');
+    marks(ctxN, tab.map(function (r) { return [r.hL, Math.abs(r.wRed / r.wEB)]; }), mx, my, '#0284c7');
+    ctxN.strokeStyle = '#1e3a5f';
+    ctxN.setLineDash([3, 3]);
+    ctxN.beginPath(); ctxN.moveTo(mx(hNow), pad.t); ctxN.lineTo(mx(hNow), h - pad.b); ctxN.stroke();
+    ctxN.setLineDash([]);
+    var nQ = Math.abs(lerpTab(tab, hNow, 'wQ4') / lerpTab(tab, hNow, 'wEB'));
+    dot(ctxN, mx(hNow), my(nQ), '#1e3a5f');
+  }
+
+  function drawErr(tab, hNow) {
+    var dim = fit(cErr, ctxE), w = dim.w, h = dim.h;
+    var pad = { l: 46, r: 10, t: 10, b: 28 };
+    function apct(wb, wq) {
+      return Math.max(100 * Math.abs(Math.abs(wb) - Math.abs(wq)) / Math.abs(wq), 0.08);
+    }
+    var ymin = 0.1, ymax = 100;
+    framePlot(ctxE, w, h, pad, 'h/L', '|Δw| / |w_Q4|  %');
+    var mx = function (x) { return linX(x, 0.02, 0.5, pad, w); };
+    var my = function (y) { return logY(Math.max(y, ymin), ymin, ymax, pad, h); };
+    ctxE.strokeStyle = '#e8e4dc';
+    ticksLog(ymin, ymax).forEach(function (t) {
+      var y = my(t.v);
+      ctxE.globalAlpha = t.major ? 1 : 0.4;
+      ctxE.beginPath(); ctxE.moveTo(pad.l, y); ctxE.lineTo(w - pad.r, y); ctxE.stroke();
+      if (t.major) {
+        ctxE.globalAlpha = 1;
+        ctxE.fillStyle = '#5c6574';
+        ctxE.font = '10px JetBrains Mono, ui-monospace, monospace';
+        ctxE.textAlign = 'right';
+        ctxE.fillText(niceLbl(t.v) + '%', pad.l - 5, y + 3);
+      }
+    });
+    ctxE.globalAlpha = 1;
+    ctxE.fillStyle = '#5c6574';
+    ctxE.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctxE.textAlign = 'center';
+    [0.02, 0.125, 0.25, 0.5].forEach(function (v) { ctxE.fillText(niceLbl(v), mx(v), h - pad.b + 14); });
+    series(ctxE, tab.map(function (r) { return [r.hL, apct(r.wEB, r.wQ4)]; }), mx, my, '#ca8a04', [], 1.5);
+    series(ctxE, tab.map(function (r) { return [r.hL, apct(r.wFull, r.wQ4)]; }), mx, my, '#c026d3', [5, 3], 1.5);
+    series(ctxE, tab.map(function (r) { return [r.hL, apct(r.wRed, r.wQ4)]; }), mx, my, '#0284c7', [], 2.2);
+    marks(ctxE, tab.map(function (r) { return [r.hL, apct(r.wRed, r.wQ4)]; }), mx, my, '#0284c7');
+    marks(ctxE, tab.map(function (r) { return [r.hL, apct(r.wEB, r.wQ4)]; }), mx, my, '#ca8a04');
+    ctxE.strokeStyle = '#1e3a5f';
+    ctxE.setLineDash([3, 3]);
+    ctxE.beginPath(); ctxE.moveTo(mx(hNow), pad.t); ctxE.lineTo(mx(hNow), h - pad.b); ctxE.stroke();
+    ctxE.setLineDash([]);
+    dot(ctxE, mx(hNow), my(apct(lerpTab(tab, hNow, 'wRed'), lerpTab(tab, hNow, 'wQ4'))), '#1e3a5f');
+  }
+
+  function getShape(hL, bc) {
+    var key = hL.toFixed(5) + '|' + bc;
+    if (shapeCache[key]) return shapeCache[key];
+    var h = hL * P.L;
+    shapeCache[key] = {
+      h: h, hL: hL,
+      q4: solveQ4(h, bc),
+      red: assembleBeam('reduced', 10, h, bc),
+      full: assembleBeam('full', 10, h, bc),
+      eb: assembleBeam('eb', 10, h, bc)
+    };
+    return shapeCache[key];
+  }
+
+  function drawOneShape(ctx, S, box, highlight) {
+    var q4 = S.q4, h = S.h, M = q4.M, i, sctr, k, n;
+    var wmax = Math.max(Math.abs(S.red.wProbe), Math.abs(S.full.wProbe), Math.abs(S.eb.wProbe), Math.abs(q4.wProbe), 1e-12);
+    var sf = 0.22 * P.L / wmax;
+    var yMin = -h / 2, yMax = h / 2, p;
+    for (i = 0; i < M.node.length; i++) {
+      p = M.node[i][1] + sf * q4.u[2 * i + 1];
+      if (p < yMin) yMin = p;
+      if (p > yMax) yMax = p;
+    }
+    yMin = Math.min(yMin, sf * S.red.wProbe, sf * S.full.wProbe) - 0.04 * P.L;
+    yMax = Math.max(yMax, h / 2) + 0.06 * P.L;
+    var xMin = -0.04 * P.L, xMax = 1.06 * P.L;
+    var sx = box.w / (xMax - xMin), sy = box.h / (yMax - yMin);
+    var s = Math.min(sx, sy);
+    var ox = box.x + (box.w - s * (xMax - xMin)) / 2;
+    var oy = box.y + (box.h - s * (yMax - yMin)) / 2;
+    function X(x) { return ox + (x - xMin) * s; }
+    function Y(y) { return oy + (yMax - y) * s; }
+    if (highlight) {
+      ctx.fillStyle = 'rgba(30,58,95,0.05)';
+      ctx.fillRect(box.x, box.y, box.w, box.h);
+    }
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(X(0), Y(h / 2), X(P.L) - X(0), Y(-h / 2) - Y(h / 2));
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#9a3412';
+    ctx.fillStyle = 'rgba(194,65,12,0.18)';
+    ctx.lineWidth = 0.7;
+    for (i = 0; i < M.el.length; i++) {
+      sctr = M.el[i];
+      ctx.beginPath();
+      for (k = 0; k < 4; k++) {
+        n = sctr[k];
+        if (k === 0) ctx.moveTo(X(M.node[n][0] + sf * q4.u[2 * n]), Y(M.node[n][1] + sf * q4.u[2 * n + 1]));
+        else ctx.lineTo(X(M.node[n][0] + sf * q4.u[2 * n]), Y(M.node[n][1] + sf * q4.u[2 * n + 1]));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    function drawLine(sol, sampleFn, color, dash, lw) {
+      var samp = sampleFn(sol, 40), j;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lw;
+      ctx.setLineDash(dash || []);
+      ctx.beginPath();
+      for (j = 0; j < samp.xs.length; j++) {
+        if (j === 0) ctx.moveTo(X(samp.xs[j]), Y(sf * samp.ws[j]));
+        else ctx.lineTo(X(samp.xs[j]), Y(sf * samp.ws[j]));
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    drawLine(S.eb, hermiteSample, '#ca8a04', [], 1.4);
+    drawLine(S.full, linSample, '#c026d3', [5, 3], 1.5);
+    drawLine(S.red, linSample, '#0284c7', [], 2.2);
+    var tab = document.getElementById('bcSel').value === 'ss' ? SS : CANT;
+    var wQ = Math.abs(lerpTab(tab, S.hL, 'wQ4'));
+    var wR = Math.abs(lerpTab(tab, S.hL, 'wRed'));
+    var dlt = 100 * (wR - wQ) / wQ;
+    ctx.fillStyle = '#1e3a5f';
+    ctx.font = '600 12px Source Serif 4, Georgia, serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('h/L = ' + niceLbl(S.hL), box.x + 8, box.y + 16);
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = Math.abs(dlt) < 8 ? '#0f766e' : '#9f1239';
+    ctx.fillText('reduced vs Q4  ' + (dlt >= 0 ? '+' : '') + dlt.toFixed(1) + '%', box.x + 8, box.y + 32);
+  }
+
+  function drawShapes(bc, hNow) {
+    var dim = fit(cShapes, ctxSh), w = dim.w, hgt = dim.h;
+    ctxSh.fillStyle = '#fbfaf7';
+    ctxSh.fillRect(0, 0, w, hgt);
+    var hLs = [0.02, 0.125, 0.25, 0.5];
+    var n = hLs.length, i, colW, rowH, r, c, box;
+    var cols = w < 640 ? 1 : 4;
+    var rows = Math.ceil(n / cols);
+    colW = w / cols;
+    rowH = hgt / rows;
+    for (i = 0; i < n; i++) {
+      c = i % cols;
+      r = Math.floor(i / cols);
+      box = { x: c * colW + 6, y: r * rowH + 4, w: colW - 12, h: rowH - 8 };
+      ctxSh.strokeStyle = '#e8e4dc';
+      ctxSh.strokeRect(box.x, box.y, box.w, box.h);
+      drawOneShape(ctxSh, getShape(hLs[i], bc), box, Math.abs(Math.log(hNow / hLs[i])) < 0.15);
+    }
+  }
+
+  function drawAgree(bc, hNow) {
+    if (cW.getBoundingClientRect().width < 20) return;
+    var tab = bc === 'ss' ? SS : CANT;
+    drawW(tab, hNow);
+    drawNrm(tab, hNow);
+    drawErr(tab, hNow);
+    drawShapes(bc, hNow);
+  }
+
+  /* ---- main update ---- */
+  var hlSlide = document.getElementById('hlSlide');
+  var nSlide = document.getElementById('nSlide');
+  var scSlide = document.getElementById('scSlide');
+  var bcSel = document.getElementById('bcSel');
+  var beamKindBar = document.getElementById('beamKindBar');
+  var cache = { bKey: '', qKey: '', q4: null, beams: null };
+  var lockCache = { key: '', sweep: null };
+
+  function beamKind() { return beamKindBar.value; }
+
+  function scaleOf(wmax) {
+    var vis = +scSlide.value / 16;
+    if (!wmax || Math.abs(wmax) < 1e-18) return vis * 0.18;
+    return vis * 0.18 * P.L / Math.abs(wmax);
+  }
+
+  function update() {
+    var rec = 1 / +hlSlide.value;
+    var h = rec * P.L;
+    var nEl = +nSlide.value;
+    var bc = bcSel.value;
+    var kind = beamKind();
+    document.getElementById('hlLabel').textContent = hlSlide.value;
+    document.getElementById('nLabel').textContent = String(nEl);
+
+    var bKey = rec.toFixed(5) + '|' + nEl + '|' + bc;
+    var qKey = rec.toFixed(5) + '|' + bc;
+    var beams, q4;
+    if (cache.bKey === bKey) beams = cache.beams;
+    else {
+      beams = {
+        eb: assembleBeam('eb', nEl, h, bc),
+        red: assembleBeam('reduced', nEl, h, bc),
+        full: assembleBeam('full', nEl, h, bc)
+      };
+      cache.bKey = bKey; cache.beams = beams;
+    }
+    if (cache.qKey === qKey) q4 = cache.q4;
+    else {
+      q4 = solveQ4(h, bc);
+      cache.qKey = qKey; cache.q4 = q4;
+    }
+
+    var tab = bc === 'ss' ? SS : CANT;
+    var wKey = kind === 'eb' ? 'wEB' : (kind === 'full' ? 'wFull' : 'wRed');
+    var wQtab = lerpTab(tab, rec, 'wQ4');
+    var wBeamMat = lerpTab(tab, rec, wKey);
+    var wBeamLive = kind === 'eb' ? beams.eb.wProbe : (kind === 'full' ? beams.full.wProbe : beams.red.wProbe);
+    var wBeam = nEl === 10 ? wBeamMat : wBeamLive;
+    var aQ = Math.abs(wQtab), aB = Math.abs(wBeam);
+    var wmax = Math.max(aQ, aB, 1e-12);
+    var sf = scaleOf(wmax);
+    var qCorr = (Math.abs(q4.wProbe) > 1e-18) ? (wQtab / q4.wProbe) : 1;
+    var samp = kind === 'eb' ? hermiteSample(beams.eb, 64)
+      : linSample(kind === 'full' ? beams.full : beams.red, 64);
+    var sol = kind === 'eb' ? beams.eb : (kind === 'full' ? beams.full : beams.red);
+    var depth = visDepth(h);
+    var wVis = sf * wmax;
+    var rowGap = Math.max(h, 0.1 * P.L) + wVis + 0.2 * P.L;
+    gSolid.position.set(0, rowGap * 0.5, 0);
+    gBeam.position.set(0, -rowGap * 0.5, 0);
+
+    meshQ4.geometry.dispose();
+    edgeQ4.geometry.dispose();
+    midQ4.geometry.dispose();
+    var built = buildQ4Solid(q4, h, sf * qCorr, depth);
+    meshQ4.geometry = built.geo;
+    edgeQ4.geometry = built.egeo;
+    midQ4.geometry = built.mid;
+    meshBeam.geometry.dispose();
+    meshBeam.geometry = buildTube(samp, sf, 0.016 * P.L);
+    fillNodes(sol, sf);
+    fillTicks(sol, sf);
+    var col = kind === 'eb' ? 0xe8c547 : (kind === 'full' ? 0xe879f9 : 0x38bdf8);
+    var em = kind === 'eb' ? 0x854d0e : (kind === 'full' ? 0x86198f : 0x0369a1);
+    mats.beam.color.setHex(col);
+    mats.beam.emissive.setHex(em);
+    mats.node.color.setHex(kind === 'eb' ? 0xfef08a : (kind === 'full' ? 0xf5d0fe : 0xe0f2fe));
+    mats.node.emissive.setHex(col);
+    mats.tick.color.setHex(col);
+    mats.tick.emissive.setHex(em);
+    tagB.element.textContent = '1-D  ' + (kind === 'eb' ? 'Euler–Bernoulli' : (kind === 'full' ? 'Full-int. Timoshenko' : 'Reduced Timoshenko'));
+    tagS.position.set(P.L * 0.22, h * 0.7 + 0.04, depth * 0.5);
+    tagB.position.set(P.L * 0.22, 0.06, 0);
+
+    setGhost(ghostS, ghostSE, P.L, h, depth);
+    var showG = document.getElementById('showGhost').checked;
+    ghostS.visible = ghostSE.visible = ghostTube.visible = showG;
+    edgeQ4.visible = document.getElementById('showMesh').checked;
+
+    fillFix(fixS, h, depth);
+    fillFix1D(fixB);
+    fillLoads(loadS, h, sf * qCorr, bc, q4, depth);
+    fillLoad1D(loadB, samp, sf, bc);
+    layoutStudio(rowGap, h);
+    fitCam(rowGap, h, wVis);
+    document.getElementById('cbarMax').textContent = fmt(built.smax);
+    document.getElementById('cbarMin').textContent = fmt(-built.smax);
+
+    var names = {
+      reduced: 'Reduced Timoshenko',
+      full: 'Full-integration Timoshenko',
+      eb: 'Euler–Bernoulli'
+    };
+    var pdiff = 100 * (aB - aQ) / aQ;
+    var match = Math.abs(pdiff) < 8;
+    var locked = kind === 'full' && aB < 0.55 * aQ;
+    var capM = document.getElementById('capMatch');
+    document.getElementById('capSolid').textContent = 'MATLAB |w| = ' + fmt(aQ) + '   drawn ×' + sf.toFixed(3);
+    document.getElementById('capBeam').textContent = (nEl === 10 ? 'MATLAB' : 'live n=' + nEl) + ' |w| = ' + fmt(aB) + '   drawn ×' + sf.toFixed(3);
+    document.getElementById('capBeamTitle').textContent = 'Bottom — 1-D ' + names[kind];
+    capM.className = 'chip c-match ' + (match ? 'ok' : 'bad');
+    capM.textContent = match
+      ? 'matches the solid (' + (pdiff >= 0 ? '+' : '') + pdiff.toFixed(1) + '%)'
+      : (locked
+        ? 'does NOT match — locked, only ' + Math.round(100 * aB / aQ) + '% of the solid drop'
+        : 'does NOT match (' + (pdiff >= 0 ? '+' : '') + pdiff.toFixed(0) + '% vs solid)');
+
+    var top = Math.max(aQ, aB, 1e-12);
+    document.getElementById('nQ4').textContent = fmt(aQ);
+    document.getElementById('nBeam').textContent = fmt(aB);
+    document.getElementById('bQ4').style.width = (100 * aQ / top).toFixed(1) + '%';
+    document.getElementById('bBeam').style.width = (100 * aB / top).toFixed(1) + '%';
+    document.getElementById('beamSub').textContent = '1-D ' + names[kind];
+    var tBeam = document.getElementById('tBeam');
+    tBeam.className = 'tag ' + (match ? 'ok' : 'bad');
+    tBeam.textContent = capM.textContent;
+    var rowB = document.getElementById('rowBeam');
+    rowB.style.color = kind === 'eb' ? 'var(--eb)' : (kind === 'full' ? 'var(--full)' : 'var(--red)');
+    rowB.querySelector('.dot').style.background = kind === 'eb' ? 'var(--eb)' : (kind === 'full' ? 'var(--full)' : 'var(--red)');
+
+    var v = document.getElementById('verdict');
+    if (match) {
+      v.querySelector('p').textContent = 'Solid and beam agree.';
+      v.querySelector('span').textContent = 'Tip drop ' + fmt(aQ) + ' (solid) vs ' + fmt(aB) + ' (beam). The cheap beam is a valid replacement for this mesh.';
+    } else if (locked) {
+      v.querySelector('p').textContent = 'The beam does not match the solid.';
+      v.querySelector('span').textContent = 'Switch the bottom model to Reduced Timoshenko. Full two-point shear on a thin strip locks: the beam barely bends while the solid does.';
+    } else if (kind === 'eb' && rec > 0.15) {
+      v.querySelector('p').textContent = 'The beam does not match the solid.';
+      v.querySelector('span').textContent = 'Euler–Bernoulli has no shear. On a thick strip that missing shear drop shows up. Reduced Timoshenko still tracks the solid.';
+    } else {
+      v.querySelector('p').textContent = 'The beam does not match the solid.';
+      v.querySelector('span').textContent = 'Difference is ' + (pdiff >= 0 ? '+' : '') + pdiff.toFixed(1) + '%. Try Reduced Timoshenko, or change thickness.';
+    }
+
+    var I = IA(h).I, EI = P.E * I, gas = GAs(h);
+    var wAnEB = bc === 'cantilever' ? P.Ptip * P.L * P.L * P.L / (3 * EI) : 5 * P.qss * Math.pow(P.L, 4) / (384 * EI);
+    var wAnTS = bc === 'cantilever' ? wAnEB + P.Ptip * P.L / gas : wAnEB + P.qss * P.L * P.L / (8 * gas);
+    drawDefl(rec, bc);
+    var lk = rec.toFixed(5) + '|' + bc;
+    if (lockCache.key !== lk) lockCache = { key: lk, sweep: lockingSweep(h, bc) };
+    drawLock(nEl, lockCache.sweep, wQtab, wAnTS, rec);
+    drawAgree(bc, rec);
+  }
+
+  function renderView() {
+    gSolid.visible = true;
+    gBeam.visible = true;
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  }
+
+  ['showGhost', 'showMesh'].forEach(function (id) {
+    document.getElementById(id).addEventListener('change', update);
+  });
+  hlSlide.addEventListener('input', function () {
+    document.getElementById('btnThin').classList.toggle('on', +hlSlide.value >= 40);
+    document.getElementById('btnThick').classList.toggle('on', +hlSlide.value <= 6);
+    update();
+  });
+  nSlide.addEventListener('input', update);
+  scSlide.addEventListener('input', update);
+  bcSel.addEventListener('change', update);
+  beamKindBar.addEventListener('change', update);
+  document.getElementById('btnThin').addEventListener('click', function () {
+    hlSlide.value = 50; nSlide.value = 10;
+    this.classList.add('on');
+    document.getElementById('btnThick').classList.remove('on');
+    update();
+  });
+  document.getElementById('btnThick').addEventListener('click', function () {
+    hlSlide.value = 4; nSlide.value = 10;
+    this.classList.add('on');
+    document.getElementById('btnThin').classList.remove('on');
+    update();
+  });
+
+  var playing = false, dir = 1, playAcc = 0, lastT = 0;
+  document.getElementById('btnPlay').addEventListener('click', function () {
+    playing = !playing;
+    this.classList.toggle('on', playing);
+    this.textContent = playing ? 'Pause' : 'Sweep thickness';
+  });
+  document.getElementById('btnReset').addEventListener('click', function () {
+    playing = false;
+    document.getElementById('btnPlay').classList.remove('on');
+    document.getElementById('btnPlay').textContent = 'Sweep thickness';
+    hlSlide.value = 8; nSlide.value = 10; scSlide.value = 16;
+    bcSel.value = 'cantilever';
+    beamKindBar.value = 'reduced';
+    camLocked = false;
+    camera.position.set(0.95, 0.28, 1.42);
+    controls.target.set(0.46, 0.02, 0);
+    document.getElementById('btnThin').classList.remove('on');
+    document.getElementById('btnThick').classList.remove('on');
+    update();
+  });
+
+  function resize() {
+    var w = Math.max(1, view.clientWidth), hgt = Math.max(1, view.clientHeight);
+    camera.aspect = w / hgt;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, hgt, false);
+    labelRenderer.setSize(w, hgt);
+    update();
+  }
+  new ResizeObserver(resize).observe(view);
+  new ResizeObserver(function () {
+    var bc = document.getElementById('bcSel').value;
+    var hNow = 1 / +document.getElementById('hlSlide').value;
+    drawAgree(bc, hNow);
+  }).observe(document.querySelector('.figwrap'));
+
+  (function loop(t) {
+    requestAnimationFrame(loop);
+    if (playing) {
+      playAcc += (lastT ? t - lastT : 0);
+      if (playAcc > 260) {
+        playAcc = 0;
+        var v = +hlSlide.value + dir;
+        if (v >= 50) { v = 50; dir = -1; }
+        if (v <= 2) { v = 2; dir = 1; }
+        hlSlide.value = String(v);
+        update();
+      }
+    }
+    lastT = t;
+    controls.update();
+    renderView();
+  })();
+})();
+</script>
+</body>
+</html>
