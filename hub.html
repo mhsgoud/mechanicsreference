@@ -293,7 +293,7 @@
     .content{grid-area:content;overflow:auto;padding:36px 40px 64px}
     .card{
       background:transparent;border:none;padding:0;
-      max-width:42rem;margin:0 auto;
+      max-width:none;width:100%;margin:0;
     }
     .breadcrumbs{
       display:flex;flex-wrap:wrap;gap:6px;
@@ -322,7 +322,7 @@
     .badges,.cta-row,.footer,#test-badge{display:none !important}
     .badge{display:none}
 
-    .card:has(.scene-frame){max-width:52rem}
+    .card:has(.scene-frame){max-width:none}
     .scene-frame{
       display:block;width:100%;height:min(52vh,420px);
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
@@ -400,13 +400,12 @@
       margin:-6px 0 1.4rem;
       font-family:"Source Serif 4",Georgia,serif;
       font-size:1.12rem;line-height:1.55;color:var(--ink-soft);
-      max-width:38rem;
     }
     .topic-bridge{
       margin:2rem 0 0;padding:16px 0 0;
       border-top:1px solid var(--rule);
       color:var(--muted);font-size:0.98rem;line-height:1.6;
-      font-style:italic;max-width:40rem;
+      font-style:italic;
     }
     .topic-bridge strong{
       font-style:normal;font-weight:600;color:var(--navy);
