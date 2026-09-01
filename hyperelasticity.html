@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hyperelasticity — Mechanics Reference</title>
+  <meta name="description" content="Side-by-side compression of a linear elastic block and an incompressible hyperelastic rubber, with a live load–displacement curve." />
+  <link rel="canonical" href="https://mechanicsreference.com/hyperelasticity.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0b0f19;--steel:#94a3b8;--hyper:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:46em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden}
+    #stage{position:relative;height:min(76vh,680px);min-height:520px}
+    #stage canvas{display:block;width:100%;height:100%}
+    .sim-label{
+      position:absolute;z-index:3;top:18px;min-width:150px;padding:10px 14px;
+      border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.78);
+      color:#e2e8f0;text-align:center;pointer-events:none;
+    }
+    .sim-label h3{margin:0 0 4px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    .sim-label p{margin:0;font-size:.72rem;color:#94a3b8}
+    #label-linear{left:18px;border-color:rgba(148,163,184,.45)}
+    #label-linear h3{color:var(--steel)}
+    #label-hyper{right:18px;border-color:rgba(56,189,248,.55)}
+    #label-hyper h3{color:var(--hyper)}
+    #graph-panel{
+      position:absolute;z-index:3;left:18px;bottom:72px;width:min(320px,calc(100% - 36px));
+      padding:10px 10px 8px;border:1px solid #334155;background:rgba(11,15,25,.88);
+    }
+    #loadGraph{display:block;width:100%;height:150px}
+    .graph-legend{display:flex;justify-content:space-around;gap:10px;margin-top:6px;font-size:.7rem;color:#94a3b8}
+    .legend-item{display:flex;align-items:center;gap:6px}
+    .dot{width:8px;height:8px;border-radius:50%}
+    #ui{
+      position:absolute;z-index:3;left:50%;bottom:16px;transform:translateX(-50%);
+      display:flex;flex-direction:column;gap:6px;width:min(420px,calc(100% - 36px));
+      padding:12px 16px;border:1px solid rgba(56,189,248,.28);background:rgba(15,23,42,.9);
+    }
+    #ui label{display:flex;justify-content:space-between;gap:12px;font-size:.78rem;color:#94a3b8}
+    #ui label span{color:var(--hyper);font-weight:700;font-variant-numeric:tabular-nums}
+    #ui input[type=range]{width:100%;accent-color:var(--hyper)}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1120px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #stage{min-height:640px}
+      #graph-panel{width:calc(100% - 36px);bottom:78px}
+    }
+  </style>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#hyperelasticity">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#hyperelasticity">Hyperelasticity</a></p>
+      <h1>Linear elastic versus hyperelastic compression</h1>
+      <p class="standfirst">The same compressive load is applied to a stiff linear solid and to an incompressible rubber. The rubber accommodates large strain, hardens nonlinearly, and barrels because friction at the platens prevents uniform lateral expansion.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage" aria-label="Compression stands comparing linear elastic and hyperelastic blocks">
+        <div class="sim-label" id="label-linear">
+          <h3>Linear (steel)</h3>
+          <p>Stiff / yields early</p>
+        </div>
+        <div class="sim-label" id="label-hyper">
+          <h3>Hyperelastic (rubber)</h3>
+          <p>Compliant / incompressible</p>
+        </div>
+        <div id="graph-panel">
+          <canvas id="loadGraph" width="380" height="180"></canvas>
+          <div class="graph-legend">
+            <div class="legend-item"><span class="dot" style="background:#94a3b8"></span> Linear elastic</div>
+            <div class="legend-item"><span class="dot" style="background:#38bdf8"></span> Hyperelastic</div>
+          </div>
+        </div>
+        <div id="ui">
+          <label>Applied compressive load <span id="val-load">0.00</span></label>
+          <input type="range" id="slider-load" min="0" max="1" step="0.01" value="0" aria-label="Applied compressive load" />
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#hyperelasticity">Hyperelasticity</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('loadGraph');
+    const ctx = canvas.getContext('2d');
+    const sliderLoad = document.getElementById('slider-load');
+    const valLoad = document.getElementById('val-load');
+
+    function resizeGraph(){
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(1, canvas.clientWidth);
+      const h = Math.max(1, canvas.clientHeight);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawGraph(currentLoad){
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const padX = 36, padY = 24;
+      const graphW = w - padX - 12;
+      const graphH = h - padY - 12;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padX, 8);
+      ctx.lineTo(padX, h - padY);
+      ctx.lineTo(w - 8, h - padY);
+      ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px "Source Sans 3", sans-serif';
+      ctx.fillText('Strain (displacement)', w / 2 - 52, h - 6);
+      ctx.save();
+      ctx.translate(11, h / 2 + 28);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Load (stress)', 0, 0);
+      ctx.restore();
+
+      const maxStrainX = 0.60;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(padX, h - padY);
+      ctx.lineTo(padX + (0.04 / maxStrainX) * graphW, h - padY - graphH);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(padX, h - padY);
+      for (let i = 0; i <= 20; i++) {
+        const loadRatio = i / 20;
+        const curveAdjust = Math.pow(loadRatio, 1.5) * 0.60;
+        ctx.lineTo(padX + (curveAdjust / maxStrainX) * graphW, (h - padY) - loadRatio * graphH);
+      }
+      ctx.stroke();
+
+      const activeLinearX = padX + ((currentLoad * 0.04) / maxStrainX) * graphW;
+      const activeHyperX = padX + (Math.pow(currentLoad, 1.5) * 0.60 / maxStrainX) * graphW;
+      const activeY = (h - padY) - currentLoad * graphH;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padX, activeY);
+      ctx.lineTo(Math.max(activeLinearX, activeHyperX) + 12, activeY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath(); ctx.arc(activeLinearX, activeY, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(activeHyperX, activeY, 4, 0, Math.PI * 2); ctx.fill();
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0f19);
+    scene.fog = new THREE.FogExp2(0x0b0f19, 0.03);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
+    camera.position.set(0, 1.5, 10);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    stage.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, -0.5, 0);
+    controls.minDistance = 6;
+    controls.maxDistance = 16;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
+    dirLight.position.set(5, 10, 8);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(40, 40),
+      new THREE.MeshStandardMaterial({color: 0x0f172a, roughness: 0.8})
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const plateMat = new THREE.MeshStandardMaterial({color: 0x334155, metalness: 0.7, roughness: 0.35});
+    function setupTestStand(xOffset){
+      const group = new THREE.Group();
+      group.position.x = xOffset;
+      const base = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.2, 2.8), plateMat);
+      base.position.y = -1.9;
+      base.receiveShadow = true;
+      group.add(base);
+      const platen = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.2, 2.8), plateMat);
+      platen.castShadow = true;
+      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 3, 32), plateMat);
+      rod.position.y = 1.6;
+      rod.castShadow = true;
+      platen.add(rod);
+      group.add(platen);
+      scene.add(group);
+      return platen;
+    }
+    const leftPlaten = setupTestStand(-2.5);
+    const rightPlaten = setupTestStand(2.5);
+
+    const blockHeight = 2;
+    const linearGeo = new THREE.BoxGeometry(1.6, blockHeight, 1.6, 2, 2, 2);
+    const linearBlock = new THREE.Mesh(linearGeo, new THREE.MeshStandardMaterial({color: 0x64748b, roughness: 0.4}));
+    linearBlock.add(new THREE.LineSegments(new THREE.EdgesGeometry(linearGeo), new THREE.LineBasicMaterial({color: 0x94a3b8})));
+    linearBlock.position.x = -2.5;
+    linearBlock.castShadow = true;
+    scene.add(linearBlock);
+
+    const hyperGeo = new THREE.BoxGeometry(1.6, blockHeight, 1.6, 32, 32, 32);
+    const hyperPosAttr = hyperGeo.attributes.position;
+    const hyperInitialPos = new Float32Array(hyperPosAttr.array);
+    const hyperBlock = new THREE.Mesh(hyperGeo, new THREE.MeshPhysicalMaterial({
+      color: 0x0ea5e9, transmission: 0.7, opacity: 0.9, transparent: true, roughness: 0.22, thickness: 0.6
+    }));
+    hyperBlock.position.set(2.5, -0.8, 0);
+    hyperBlock.castShadow = true;
+    hyperBlock.add(new THREE.Mesh(hyperGeo, new THREE.MeshBasicMaterial({color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.15})));
+    scene.add(hyperBlock);
+
+    let targetLoad = 0, currentLoad = 0;
+    sliderLoad.addEventListener('input', () => {
+      targetLoad = parseFloat(sliderLoad.value);
+      valLoad.textContent = targetLoad.toFixed(2);
+    });
+
+    function resize(){
+      const w = Math.max(1, stage.clientWidth);
+      const h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      resizeGraph();
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    (function loop(){
+      requestAnimationFrame(loop);
+      currentLoad += (targetLoad - currentLoad) * 0.15;
+      drawGraph(currentLoad);
+
+      const linearStrain = currentLoad * 0.04;
+      const linearScaleY = 1 - linearStrain;
+      const poissonExpansion = 1 + linearStrain * 0.3;
+      linearBlock.scale.set(poissonExpansion, linearScaleY, poissonExpansion);
+      linearBlock.position.y = -1.8 + (blockHeight * linearScaleY) / 2;
+      leftPlaten.position.y = -1.8 + blockHeight * linearScaleY + 0.1;
+
+      const hyperStrain = Math.pow(currentLoad, 1.5) * 0.60;
+      const hyperCompression = Math.max(1 - hyperStrain, 0.08);
+      const volumeBulge = 1 / Math.sqrt(hyperCompression);
+      for (let i = 0; i < hyperPosAttr.count; i++) {
+        const ox = hyperInitialPos[i * 3];
+        const oy = hyperInitialPos[i * 3 + 1];
+        const oz = hyperInitialPos[i * 3 + 2];
+        const normY = (oy + 1) / 2;
+        const cy = -1 + (oy + 1) * hyperCompression;
+        const frictionProfile = Math.sin(normY * Math.PI);
+        const lateralScale = 1 + (volumeBulge - 1) * (0.2 + 0.8 * frictionProfile);
+        hyperPosAttr.setXYZ(i, ox * lateralScale, cy, oz * lateralScale);
+      }
+      hyperPosAttr.needsUpdate = true;
+      hyperGeo.computeVertexNormals();
+      rightPlaten.position.y = -0.8 + (-1 + 2 * hyperCompression) + 0.1;
+
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>

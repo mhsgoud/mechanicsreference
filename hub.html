@@ -448,6 +448,21 @@
     .topic-story p{margin:0 0 .85rem;color:var(--ink-soft);line-height:1.72}
     .topic-story p:last-child{margin-bottom:0}
 
+    .topic-table-wrap{margin:1.6rem 0 2.2rem;overflow-x:auto}
+    .topic-table-wrap .caption{
+      margin:0 0 8px;font-size:0.92rem;color:var(--muted);
+    }
+    .topic-table{width:100%;border-collapse:collapse}
+    .topic-table th,.topic-table td{
+      padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule);
+      vertical-align:top;
+    }
+    .topic-table th{
+      color:var(--navy);font-weight:600;font-size:0.92rem;
+    }
+    .topic-table td{color:var(--ink-soft)}
+    .topic-table tbody tr:last-child th,.topic-table tbody tr:last-child td{border-bottom:0}
+
     .topic-subsections{margin:2.2rem 0 0}
     .topic-subsection{margin:0 0 1.8rem}
     .topic-subsection h2{margin:0 0 0.7rem}
@@ -1240,14 +1255,58 @@ const topics = [
       ]
     }
   ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking","Navier-Cauchy","elastodynamics","P-wave","S-wave"], scene:"hookePoisson", sceneFirst:true},
-  {part:"Part I – Continuum Mechanics", title:"Hyperelasticity", bullets:[
-    "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
-    "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
-    "The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser.",
-    "The block is pulled in one direction and contracts in the other two so that J stays one — the kinematics every incompressible hyperelastic law has to live with."
-  ], equations:[
-    {name:"Hyperelastic stress", expr:"S = ∂W/∂E", tex:"\\mathbf{S} = \\dfrac{\\partial W}{\\partial\\mathbf{E}}", note:"The second Piola–Kirchhoff stress is the derivative of the strain-energy density with respect to Green strain. In principal stretches, σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume."}
-  ], tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility"], scene:"principalStretches"},
+  {part:"Part I – Continuum Mechanics", title:"Hyperelasticity",
+  lead:"Hyperelasticity (or Green elasticity) is a constitutive material model used in solid mechanics to describe materials that can undergo large, reversible elastic deformations.",
+  bullets:[
+    "Unlike standard metals, which permanently deform (yield) if stretched beyond roughly 1%, hyperelastic materials such as vulcanized rubber and biological tissues can stretch by several hundred percent and snap back to their original shape."
+  ], story:[
+    {
+      heading:"The Barrelling Effect",
+      paragraphs:[
+        "In the simulation, friction at the top and bottom platens (no-slip boundaries) prevents the rubber from expanding uniformly. Because the material is incompressible, it bulges outward at mid-height — barrelling.",
+        "The load–displacement curve next to the stands shows the same load on both specimens. The linear solid is a nearly vertical wall of stiffness; the hyperelastic solid accommodates large strain and hardens nonlinearly as molecular chains straighten."
+      ]
+    }
+  ], flow:[
+    {
+      section:"Mathematical Principles",
+      lead:"Stress is not obtained from a constant stiffness matrix. It is the derivative of a stored-energy function of the stretch.",
+      items:[
+        {
+          name:"Strain-energy density",
+          tex:"\\mathbf{S} = \\dfrac{\\partial W}{\\partial\\mathbf{E}}",
+          body:"A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal."
+        },
+        {
+          name:"Incompressibility",
+          tex:"J = \\lambda_1\\lambda_2\\lambda_3 = 1",
+          body:"Most hyperelastic polymers experience virtually zero volume change under load (Poisson’s ratio near ½). Incompressibility is enforced by J = 1, with pressure a Lagrange multiplier rather than a constitutive output. That is why the rubber block must barrel when the platens prevent free lateral expansion."
+        },
+        {
+          name:"Non-linear stiffness",
+          body:"The material initially stretches easily and then grows exponentially stiffer as tangled molecular chains straighten. That is the source of the curved load path in the figure."
+        },
+        {
+          name:"Isotropic stored energy",
+          tex:"W = W(I_1,I_2,I_3)\\quad\\text{or}\\quad W(\\lambda_1,\\lambda_2,\\lambda_3)",
+          body:"Isotropic W depends on the invariants of C, or on the principal stretches. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂."
+        },
+        {
+          name:"Consistent tangent",
+          body:"The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser."
+        }
+      ]
+    }
+  ], table:{
+    heading:"Material Comparison",
+    caption:"Linear elastic steel versus hyperelastic rubber",
+    columns:["Property","Linear elastic (steel)","Hyperelastic (rubber)"],
+    rows:[
+      ["Strain limit","< 1% (tiny)","Up to 700% (massive)"],
+      ["Stress–strain","Linear (Hooke’s law)","Non-linear"],
+      ["Volume check","Compressible","Incompressible"]
+    ]
+  }, tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility","barrelling","rubber","Green elasticity","load curve"], scene:"hyperelasticity", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Metal Plasticity", bullets:[
     "Below a yield stress the response is elastic. Beyond it, metals flow at nearly constant volume. The elastic strain is recoverable; the plastic strain is a history, not a state derived from the current stretch alone.",
     "J₂ plasticity yields when the von Mises stress reaches σ_y. The flow direction is the normal to that surface—associated flow. Isotropic hardening expands the cylinder; kinematic hardening translates it (the Bauschinger effect) by a backstress α.",
@@ -2242,6 +2301,7 @@ function renderTopicScene(topic){
     vonMises: {src:'von-mises.html', title:'von Mises yield surface'},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
+    hyperelasticity: {src:'hyperelasticity.html', title:'Linear elastic steel versus hyperelastic rubber under the same compressive load. The rubber barrels because friction at the platens prevents uniform expansion of an incompressible solid.', tall:true},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
@@ -3545,7 +3605,7 @@ const PART_I_LEAD = {
   "Principal Stresses and von Mises": "Hydrostatic part, stress deviator, and the cylindrical yield surface of J₂ plasticity.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
   "Hooke’s Law": "Two isotropic moduli, the Navier–Cauchy displacement equation, and P- and S-waves at finite speeds.",
-  "Hyperelasticity": "Finite elastic stretch from a stored-energy function; S = ∂W/∂E.",
+  "Hyperelasticity": "Large reversible stretch from a stored-energy function; S = ∂W/∂E. The figure compares a linear solid with an incompressible rubber that barrels.",
   "Metal Plasticity": "Yield, associated flow, hardening, and the return map at each quadrature point.",
   "Fluids: Continuity and Navier–Stokes": "The same momentum equation once Newton’s viscosity replaces Hooke’s law.",
   "Thermodynamics of Continua": "Heat, thermoelastic coupling, and Biot’s effective-stress split."
@@ -3636,6 +3696,18 @@ function renderSubsections(sections){
   `).join("")}</div>`;
 }
 
+function renderTopicTable(table){
+  if(!table || !table.columns || !table.rows) return "";
+  return `<div class="topic-table-wrap">
+    ${table.heading ? `<h2>${escHtml(table.heading)}</h2>` : ""}
+    ${table.caption ? `<p class="caption">${escHtml(table.caption)}</p>` : ""}
+    <table class="topic-table">
+      <thead><tr>${table.columns.map(c => `<th>${escHtml(c)}</th>`).join("")}</tr></thead>
+      <tbody>${table.rows.map(row => `<tr>${row.map(cell => `<td>${escHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table>
+  </div>`;
+}
+
 function renderStorySections(sections){
   if(!sections || !sections.length) return "";
   return `<div class="topic-story">${sections.map(section => `
@@ -3664,6 +3736,7 @@ function renderContent(topic){
   const flowBlock = topic.flow ? renderEquationFlow(topic.flow) : "";
   const storyBlock = renderStorySections(topic.story);
   const subsectionBlock = renderSubsections(topic.subsections);
+  const tableBlock = renderTopicTable(topic.table);
   const eqBlock = (!topic.flow && topic.equations && topic.equations.length)
     ? `<p class="section-label">Field equations</p>
       <div class="eq-list">${topic.equations.map(eq => `
@@ -3685,6 +3758,7 @@ function renderContent(topic){
       ${topic.sceneFirst ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
+      ${tableBlock}
       ${subsectionBlock}
       ${topic.sceneFirst ? "" : sceneBlock}
       ${illustrationsBlock}
