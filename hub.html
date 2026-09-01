@@ -932,24 +932,79 @@ const topics = [
       ]
     }
   ], tags:["basic equations","continuum","continuum hypothesis","RVE","scale separation","theory","strain","stress","conservation","momentum","Hooke","Navier-Cauchy","Newtonian fluid","elastodynamics","multiphase","Biot","thermoelasticity","virtual work","FEM","Newton-Raphson"], scene:"linearMomentum", interactive:"beamSim", theoryExtra:true},
-  {part:"Part I – Continuum Mechanics", title:"Introduction to Continuum Mechanics", bullets:[
-    "Continuum mechanics models material as a continuous body occupying a region Ω ⊂ ℝ³. Fields such as density ρ, velocity v, stress σ, and temperature are assigned at every point as averages over a small representative volume. The approximation requires scale separation: the averaging volume must be large compared with the microstructure and small compared with the macroscopic length over which those fields vary.",
-    "This common framework covers solids, fluids, and coupled media. Universal balance laws remain the same; kinematic assumptions, constitutive equations, internal variables, and additional fields select elasticity, plasticity, viscoelasticity, fluid flow, poromechanics, thermo-mechanics, or fluid–structure interaction.",
-    "Two main sources of nonlinearity in solids: material nonlinearity (nonlinear stress–strain laws; contact and friction are often grouped here) and geometric nonlinearity (equilibrium and stiffness depend on the deformed shape, including deformation-dependent boundaries and loads).",
-    "Linear continuum models assume deformations are small enough that changes in geometry can be ignored when writing equilibrium and strain; nonlinear models place no such restriction—kinematics, stress, equilibrium, and constitutive laws are the same subjects, but without the small-deformation shortcut.",
-    "Nonlinear computational mechanics means formulating those continuous governing equations and then solving them numerically—today almost always with the finite element method: approximate the continuum with nodes and elements, introduce shape functions for geometry and unknown fields, and replace the strong form with a weak integral statement (e.g. principle of virtual work or stationary potential energy).",
-    "Discretization yields a finite set of nonlinear algebraic equations in the nodal degrees of freedom (e.g. displacements). These are typically solved with Newton–Raphson iteration, which requires a consistent tangent (Jacobian) of the residual—exactly the matrix structure you build in nonlinear FE codes.",
-    "Simple geometrically nonlinear structures: a rigid bar on a torsional spring (cantilever model) gives FL cos θ = Kθ; for small θ, cos θ → 1 and the linear relation F ≈ (K/L)θ is recovered. The full nonlinear path stays physical (e.g. θ remains below π/2 in that idealization).",
-    "The same idea vertically (column model) gives PL sin θ = Kθ. Besides the trivial θ = 0 solution, a second branch appears—bifurcation. For small θ, linearization yields (K − PL)θ = 0, giving the elastic critical load P = K/L (Euler-type buckling in a structural analog). In FE, plate and shell buckling often appears as an eigenvalue problem for critical loads and modes.",
-    "When bodies deform finitely, strain must be defined carefully. In 1D, common measures include engineering strain (l − L)/L, logarithmic (natural) strain ln(l/L), Green strain (l² − L²)/(2L²), and Almansi strain (l² − L²)/(2l²). Taylor expansion shows that as l → L, all of these reduce to the small-strain increment ∆l/l over the reference length.",
-    "A single truss bar under large displacement illustrates the full pipeline: equilibrium at a joint leads to a residual R(x) = 0 that is highly nonlinear in the position x (because bar length and angle depend on x). Constitutive laws written in terms of different strain measures change the force–stretch relation; work-conjugate stress–strain pairs matter for 3D (preview only in Ch. 1, detailed later).",
-    "Directional derivatives and linearization of nonlinear equations are the bridge between continuum theory and Newton–Raphson: each iteration solves a linearized problem until the residual vanishes—prototype for every nonlinear FE increment.",
-    "The figures below collect the elementary models used to introduce those ideas: a rigid bar on a spring, a column that buckles, one-dimensional strain measures, a truss joint, qualitative equilibrium paths, and a single Newton step.",
-    "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
-  ], equations:[
-    {name:"Continuum body and fields", expr:"Ωₜ ⊂ ℝ³,  ρ = ρ(x,t),  v = v(x,t),  σ = σ(x,t)", tex:"\\Omega_t\\subset\\mathbb{R}^3,\\qquad \\rho=\\rho(\\mathbf{x},t),\\quad \\mathbf{v}=\\mathbf{v}(\\mathbf{x},t),\\quad \\boldsymbol{\\sigma}=\\boldsymbol{\\sigma}(\\mathbf{x},t)", note:"Pointwise fields are local averages over a representative volume, not values at a single molecule."},
-    {name:"Scale separation", expr:"ℓ_micro ≪ ℓ_RVE ≪ ℓ_macro", tex:"\\ell_{\\mathrm{micro}}\\ll\\ell_{\\mathrm{RVE}}\\ll\\ell_{\\mathrm{macro}}", note:"When no intermediate representative scale exists, a classical local continuum model may fail."}
-  ], tags:["continuum","continuum hypothesis","RVE","scale separation","solid mechanics","fluid mechanics","coupled problems","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
+  {part:"Part I – Continuum Mechanics", title:"Introduction to Continuum Mechanics",
+  lead:"In continuum mechanics, a solid or a fluid is treated as a continuous, undivided medium rather than a collection of discrete particles. This macroscopic approximation allows us to describe the physical behavior of materials using continuous field variables.",
+  bullets:[
+    "In this framework, motion and deformation are measured by strain, while internal forces are measured by stress."
+  ], flow:[
+    {
+      section:"Basic Governing Equations",
+      lead:"At the core of continuum mechanics are the balance laws. Regardless of the material, the conservation of mass and momentum must hold. This is expressed through equilibrium equations, most notably Cauchy’s first law of motion. Depending on the chosen frame of reference, this balance of linear momentum is written as:",
+      items:[
+        {
+          name:"Current placement (spatial formulation)",
+          tex:"\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}"
+        },
+        {
+          name:"Reference mesh (material formulation)",
+          tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
+          body:"These equations establish the fundamental strong form of the field problem, balancing internal stresses (σ or P) with body forces (b or B) and inertial terms (a or A)."
+        }
+      ]
+    },
+    {
+      section:"Constitutive Models",
+      lead:"While the balance laws apply universally, they do not close the system of equations. A constitutive model is required to describe how the stress depends on the deformation, or the rate of deformation, for a specific material.",
+      items:[
+        {
+          name:"What the constitutive law does",
+          body:"The constitutive law is what distinguishes elasticity from plasticity, and a viscous fluid from an elastic solid, entirely independent of how the problem will eventually be solved numerically."
+        }
+      ]
+    },
+    {
+      section:"Linear vs. Nonlinear Formulations",
+      lead:"The complexity of the continuum model depends heavily on the scale of deformation.",
+      items:[
+        {
+          name:"Linear continuum models",
+          body:"Assume deformations are small enough that changes in geometry can be safely ignored when writing equilibrium and strain equations (the small-deformation shortcut)."
+        },
+        {
+          name:"Nonlinear models",
+          body:"Place no such restrictions. Kinematics, stress, equilibrium, and constitutive laws remain the exact same subjects, but they must account for geometric and material nonlinearity without simplifications."
+        }
+      ]
+    },
+    {
+      section:"Transition to Computational Mechanics",
+      lead:"Formulating the continuous governing equations is only the first step; solving them for complex geometries requires numerical methods—today, almost exclusively the Finite Element Method (FEM). To transition from continuum theory to a discrete numerical model, the problem undergoes a specific pipeline:",
+      items:[
+        {
+          name:"1. Weak form",
+          body:"The strong form of the balance laws is replaced by a weak statement, such as the principle of virtual work or a Galerkin projection."
+        },
+        {
+          name:"2. Discretization",
+          body:"The continuous domain is approximated using a mesh of nodes and elements. Unknown fields and geometry are interpolated using shape functions."
+        },
+        {
+          name:"3. Assembly",
+          body:"Integrals on individual elements are evaluated (typically via Gauss quadrature) and assembled into a global system of algebraic equations for the nodal degrees of freedom."
+        }
+      ]
+    },
+    {
+      section:"Solving Nonlinear Systems",
+      lead:"For nonlinear continuum mechanics, discretization yields a finite set of nonlinear algebraic equations. These cannot be solved in a single step and rely on Newton–Raphson iteration.",
+      items:[
+        {
+          name:"Linearization and the consistent tangent",
+          body:"The bridge between pure continuum theory and the Newton–Raphson method is linearization. Each iteration requires calculating directional derivatives to linearize the nonlinear equations. This produces a consistent tangent (or Jacobian) of the residual—the exact matrix structure assembled in nonlinear finite element codes—which is solved repeatedly until the residual vanishes."
+        }
+      ]
+    }
+  ], tags:["continuum","strain","stress","Cauchy","balance laws","constitutive","linear","nonlinear","FEM","weak form","discretization","assembly","Newton-Raphson","tangent","linearization"]},
   {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation", bullets:[
     "A motion x = χ(X,t) maps a material point X in the reference configuration Ω₀ to its position x in the current configuration Ωₜ; displacement is u(X,t) = x − X. When displacement gradients are small, the symmetric gradient of u is enough to measure strain.",
     "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Its positive Jacobian J = det F gives the local volume ratio dv = J dV. Rigid translation never appears in F; rotation, stretch, shear, and volume change do.",
@@ -3477,7 +3532,7 @@ const PART_I_ARC = {
 
 const PART_I_LEAD = {
   "Basic Equations": "The closed list of field equations that the rest of Part I expands, one subject at a time.",
-  "Introduction to Continuum Mechanics": "Why continuum statements and finite-element discretizations are written together: nonlinearity, linearization, and the Newton step.",
+  "Introduction to Continuum Mechanics": "A solid or fluid as a continuous medium: strain, stress, balance laws, constitutive closure, and the pipeline to a finite-element Newton step.",
   "Kinematics of Deformation": "Motion as a map from the reference placement to the current one; strain begins with the deformation gradient.",
   "Tensors and the Divergence Theorem": "The bookkeeping of components, and the integral identity that turns volume balance into surface traction.",
   "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
