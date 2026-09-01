@@ -395,23 +395,6 @@
     }
     .part-path .sep{margin:0 8px;color:var(--rule);font-weight:400;letter-spacing:0}
     .part-path .pos{font-variant-numeric:tabular-nums;letter-spacing:0.02em}
-    .library-parts{
-      position:sticky;top:0;z-index:4;
-      display:flex;flex-wrap:nowrap;gap:6px;
-      margin:-12px 0 16px;padding:10px 0 10px;
-      background:var(--paper);
-      border-bottom:1px solid var(--rule);
-    }
-    .library-parts button{
-      appearance:none;border:1px solid var(--rule);background:#fff;
-      color:var(--navy);font:inherit;font-size:0.82rem;font-weight:600;
-      padding:7px 0;cursor:pointer;min-height:36px;flex:1;min-width:0;
-    }
-    .library-parts button:hover{border-color:var(--navy)}
-    .library-parts button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
-    .library-parts button.current{
-      background:var(--navy);border-color:var(--navy);color:#fff;cursor:default;
-    }
 
     .topic-lead{
       margin:-6px 0 1.4rem;
@@ -3478,17 +3461,6 @@ function topicBridge(topic){
   return topic.bridge || PART_I_BRIDGE[topic.title] || null;
 }
 
-function libraryPartsHtml(topic){
-  const parts = [...new Set(topics.map(t => t.part))];
-  return `<nav class="library-parts" aria-label="Library parts">${parts.map(part => {
-    const first = topics.find(t => t.part === part);
-    if(!first) return "";
-    const {roman} = partBits(part);
-    const on = topic.part === part;
-    return `<button type="button" class="${on ? "current" : ""}" data-title="${escHtml(first.title)}" title="${escHtml(part)}" ${on ? "aria-current=\"true\"" : ""}>${escHtml(roman)}</button>`;
-  }).join("")}</nav>`;
-}
-
 function partPathHtml(topic){
   if(topic.part !== PART_I) return "";
   const siblings = partTopics(topic.part);
@@ -3580,7 +3552,6 @@ function renderContent(topic){
 
   content.innerHTML = `
     <article class="card">
-      ${libraryPartsHtml(topic)}
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
       ${partPathHtml(topic)}
       <h1>${escHtml(topic.title)}</h1>
@@ -3607,11 +3578,6 @@ function renderContent(topic){
     active.classList.add('active');
     active.scrollIntoView({block:'nearest'});
   }
-
-  content.querySelectorAll('.library-parts button[data-title]').forEach(btn => {
-    if(btn.classList.contains('current')) return;
-    btn.addEventListener('click', () => selectTopic(btn.getAttribute('data-title')));
-  });
 
   const nav = content.querySelector('.topic-nav');
   if(nav){
