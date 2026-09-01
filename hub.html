@@ -1113,12 +1113,50 @@ const topics = [
     {name:"Second Piola–Kirchhoff", expr:"S = F⁻¹ P = J F⁻¹ σ F⁻ᵀ", tex:"\\mathbf{S} = \\mathbf{F}^{-1}\\mathbf{P} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Work-conjugate to Ė. A hyperelastic law S = ∂W/∂E is consistent with Green–Lagrange kinematics. When stretches and rotations are both small, P, S, and σ coincide to first order."},
     {name:"Kirchhoff power", expr:"τ : D,   τ = J σ", tex:"\\boldsymbol{\\tau}:\\mathbf{D},\\qquad \\boldsymbol{\\tau}=J\\boldsymbol{\\sigma}", note:"Cauchy stress is conjugate to the rate of deformation D up to the factor J."}
   ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"], scene:"workConjugates"},
-  {part:"Part I – Continuum Mechanics", title:"Principal Stresses and von Mises", bullets:[
-    "The principal stresses are the eigenvalues of σ. The hydrostatic part is the mean (tr σ)/3; the deviator is σ′ = σ − (tr σ/3) I. Plasticity in metals is, to a first approximation, independent of the hydrostatic part.",
-    "The von Mises equivalent stress is √(3/2 σ′ : σ′), the magnitude of the deviator scaled so that it equals |σ| in uniaxial tension. In principal-stress space the yield condition σ_vm = σ_y is a cylinder along the hydrostatic axis.",
-    "The same split on strain separates change of volume from change of shape. In isotropic linear elasticity the deviators are related by ε′ = σ′ / (2G) and the spherical parts by the bulk modulus.",
-    "The cylinder in the figure is that yield surface. A path along the diagonal never hits it; a path with enough shear does."
-  ], tags:["principal stress","von Mises","deviatoric","hydrostatic","yield"], scene:"vonMises"},
+  {part:"Part I – Continuum Mechanics", title:"Principal Stresses and von Mises",
+  lead:"An interactive reference for principal stresses, 3D Mohr’s circles, and the von Mises and Tresca yield criteria.",
+  bullets:[
+    "The principal stresses σ₁ ≥ σ₂ ≥ σ₃ are the eigenvalues of the Cauchy stress. Shear vanishes on those planes. The cube in the figure scales with the three principals; the arrows are the corresponding traction vectors."
+  ], flow:[
+    {
+      section:"3D Mohr’s circles",
+      lead:"Every orientation of a cut through the same stress state plots inside the three Mohr circles in the (σ, τ) plane. The outer circle bounds the absolute maximum shear.",
+      items:[
+        {
+          name:"Maximum shear",
+          tex:"\\tau_{\\max} = \\dfrac{\\sigma_1 - \\sigma_3}{2}",
+          body:"The radius of the largest Mohr circle. Hydrostatic pressure only translates the set of circles along the σ-axis; it does not change τ_max."
+        },
+        {
+          name:"Hydrostatic–deviatoric split",
+          tex:"\\boldsymbol{\\sigma}' = \\boldsymbol{\\sigma} - \\tfrac13(\\mathrm{tr}\\,\\boldsymbol{\\sigma})\\,\\mathbf{I}",
+          body:"The hydrostatic part is the mean (tr σ)/3. Plasticity in metals is, to a first approximation, independent of that part: only the deviator drives yield. The same split on strain separates change of volume from change of shape."
+        }
+      ]
+    },
+    {
+      section:"Von Mises Yield Criterion (Distortion Energy Theory)",
+      lead:"Yielding begins when the distortional strain energy reaches the value attained at yield in uniaxial tension. The criterion uses all three principal stresses and is the usual predictor for ductile metals.",
+      items:[
+        {
+          name:"Equivalent stress",
+          tex:"\\sigma_v = \\sqrt{\\tfrac12\\bigl[(\\sigma_1-\\sigma_2)^2+(\\sigma_2-\\sigma_3)^2+(\\sigma_3-\\sigma_1)^2\\bigr]}",
+          body:"Yielding occurs if σ_v ≥ S_y. Equivalently σ_v = √(3/2 σ′ : σ′), scaled so that it equals |σ| in uniaxial tension. In principal-stress space the yield surface is a smooth cylinder about the hydrostatic axis."
+        }
+      ]
+    },
+    {
+      section:"Tresca Yield Criterion (Maximum Shear Stress Theory)",
+      lead:"Henri Tresca’s more conservative statement: yielding starts when the largest shear in the material reaches the shear at yield in a tension test.",
+      items:[
+        {
+          name:"Tresca equivalent stress",
+          tex:"\\tau_{\\max}=\\dfrac{\\sigma_1-\\sigma_3}{2}\\qquad\\Rightarrow\\qquad \\sigma_t=\\sigma_1-\\sigma_3",
+          body:"Failure is declared when σ_t ≥ S_y. Tresca is slightly more conservative than von Mises: its hexagonal yield locus sits inside the von Mises circle (or cylinder) in the π-plane."
+        }
+      ]
+    }
+  ], tags:["principal stress","von Mises","Tresca","Mohr","deviatoric","hydrostatic","yield","distortion energy","maximum shear"], scene:"vonMises", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Objective Rates",
   lead:"Why a fixed observer can report changing stress when the material itself only rotates.",
   bullets:[], story:[
@@ -2298,7 +2336,7 @@ function renderTopicScene(topic){
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
     hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Hydrostatic and deviatoric strain'},
     velocityGradient: {src:'velocity-gradient.html', title:'Rate of deformation and spin'},
-    vonMises: {src:'von-mises.html', title:'von Mises yield surface'},
+    vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hyperelasticity: {src:'hyperelasticity.html', title:'Linear elastic steel versus hyperelastic rubber under the same compressive load. The rubber barrels because friction at the platens prevents uniform expansion of an incompressible solid.', tall:true},
@@ -3602,7 +3640,7 @@ const PART_I_LEAD = {
   "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
   "Constitutive Models": "Balance does not determine stress; a constitutive map says what the material may remember.",
   "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
-  "Principal Stresses and von Mises": "Hydrostatic part, stress deviator, and the cylindrical yield surface of J₂ plasticity.",
+  "Principal Stresses and von Mises": "Principal stresses, Mohr’s circles, and the von Mises and Tresca yield checks on the same stress state.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
   "Hooke’s Law": "Two isotropic moduli, the Navier–Cauchy displacement equation, and P- and S-waves at finite speeds.",
   "Hyperelasticity": "Large reversible stretch from a stored-energy function; S = ∂W/∂E. The figure compares a linear solid with an incompressible rubber that barrels.",

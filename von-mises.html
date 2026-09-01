@@ -3,43 +3,67 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>von Mises Yield Surface — Mechanics Reference</title>
-  <meta name="description" content="In principal-stress space the von Mises condition is a cylinder about the hydrostatic axis. Plasticity begins when a load path reaches that cylinder." />
+  <title>Principal Stresses, von Mises &amp; Tresca — Mechanics Reference</title>
+  <meta name="description" content="Interactive principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca yield checks." />
   <link rel="canonical" href="https://mechanicsreference.com/von-mises.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#020617;--accent:#38bdf8;--danger:#f43f5e;--success:#10b981}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
-    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
-    #stage canvas{display:block;width:100%;height:100%}
-    #ui{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
-    #formula,#phase{margin:0}
-    #formula{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--navy)}
-    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
-    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden;color:#e2e8f0}
+    #stage{display:flex;flex-direction:column;height:min(84vh,760px);min-height:620px}
+    #views{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0}
+    .view{position:relative;min-height:0;border-bottom:1px solid #1e293b}
+    .view + .view{border-left:1px solid #1e293b}
+    .view-caption{
+      position:absolute;z-index:3;top:10px;left:12px;right:12px;
+      font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;pointer-events:none;
+    }
+    #three-container,#mohr-wrap{position:absolute;inset:0}
+    #three-container canvas,#mohrCanvas{display:block;width:100%;height:100%}
+    #dash{flex:none;padding:12px 16px 14px;background:#0f172a;border-top:1px solid #1e293b}
+    #controls{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center}
+    .sliders{display:grid;gap:8px}
+    .control-row{display:flex;align-items:center;gap:10px;font-size:.8rem;color:#cbd5e1}
+    .control-row label{width:118px;flex-shrink:0;font-weight:600}
+    .control-row input[type=range]{flex:1;accent-color:var(--accent)}
+    .control-row .val{width:78px;text-align:right;font:500 .76rem "JetBrains Mono",ui-monospace,monospace;color:#f8fafc}
+    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .status-box{padding:10px;border:1px solid #334155;text-align:center;font-size:.78rem}
+    .status-box strong{display:block;margin-bottom:2px}
+    .status-box span{font:600 1rem "JetBrains Mono",ui-monospace,monospace}
+    .status-safe{color:var(--success);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.12)}
+    .status-yield{color:var(--danger);border-color:rgba(244,63,94,.4);background:rgba(244,63,94,.14)}
+    #overall-status{margin-top:8px;padding:8px 10px;text-align:center;font-size:.8rem;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.1);color:var(--success)}
+    #overall-status.warn{border-color:rgba(244,63,94,.35);background:rgba(244,63,94,.1);color:var(--danger)}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
     html.embed,html.embed body{height:100%;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed #stage{flex:1;height:auto}
-    html.embed #ui{background:#fff}
-    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:800px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #views,#controls{grid-template-columns:1fr}
+      .view + .view{border-left:0}
+      #stage{min-height:820px}
+    }
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -49,104 +73,265 @@
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#principal-stresses-and-von-mises">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#principal-stresses-and-von-mises">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
-      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#principal-stresses-and-von-mises">von Mises</a></p>
-      <h1>The yield cylinder</h1>
-      <p class="standfirst">In principal-stress space the hydrostatic axis is the diagonal (1,1,1). von Mises yield is a cylinder about that axis: adding pressure does not move a point toward the wall. The moving sphere is a load path. It turns when it reaches yield.</p>
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#principal-stresses-and-von-mises">Principal stresses and von Mises</a></p>
+      <h1>Principal stresses, Mohr’s circles, and yield</h1>
+      <p class="standfirst">Change the three principal stresses and the yield strength. The cube scales with σ₁, σ₂, σ₃; Mohr’s circles enclose every orientation; von Mises and Tresca report whether the state is still elastic.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage"></div>
-      <div id="ui">
-        <p id="formula">σ_vm = √(3/2 σ′ : σ′) = σ_y</p>
-        <p id="phase"></p>
+      <div id="stage">
+        <div id="views">
+          <div class="view">
+            <div class="view-caption">3D continuum element &amp; principal vectors</div>
+            <div id="three-container" aria-label="Principal-stress cube"></div>
+          </div>
+          <div class="view">
+            <div class="view-caption">3D Mohr’s circles</div>
+            <div id="mohr-wrap"><canvas id="mohrCanvas"></canvas></div>
+          </div>
+        </div>
+        <div id="dash">
+          <div id="controls">
+            <div class="sliders">
+              <div class="control-row">
+                <label for="sig1">σ₁ (max)</label>
+                <input type="range" id="sig1" min="-250" max="250" value="150">
+                <span class="val" id="val1">150 MPa</span>
+              </div>
+              <div class="control-row">
+                <label for="sig2">σ₂ (int)</label>
+                <input type="range" id="sig2" min="-250" max="250" value="50">
+                <span class="val" id="val2">50 MPa</span>
+              </div>
+              <div class="control-row">
+                <label for="sig3">σ₃ (min)</label>
+                <input type="range" id="sig3" min="-250" max="250" value="-50">
+                <span class="val" id="val3">-50 MPa</span>
+              </div>
+              <div class="control-row">
+                <label for="sy">Yield S<sub>y</sub></label>
+                <input type="range" id="sy" min="50" max="500" value="250">
+                <span class="val" id="valSy">250 MPa</span>
+              </div>
+            </div>
+            <div>
+              <div class="metrics">
+                <div id="vm-status" class="status-box status-safe">
+                  <strong>von Mises</strong>
+                  <span id="vm-val">0</span> MPa
+                </div>
+                <div id="tresca-status" class="status-box status-safe">
+                  <strong>Tresca (max shear)</strong>
+                  <span id="tresca-val">0</span> MPa
+                </div>
+              </div>
+              <div id="overall-status">Structure is safe across both yield criteria.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
-  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#principal-stresses-and-von-mises">von Mises</a></span></div></footer>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#principal-stresses-and-von-mises">Principal stresses and von Mises</a></span></div></footer>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-    const stage = document.getElementById('stage');
-    const phase = document.getElementById('phase');
+    const inputs = {
+      s1: document.getElementById('sig1'),
+      s2: document.getElementById('sig2'),
+      s3: document.getElementById('sig3'),
+      sy: document.getElementById('sy')
+    };
+    const labels = {
+      s1: document.getElementById('val1'),
+      s2: document.getElementById('val2'),
+      s3: document.getElementById('val3'),
+      sy: document.getElementById('valSy')
+    };
+    const vmStatus = document.getElementById('vm-status');
+    const trescaStatus = document.getElementById('tresca-status');
+    const vmValSpan = document.getElementById('vm-val');
+    const trescaValSpan = document.getElementById('tresca-val');
+    const overallStatus = document.getElementById('overall-status');
+
+    const container = document.getElementById('three-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-    camera.position.set(5.5, 3.8, 5.8);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
+    scene.background = new THREE.Color(0x020617);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.set(3.5, 3.5, 5);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-    const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    stage.appendChild(labels.domElement);
+    container.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    scene.add(new THREE.HemisphereLight(0xc9d6ee, 0x1a2740, 1.5));
-    const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(4,6,3); scene.add(key);
+    controls.target.set(0, 0, 0);
 
-    scene.add(new THREE.AxesHelper(2.6));
-    const hydro = new THREE.Vector3(1,1,1).normalize();
-    const axis = new THREE.ArrowHelper(hydro, new THREE.Vector3(-1.6,-1.6,-1.6), 5.2, 0x7eabdc, 0.14, 0.08);
-    scene.add(axis);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 8, 5);
+    scene.add(dirLight);
 
-    const sy = 1.35;
-    const radius = Math.sqrt(2/3) * sy;
-    const cyl = new THREE.Mesh(
-      new THREE.CylinderGeometry(radius, radius, 4.6, 48, 1, true),
-      new THREE.MeshStandardMaterial({color:0xe39a4a, transparent:true, opacity:0.28, side:THREE.DoubleSide, roughness:0.6})
-    );
-    cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), hydro);
-    scene.add(cyl);
-    const cylEdge = new THREE.LineSegments(new THREE.WireframeGeometry(cyl.geometry), new THREE.LineBasicMaterial({color:0xe39a4a, transparent:true, opacity:0.35}));
-    cylEdge.quaternion.copy(cyl.quaternion);
-    scene.add(cylEdge);
+    const boxGeo = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+    const boxMat = new THREE.MeshPhongMaterial({
+      color: 0x38bdf8, transparent: true, opacity: 0.85, shininess: 90, side: THREE.DoubleSide
+    });
+    const stressCube = new THREE.Mesh(boxGeo, boxMat);
+    scene.add(stressCube);
+    stressCube.add(new THREE.LineSegments(
+      new THREE.WireframeGeometry(boxGeo),
+      new THREE.LineBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.3})
+    ));
+    const arrowGroup = new THREE.Group();
+    scene.add(arrowGroup);
 
-    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), new THREE.MeshStandardMaterial({color:0x6dcc9c, roughness:0.4}));
-    scene.add(dot);
-
-    function tag(text, pos) {
-      const d=document.createElement('div'); d.className='label'; d.textContent=text;
-      const o=new CSS2DObject(d); o.position.copy(pos); scene.add(o);
+    function updateArrows(s1, s2, s3){
+      while (arrowGroup.children.length) arrowGroup.remove(arrowGroup.children[0]);
+      const maxLen = 2.2;
+      const add = (dir, length, color) => {
+        if (Math.abs(length) < 1e-3) return;
+        const n = dir.clone().normalize();
+        const actualLen = Math.min(Math.max(Math.abs(length) / 100, 0.3), maxLen);
+        if (length < 0) n.negate();
+        arrowGroup.add(new THREE.ArrowHelper(n, new THREE.Vector3(), actualLen, color, 0.2, 0.1));
+      };
+      add(new THREE.Vector3(1, 0, 0), s1, 0xf43f5e);
+      add(new THREE.Vector3(0, 1, 0), s2, 0x10b981);
+      add(new THREE.Vector3(0, 0, 1), s3, 0x38bdf8);
     }
-    tag('σ1', new THREE.Vector3(2.8, 0, 0));
-    tag('σ2', new THREE.Vector3(0, 2.8, 0));
-    tag('σ3', new THREE.Vector3(0, 0, 2.8));
-    tag('hydrostatic', new THREE.Vector3(1.7, 1.9, 1.7));
 
-    function vm(p) {
-      const m = (p.x+p.y+p.z)/3;
-      const d = new THREE.Vector3(p.x-m, p.y-m, p.z-m);
-      return Math.sqrt(1.5 * d.lengthSq());
+    const mohrCanvas = document.getElementById('mohrCanvas');
+    const ctx = mohrCanvas.getContext('2d');
+    function resizeMohrCanvas(){
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.max(1, mohrCanvas.clientWidth);
+      const h = Math.max(1, mohrCanvas.clientHeight);
+      mohrCanvas.width = Math.round(w * dpr);
+      mohrCanvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+
+    function drawMohrCircles(s1, s2, s3){
+      const width = mohrCanvas.clientWidth;
+      const height = mohrCanvas.clientHeight;
+      ctx.clearRect(0, 0, width, height);
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x < width; x += 40) { ctx.moveTo(x, 0); ctx.lineTo(x, height); }
+      for (let y = 0; y < height; y += 40) { ctx.moveTo(0, y); ctx.lineTo(width, y); }
+      ctx.stroke();
+      const originX = width / 2;
+      const originY = height / 2;
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, originY); ctx.lineTo(width, originY);
+      ctx.moveTo(originX, 0); ctx.lineTo(originX, height);
+      ctx.stroke();
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px "Source Sans 3", sans-serif';
+      ctx.fillText('σ', width - 16, originY - 8);
+      ctx.fillText('τ', originX + 6, 14);
+
+      const maxVal = Math.max(Math.abs(s1), Math.abs(s2), Math.abs(s3), 150) * 1.3;
+      const scale = (width * 0.38) / maxVal;
+      const drawCircle = (center, radius, strokeColor, fillColor) => {
+        if (radius <= 0) return;
+        const cx = originX + center * scale;
+        const rad = radius * scale;
+        ctx.fillStyle = fillColor;
+        ctx.beginPath(); ctx.arc(cx, originY, rad, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(cx, originY, rad, 0, Math.PI * 2); ctx.stroke();
+      };
+      drawCircle((s1 + s3) / 2, Math.abs(s1 - s3) / 2, 'rgba(56,189,248,0.4)', 'rgba(56,189,248,0.05)');
+      drawCircle((s1 + s2) / 2, Math.abs(s1 - s2) / 2, 'rgba(244,63,94,0.7)', 'rgba(244,63,94,0.1)');
+      drawCircle((s2 + s3) / 2, Math.abs(s2 - s3) / 2, 'rgba(16,185,129,0.7)', 'rgba(16,185,129,0.1)');
+      [
+        {val: s1, label: 'σ₁'},
+        {val: s2, label: 'σ₂'},
+        {val: s3, label: 'σ₃'}
+      ].forEach(pt => {
+        const px = originX + pt.val * scale;
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.beginPath(); ctx.arc(px, originY, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillText(pt.label, px - 8, originY + 18);
+      });
+    }
+
+    function computeAndUpdate(){
+      let s1 = parseFloat(inputs.s1.value);
+      let s2 = parseFloat(inputs.s2.value);
+      let s3 = parseFloat(inputs.s3.value);
+      const sy = parseFloat(inputs.sy.value);
+      const arr = [s1, s2, s3].sort((a, b) => b - a);
+      s1 = arr[0]; s2 = arr[1]; s3 = arr[2];
+      inputs.s1.value = s1;
+      inputs.s2.value = s2;
+      inputs.s3.value = s3;
+      labels.s1.textContent = s1 + ' MPa';
+      labels.s2.textContent = s2 + ' MPa';
+      labels.s3.textContent = s3 + ' MPa';
+      labels.sy.textContent = sy + ' MPa';
+
+      const vonMises = Math.sqrt(0.5 * ((s1 - s2) ** 2 + (s2 - s3) ** 2 + (s3 - s1) ** 2));
+      const tresca = s1 - s3;
+      vmValSpan.textContent = vonMises.toFixed(1);
+      trescaValSpan.textContent = tresca.toFixed(1);
+      const isVmYield = vonMises > sy;
+      const isTrescaYield = tresca > sy;
+      vmStatus.className = 'status-box ' + (isVmYield ? 'status-yield' : 'status-safe');
+      trescaStatus.className = 'status-box ' + (isTrescaYield ? 'status-yield' : 'status-safe');
+      if (isVmYield || isTrescaYield) {
+        overallStatus.classList.add('warn');
+        overallStatus.textContent = 'Warning: a yield criterion has been exceeded.';
+        boxMat.color.setHex(0xf43f5e);
+      } else {
+        overallStatus.classList.remove('warn');
+        overallStatus.textContent = 'Structure is safe within elastic limits across both criteria.';
+        boxMat.color.setHex(0x38bdf8);
+      }
+      const scaleFactor = 0.0022;
+      stressCube.scale.set(
+        Math.max(0.2, 1 + s1 * scaleFactor),
+        Math.max(0.2, 1 + s2 * scaleFactor),
+        Math.max(0.2, 1 + s3 * scaleFactor)
+      );
+      updateArrows(s1, s2, s3);
+      drawMohrCircles(s1, s2, s3);
+    }
+
+    Object.values(inputs).forEach(input => input.addEventListener('input', computeAndUpdate));
+
+    function resizeThree(){
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(() => { resizeThree(); resizeMohrCanvas(); computeAndUpdate(); }).observe(document.getElementById('stage'));
+    resizeThree();
+    resizeMohrCanvas();
+    computeAndUpdate();
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clock = new THREE.Clock();
-    let running = !reduce;
-    document.addEventListener('visibilitychange', ()=>{ running = !document.hidden && !reduce; });
-
-    function frame(t) {
-      const s = 0.5 + 0.5*Math.sin(t*0.65);
-      const path = new THREE.Vector3(0.15, 0.08, 0.05).add(new THREE.Vector3(1.55, -0.35, -0.25).multiplyScalar(s * 1.35));
-      const eq = vm(path);
-      const scale = eq > sy ? sy / eq : 1;
-      path.multiplyScalar(scale);
-      dot.position.copy(path);
-      const yielded = Math.abs(vm(path) - sy) < 0.04 || scale < 1;
-      dot.material.color.set(yielded ? 0xef4444 : 0x6dcc9c);
-      phase.textContent = yielded ? 'On the cylinder: σ_vm = σ_y. Pressure along the axis would not yield it.' : `Elastic.  σ_vm / σ_y = ${(vm(path)/sy).toFixed(2)}`;
-    }
-    function resize(){ const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); labels.setSize(w,h); }
-    new ResizeObserver(resize).observe(stage); resize();
-    frame(reduce ? 2 : 0);
-    (function loop(){ requestAnimationFrame(loop); if(running) frame(clock.getElapsedTime()); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+    (function loop(){
+      requestAnimationFrame(loop);
+      if (!reduce) {
+        stressCube.rotation.y += 0.003;
+        stressCube.rotation.x += 0.001;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    })();
   </script>
 </body>
 </html>
