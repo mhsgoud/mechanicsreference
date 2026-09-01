@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structural steel connection — Mechanics Reference</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="steel-connection-mesh.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="canonical" href="https://mechanicsreference.com/steel-connection.html" />
+  <meta name="description" content="Deformed steel fin-plate connection: clamped column stub, gravity shear on the tab, panel-zone racking." />
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f}
+    .site-header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
+    .page-intro{max-width:1180px;margin:0 auto;padding:28px 28px 8px}
+    .crumb{font-size:0.92rem;color:var(--ink-soft);margin:0 0 8px}
+    .page-intro h1{margin:0 0 10px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:600;color:var(--navy)}
+    .standfirst{margin:0 0 8px;max-width:48em;font-family:"Source Serif 4",Georgia,serif;font-size:1.08rem;color:var(--ink-soft)}
+    .related{margin:0 0 12px;font-size:0.9rem;color:var(--ink-soft)}
+    .related a{color:#3a5f8a}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif}
+    .demo-root{background:#0f172a;color:#e2e8f0;padding-bottom:48px}
+    .demo-root > header{display:none}
+    html.embed,html.embed body{height:100%;background:#0f172a}
+    html.embed .site-header,html.embed .page-intro{display:none}
+    html.embed .demo-root{min-height:100%;padding:0}
+    html.embed .demo-root > .max-w-6xl,html.embed .demo-root > main{max-width:none;margin:0;padding:8px;height:100%}
+    @media (max-width:800px){.site-header,.page-intro{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</head>
+<body>
+  <header class="site-header">
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site">
+      <a href="./">Home</a>
+      <a href="hub.html#nonlinear-fem">Library</a>
+    </nav>
+  </header>
+  <div class="page-intro">
+    <p class="crumb"><a href="./">Home</a> · <a href="hub.html#nonlinear-fem">Nonlinear FEM</a></p>
+    <h1>Structural steel connection</h1>
+    <p class="standfirst">A column stub with a fin plate under gravity shear from a framing beam. The motion is geometric: panel-zone racking and in-plane parallelogram shear of the tab, not a banana curve of the column.</p>
+    <p class="related"><a href="hub.html#boundary-conditions-loads">Boundary conditions &amp; loads</a> · <a href="elasto-plasto-cantilever.html">Elasto-plastic cantilever</a></p>
+  </div>
+  <div class="demo-root">
+
+
+<header class="max-w-6xl mx-auto px-6 pt-8 pb-4 text-center">
+  <h1 class="text-3xl font-bold text-orange-400">Structural steel connection</h1>
+  <p class="text-slate-400 text-sm mt-1">
+    STL surface · column stub in $Y$ · fin plate at mid-height · gravity shear from a framing beam
+  </p>
+  <p class="text-slate-500 text-xs mt-2">
+    Clamped base · shear tab under gravity $V$ · column almost straight · plate parallelogram + panel-zone racking
+  </p>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 pb-12 space-y-6">
+  <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div class="lg:col-span-4 relative w-full h-[560px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+        <div id="threejs-container" class="w-full h-full"></div>
+        <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
+          <strong>Drag</strong> rotate · <strong>Scroll</strong> zoom
+        </div>
+        <div id="statusBadge" class="absolute top-3 right-3 bg-orange-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-orange-100 border border-orange-700">Loading mesh…</div>
+        <div id="dispOverlay" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-2 rounded text-xs text-slate-300 border border-slate-700 font-mono leading-relaxed">—</div>
+        <div id="colorbar" class="absolute bottom-3 right-3 bg-slate-900/90 backdrop-blur px-2 py-2 rounded border border-slate-700">
+          <div class="text-[10px] text-center text-slate-400 mb-1" id="cbarLabel">|U|</div>
+          <div class="flex gap-1.5 items-stretch">
+            <div class="w-3 h-36 rounded-sm" style="background: linear-gradient(to top,#0000ff,#0046ff,#008dff,#00d4ff,#00ff8d,#8dff00,#ffd400,#ff8d00,#ff4600,#ff0000);"></div>
+            <div class="flex flex-col justify-between text-[10px] font-mono text-slate-300 py-0.5">
+              <span id="cbarMax">0</span><span id="cbarMid">—</span><span id="cbarMin">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col gap-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">
+            Load factor λ <span id="lambdaValue" class="text-orange-400 font-mono">1.00</span>
+          </label>
+          <input id="lambdaSlider" type="range" min="0" max="1" step="0.002" value="1"
+                 class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+        </div>
+        <div class="flex justify-between"><span class="text-slate-500">Beam shear V</span><span id="forceVal" class="font-mono text-amber-300">250 kN</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Moment M</span><span id="momVal" class="font-mono text-amber-300">62.5 kN·m</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Plate drop</span><span id="tipVal" class="font-mono text-sky-300">—</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Max |U|</span><span id="umagVal" class="font-mono text-rose-300">—</span></div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">
+            Disp. scale <span id="scaleValue" class="text-orange-400 font-mono">12</span>×
+          </label>
+          <input id="scaleSlider" type="range" min="1" max="40" step="1" value="12"
+                 class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">View</label>
+          <select id="viewMode" class="w-full bg-slate-800 border border-slate-600 rounded-md px-2 py-1.5 text-slate-200">
+            <option value="steel">Structural steel</option>
+            <option value="contour" selected>FEA contour</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Contour</label>
+          <select id="fieldSelect" class="w-full bg-slate-800 border border-slate-600 rounded-md px-2 py-1.5 text-slate-200">
+            <option value="svm" selected>σ<sub>vm</sub> proxy</option>
+            <option value="Umag">|U|</option>
+            <option value="Uy">U<sub>Y</sub> (drop)</option>
+            <option value="Ux">U<sub>X</sub> (drift)</option>
+          </select>
+        </div>
+        <label class="flex items-center gap-2 text-slate-400 cursor-pointer">
+          <input id="wireToggle" type="checkbox" class="accent-orange-500"> Mesh edges
+        </label>
+        <label class="flex items-center gap-2 text-slate-400 cursor-pointer">
+          <input id="undefToggle" type="checkbox" class="accent-orange-500" checked> Undeformed ghost
+        </label>
+        <label class="flex items-center gap-2 text-slate-400 cursor-pointer">
+          <input id="loadToggle" type="checkbox" class="accent-orange-500" checked> Load arrows
+        </label>
+        <label class="flex items-center gap-2 text-slate-400 cursor-pointer">
+          <input id="fixToggle" type="checkbox" class="accent-orange-500" checked> Base support
+        </label>
+        <button id="playBtn" type="button" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-orange-600 hover:bg-orange-500 text-white">▶ Animate λ</button>
+        <button id="resetCamBtn" type="button" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-200">Reset camera</button>
+        <div class="mt-auto space-y-1.5 pt-2 border-t border-slate-800">
+          <div class="flex justify-between"><span class="text-slate-500">Vertices</span><span id="nNodeVal" class="font-mono text-slate-300">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Triangles</span><span id="nElemVal" class="font-mono text-slate-300">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">σ<sub>vm</sub> max</span><span id="svmVal" class="font-mono text-rose-400">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+    <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 space-y-2">
+      <h3 class="font-bold text-white text-base">Setup</h3>
+      <ul class="list-disc list-inside space-y-1 text-slate-300">
+        <li>Tessellation from <code class="text-slate-400">structural steel connection 3d model.stl</code> (welded to 3958 unique vertices)</li>
+        <li>Column along $Z_{\mathrm{STL}}$ shown upright in Three.js $Y$</li>
+        <li>Fin plate on the $-X$ face at mid-height — a shear-tab / fin-plate joint</li>
+        <li>Base clamped. Gravity shear $V=250\,\mathrm{kN}$ on the tab; eccentricity $e=250\,\mathrm{mm}$ racks the panel zone</li>
+      </ul>
+    </div>
+    <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 space-y-2">
+      <h3 class="font-bold text-white text-base">What the motion is</h3>
+      <ul class="list-disc list-inside space-y-1 text-slate-300">
+        <li>Column: finite-rotation beam (sections stay rigid). Mild drift, not a banana curve</li>
+        <li>Fin plate: in-plane parallelogram shear about the weld — the real shear-tab mode</li>
+        <li>Column web at the joint: panel-zone racking; flanges stay straighter</li>
+        <li>Scale multiplies the <em>angles</em> then rebuilds the pose, so exaggeration does not stretch the plates</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  const JET = [
+    [0, 0, 255], [0, 70, 255], [0, 141, 255], [0, 212, 255],
+    [0, 255, 141], [141, 255, 0], [255, 212, 0], [255, 141, 0],
+    [255, 70, 0], [255, 0, 0]
+  ].map(c => c.map(v => v / 255));
+
+  function jetColor(t) {
+    t = Math.min(1, Math.max(0, t));
+    const x = t * (JET.length - 1);
+    const i = Math.floor(x);
+    const f = x - i;
+    const a = JET[i], b = JET[Math.min(i + 1, JET.length - 1)];
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  }
+
+  const MM = 1000;
+  const V_KN = 250;
+  const E_MM = 250;
+  const FY = 355;
+  const E_MPA = 210000;
+
+  const meshData = window.STEEL_MESH;
+  if (!meshData) {
+    document.getElementById('statusBadge').textContent = 'Missing steel-connection-mesh.js';
+    return;
+  }
+
+  const nVerts = meshData.nVerts;
+  const rest = new Float32Array(nVerts * 3);
+  for (let i = 0; i < meshData.positions.length; i++) rest[i] = meshData.positions[i] * MM;
+
+  const ux = new Float32Array(nVerts);
+  const uy = new Float32Array(nVerts);
+  const uz = new Float32Array(nVerts);
+  const svm1 = new Float32Array(nVerts);
+
+  const H = 1000;
+  const L = 530;
+  const XNA = 124;
+  const XWELD = 64;
+  const XPLATE = -198;
+  const PLATE_W = XWELD - XPLATE;
+  const ZJ = 530;
+  const D_COL = 3.2;
+  const G_PLATE = 8.5 / PLATE_W;
+  const G_PZ = 0.014;
+  const PRY = 2.2;
+  const NT = 220;
+  const Tdz = H / (NT - 1);
+
+  function thetaShape(z) {
+    const s = Math.min(Math.max(z, 0), L) / L;
+    const thj = 1.5 * D_COL / L;
+    return z <= L ? thj * (2 * s - s * s) : thj;
+  }
+
+  function buildTable(amp) {
+    const xc = new Float32Array(NT);
+    const zc = new Float32Array(NT);
+    const th = new Float32Array(NT);
+    let x = XNA, zz = 0;
+    for (let i = 0; i < NT; i++) {
+      const Zi = i * Tdz;
+      th[i] = thetaShape(Zi) * amp;
+      xc[i] = x;
+      zc[i] = zz;
+      if (i < NT - 1) {
+        const thm = thetaShape(Zi + 0.5 * Tdz) * amp;
+        x += Math.sin(thm) * Tdz;
+        zz += Math.cos(thm) * Tdz;
+      }
+    }
+    return { xc, zc, th };
+  }
+
+  function sampleFrame(z, tab) {
+    const t = Math.max(0, Math.min(NT - 1.0001, z / Tdz));
+    const i = t | 0;
+    const f = t - i;
+    return {
+      xc: tab.xc[i] + (tab.xc[i + 1] - tab.xc[i]) * f,
+      zc: tab.zc[i] + (tab.zc[i + 1] - tab.zc[i]) * f,
+      th: tab.th[i] + (tab.th[i + 1] - tab.th[i]) * f
+    };
+  }
+
+  function place(x, y, z, tab, amp, out) {
+    const fr = sampleFrame(z, tab);
+    const c = Math.cos(fr.th), s = Math.sin(fr.th);
+    const xr = x - XNA;
+    let px = fr.xc + xr * c;
+    let py = y;
+    let pz = fr.zc - xr * s;
+
+    const inWeb = x > 82 && x < 168 && Math.abs(y) < 34;
+    const pzWin = Math.exp(-((z - ZJ) / 88) * ((z - ZJ) / 88));
+    if (inWeb) {
+      const d = G_PZ * amp * pzWin * (z - ZJ);
+      px += d * c;
+      pz += d * (-s);
+    }
+
+    if (x < XWELD) {
+      const dist = XWELD - x;
+      const g = G_PLATE * amp;
+      px -= g * dist * s;
+      pz -= g * dist * c;
+      const eta = dist / PLATE_W;
+      const pry = PRY * amp * eta * eta;
+      px -= pry * c;
+      pz -= pry * (-s);
+      py += 0.04 * pry * (y / 78);
+    }
+
+    out[0] = px;
+    out[1] = py;
+    out[2] = pz;
+  }
+
+  function stressProxy(x, y, z) {
+    const pzWin = Math.exp(-((z - ZJ) / 80) * ((z - ZJ) / 80));
+    const inWeb = x > 82 && x < 168 && Math.abs(y) < 34;
+    const tau = (inWeb ? 190 * pzWin : 18) + (x < XWELD ? 40 : 0);
+    const s = Math.min(Math.max(z, 0), L) / L;
+    const kappa = z <= L ? (3 * D_COL / (L * L)) * (1 - s) : 0;
+    const sigb = x >= XWELD ? E_MPA * Math.abs(x - XNA) * kappa : 0;
+    const eta = x < XWELD ? (XWELD - x) / PLATE_W : 0;
+    const onPlate = x < XWELD && z > 420 && z < 640;
+    const plate = onPlate ? 170 * (1 - eta) : 0;
+    const weld = 210 * Math.exp(-((x - XWELD) * (x - XWELD)) / 450 - ((z - ZJ) * (z - ZJ)) / 2600);
+    const bolt = onPlate
+      ? 160 * (Math.exp(-((x + 175) ** 2) / 900 - ((z - 490) ** 2) / 2200) +
+               Math.exp(-((x + 175) ** 2) / 900 - ((z - 570) ** 2) / 2200))
+      : 0;
+    const sig = sigb + plate + weld + bolt;
+    return Math.sqrt(sig * sig + 3 * tau * tau);
+  }
+
+  const tmp = [0, 0, 0];
+  const table1 = buildTable(1);
+  let svmMax1 = 0, uMax1 = 0, plateDrop1 = 0;
+  for (let i = 0; i < nVerts; i++) {
+    const x = rest[i * 3], y = rest[i * 3 + 1], z = rest[i * 3 + 2];
+    place(x, y, z, table1, 1, tmp);
+    ux[i] = tmp[0] - x;
+    uy[i] = tmp[1] - y;
+    uz[i] = tmp[2] - z;
+    const mag = Math.hypot(ux[i], uy[i], uz[i]);
+    if (mag > uMax1) uMax1 = mag;
+    if (x < 0 && z > 420 && z < 640 && uz[i] < plateDrop1) plateDrop1 = uz[i];
+    svm1[i] = stressProxy(x, y, z);
+    if (svm1[i] > svmMax1) svmMax1 = svm1[i];
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(rest.slice(), 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nVerts * 3), 3));
+  geometry.setIndex(meshData.indices);
+  geometry.computeVertexNormals();
+
+  const ghostGeo = geometry.clone();
+  ghostGeo.deleteAttribute('color');
+
+  const container = document.getElementById('threejs-container');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0b1220);
+
+  const camera = new THREE.PerspectiveCamera(36, container.clientWidth / container.clientHeight, 2, 12000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  const hemi = new THREE.HemisphereLight(0xcbd5e1, 0x1e293b, 0.55);
+  const key = new THREE.DirectionalLight(0xfff4e6, 0.95);
+  key.position.set(420, 980, 520);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.near = 50;
+  key.shadow.camera.far = 2800;
+  key.shadow.camera.left = -700;
+  key.shadow.camera.right = 700;
+  key.shadow.camera.top = 900;
+  key.shadow.camera.bottom = -400;
+  const fill = new THREE.DirectionalLight(0xa5c8ff, 0.28);
+  fill.position.set(-500, 400, -300);
+  scene.add(hemi, key, fill);
+
+  const root = new THREE.Group();
+  root.rotation.x = -Math.PI / 2;
+  scene.add(root);
+
+  const steelMat = new THREE.MeshStandardMaterial({
+    color: 0x9aa3ad, metalness: 0.82, roughness: 0.38,
+    side: THREE.DoubleSide, envMapIntensity: 0.8
+  });
+  const contourMat = new THREE.MeshPhongMaterial({
+    vertexColors: THREE.VertexColors, shininess: 28,
+    side: THREE.DoubleSide, specular: 0x222222
+  });
+  const mesh = new THREE.Mesh(geometry, contourMat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  root.add(mesh);
+
+  const ghost = new THREE.Mesh(ghostGeo, new THREE.MeshBasicMaterial({
+    color: 0x64748b, transparent: true, opacity: 0.18,
+    side: THREE.DoubleSide, depthWrite: false
+  }));
+  root.add(ghost);
+
+  const edgeMat = new THREE.LineBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.35 });
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 28), edgeMat);
+  edges.visible = false;
+  root.add(edges);
+  function refreshEdges() {
+    if (!els.wire.checked) return;
+    edges.geometry.dispose();
+    edges.geometry = new THREE.EdgesGeometry(geometry, 28);
+  }
+
+  const fixture = new THREE.Group();
+  root.add(fixture);
+  (function buildFixture() {
+    const concrete = new THREE.MeshStandardMaterial({ color: 0x6b7280, roughness: 0.92, metalness: 0.05 });
+    const plate = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.55, roughness: 0.45 });
+    const bolt = new THREE.MeshStandardMaterial({ color: 0x1f2937, metalness: 0.7, roughness: 0.4 });
+    const base = new THREE.Mesh(new THREE.BoxGeometry(520, 420, 48), concrete);
+    base.position.set(40, 0, -28);
+    base.receiveShadow = true;
+    fixture.add(base);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(280, 220, 16), plate);
+    cap.position.set(70, 0, 6);
+    cap.castShadow = true;
+    fixture.add(cap);
+    [[-40, -70], [180, -70], [-40, 70], [180, 70]].forEach(([x, y]) => {
+      const h = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 18, 8), bolt);
+      h.rotation.x = Math.PI / 2;
+      h.position.set(x, y, 18);
+      fixture.add(h);
+    });
+  })();
+
+  const loadGroup = new THREE.Group();
+  root.add(loadGroup);
+  const arrowMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+  function makeArrow(len) {
+    const g = new THREE.Group();
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, len * 0.72, 10), arrowMat);
+    shaft.position.z = -len * 0.36;
+    const head = new THREE.Mesh(new THREE.ConeGeometry(14, len * 0.28, 10), arrowMat);
+    head.rotation.x = Math.PI;
+    head.position.z = -len * 0.86;
+    g.add(shaft, head);
+    return g;
+  }
+  const plateLoads = [];
+  const zs = [470, 500, 530, 560, 590];
+  zs.forEach((z) => {
+    const a = makeArrow(110);
+    a.position.set(-210, 0, z);
+    loadGroup.add(a);
+    plateLoads.push(a);
+  });
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(2800, 2800),
+    new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 1, metalness: 0 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -55;
+  ground.receiveShadow = true;
+  scene.add(ground);
+  const grid = new THREE.GridHelper(2200, 22, 0x334155, 0x1e293b);
+  grid.position.y = -54;
+  scene.add(grid);
+
+  function resetCamera() {
+    camera.position.set(920, 620, 980);
+    controls.target.set(40, 420, 0);
+    controls.update();
+  }
+  resetCamera();
+
+  const els = {
+    lambda: document.getElementById('lambdaSlider'),
+    scale: document.getElementById('scaleSlider'),
+    view: document.getElementById('viewMode'),
+    field: document.getElementById('fieldSelect'),
+    wire: document.getElementById('wireToggle'),
+    undef: document.getElementById('undefToggle'),
+    load: document.getElementById('loadToggle'),
+    fix: document.getElementById('fixToggle'),
+    play: document.getElementById('playBtn'),
+    reset: document.getElementById('resetCamBtn'),
+    lambdaV: document.getElementById('lambdaValue'),
+    scaleV: document.getElementById('scaleValue'),
+    forceV: document.getElementById('forceVal'),
+    momV: document.getElementById('momVal'),
+    tipV: document.getElementById('tipVal'),
+    umagV: document.getElementById('umagVal'),
+    svmV: document.getElementById('svmVal'),
+    nNode: document.getElementById('nNodeVal'),
+    nElem: document.getElementById('nElemVal'),
+    overlay: document.getElementById('dispOverlay'),
+    badge: document.getElementById('statusBadge'),
+    cbarL: document.getElementById('cbarLabel'),
+    cbarMax: document.getElementById('cbarMax'),
+    cbarMid: document.getElementById('cbarMid'),
+    cbarMin: document.getElementById('cbarMin')
+  };
+
+  els.nNode.textContent = nVerts.toLocaleString();
+  els.nElem.textContent = meshData.nTris.toLocaleString();
+  els.badge.textContent = 'Ready';
+
+  let playing = false, playDir = 1, lastT = 0;
+
+  function fmt(v, unit) {
+    const a = Math.abs(v);
+    if (a >= 100) return v.toFixed(1) + unit;
+    if (a >= 10) return v.toFixed(2) + unit;
+    return v.toFixed(3) + unit;
+  }
+
+  function apply() {
+    const lam = parseFloat(els.lambda.value);
+    const sc = parseFloat(els.scale.value);
+    const field = els.field.value;
+    const steel = els.view.value === 'steel';
+
+    els.lambdaV.textContent = lam.toFixed(2);
+    els.scaleV.textContent = String(sc);
+    els.forceV.textContent = (V_KN * lam).toFixed(1) + ' kN';
+    els.momV.textContent = (V_KN * E_MM * 0.001 * lam).toFixed(1) + ' kN·m';
+    els.tipV.textContent = fmt(plateDrop1 * lam, ' mm');
+    els.umagV.textContent = fmt(uMax1 * lam, ' mm');
+    els.svmV.textContent = (svmMax1 * lam).toFixed(0) + ' MPa';
+
+    const pos = geometry.attributes.position;
+    const col = geometry.attributes.color;
+    let fMin = Infinity, fMax = -Infinity;
+    const fieldVals = new Float32Array(nVerts);
+    const tabViz = buildTable(lam * sc);
+
+    for (let i = 0; i < nVerts; i++) {
+      const x = rest[i * 3], y = rest[i * 3 + 1], z = rest[i * 3 + 2];
+      place(x, y, z, tabViz, lam * sc, tmp);
+      pos.setXYZ(i, tmp[0], tmp[1], tmp[2]);
+      const uxi = ux[i] * lam, uyi = uy[i] * lam, uzi = uz[i] * lam;
+      let f;
+      if (field === 'svm') f = svm1[i] * lam;
+      else if (field === 'Umag') f = Math.hypot(uxi, uyi, uzi);
+      else if (field === 'Uy') f = uzi;
+      else f = uxi;
+      fieldVals[i] = f;
+      if (f < fMin) fMin = f;
+      if (f > fMax) fMax = f;
+    }
+    pos.needsUpdate = true;
+    geometry.computeVertexNormals();
+
+    const span = Math.max(1e-9, fMax - fMin);
+    if (!steel) {
+      for (let i = 0; i < nVerts; i++) {
+        const c = jetColor((fieldVals[i] - fMin) / span);
+        col.setXYZ(i, c[0], c[1], c[2]);
+      }
+      col.needsUpdate = true;
+      mesh.material = contourMat;
+      scene.background.set(0x0b1220);
+    } else {
+      mesh.material = steelMat;
+      scene.background.set(0xe8edf2);
+    }
+    grid.visible = !steel;
+    ground.material.color.set(steel ? 0xd1d5db : 0x0f172a);
+    hemi.intensity = steel ? 0.9 : 0.55;
+    key.intensity = steel ? 1.2 : 0.95;
+
+    ghost.visible = els.undef.checked;
+    edges.visible = els.wire.checked;
+    if (els.wire.checked && !playing) refreshEdges();
+    loadGroup.visible = els.load.checked;
+    fixture.visible = els.fix.checked;
+    zs.forEach((z, i) => {
+      place(-210, 0, z, tabViz, lam * sc, tmp);
+      plateLoads[i].position.set(tmp[0], tmp[1], tmp[2]);
+      plateLoads[i].scale.setScalar(0.55 + 0.45 * lam);
+    });
+
+    const labels = { svm: 'σvm MPa', Umag: '|U| mm', Uy: 'UY mm', Ux: 'UX mm' };
+    els.cbarL.textContent = labels[field];
+    els.cbarMax.textContent = field === 'svm' ? fMax.toFixed(0) : fMax.toFixed(2);
+    els.cbarMid.textContent = field === 'svm' ? ((0.5 * (fMin + fMax)).toFixed(0)) : (0.5 * (fMin + fMax)).toFixed(2);
+    els.cbarMin.textContent = field === 'svm' ? fMin.toFixed(0) : fMin.toFixed(2);
+    if (field === 'svm' && fMax > FY) {
+      els.cbarMid.textContent = 'fy ' + FY;
+    }
+
+    els.overlay.innerHTML =
+      'λ = ' + lam.toFixed(2) + '<br>' +
+      'V = ' + (V_KN * lam).toFixed(0) + ' kN · M = ' + (V_KN * E_MM * 0.001 * lam).toFixed(1) + ' kN·m<br>' +
+      'max |U| = ' + fmt(uMax1 * lam, ' mm') + ' true · pose ×' + sc;
+  }
+
+  ['input', 'change'].forEach(ev => {
+    [els.lambda, els.scale, els.view, els.field, els.wire, els.undef, els.load, els.fix].forEach(el => {
+      el.addEventListener(ev, apply);
+    });
+  });
+  els.reset.addEventListener('click', resetCamera);
+  els.play.addEventListener('click', () => {
+    playing = !playing;
+    els.play.textContent = playing ? '❚❚ Pause' : '▶ Animate λ';
+    if (!playing) apply();
+  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
+  apply();
+
+  function tick(t) {
+    if (playing) {
+      if (!lastT) lastT = t;
+      const dt = Math.min(0.05, (t - lastT) / 1000);
+      lastT = t;
+      let v = parseFloat(els.lambda.value) + playDir * dt * 0.35;
+      if (v >= 1) { v = 1; playDir = -1; }
+      if (v <= 0) { v = 0; playDir = 1; }
+      els.lambda.value = v.toFixed(3);
+      apply();
+    } else lastT = t;
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+  </div>
+</body>
+</html>
