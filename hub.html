@@ -946,29 +946,44 @@ const topics = [
     "Directional derivatives and linearization of nonlinear equations are the bridge between continuum theory and Newton–Raphson: each iteration solves a linearized problem until the residual vanishes—prototype for every nonlinear FE increment.",
     "The figures below collect the elementary models used to introduce those ideas: a rigid bar on a spring, a column that buckles, one-dimensional strain measures, a truss joint, qualitative equilibrium paths, and a single Newton step.",
     "The account follows Bonet and Wood, Nonlinear Continuum Mechanics for Finite Element Analysis, Chapter 1."
+  ], equations:[
+    {name:"Continuum body and fields", expr:"Ωₜ ⊂ ℝ³,  ρ = ρ(x,t),  v = v(x,t),  σ = σ(x,t)", tex:"\\Omega_t\\subset\\mathbb{R}^3,\\qquad \\rho=\\rho(\\mathbf{x},t),\\quad \\mathbf{v}=\\mathbf{v}(\\mathbf{x},t),\\quad \\boldsymbol{\\sigma}=\\boldsymbol{\\sigma}(\\mathbf{x},t)", note:"Pointwise fields are local averages over a representative volume, not values at a single molecule."},
+    {name:"Scale separation", expr:"ℓ_micro ≪ ℓ_RVE ≪ ℓ_macro", tex:"\\ell_{\\mathrm{micro}}\\ll\\ell_{\\mathrm{RVE}}\\ll\\ell_{\\mathrm{macro}}", note:"When no intermediate representative scale exists, a classical local continuum model may fail."}
   ], tags:["continuum","continuum hypothesis","RVE","scale separation","solid mechanics","fluid mechanics","coupled problems","material nonlinearity","geometric nonlinearity","FEM","virtual work","Newton-Raphson","tangent","buckling","bifurcation","Green strain","Almansi strain","logarithmic strain","engineering strain","linearization","Bonet-Wood"], illustrations:"introContinuum"},
   {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation", bullets:[
     "A motion x = χ(X,t) maps a material point X in the reference configuration Ω₀ to its position x in the current configuration Ωₜ; displacement is u(X,t) = x − X. When displacement gradients are small, the symmetric gradient of u is enough to measure strain.",
     "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Its positive Jacobian J = det F gives the local volume ratio dv = J dV. Rigid translation never appears in F; rotation, stretch, shear, and volume change do.",
     "The right Cauchy–Green tensor C = Fᵀ F and the left Cauchy–Green tensor b = F Fᵀ are stretch without rotation. Their eigenvalues are the squared principal stretches.",
     "The figure runs through those cases on a homogeneous motion. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
+  ], equations:[
+    {name:"Motion and displacement", expr:"x = χ(X,t),   u = x − X", tex:"\\mathbf{x}=\\boldsymbol{\\chi}(\\mathbf{X},t),\\qquad \\mathbf{u}(\\mathbf{X},t)=\\mathbf{x}-\\mathbf{X}", note:"The motion sends each material point X in Ω₀ to its current place x in Ωₜ. Velocity and acceleration are time derivatives at fixed X."},
+    {name:"Deformation gradient", expr:"F = ∂x/∂X", tex:"\\mathbf{F} = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Linear part of the motion: dx = F dX. Rigid translation never appears in F."},
+    {name:"Jacobian", expr:"J = det F = dv/dV", tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}", note:"Local volume ratio. Mass on the reference placement is ρ₀ = ρ J. Incompressibility is J = 1, equivalently ∇ · v = 0."},
+    {name:"Infinitesimal strain", expr:"ε = ½(∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"The symmetric gradient of displacement is enough when rotations and stretches are both small. It is the strain that enters isotropic Hooke’s law."}
   ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green"], scene:"deformationGradient"},
   {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
     "Vectors and second-order tensors are the language of the field equations. Components transform when the basis changes; the objects themselves do not. Index notation makes that bookkeeping compact: repeated indices are summed, and a comma denotes a derivative.",
     "The divergence theorem turns a volume integral of a derivative into a surface integral. For the Cauchy stress it reads ∫ ∇·σ dV = ∫ σ n dA, which is why the local momentum equation and the statement of traction on the boundary are the same balance.",
     "Coordinate transformations of a vector use a single rotation matrix; those of a stress or strain use the matrix on both sides. Principal directions are the eigenvectors of that tensor, independent of the basis in which it was first written."
+  ], equations:[
+    {name:"Divergence theorem (Cauchy stress)", expr:"∫_Ω ∇·σ dV = ∫_∂Ω σ n dA", tex:"\\int_{\\Omega}\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}\\,\\mathrm{d}V = \\int_{\\partial\\Omega}\\boldsymbol{\\sigma}\\,\\mathbf{n}\\,\\mathrm{d}A", note:"Turns a volume integral of a derivative into a surface integral. This is why the local momentum equation and the statement of traction on the boundary are the same balance."}
   ], tags:["tensor","index notation","divergence theorem","transformation"]},
   {part:"Part I – Continuum Mechanics", title:"Polar Decomposition", bullets:[
     "Any invertible F factors uniquely as F = R U = V R, with R a rotation and U, V symmetric positive-definite stretches. U stretches in the reference placement, then R rotates; V stretches in the current placement after the same rotation.",
     "Neither order is more physical than the other. Both describe the same final map. Strain measures that are built from U or from C = U² are blind to R, which is the point: a rigid rotation must not look like stretch.",
     "In computation U is the unique positive square root of C. Iterative polar algorithms average a matrix with its inverse-transpose until the result is orthogonal; that limit is R.",
     "The figure runs the two factorisations side by side. They coincide on the same parallelogram: that common map is F."
+  ], equations:[
+    {name:"Polar decomposition", expr:"F = R U = V R", tex:"\\mathbf{F} = \\mathbf{R}\\mathbf{U} = \\mathbf{V}\\mathbf{R}", note:"Unique split of an invertible F into a rotation R and symmetric positive-definite stretches U (right) and V (left). Strain built from U or C = U² is blind to R."}
   ], tags:["polar decomposition","stretch","rotation","right stretch","left stretch"], scene:"polarDecomposition"},
   {part:"Part I – Continuum Mechanics", title:"Finite Strain Measures", bullets:[
     "Change of squared length is the invariant that strain must capture. Green–Lagrange strain E = ½(C − I) = ½(FᵀF − I) lives on the reference placement. Almansi strain e = ½(I − b⁻¹) lives on the current placement. Both vanish in a rigid motion.",
     "In one dimension the same stretch λ = l/L gives engineering strain λ − 1, Green strain ½(λ² − 1), Almansi ½(1 − 1/λ²), and logarithmic (true) strain ln λ. They agree to first order as λ → 1 and disagree as soon as the stretch is finite.",
     "In terms of displacement, Green strain keeps the quadratic terms in ∇u written with respect to X; Almansi keeps them with respect to x. Dropping those products recovers the infinitesimal strain ε.",
     "The figure applies a pure rotation to both squares. Green strain stays zero. Drawing I + ε for the same motion shrinks the left square: infinitesimal strain has mistaken a rotation for stretch."
+  ], equations:[
+    {name:"Green–Lagrange strain", expr:"E = ½(FᵀF − I)", tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)", note:"Lives on the reference placement. Vanishes in a rigid motion. When displacement gradients are small, the quadratic terms drop and E reduces to infinitesimal strain."},
+    {name:"Almansi strain", expr:"e = ½(I − b⁻¹)", tex:"\\mathbf{e} = \\tfrac{1}{2}\\bigl(\\mathbf{I} - \\mathbf{b}^{-1}\\bigr)", note:"The spatial counterpart, with b = F Fᵀ. Same rigid-motion test, written on the current placement."}
   ], tags:["Green-Lagrange","Almansi","logarithmic strain","engineering strain","stretch"], scene:"rotationStrain"},
   {part:"Part I – Continuum Mechanics", title:"Principal Stretches and Invariants", bullets:[
     "The eigenvalues of U are the principal stretches λᵢ. The invariants of C (or of b) are I₁ = tr C, I₂ = ½[(tr C)² − tr(C²)], I₃ = det C = J². Isotropic hyperelastic laws are functions of those three numbers.",
@@ -981,13 +996,20 @@ const topics = [
     "From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ. The second term is pure spin. The first is the stretching, rotated into the current placement.",
     "The material derivative of a spatial field is D(·)/Dt = ∂(·)/∂t + v · ∇(·). It is the rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it.",
     "The three crosses are D, W, and L = D + W. Stretching, spin, and simple shear."
+  ], equations:[
+    {name:"Velocity gradient", expr:"L = ∇v = Ḟ F⁻¹", tex:"\\mathbf{L} = \\nabla\\mathbf{v} = \\dot{\\mathbf{F}}\\,\\mathbf{F}^{-1}", note:"Spatial velocity gradient. From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ: stretching rotated into the current placement, plus pure spin."},
+    {name:"Stretching and spin", expr:"D = ½(L+Lᵀ),   W = ½(L−Lᵀ)", tex:"\\mathbf{D}=\\tfrac12(\\mathbf{L}+\\mathbf{L}^{\\mathsf T}),\\qquad \\mathbf{W}=\\tfrac12(\\mathbf{L}-\\mathbf{L}^{\\mathsf T})", note:"The symmetric part D is the rate of deformation; the skew part W is the spin."},
+    {name:"Material derivative", expr:"D(·)/Dt = ∂(·)/∂t + v · ∇(·)", tex:"\\dfrac{\\mathrm{D}(\\cdot)}{\\mathrm{D}t} = \\dfrac{\\partial(\\cdot)}{\\partial t} + \\mathbf{v}\\cdot\\nabla(\\cdot)", note:"The rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it."}
   ], tags:["velocity gradient","rate of deformation","spin","material derivative"], scene:"velocityGradient"},
   {part:"Part I – Continuum Mechanics", title:"Cauchy Stress and Traction", bullets:[
     "The traction t on a surface with outward unit normal n is force per current area. Cauchy’s theorem says it is linear in n: t = σ n. The tensor σ is the Cauchy stress.",
     "The normal component is n · σ n; the shear component is the remainder, t − (n · σ n) n. Both are scalars or vectors on that cut, not a replacement for the full tensor.",
     "Because t is defined on the current surface, the arrows move when the body deforms. Stresses pulled back to the reference placement are different tensors, used when the weak form is written on the undeformed mesh.",
     "Turn the cut in the figure. The stress tensor is fixed; the traction, and its split into normal and shear, are not."
-  ], tags:["traction","Cauchy stress","normal stress","shear"], scene:"tractionCut"},
+  ], equations:[
+    {name:"Cauchy traction", expr:"t = σ n", tex:"\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}", note:"Force per current area. Without couple stresses, angular momentum requires σ = σᵀ — an algebraic restriction, not a PDE."},
+    {name:"First Piola–Kirchhoff stress", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Current force measured per reference area. Total Lagrangian codes discretize balance written with P; Updated Lagrangian keeps σ on the current mesh."}
+  ], tags:["traction","Cauchy stress","normal stress","shear","Piola"], scene:"tractionCut"},
   {part:"Part I – Continuum Mechanics", title:"Balance Laws & Conservation", equations:[
     {name:"Mass (spatial)", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Continuity. Referential: ρ₀ = ρ J."},
     {name:"Mass (integral, material part)", expr:"d/dt ∫_Pₜ ρ dv = 0", tex:"\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\,\\mathrm{d}v=0", note:"The total mass of every material part Pₜ = χ(P₀,t) is constant. Applying Reynolds transport and localization gives the spatial continuity equation above."},
@@ -996,7 +1018,8 @@ const topics = [
     {name:"Linear momentum (referential)", expr:"Div P + ρ₀ B = ρ₀ A", tex:"\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}", note:"Same physics on the reference placement; used by Total Lagrangian FEM."},
     {name:"Angular momentum", expr:"σ = σᵀ", tex:"\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}", note:"No couple stresses. Equivalently P Fᵀ = F Pᵀ."},
     {name:"Total energy (integral)", expr:"d/dt ∫_Pₜ ρ(e + |v|²/2) dv = external mechanical power + heat supply", tex:"\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\left(e+\\tfrac12\\mathbf{v}\\cdot\\mathbf{v}\\right)\\mathrm{d}v=\\int_{\\partial\\mathcal{P}_t}\\mathbf{t}\\cdot\\mathbf{v}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho\\mathbf{b}\\cdot\\mathbf{v}\\,\\mathrm{d}v-\\int_{\\partial\\mathcal{P}_t}\\mathbf{q}\\cdot\\mathbf{n}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho r\\,\\mathrm{d}v", note:"Rate of kinetic plus internal energy equals traction and body-force power, net heat inflow, and volumetric heat supply. Combining this with momentum localizes to the internal-energy equation."},
-    {name:"Energy", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"Internal energy, stress power, heat flux, and supply."}
+    {name:"Energy", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"Internal energy, stress power, heat flux, and supply."},
+    {name:"Principle of virtual work", expr:"∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV", tex:"\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V", note:"Weak statement of linear momentum (quasi-static). Dynamics adds ∫ ρ a · δu. This is the continuum statement a finite-element code actually discretizes; Variational Principles takes the Galerkin step."}
   ], bullets:[
     "Mass, linear momentum, angular momentum, and energy are conserved in every continuum theory — or balanced, once heat flux and external power are admitted. Once a stress (and a heat flux) are introduced, the local forms of those statements become partial differential equations.",
     "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Globally, the resultant of tractions and body forces equals the rate of change of linear momentum of that part. The divergence theorem turns the surface term into ∇·σ and yields the PDE.",
@@ -1008,13 +1031,18 @@ const topics = [
   {part:"Part I – Continuum Mechanics", title:"Constitutive Models", bullets:[
     "Balance laws do not determine the stress. A constitutive model relates stress to the history of deformation: Hooke’s law for small elastic strain, hyperelasticity for finite elastic strain, viscoelasticity when rate matters, and plasticity when unloading leaves a permanent set.",
     "Every model is constrained by the same list of requirements. It must be independent of the observer (objectivity), it must not produce energy in a closed cycle unless that energy is accounted for as heat or as stored energy, and it must have a well-posed initial-boundary-value problem. The Clausius–Duhem inequality is the usual filter for the last two.",
-    "The same momentum equation describes a fluid once Newton’s law of viscosity replaces Hooke’s law. The choice of model is the choice of what the material is allowed to forget: an elastic solid remembers only the current stretch; a plastic solid remembers a yield surface and a plastic strain; a fluid remembers nothing of the reference placement."
-  ], tags:["elasticity","plasticity","viscoelasticity","hyperelasticity"]},
+    "The same momentum equation describes a fluid once Newton’s law of viscosity replaces Hooke’s law. The choice of model is the choice of what the material is allowed to forget: an elastic solid remembers only the current stretch; a plastic solid remembers a yield surface and a plastic strain; a fluid remembers nothing of the reference placement.",
+    "The isotropic linear solid is the first closure: σ = λ tr(ε) I + 2μ ε. Substituting it into Cauchy’s first law produces the Navier–Cauchy equation of elastodynamics, with P- and S-waves at finite speeds — Hooke’s Law writes that substitution out. Coupled continua keep the same momentum balance and add temperature (thermoelasticity) or pore pressure (Biot); Fluids and Thermodynamics of Continua are those closures."
+  ], tags:["elasticity","plasticity","viscoelasticity","hyperelasticity","Hooke","Navier-Cauchy"]},
   {part:"Part I – Continuum Mechanics", title:"Work-Conjugate Stresses", bullets:[
     "Power per reference volume can be written in several equivalent ways. Cauchy stress is conjugate to the rate of deformation D, up to the factor J: τ : D with Kirchhoff stress τ = J σ. The first Piola–Kirchhoff stress P = J σ F⁻ᵀ is conjugate to Ḟ. The second Piola–Kirchhoff stress S = F⁻¹ P is conjugate to Ė.",
     "Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain, or an unrotated rate of σ with D, produces spurious dissipation in a rigid rotation.",
     "When stretches and rotations are both small, P, S, and σ coincide to first order. The distinction matters as soon as either is finite.",
     "The figure keeps the force on a face fixed. The Piola arrow is drawn on the reference square; the Cauchy arrow on the stretched square."
+  ], equations:[
+    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Work-conjugate to Ḟ. Nominal stress: current force per reference area."},
+    {name:"Second Piola–Kirchhoff", expr:"S = F⁻¹ P = J F⁻¹ σ F⁻ᵀ", tex:"\\mathbf{S} = \\mathbf{F}^{-1}\\mathbf{P} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Work-conjugate to Ė. A hyperelastic law S = ∂W/∂E is consistent with Green–Lagrange kinematics. When stretches and rotations are both small, P, S, and σ coincide to first order."},
+    {name:"Kirchhoff power", expr:"τ : D,   τ = J σ", tex:"\\boldsymbol{\\tau}:\\mathbf{D},\\qquad \\boldsymbol{\\tau}=J\\boldsymbol{\\sigma}", note:"Cauchy stress is conjugate to the rate of deformation D up to the factor J."}
   ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"], scene:"workConjugates"},
   {part:"Part I – Continuum Mechanics", title:"Principal Stresses and von Mises", bullets:[
     "The principal stresses are the eigenvalues of σ. The hydrostatic part is the mean (tr σ)/3; the deviator is σ′ = σ − (tr σ/3) I. Plasticity in metals is, to a first approximation, independent of the hydrostatic part.",
@@ -1116,6 +1144,29 @@ const topics = [
           body:""
         }
       ]
+    },
+    {
+      section:"Elastodynamics",
+      lead:"Balance laws do not determine the stress. Substitute isotropic Hooke’s law and infinitesimal strain into Cauchy’s first law: the result is a displacement equation. Helmholtz potentials uncouple it into waves that travel at finite speeds.",
+      items:[
+        {
+          name:"Hooke’s law (isotropic)",
+          tex:"\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}",
+          body:"Linear isotropic elasticity in Lamé form — equivalently σ = ℂ : ε. Two independent moduli fix the entire response. Fluids use the same momentum equation once Newton’s viscous law replaces Hooke’s law.",
+          bridge:"Substitute this law and the infinitesimal strain into Cauchy’s first law."
+        },
+        {
+          name:"Navier–Cauchy equation",
+          tex:"(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}",
+          body:"The displacement form of isotropic linear elastodynamics. The static problem drops the right-hand side. Index form of momentum before substitution is σ_{ij,j} + b_i = ρ ü_i.",
+          bridge:"Helmholtz potentials uncouple that vector equation into waves that travel at finite speeds."
+        },
+        {
+          name:"Helmholtz wave split",
+          tex:"\\mathbf{u} = \\boldsymbol{\\nabla}\\phi + \\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi},\\quad \\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0",
+          body:"With this decomposition, elastodynamics splits into a compressional P-wave at c_p = √((λ+2μ)/ρ) and a shear S-wave at c_s = √(μ/ρ). Static mechanics neglects inertia; dynamic response is carried by these finite wave speeds."
+        }
+      ]
     }
   ], subsections:[
     {
@@ -1134,12 +1185,14 @@ const topics = [
         {name:"Geometric Non-linearity", text:"Under finite rotations—even with small strains—a frame-invariant (objective) stress–strain rate formulation or conjugate stress–strain measure pair (e.g., Second Piola–Kirchhoff stress and Green–Lagrange strain) must be used."}
       ]
     }
-  ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking"], scene:"hookePoisson", sceneFirst:true},
+  ], tags:["Hooke","Lamé","Young","Poisson","isotropic","bulk modulus","volumetric locking","Navier-Cauchy","elastodynamics","P-wave","S-wave"], scene:"hookePoisson", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Hyperelasticity", bullets:[
     "A hyperelastic solid stores energy in the stretch. The second Piola–Kirchhoff stress is the derivative of the strain-energy density W with respect to Green strain, S = ∂W/∂E. In principal stretches, the Cauchy stresses satisfy σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume and the axes are principal.",
     "Isotropic W depends on the invariants of C, or on λ₁, λ₂, λ₃. Neo-Hooke uses only I₁; Mooney–Rivlin adds I₂. Incompressibility enforces J = 1 with a pressure that is a Lagrange multiplier, not a constitutive output.",
     "The tangent needed by Newton’s method is the second derivative of W, pushed forward to the current placement. An energy that is not polyconvex can lose ellipticity; the discrete problem then has no unique minimiser.",
     "The block is pulled in one direction and contracts in the other two so that J stays one — the kinematics every incompressible hyperelastic law has to live with."
+  ], equations:[
+    {name:"Hyperelastic stress", expr:"S = ∂W/∂E", tex:"\\mathbf{S} = \\dfrac{\\partial W}{\\partial\\mathbf{E}}", note:"The second Piola–Kirchhoff stress is the derivative of the strain-energy density with respect to Green strain. In principal stretches, σᵢ = λᵢ ∂W/∂λᵢ when W is written per reference volume."}
   ], tags:["hyperelasticity","neo-Hooke","Mooney-Rivlin","strain energy","incompressibility"], scene:"principalStretches"},
   {part:"Part I – Continuum Mechanics", title:"Metal Plasticity", bullets:[
     "Below a yield stress the response is elastic. Beyond it, metals flow at nearly constant volume. The elastic strain is recoverable; the plastic strain is a history, not a state derived from the current stretch alone.",
@@ -1152,12 +1205,20 @@ const topics = [
     "A compressible isotropic Newtonian fluid obeys σ = −p I + 2μ_f D + λ_f tr(D) I, where D = ½(∇v + ∇vᵀ) is the rate of deformation. Unlike an elastic solid, its deviatoric stress depends on deformation rate rather than accumulated strain. Incompressibility sets tr(D) = ∇·v = 0 and removes the bulk-viscous term.",
     "For constant viscosity, substituting the incompressible law σ = −p I + 2μ D into Cauchy’s first law gives Navier–Stokes: ρ(∂v/∂t + v·∇v) = −∇p + μ ∇²v + ρ b, together with ∇·v = 0.",
     "The pressure is the Lagrange multiplier for incompressibility, analogous to the pressure in an incompressible solid. Mixed velocity–pressure elements, or a slightly compressible regularisation, are the discrete counterpart of the mixed u–p pairs used in rubber."
+  ], equations:[
+    {name:"Continuity", expr:"∂ρ/∂t + ∇ · (ρ v) = 0", tex:"\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0", note:"Mass balance. For constant density it is ∇ · v = 0, a constraint on the velocity rather than an evolution for ρ."},
+    {name:"Newtonian viscous stress", expr:"σ = −p I + 2μ_f D + λ_f tr(D) I", tex:"\\boldsymbol{\\sigma}=-p\\mathbf{I}+2\\mu_f\\mathbf{D}+\\lambda_f\\,\\mathrm{tr}(\\mathbf{D})\\mathbf{I},\\qquad \\mathbf{D}=\\tfrac{1}{2}\\bigl(\\nabla\\mathbf{v}+(\\nabla\\mathbf{v})^{\\mathsf T}\\bigr)", note:"Stress depends on the rate of deformation, not on accumulated strain. For an incompressible fluid tr(D) = ∇ · v = 0 and the bulk-viscous term vanishes."},
+    {name:"Incompressible Navier–Stokes", expr:"ρ(∂t v + v·∇v) = −∇p + μ ∇²v + ρ b", tex:"\\rho\\bigl(\\partial_t\\mathbf{v} + \\mathbf{v}\\cdot\\nabla\\mathbf{v}\\bigr) = -\\nabla p + \\mu\\nabla^2\\mathbf{v} + \\rho\\mathbf{b}", note:"Cauchy’s first law closed by Newton’s law of viscosity, together with ∇ · v = 0. The continuum structure is unchanged: momentum balance plus a constitutive map from kinematics to stress."}
   ], tags:["Navier-Stokes","continuity","Newtonian fluid","viscosity","rate of deformation","compressible","incompressible"]},
   {part:"Part I – Continuum Mechanics", title:"Thermodynamics of Continua", bullets:[
     "The first law balances internal energy with mechanical power and heat. In local form it introduces the heat flux q and a temperature θ. Fourier’s law q = −k ∇θ is the usual constitutive closure for conduction.",
     "The second law, in the Clausius–Duhem form, restricts what a constitutive model may do. A hyperelastic W that depends only on C automatically satisfies it in an isothermal setting; a viscous or plastic model must dissipate.",
     "Thermal expansion couples the heat equation to momentum: strain contains a term α (θ − θ₀) I, and plastic work may heat the body. A staggered split is often enough; a monolithic coupling is needed when the time scales meet."
-  ], tags:["thermodynamics","Clausius-Duhem","Fourier","dissipation"]},
+  ], equations:[
+    {name:"Energy (local)", expr:"ρ ė = σ : D − ∇ · q + ρ r", tex:"\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r", note:"The first law: stress power, heat efflux, and supply. Fourier’s law q = −k ∇θ is the usual closure for conduction."},
+    {name:"Thermoelastic Hooke", expr:"σ = λ tr(ε) I + 2μ ε − (3λ+2μ)α(T−T₀) I", tex:"\\boldsymbol{\\sigma} = \\lambda(\\mathrm{tr}\\,\\boldsymbol{\\varepsilon})\\mathbf{I} + 2\\mu\\boldsymbol{\\varepsilon} - (3\\lambda+2\\mu)\\alpha(T-T_0)\\mathbf{I}", note:"Thermal expansion enters the stress as an isotropic eigenstress. Two-way coupling also puts a term −(3λ+2μ)α T₀ ∂_t(∇ · u) in the heat equation: deformation does work on the thermal field."},
+    {name:"Multiphase Biot momentum", expr:"∇·σ′ − α ∇(S_w p_w + S_n p_n) + b = ρ ü", tex:"\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}' - \\alpha\\boldsymbol{\\nabla}(S_w p_w + S_n p_n) + \\mathbf{b} = \\rho\\ddot{\\mathbf{u}}", note:"The skeleton constitutive law sees the effective stress σ′. Terzaghi’s principle is the saturated limit α = 1. Multiphase Porous Materials and the consolidation entries develop the mixture setting in full."}
+  ], tags:["thermodynamics","Clausius-Duhem","Fourier","dissipation","thermoelasticity","Biot"]},
 
   // Part II – Numerical Methods
   {part:"Part II – Numerical Methods", title:"Variational Principles",
@@ -3429,11 +3490,11 @@ const PART_I_LEAD = {
   "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
   "Principal Stresses and von Mises": "Hydrostatic part, stress deviator, and the cylindrical yield surface of J₂ plasticity.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
-  "Hooke’s Law": "Generalized Hooke’s Law: two isotropic moduli, Poisson contraction, and locking as ν → ½.",
+  "Hooke’s Law": "Two isotropic moduli, the Navier–Cauchy displacement equation, and P- and S-waves at finite speeds.",
   "Hyperelasticity": "Finite elastic stretch from a stored-energy function; S = ∂W/∂E.",
   "Metal Plasticity": "Yield, associated flow, hardening, and the return map at each quadrature point.",
   "Fluids: Continuity and Navier–Stokes": "The same momentum equation once Newton’s viscosity replaces Hooke’s law.",
-  "Thermodynamics of Continua": "Heat, the second law, and thermal coupling back into momentum."
+  "Thermodynamics of Continua": "Heat, thermoelastic coupling, and Biot’s effective-stress split."
 };
 
 const PART_I_BRIDGE = {
@@ -3771,6 +3832,9 @@ window.addEventListener('keydown', (e)=>{
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
+    ok('hooke has navier-cauchy', topics.some(t => t.title === "Hooke’s Law" && Array.isArray(t.flow) && t.flow.some(s => (s.items||[]).some(e => /Navier/i.test(e.name)))));
+    ok('fluids has navier-stokes equation', topics.some(t => t.title === 'Fluids: Continuity and Navier–Stokes' && (t.equations||[]).some(e => /Navier/i.test(e.name))));
+    ok('thermoelasticity in thermodynamics', topics.some(t => t.title === 'Thermodynamics of Continua' && (t.equations||[]).some(e => /Thermoelastic/i.test(e.name))));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
     ok('buckling scene wired', topics.some(t => t.scene === 'columnBuckling'));
     ok('fracture mechanics overview', topics.some(t => t.title === 'Fracture Mechanics' && t.illustrations === 'fractureOverview'));
