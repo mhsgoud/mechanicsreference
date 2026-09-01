@@ -137,24 +137,34 @@
     .app{
       display:grid;
       grid-template-columns:minmax(280px,320px) 1fr;
-      grid-template-rows:1fr;
-      grid-template-areas:"sidebar content";
+      grid-template-rows:auto 1fr;
+      grid-template-areas:"header header" "sidebar content";
       height:100vh;
     }
+    header{
+      grid-area:header;
+      position:sticky;top:0;z-index:20;
+      background:#fff;
+      border-bottom:1px solid var(--rule);
+      display:flex;align-items:center;gap:20px;
+      padding:12px 28px;
+    }
+    header .brand{display:flex;align-items:center;text-decoration:none}
     .visually-hidden{
       position:absolute;width:1px;height:1px;padding:0;margin:-1px;
       overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
     }
-    .sidebar-brand{
-      display:flex;align-items:center;margin:0 8px 12px;
-      text-decoration:none;
+    .brand-logo{display:block;height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;align-items:center;gap:4px}
+    .top-nav a{
+      color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;
+      padding:8px 12px;
     }
-    .sidebar-brand img{display:block;height:40px;width:auto}
+    .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
     .menu-toggle{
       display:none;appearance:none;border:1px solid var(--rule);background:#fff;
       color:var(--navy);font:inherit;font-size:0.88rem;font-weight:600;
-      padding:8px 12px;cursor:pointer;
-      position:fixed;top:12px;left:12px;z-index:24;
+      padding:8px 12px;cursor:pointer;margin-left:8px;
     }
     .menu-toggle:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
     .sidebar-backdrop{
@@ -385,20 +395,6 @@
     }
     .part-path .sep{margin:0 8px;color:var(--rule);font-weight:400;letter-spacing:0}
     .part-path .pos{font-variant-numeric:tabular-nums;letter-spacing:0.02em}
-    .part-arcs{
-      display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px;
-    }
-    .part-arcs button{
-      appearance:none;border:1px solid var(--rule);background:#fff;
-      color:var(--muted);font:inherit;font-size:0.78rem;font-weight:600;
-      letter-spacing:0.04em;text-transform:uppercase;
-      padding:6px 10px;cursor:pointer;
-    }
-    .part-arcs button:hover{border-color:var(--navy);color:var(--navy)}
-    .part-arcs button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
-    .part-arcs button.current{
-      background:var(--navy);border-color:var(--navy);color:#fff;cursor:default;
-    }
     .library-parts{
       position:sticky;top:0;z-index:4;
       display:flex;flex-wrap:nowrap;gap:6px;
@@ -561,7 +557,7 @@
     @media (max-width:800px){#theory-canvas{height:300px}}
 
     @media (max-width: 980px){
-      .app{grid-template-columns:1fr;grid-template-areas:"content"}
+      .app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
       .menu-toggle{display:inline-flex;align-items:center;gap:6px}
       .sidebar{
         display:none;position:fixed;top:0;left:0;bottom:0;z-index:30;
@@ -570,7 +566,8 @@
       }
       .sidebar.open{display:flex}
       .grid2{grid-template-columns:1fr}
-      .content{padding-left:18px;padding-right:18px;padding-top:56px}
+      .brand-logo{height:44px}
+      header,.content{padding-left:18px;padding-right:18px}
       .topic-nav{grid-template-columns:1fr}
       .topic-nav .next{text-align:left}
     }
@@ -587,14 +584,21 @@
 </head>
 <body>
   <div class="app">
-    <h1 class="visually-hidden">Encyclopedia of mechanics: basic equations, continuum mechanics, finite elements, and numerical methods</h1>
-    <button type="button" class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="topicsSidebar">Topics</button>
+    <header>
+      <a class="brand" href="./" aria-label="Mechanics Reference home">
+        <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
+      </a>
+      <h1 class="visually-hidden">Encyclopedia of mechanics: basic equations, continuum mechanics, finite elements, and numerical methods</h1>
+      <nav class="top-nav" aria-label="Site">
+        <a href="./">Home</a>
+        <a href="hub.html" class="active" aria-current="page">Library</a>
+        <button type="button" class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="topicsSidebar">Topics</button>
+      </nav>
+    </header>
+
     <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
     <aside class="sidebar" id="topicsSidebar" aria-label="Topics navigation">
       <div class="sidebar-chrome">
-        <a class="sidebar-brand" href="./" aria-label="Mechanics Reference home">
-          <img src="logo.png" alt="Mechanics Reference" width="240" height="80" />
-        </a>
         <div class="search" role="search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 6.03-3.03l4 4-1.5 1.5-4-4A7.46 7.46 0 0 1 10.5 18Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"/></svg>
           <input id="searchInput" placeholder="Search the library" aria-label="Search the library" />
@@ -3462,8 +3466,6 @@ const PART_I_BRIDGE = {
   "Thermodynamics of Continua": "Part II takes the weak form of these continuum statements onto a mesh."
 };
 
-const PART_I_ARC_ORDER = ["Overview", "Kinematics", "Stress & balance", "Constitutive response", "Coupled continua"];
-
 function topicArc(topic){
   return topic.arc || PART_I_ARC[topic.title] || null;
 }
@@ -3498,18 +3500,6 @@ function partPathHtml(topic){
     <span class="sep">·</span>
     <span class="pos">${idx + 1} of ${siblings.length}</span>
   </div>`;
-}
-
-function partArcsHtml(topic){
-  if(topic.part !== PART_I) return "";
-  const current = topicArc(topic);
-  const siblings = partTopics(topic.part);
-  return `<nav class="part-arcs" aria-label="Part I arcs">${PART_I_ARC_ORDER.map(arc => {
-    const first = siblings.find(t => topicArc(t) === arc);
-    if(!first) return "";
-    const isCurrent = arc === current;
-    return `<button type="button" class="${isCurrent ? "current" : ""}" data-title="${escHtml(first.title)}" ${isCurrent ? "aria-current=\"true\"" : ""}>${escHtml(arc)}</button>`;
-  }).join("")}</nav>`;
 }
 
 function topicBridgeHtml(topic){
@@ -3593,7 +3583,6 @@ function renderContent(topic){
       ${libraryPartsHtml(topic)}
       <div class="breadcrumbs"><span>${escHtml(topic.part)}</span><span>${escHtml(topic.title)}</span></div>
       ${partPathHtml(topic)}
-      ${partArcsHtml(topic)}
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
       <div class="prose">${prose}</div>
@@ -3619,7 +3608,7 @@ function renderContent(topic){
     active.scrollIntoView({block:'nearest'});
   }
 
-  content.querySelectorAll('.part-arcs button[data-title], .library-parts button[data-title]').forEach(btn => {
+  content.querySelectorAll('.library-parts button[data-title]').forEach(btn => {
     if(btn.classList.contains('current')) return;
     btn.addEventListener('click', () => selectTopic(btn.getAttribute('data-title')));
   });
