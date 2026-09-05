@@ -1023,13 +1023,14 @@ const topics = [
     "A motion x = χ(X,t) maps a material point X in the reference configuration Ω₀ to its position x in the current configuration Ωₜ; displacement is u(X,t) = x − X. When displacement gradients are small, the symmetric gradient of u is enough to measure strain.",
     "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Its positive Jacobian J = det F gives the local volume ratio dv = J dV. Rigid translation never appears in F; rotation, stretch, shear, and volume change do.",
     "The right Cauchy–Green tensor C = Fᵀ F and the left Cauchy–Green tensor b = F Fᵀ are stretch without rotation. Their eigenvalues are the squared principal stretches.",
-    "The figure runs through those cases on a homogeneous motion. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
+    "The first figure is that motion: the wire ghost is κ₀(B), the solid body is κₜ(B). Click a material point X on the ghost, then play t. The red arrow is the displacement u(X,t); the dashed path is χ(X,t); the live matrix is F = ∂x/∂X at that particle.",
+    "The second figure runs through homogeneous cases. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
   ], equations:[
     {name:"Motion and displacement", expr:"x = χ(X,t),   u = x − X", tex:"\\mathbf{x}=\\boldsymbol{\\chi}(\\mathbf{X},t),\\qquad \\mathbf{u}(\\mathbf{X},t)=\\mathbf{x}-\\mathbf{X}", note:"The motion sends each material point X in Ω₀ to its current place x in Ωₜ. Velocity and acceleration are time derivatives at fixed X."},
     {name:"Deformation gradient", expr:"F = ∂x/∂X", tex:"\\mathbf{F} = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Linear part of the motion: dx = F dX. Rigid translation never appears in F."},
     {name:"Jacobian", expr:"J = det F = dv/dV", tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}", note:"Local volume ratio. Mass on the reference placement is ρ₀ = ρ J. Incompressibility is J = 1, equivalently ∇ · v = 0."},
     {name:"Infinitesimal strain", expr:"ε = ½(∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"The symmetric gradient of displacement is enough when rotations and stretches are both small. It is the strain that enters isotropic Hooke’s law."}
-  ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green"], scene:"deformationGradient"},
+  ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green","motion","path line"], scenes:["continuumKinematics","deformationGradient"], sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
     "Vectors and second-order tensors are the language of the field equations. Components transform when the basis changes; the objects themselves do not. Index notation makes that bookkeeping compact: repeated indices are summed, and a comma denotes a derivative.",
     "The divergence theorem turns a volume integral of a derivative into a surface integral. For the Cauchy stress it reads ∫ ∇·σ dV = ∫ σ n dA, which is why the local momentum equation and the statement of traction on the boundary are the same balance.",
@@ -2329,6 +2330,7 @@ const content = document.getElementById('content');
 
 function renderTopicScene(topic){
   const pages = {
+    continuumKinematics: {src:'continuum-kinematics.html', title:'Motion χ(X,t): pick a material point on the reference body, play the path line, and read F = ∂x/∂X.', tall:true},
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
     linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
     polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},

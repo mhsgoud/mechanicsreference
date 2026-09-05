@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Continuum Kinematics — Mechanics Reference</title>
+  <meta name="description" content="Interactive motion χ(X,t): pick a material point, play the path line, and read the deformation gradient F." />
+  <link rel="canonical" href="https://mechanicsreference.com/continuum-kinematics.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0f172a;--accent:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden}
+    #stage{position:relative;height:min(80vh,720px);min-height:560px;background:var(--plate);user-select:none}
+    #stage canvas{display:block;width:100%;height:100%}
+    #labels-container{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .label3d{
+      position:absolute;color:#fff;font:700 12px "Source Sans 3",sans-serif;
+      padding:2px 6px;background:rgba(15,23,42,.75);border:1px solid rgba(255,255,255,.2);
+      border-radius:4px;white-space:nowrap;transform:translate(-50%,-100%);
+    }
+    #ui-container{
+      position:absolute;z-index:4;top:14px;left:14px;width:min(310px,calc(100% - 28px));
+      padding:14px;border:1px solid #334155;background:rgba(15,23,42,.92);color:#e2e8f0;
+    }
+    #ui-container h3{margin:0 0 6px;font-size:.95rem;color:var(--accent)}
+    #ui-container p{margin:0 0 10px;font-size:.72rem;line-height:1.4;color:#94a3b8}
+    .slider-group{margin-bottom:10px}
+    .slider-group label{display:flex;justify-content:space-between;font-size:.75rem;font-weight:600;margin-bottom:4px}
+    .slider-group input{width:100%;accent-color:var(--accent)}
+    .btn-group{display:flex;gap:8px;margin-bottom:10px}
+    .btn-group button{
+      flex:1;padding:7px 8px;border:0;background:#0284c7;color:#fff;font:700 .72rem "Source Sans 3",sans-serif;cursor:pointer;
+    }
+    .btn-group button:hover{background:#0369a1}
+    #data-panel{padding:10px;border:1px solid #475569;background:#1e293b;font:11px/1.4 "JetBrains Mono",ui-monospace,monospace}
+    .data-title{margin-bottom:6px;font:700 11px "Source Sans 3",sans-serif;color:var(--accent)}
+    .data-row{display:flex;justify-content:space-between;margin-bottom:3px;color:#cbd5e1}
+    .matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#0f172a;text-align:center}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #stage{min-height:680px}
+    }
+  </style>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#kinematics-of-deformation">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#kinematics-of-deformation">Kinematics of deformation</a></p>
+      <h1>Motion, displacement, and F</h1>
+      <p class="standfirst">A motion x = χ(X,t) carries the reference body κ₀(B) onto the current placement κₜ(B). Click a material point on the ghost mesh, then play the path line and watch F = ∂x/∂X.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage" aria-label="Interactive continuum kinematics">
+        <div id="labels-container"></div>
+        <div id="ui-container">
+          <h3>Continuum kinematics</h3>
+          <p>Drag to rotate. Click the reference body to pick a material point X.</p>
+          <div class="slider-group">
+            <label>Time parameter t <span id="timeVal">0.00</span></label>
+            <input type="range" id="timeSlider" min="0" max="1" step="0.005" value="0" aria-label="Time parameter">
+          </div>
+          <div class="btn-group">
+            <button type="button" id="playBtn">Play motion</button>
+            <button type="button" id="resetBtn">Reset</button>
+          </div>
+          <div id="data-panel">
+            <div class="data-title">Live kinematic quantities</div>
+            <div class="data-row"><span>Ref pos X</span><span id="valX" style="color:#38bdf8">[0.00, 0.00, 0.00]</span></div>
+            <div class="data-row"><span>Def pos x</span><span id="valx" style="color:#38bdf8">[0.00, 0.00, 0.00]</span></div>
+            <div class="data-row"><span>Displacement u</span><span id="valu" style="color:#f43f5e">0.000</span></div>
+            <div class="data-row"><span>Stretch λ</span><span id="valStretch" style="color:#4ade80">1.000</span></div>
+            <div class="data-title" style="margin-top:8px">Deformation gradient F</div>
+            <div class="matrix-grid" id="matrixF">
+              <div>1.00</div><div>0.00</div><div>0.00</div>
+              <div>0.00</div><div>1.00</div><div>0.00</div>
+              <div>0.00</div><div>0.00</div><div>1.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#kinematics-of-deformation">Kinematics of deformation</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+    const stage = document.getElementById('stage');
+    const labelsContainer = document.getElementById('labels-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.set(7, 7, 13);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 15, 10);
+    scene.add(dirLight);
+
+    const labels = [];
+    function createLabel(text, color){
+      const div = document.createElement('div');
+      div.className = 'label3d';
+      div.innerHTML = text;
+      div.style.borderColor = color;
+      labelsContainer.appendChild(div);
+      const labelObj = {element: div, pos: new THREE.Vector3()};
+      labels.push(labelObj);
+      return labelObj;
+    }
+    const labelKappa0 = createLabel('κ₀(B) [t=0]', '#38bdf8');
+    const labelKappat = createLabel('κₜ(B) [t=t]', '#0284c7');
+    const labelP0 = createLabel('P (X)', '#ffffff');
+    const labelP = createLabel('p (x)', '#f43f5e');
+    const labelU = createLabel('u(X,t)', '#f43f5e');
+    const labelPath = createLabel('Path line χ(X,t)', '#eab308');
+
+    function updateLabelPositions(){
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      const tempV = new THREE.Vector3();
+      labels.forEach(l => {
+        tempV.copy(l.pos).project(camera);
+        const x = (tempV.x * 0.5 + 0.5) * w;
+        const y = (tempV.y * -0.5 + 0.5) * h;
+        l.element.style.transform = `translate(-50%, -100%) translate(${x}px, ${y}px)`;
+        l.element.style.opacity = tempV.z > 1 ? '0' : '1';
+      });
+    }
+
+    function createDynamicArrow(color){
+      const group = new THREE.Group();
+      const shaftGeo = new THREE.CylinderGeometry(0.025, 0.025, 1, 12);
+      shaftGeo.translate(0, 0.5, 0);
+      const shaft = new THREE.Mesh(shaftGeo, new THREE.MeshPhongMaterial({color}));
+      group.add(shaft);
+      const headGeo = new THREE.ConeGeometry(0.09, 0.25, 12);
+      headGeo.translate(0, 0.125, 0);
+      const head = new THREE.Mesh(headGeo, new THREE.MeshPhongMaterial({color}));
+      group.add(head);
+      group.update = function(start, end){
+        const dir = new THREE.Vector3().subVectors(end, start);
+        const len = dir.length();
+        if (len < 0.001) { group.visible = false; return; }
+        group.visible = true;
+        shaft.scale.set(1, Math.max(0, len - 0.25), 1);
+        head.position.set(0, Math.max(0, len - 0.25), 0);
+        group.position.copy(start);
+        group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+      };
+      return group;
+    }
+
+    scene.add(new THREE.AxesHelper(2.5));
+    const radius = 1.3;
+    const baseGeo = new THREE.SphereGeometry(radius, 32, 32);
+    baseGeo.scale(1, 1.3, 0.6);
+    const initialPositions = baseGeo.attributes.position.clone();
+    const bodyMesh = new THREE.Mesh(baseGeo, new THREE.MeshPhongMaterial({
+      color: 0x38bdf8, transparent: true, opacity: 0.65, side: THREE.DoubleSide
+    }));
+    scene.add(bodyMesh);
+    const ghostMesh = new THREE.Mesh(
+      baseGeo.clone(),
+      new THREE.MeshBasicMaterial({color: 0x38bdf8, wireframe: true, opacity: 0.15, transparent: true})
+    );
+    scene.add(ghostMesh);
+
+    let P0 = new THREE.Vector3(-0.4, 0.8, 0.2);
+    function motionMap(X, t){
+      const angle = t * Math.PI * 0.25;
+      let x = X.x + t * 3.5;
+      let y = X.y + t * 1.8;
+      let z = X.z + t * 1.2;
+      x += 0.4 * Math.sin(t * Math.PI) * X.y;
+      y += 0.2 * (1 - Math.cos(t * Math.PI)) * X.x;
+      const rx = (x - t * 3.5) * Math.cos(angle) - (y - t * 1.8) * Math.sin(angle) + t * 3.5;
+      const ry = (x - t * 3.5) * Math.sin(angle) + (y - t * 1.8) * Math.cos(angle) + t * 1.8;
+      return new THREE.Vector3(rx, ry, z);
+    }
+
+    const uArrow = createDynamicArrow(0xf43f5e);
+    const XArrow = createDynamicArrow(0x38bdf8);
+    const xArrow = createDynamicArrow(0x0284c7);
+    scene.add(uArrow, XArrow, xArrow);
+    const markerP0 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff}));
+    const markerP = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), new THREE.MeshBasicMaterial({color: 0xf43f5e}));
+    scene.add(markerP0, markerP);
+    const pathLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineDashedMaterial({
+      color: 0xeab308, dashSize: 0.08, gapSize: 0.04
+    }));
+    scene.add(pathLine);
+
+    function updatePathLine(){
+      const pts = [];
+      for (let i = 0; i <= 60; i++) pts.push(motionMap(P0, i / 60));
+      pathLine.geometry.dispose();
+      pathLine.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+      pathLine.computeLineDistances();
+      labelPath.pos.copy(pts[30]);
+    }
+
+    function computeKinematics(X, t){
+      const Pt = motionMap(X, t);
+      const eps = 0.0001;
+      const dX = motionMap(new THREE.Vector3(X.x + eps, X.y, X.z), t).sub(Pt).divideScalar(eps);
+      const dY = motionMap(new THREE.Vector3(X.x, X.y + eps, X.z), t).sub(Pt).divideScalar(eps);
+      const dZ = motionMap(new THREE.Vector3(X.x, X.y, X.z + eps), t).sub(Pt).divideScalar(eps);
+      const F = [dX.x, dY.x, dZ.x, dX.y, dY.y, dZ.y, dX.z, dY.z, dZ.z];
+      return {Pt, F, stretch: Math.sqrt(dX.lengthSq())};
+    }
+
+    function updateState(t){
+      const posAttr = bodyMesh.geometry.attributes.position;
+      const vX = new THREE.Vector3();
+      for (let i = 0; i < posAttr.count; i++) {
+        vX.fromBufferAttribute(initialPositions, i);
+        const vt = motionMap(vX, t);
+        posAttr.setXYZ(i, vt.x, vt.y, vt.z);
+      }
+      posAttr.needsUpdate = true;
+      bodyMesh.geometry.computeVertexNormals();
+      const {Pt, F, stretch} = computeKinematics(P0, t);
+      markerP0.position.copy(P0);
+      markerP.position.copy(Pt);
+      const origin = new THREE.Vector3();
+      XArrow.update(origin, P0);
+      xArrow.update(origin, Pt);
+      uArrow.update(P0, Pt);
+      labelKappa0.pos.set(0, 2.0, 0);
+      labelKappat.pos.set(3.5 * t, 2.0 + 1.8 * t, 1.2 * t);
+      labelP0.pos.copy(P0);
+      labelP.pos.copy(Pt);
+      labelU.pos.copy(P0).add(Pt).multiplyScalar(0.5);
+      document.getElementById('valX').textContent = `[${P0.x.toFixed(2)}, ${P0.y.toFixed(2)}, ${P0.z.toFixed(2)}]`;
+      document.getElementById('valx').textContent = `[${Pt.x.toFixed(2)}, ${Pt.y.toFixed(2)}, ${Pt.z.toFixed(2)}]`;
+      document.getElementById('valu').textContent = P0.distanceTo(Pt).toFixed(3);
+      document.getElementById('valStretch').textContent = stretch.toFixed(3);
+      const fDivs = document.getElementById('matrixF').children;
+      for (let i = 0; i < 9; i++) fDivs[i].textContent = F[i].toFixed(2);
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#ui-container')) return;
+      const rect = stage.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(ghostMesh);
+      if (hits.length) {
+        P0.copy(hits[0].point);
+        updatePathLine();
+        updateState(parseFloat(slider.value));
+      }
+    });
+
+    const slider = document.getElementById('timeSlider');
+    const timeDisplay = document.getElementById('timeVal');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    let isPlaying = false;
+    slider.addEventListener('input', () => {
+      const t = parseFloat(slider.value);
+      timeDisplay.textContent = t.toFixed(2);
+      updateState(t);
+    });
+    playBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playBtn.textContent = isPlaying ? 'Pause motion' : 'Play motion';
+    });
+    resetBtn.addEventListener('click', () => {
+      isPlaying = false;
+      playBtn.textContent = 'Play motion';
+      slider.value = 0;
+      timeDisplay.textContent = '0.00';
+      updateState(0);
+    });
+
+    function resize(){
+      const w = Math.max(1, stage.clientWidth);
+      const h = Math.max(1, stage.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(stage);
+    resize();
+    updatePathLine();
+    updateState(0);
+
+    (function loop(){
+      requestAnimationFrame(loop);
+      if (isPlaying) {
+        let t = parseFloat(slider.value) + 0.003;
+        if (t > 1) t = 0;
+        slider.value = t;
+        timeDisplay.textContent = t.toFixed(2);
+        updateState(t);
+      }
+      controls.update();
+      updateLabelPositions();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
