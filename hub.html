@@ -324,12 +324,17 @@
 
     .card:has(.scene-frame){max-width:none}
     .scene-frame{
-      display:block;width:100%;height:min(52vh,420px);
+      display:block;width:100%;height:min(38vh,340px);
+      min-height:180px;max-height:80vh;
+      resize:vertical;overflow:hidden;
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
     }
-    .scene-frame-tall{height:min(84vh,720px)}
+    .scene-frame iframe{
+      display:block;width:100%;height:100%;border:0;background:#1a2740;
+    }
+    .scene-frame-tall{height:min(50vh,460px)}
     .scene-frame-flush{
-      margin-top:0;border:0;height:min(88vh,860px);
+      margin-top:0;border:0;height:min(46vh,420px);
     }
     .figure-section.flush{
       margin-top:1.1rem;padding-top:0.7rem;
@@ -2548,7 +2553,9 @@ function renderTopicScene(topic){
 <section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
-  <iframe class="${frameClass}" title="${page.title}" src="${page.src}" loading="lazy"></iframe>
+  <div class="${frameClass}">
+    <iframe title="${page.title}" src="${page.src}" loading="lazy"></iframe>
+  </div>
 </section>`;
   }).join('');
 }
