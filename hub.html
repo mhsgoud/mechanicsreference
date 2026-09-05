@@ -1025,18 +1025,117 @@ const topics = [
       ]
     }
   ], tags:["continuum","strain","stress","Cauchy","balance laws","constitutive","linear","nonlinear","FEM","weak form","discretization","assembly","Newton-Raphson","tangent","linearization"]},
-  {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation", bullets:[
-    "A motion x = χ(X,t) maps a material point X in the reference configuration Ω₀ to its position x in the current configuration Ωₜ; displacement is u(X,t) = x − X. When displacement gradients are small, the symmetric gradient of u is enough to measure strain.",
-    "When they are not, strain is defined from the deformation gradient F = ∂x/∂X, the linear map that sends a material line element dX to dx. Its positive Jacobian J = det F gives the local volume ratio dv = J dV. Rigid translation never appears in F; rotation, stretch, shear, and volume change do.",
-    "The right Cauchy–Green tensor C = Fᵀ F and the left Cauchy–Green tensor b = F Fᵀ are stretch without rotation. Their eigenvalues are the squared principal stretches.",
-    "The first figure is that motion: the wire ghost is κ₀(B), the solid body is κₜ(B). Click a material point X on the ghost, then play t. The red arrow is the displacement u(X,t); the dashed path is χ(X,t); the live matrix is F = ∂x/∂X at that particle.",
+  {part:"Part I – Continuum Mechanics", title:"Kinematics of Deformation",
+  lead:"Kinematics of deformation describes how continuous bodies move, change shape, and rotate over time without considering the forces or torques that produce those motions.",
+  bullets:[
+    "The first figure is that motion: the wire ghost is the reference configuration B₀, the solid body is the current configuration Bₜ. Click a material point X on the ghost, then play t. The red arrow is the displacement u(X,t); the dashed path is χ(X,t); the live matrix is F = ∂x/∂X.",
     "The second figure runs through homogeneous cases. The blue grid is the reference placement; the orange grid is its image. The two arrows are the columns of F: the images of the material unit vectors e₁ and e₂."
-  ], equations:[
-    {name:"Motion and displacement", expr:"x = χ(X,t),   u = x − X", tex:"\\mathbf{x}=\\boldsymbol{\\chi}(\\mathbf{X},t),\\qquad \\mathbf{u}(\\mathbf{X},t)=\\mathbf{x}-\\mathbf{X}", note:"The motion sends each material point X in Ω₀ to its current place x in Ωₜ. Velocity and acceleration are time derivatives at fixed X."},
-    {name:"Deformation gradient", expr:"F = ∂x/∂X", tex:"\\mathbf{F} = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}", note:"Linear part of the motion: dx = F dX. Rigid translation never appears in F."},
-    {name:"Jacobian", expr:"J = det F = dv/dV", tex:"J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}", note:"Local volume ratio. Mass on the reference placement is ρ₀ = ρ J. Incompressibility is J = 1, equivalently ∇ · v = 0."},
-    {name:"Infinitesimal strain", expr:"ε = ½(∇u + (∇u)ᵀ)", tex:"\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)", note:"The symmetric gradient of displacement is enough when rotations and stretches are both small. It is the strain that enters isotropic Hooke’s law."}
-  ], tags:["kinematics","deformation","deformation gradient","small strain","large strain","Cauchy-Green","motion","path line"], scenes:["continuumKinematics","deformationGradient"], sceneFirst:true},
+  ], flow:[
+    {
+      section:"Configurations and Motion Tracking",
+      lead:"The spatial configuration of a body is defined relative to two main coordinate systems.",
+      items:[
+        {
+          name:"Reference configuration B₀",
+          tex:"\\mathbf{X}\\in\\mathcal{B}_0\\quad(t=0)",
+          body:"The undeformed state at the initial time t = 0. Points are labeled by material (Lagrangian) coordinates X."
+        },
+        {
+          name:"Current configuration Bₜ",
+          tex:"\\mathbf{x}\\in\\mathcal{B}_t",
+          body:"The deformed state at time t. Points are identified by spatial (Eulerian) coordinates x."
+        },
+        {
+          name:"Motion",
+          tex:"\\mathbf{x} = \\boldsymbol{\\chi}(\\mathbf{X}, t)",
+          body:"The continuous mapping χ tracks each material particle from its reference place to its current place."
+        },
+        {
+          name:"Displacement",
+          tex:"\\mathbf{u}(\\mathbf{X}, t) = \\mathbf{x} - \\mathbf{X}",
+          body:"The displacement vector connects a material particle’s original position to its current position."
+        }
+      ]
+    },
+    {
+      section:"Core Kinematic Tensors",
+      items:[
+        {
+          name:"Deformation gradient",
+          tex:"\\mathbf{F} = \\dfrac{\\partial\\mathbf{x}}{\\partial\\mathbf{X}} = \\nabla_{\\mathbf{X}}\\boldsymbol{\\chi}",
+          body:"Fundamental second-order tensor mapping infinitesimal line elements: dx = F dX. Rigid translation never appears in F."
+        },
+        {
+          name:"Jacobian determinant",
+          tex:"J = \\det(\\mathbf{F}) > 0",
+          body:"Volume-change ratio dV = J dV₀. J = 1 for incompressible materials."
+        },
+        {
+          name:"Right Cauchy–Green tensor",
+          tex:"\\mathbf{C} = \\mathbf{F}^{\\mathsf T}\\mathbf{F}",
+          body:"Frame-invariant strain measure defined in the reference configuration."
+        },
+        {
+          name:"Left Cauchy–Green tensor",
+          tex:"\\mathbf{B} = \\mathbf{F}\\,\\mathbf{F}^{\\mathsf T}",
+          body:"Spatial strain measure defined in the current configuration."
+        }
+      ]
+    },
+    {
+      section:"Polar Decomposition and Strain Measures",
+      lead:"To isolate pure shape distortion from rigid-body rotation, the deformation gradient is factored by polar decomposition.",
+      items:[
+        {
+          name:"Polar decomposition",
+          tex:"\\mathbf{F} = \\mathbf{R}\\mathbf{U} = \\mathbf{V}\\mathbf{R}",
+          body:"R is the proper orthogonal rotation (RᵀR = I, det R = 1). U is the right stretch (symmetric, positive-definite on the reference configuration). V is the left stretch (symmetric, positive-definite on the current configuration)."
+        },
+        {
+          name:"Green–Lagrange strain",
+          tex:"\\mathbf{E} = \\tfrac12(\\mathbf{C}-\\mathbf{I}) = \\tfrac12\\bigl(\\nabla_{\\mathbf{X}}\\mathbf{u}+(\\nabla_{\\mathbf{X}}\\mathbf{u})^{\\mathsf T}+(\\nabla_{\\mathbf{X}}\\mathbf{u})^{\\mathsf T}\\nabla_{\\mathbf{X}}\\mathbf{u}\\bigr)",
+          body:"Lagrangian finite strain. It vanishes in a rigid motion and reduces to infinitesimal strain when displacement gradients are small."
+        },
+        {
+          name:"Euler–Almansi strain",
+          tex:"\\mathbf{e} = \\tfrac12(\\mathbf{I}-\\mathbf{B}^{-1})",
+          body:"Eulerian finite strain, written on the current configuration."
+        }
+      ]
+    },
+    {
+      section:"Small Deformation Simplification",
+      lead:"When displacements and displacement gradients are infinitesimal (‖∇_X u‖ ≪ 1), the nonlinear higher-order terms disappear.",
+      items:[
+        {
+          name:"Infinitesimal strain",
+          tex:"\\boldsymbol{\\varepsilon} = \\tfrac12\\bigl(\\nabla\\mathbf{u}+(\\nabla\\mathbf{u})^{\\mathsf T}\\bigr)",
+          body:"The symmetric part of the displacement gradient. This is the strain that enters isotropic Hooke’s law."
+        },
+        {
+          name:"Infinitesimal rotation",
+          tex:"\\boldsymbol{\\omega} = \\tfrac12\\bigl(\\nabla\\mathbf{u}-(\\nabla\\mathbf{u})^{\\mathsf T}\\bigr)",
+          body:"The skew part of the displacement gradient: a small rigid rotation."
+        }
+      ]
+    },
+    {
+      section:"Rates of Deformation",
+      lead:"For dynamic analysis the spatial velocity gradient isolates stretching rate from instantaneous spin.",
+      items:[
+        {
+          name:"Velocity gradient",
+          tex:"\\mathbf{L} = \\nabla_{\\mathbf{x}}\\mathbf{v} = \\dot{\\mathbf{F}}\\,\\mathbf{F}^{-1}",
+          body:"The spatial gradient of velocity, equivalently Ḟ F⁻¹. The next topic develops L, D, and W in full."
+        },
+        {
+          name:"Stretching and spin",
+          tex:"\\mathbf{L}=\\mathbf{D}+\\mathbf{W},\\qquad \\mathbf{D}=\\tfrac12(\\mathbf{L}+\\mathbf{L}^{\\mathsf T}),\\qquad \\mathbf{W}=\\tfrac12(\\mathbf{L}-\\mathbf{L}^{\\mathsf T})",
+          body:"D is the rate of deformation (stretching rate). W is the spin (vorticity / rotation rate)."
+        }
+      ]
+    }
+  ], tags:["kinematics","deformation","deformation gradient","Jacobian","Cauchy-Green","polar decomposition","Green-Lagrange","Almansi","small strain","velocity gradient","motion","path line"], scenes:["continuumKinematics","deformationGradient"], sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
     "Vectors and second-order tensors are the language of the field equations. Components transform when the basis changes; the objects themselves do not. Index notation makes that bookkeeping compact: repeated indices are summed, and a comma denotes a derivative.",
     "The divergence theorem turns a volume integral of a derivative into a surface integral. For the Cauchy stress it reads ∫ ∇·σ dV = ∫ σ n dA, which is why the local momentum equation and the statement of traction on the boundary are the same balance.",
@@ -3695,7 +3794,7 @@ const PART_I_ARC = {
 const PART_I_LEAD = {
   "Basic Equations": "The closed list of field equations that the rest of Part I expands, one subject at a time.",
   "Introduction to Continuum Mechanics": "A solid or fluid as a continuous medium: strain, stress, balance laws, constitutive closure, and the pipeline to a finite-element Newton step.",
-  "Kinematics of Deformation": "Motion as a map from the reference placement to the current one; strain begins with the deformation gradient.",
+  "Kinematics of Deformation": "How continuous bodies move, change shape, and rotate — without the forces that produce those motions.",
   "Tensors and the Divergence Theorem": "The bookkeeping of components, and the integral identity that turns volume balance into surface traction.",
   "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
   "Finite Strain Measures": "Green–Lagrange, Almansi, and the one-dimensional stretch measures that agree only as λ → 1.",
