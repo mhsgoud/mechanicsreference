@@ -1067,16 +1067,44 @@ const topics = [
     "A pure rotation leaves every invariant of C equal to that of I. A computation that reports strain after a large rotation but a small stretch has usually used a measure that still contains R.",
     "The two blocks split that idea: the left changes volume and keeps its shape; the right changes shape and keeps its volume."
   ], tags:["invariants","principal stretch","hydrostatic","deviatoric","J"], scene:"hydroDeviator"},
-  {part:"Part I – Continuum Mechanics", title:"Velocity Gradient and Material Derivative", bullets:[
-    "The spatial velocity gradient is L = ∇v = Ḟ F⁻¹. Its symmetric part D = ½(L + Lᵀ) is the rate of deformation; its skew part W = ½(L − Lᵀ) is the spin. Stretching lives in D; rigid spin lives in W.",
-    "From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ. The second term is pure spin. The first is the stretching, rotated into the current placement.",
-    "The material derivative of a spatial field is D(·)/Dt = ∂(·)/∂t + v · ∇(·). It is the rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it.",
-    "The three crosses are D, W, and L = D + W. Stretching, spin, and simple shear."
-  ], equations:[
-    {name:"Velocity gradient", expr:"L = ∇v = Ḟ F⁻¹", tex:"\\mathbf{L} = \\nabla\\mathbf{v} = \\dot{\\mathbf{F}}\\,\\mathbf{F}^{-1}", note:"Spatial velocity gradient. From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ: stretching rotated into the current placement, plus pure spin."},
-    {name:"Stretching and spin", expr:"D = ½(L+Lᵀ),   W = ½(L−Lᵀ)", tex:"\\mathbf{D}=\\tfrac12(\\mathbf{L}+\\mathbf{L}^{\\mathsf T}),\\qquad \\mathbf{W}=\\tfrac12(\\mathbf{L}-\\mathbf{L}^{\\mathsf T})", note:"The symmetric part D is the rate of deformation; the skew part W is the spin."},
-    {name:"Material derivative", expr:"D(·)/Dt = ∂(·)/∂t + v · ∇(·)", tex:"\\dfrac{\\mathrm{D}(\\cdot)}{\\mathrm{D}t} = \\dfrac{\\partial(\\cdot)}{\\partial t} + \\mathbf{v}\\cdot\\nabla(\\cdot)", note:"The rate seen by a particle, not the rate at a fixed point in space. Mass balance and the chain rule for F both use it."}
-  ], tags:["velocity gradient","rate of deformation","spin","material derivative"], scene:"velocityGradient"},
+  {part:"Part I – Continuum Mechanics", title:"Velocity Gradient and Material Derivative",
+  lead:"The velocity gradient measures how velocity varies from point to point. Split it into stretching and spin; the material derivative follows a particle through that field.",
+  bullets:[
+    "The figure is a continuum element under L. Shear, vorticity, and dilatation are independent sliders. The red particle is advected by v = L x — a pathline, the material derivative of position."
+  ], flow:[
+    {
+      section:"Velocity Gradient Tensor",
+      lead:"L quantifies the spatial variation of velocity v(x, t) across the continuum.",
+      items:[
+        {
+          name:"Definition",
+          tex:"\\mathbf{L} = \\nabla\\mathbf{v} = \\dfrac{\\partial v_i}{\\partial x_j} = \\dot{\\mathbf{F}}\\,\\mathbf{F}^{-1}",
+          body:"The last equality is the referential form: L is the spatial velocity gradient and also Ḟ F⁻¹. Rigid translation never appears in L."
+        },
+        {
+          name:"Stretching and spin",
+          tex:"\\mathbf{L}=\\mathbf{D}+\\mathbf{W},\\qquad \\mathbf{D}=\\tfrac12(\\mathbf{L}+\\mathbf{L}^{\\mathsf T}),\\qquad \\mathbf{W}=\\tfrac12(\\mathbf{L}-\\mathbf{L}^{\\mathsf T})",
+          body:"D is the strain-rate (rate-of-deformation) tensor: stretching and shearing. W is the spin: rigid rotation, equivalent to vorticity. From the polar factor, L = R (Ũ U⁻¹) Rᵀ + Ṙ Rᵀ — stretching rotated into the current placement, plus pure spin."
+        }
+      ]
+    },
+    {
+      section:"Material Derivative",
+      lead:"The time rate of a field following a moving particle (Lagrangian) written in a fixed spatial frame (Eulerian).",
+      items:[
+        {
+          name:"Local plus convective",
+          tex:"\\dfrac{\\mathrm{D}}{\\mathrm{D}t} = \\dfrac{\\partial}{\\partial t} + \\mathbf{v}\\cdot\\nabla",
+          body:"The local (unsteady) term is the change at a fixed place. The convective (advective) term is the change from moving through a spatial gradient."
+        },
+        {
+          name:"Material acceleration",
+          tex:"\\mathbf{a} = \\dfrac{\\mathrm{D}\\mathbf{v}}{\\mathrm{D}t} = \\dfrac{\\partial\\mathbf{v}}{\\partial t} + (\\mathbf{v}\\cdot\\nabla)\\mathbf{v}",
+          body:"Mass balance and the chain rule for F both use the same derivative. In the figure the red path is Dx/Dt = v(x,t)."
+        }
+      ]
+    }
+  ], tags:["velocity gradient","rate of deformation","spin","material derivative","vorticity","dilatation","pathline"], scene:"velocityGradient", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Cauchy Stress and Traction",
   lead:"Independent derivation of the traction vector, Cauchy’s stress theorem, and the split of t into normal and shear on a cut.",
   bullets:[
@@ -2372,7 +2400,7 @@ function renderTopicScene(topic){
     tractionCut: {src:'traction-cut.html', title:'Interactive Cauchy inspector: rotate the cut (θ, φ), change σ, and split t = σ n into normal and shear.', tall:true, flush:true},
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
     hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Hydrostatic and deviatoric strain'},
-    velocityGradient: {src:'velocity-gradient.html', title:'Rate of deformation and spin'},
+    velocityGradient: {src:'velocity-gradient.html', title:'Continuum element under L = D + W. Sliders set shear, spin, and dilatation; the red pathline is the material derivative of position.', tall:true, flush:true},
     vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
@@ -3672,7 +3700,7 @@ const PART_I_LEAD = {
   "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
   "Finite Strain Measures": "Green–Lagrange, Almansi, and the one-dimensional stretch measures that agree only as λ → 1.",
   "Principal Stretches and Invariants": "The eigenvalues of U, the invariants of C, and the split into change of volume and change of shape.",
-  "Velocity Gradient and Material Derivative": "Rates of those fields: stretching D, spin W, and the derivative that follows a particle.",
+  "Velocity Gradient and Material Derivative": "L = D + W: stretching, spin, and the material derivative that follows a particle.",
   "Cauchy Stress and Traction": "Force per current area on a cut: t = σ n, split into normal and shear. The figure lets you turn the plane and change σ.",
   "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
   "Constitutive Models": "Balance does not determine stress; a constitutive map says what the material may remember.",
