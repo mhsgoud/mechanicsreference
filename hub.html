@@ -328,6 +328,12 @@
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
     }
     .scene-frame-tall{height:min(84vh,720px)}
+    .scene-frame-flush{
+      margin-top:0;border:0;height:min(88vh,860px);
+    }
+    .figure-section.flush{
+      margin-top:1.1rem;padding-top:0.7rem;
+    }
     .figure-caption{margin:0 0 4px;font-size:0.9rem;color:var(--muted)}
     .figure-grid{
       display:grid;
@@ -2330,7 +2336,7 @@ const content = document.getElementById('content');
 
 function renderTopicScene(topic){
   const pages = {
-    continuumKinematics: {src:'continuum-kinematics.html', title:'Motion χ(X,t): pick a material point on the reference body, play the path line, and read F = ∂x/∂X.', tall:true},
+    continuumKinematics: {src:'continuum-kinematics.html', title:'Motion χ(X,t): pick a material point on the reference body, play the path line, and read F = ∂x/∂X.', tall:true, flush:true},
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
     linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
     polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},
@@ -2381,9 +2387,9 @@ function renderTopicScene(topic){
     const page = pages[key];
     if(!page) return '';
     const heading = keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1));
-    const frameClass = page.tall ? 'scene-frame scene-frame-tall' : 'scene-frame';
+    const frameClass = ['scene-frame', page.tall ? 'scene-frame-tall' : '', page.flush ? 'scene-frame-flush' : ''].filter(Boolean).join(' ');
     return `
-<section class="figure-section" aria-label="${page.title}">
+<section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
   <iframe class="${frameClass}" title="${page.title}" src="${page.src}" loading="lazy"></iframe>

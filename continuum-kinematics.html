@@ -26,17 +26,17 @@
     h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
     .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
     .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden}
-    #stage{position:relative;height:min(80vh,720px);min-height:560px;background:var(--plate);user-select:none}
-    #stage canvas{display:block;width:100%;height:100%}
+    #stage{position:relative;height:min(80vh,720px);min-height:560px;background:var(--plate);user-select:none;overflow:hidden}
+    #stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
     #labels-container{position:absolute;inset:0;pointer-events:none;overflow:hidden}
     .label3d{
       position:absolute;color:#fff;font:700 12px "Source Sans 3",sans-serif;
       padding:2px 6px;background:rgba(15,23,42,.75);border:1px solid rgba(255,255,255,.2);
-      border-radius:4px;white-space:nowrap;transform:translate(-50%,-100%);
+      white-space:nowrap;transform:translate(-50%,-100%);
     }
     #ui-container{
-      position:absolute;z-index:4;top:14px;left:14px;width:min(310px,calc(100% - 28px));
-      padding:14px;border:1px solid #334155;background:rgba(15,23,42,.92);color:#e2e8f0;
+      position:absolute;z-index:4;top:0;left:0;width:min(280px,calc(100% - 16px));
+      padding:10px 12px;border:1px solid #334155;border-top:0;border-left:0;background:rgba(15,23,42,.94);color:#e2e8f0;
     }
     #ui-container h3{margin:0 0 6px;font-size:.95rem;color:var(--accent)}
     #ui-container p{margin:0 0 10px;font-size:.72rem;line-height:1.4;color:#94a3b8}
@@ -54,10 +54,10 @@
     .matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:#0f172a;text-align:center}
     footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
-    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0;overflow:hidden}
     @media(max-width:700px){
       header,.wrap,footer{padding-left:18px;padding-right:18px}
       .brand-logo{height:44px}
@@ -122,12 +122,15 @@
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.set(7, 7, 13);
+    camera.position.set(3.6, 2.4, 7.2);
     const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     stage.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    controls.target.set(0.35, 0.25, 0);
+    controls.minDistance = 4;
+    controls.maxDistance = 14;
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -269,6 +272,7 @@
       labelP0.pos.copy(P0);
       labelP.pos.copy(Pt);
       labelU.pos.copy(P0).add(Pt).multiplyScalar(0.5);
+      controls.target.set(0.35 + 1.75 * t, 0.25 + 0.9 * t, 0.6 * t);
       document.getElementById('valX').textContent = `[${P0.x.toFixed(2)}, ${P0.y.toFixed(2)}, ${P0.z.toFixed(2)}]`;
       document.getElementById('valx').textContent = `[${Pt.x.toFixed(2)}, ${Pt.y.toFixed(2)}, ${Pt.z.toFixed(2)}]`;
       document.getElementById('valu').textContent = P0.distanceTo(Pt).toFixed(3);
