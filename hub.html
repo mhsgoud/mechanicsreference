@@ -1368,12 +1368,50 @@ const topics = [
     "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Energy balance introduces temperature and heat flux; mechanical theories often close it later, after momentum and a constitutive law are already on the table.",
     "The figure is a body on a small support. Reactions and free-surface tractions close the global momentum balance while the local equation holds in the interior."
   ], tags:["balance","momentum","energy","mass","Cauchy","traction","Piola"], scene:"linearMomentum"},
-  {part:"Part I – Continuum Mechanics", title:"Constitutive Models", bullets:[
-    "Balance laws do not determine the stress. A constitutive model relates stress to the history of deformation: Hooke’s law for small elastic strain, hyperelasticity for finite elastic strain, viscoelasticity when rate matters, and plasticity when unloading leaves a permanent set.",
-    "Every model is constrained by the same list of requirements. It must be independent of the observer (objectivity), it must not produce energy in a closed cycle unless that energy is accounted for as heat or as stored energy, and it must have a well-posed initial-boundary-value problem. The Clausius–Duhem inequality is the usual filter for the last two.",
-    "The same momentum equation describes a fluid once Newton’s law of viscosity replaces Hooke’s law. The choice of model is the choice of what the material is allowed to forget: an elastic solid remembers only the current stretch; a plastic solid remembers a yield surface and a plastic strain; a fluid remembers nothing of the reference placement.",
-    "The isotropic linear solid is the first closure: σ = λ tr(ε) I + 2μ ε. Substituting it into Cauchy’s first law produces the Navier–Cauchy equation of elastodynamics, with P- and S-waves at finite speeds — Hooke’s Law writes that substitution out. Coupled continua keep the same momentum balance and add temperature (thermoelasticity) or pore pressure (Biot); Fluids and Thermodynamics of Continua are those closures."
-  ], tags:["elasticity","plasticity","viscoelasticity","hyperelasticity","Hooke","Navier-Cauchy"]},
+  {part:"Part I – Continuum Mechanics", title:"Constitutive Models",
+  lead:"Constitutive models define the mathematical laws governing how materials respond to mechanical loads, thermal variations, and environmental conditions. This reference covers classical continuum foundations, non-linear stress–strain relationships, numerical implementations, and parameter identification across material regimes.",
+  bullets:[
+    "The figure is a continuum mesh under a time-varying strain field. Balance does not determine the stress on that mesh; a constitutive map does. The later topics take each regime in turn."
+  ], flow:[
+    {
+      section:"Material regimes",
+      lead:"The same momentum equation is closed by different maps from kinematics to stress. The choice is what the material is allowed to forget.",
+      items:[
+        {
+          name:"Linear elasticity",
+          tex:"\\boldsymbol{\\sigma} = \\lambda\\,(\\mathrm{tr}\\,\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\boldsymbol{\\varepsilon}",
+          body:"Hooke’s law for small elastic strain. Substituting it into Cauchy’s first law produces the Navier–Cauchy equation, with P- and S-waves at finite speeds. Hooke’s Law writes that substitution out."
+        },
+        {
+          name:"Hyperelasticity",
+          tex:"\\mathbf{S} = \\dfrac{\\partial W}{\\partial\\mathbf{E}}",
+          body:"Finite, reversible elastic strain from a stored-energy function. Rubber and tissue live here. Hyperelasticity develops the energy, incompressibility, and the steel-versus-rubber comparison."
+        },
+        {
+          name:"Elastoplasticity",
+          body:"Unloading leaves a permanent set. The elastic strain is recoverable; the plastic strain is a history. Metal Plasticity is the yield surface, associated flow, and the return map."
+        },
+        {
+          name:"Viscoelasticity",
+          body:"Rate matters: the stress depends on the history of strain, not only on its current value. A fluid is the extreme case — Newton’s viscosity replaces Hooke’s law and the reference placement is forgotten."
+        },
+        {
+          name:"Finite strain",
+          body:"When stretches or rotations are not small, the constitutive map must be written on F (or C, or E) and must be objective. A model that is not frame-indifferent invents stress from a rigid rotation. Objective Rates and Work-Conjugate Stresses are that bookkeeping."
+        }
+      ]
+    },
+    {
+      section:"What every model must satisfy",
+      lead:"Every constitutive law is filtered by the same list, independent of how the problem will later be discretized.",
+      items:[
+        {
+          name:"Objectivity and dissipation",
+          body:"The response must be independent of the observer. It must not produce energy in a closed cycle unless that energy is accounted for as heat or as stored energy. The Clausius–Duhem inequality is the usual filter. The initial-boundary-value problem that remains must be well posed."
+        }
+      ]
+    }
+  ], tags:["linear elasticity","hyperelasticity","elastoplasticity","viscoelasticity","finite strain","Hooke","objectivity"], scene:"constitutiveModels", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Work-Conjugate Stresses", bullets:[
     "Power per reference volume can be written in several equivalent ways. Cauchy stress is conjugate to the rate of deformation D, up to the factor J: τ : D with Kirchhoff stress τ = J σ. The first Piola–Kirchhoff stress P = J σ F⁻ᵀ is conjugate to Ḟ. The second Piola–Kirchhoff stress S = F⁻¹ P is conjugate to Ė.",
     "Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain, or an unrotated rate of σ with D, produces spurious dissipation in a rigid rotation.",
@@ -2608,6 +2646,7 @@ function renderTopicScene(topic){
     tractionCut: {src:'traction-cut.html', title:'Interactive Cauchy inspector: rotate the cut (θ, φ), change σ, and split t = σ n into normal and shear.', tall:true, flush:true},
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
     hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Unit cube scaled by the principal stretches λ₁, λ₂, λ₃. The readout is I₁, I₂, I₃ of C and the volume ratio J; lock J = 1 for an incompressible motion.', flush:true},
+    constitutiveModels: {src:'constitutive-models.html', title:'A continuum mesh under a time-varying strain field. The constitutive map is what turns that deformation into stress.', flush:true},
     velocityGradient: {src:'velocity-gradient.html', title:'Continuum element under L = D + W. Sliders set shear, spin, and dilatation; the red pathline is the material derivative of position.', tall:true, flush:true},
     vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
@@ -3913,7 +3952,7 @@ const PART_I_LEAD = {
   "Velocity Gradient and Material Derivative": "L = D + W: stretching, spin, and the material derivative that follows a particle.",
   "Cauchy Stress and Traction": "Force per current area on a cut: t = σ n, split into normal and shear. The figure lets you turn the plane and change σ.",
   "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
-  "Constitutive Models": "Balance does not determine stress; a constitutive map says what the material may remember.",
+  "Constitutive Models": "The maps from kinematics to stress: linear elasticity, hyperelasticity, elastoplasticity, viscoelasticity, and finite strain.",
   "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
   "Principal Stresses and von Mises": "Principal stresses, Mohr’s circles, and the von Mises and Tresca yield checks on the same stress state.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",

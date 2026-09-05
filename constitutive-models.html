@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Constitutive Models — Mechanics Reference</title>
+  <meta name="description" content="A continuum mesh under a time-varying strain field: the constitutive map is what turns that deformation into stress." />
+  <link rel="canonical" href="https://mechanicsreference.com/constitutive-models.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0b1120;--accent:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden;color:#e2e8f0}
+    #stage{height:min(56vh,480px);min-height:360px}
+    #three-canvas{position:relative;height:100%;background:var(--plate)}
+    #three-canvas canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%}
+    .caption{
+      position:absolute;z-index:3;left:0;bottom:0;padding:8px 12px;
+      background:rgba(15,23,42,.92);border-top:1px solid #334155;border-right:1px solid #334155;
+      font-size:.72rem;color:#94a3b8;pointer-events:none;
+    }
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+    }
+  </style>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#constitutive-models">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#constitutive-models">Constitutive models</a></p>
+      <h1>Constitutive models</h1>
+      <p class="standfirst">A continuum mesh under a time-varying strain field. Balance does not determine the stress; a constitutive map does — linear elastic, hyperelastic, plastic, or viscous.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage">
+        <div id="three-canvas" aria-label="Interactive continuum mesh deformation">
+          <div class="caption">Continuum mesh under a time-varying strain field</div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#constitutive-models">Constitutive models</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+    const container = document.getElementById('three-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1120);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(3, 3, 5);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+    controls.minDistance = 3;
+    controls.maxDistance = 10;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.15);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+
+    const width = 2, height = 2, depth = 2, segments = 12;
+    const geometry = new THREE.BoxGeometry(width, height, depth, segments, segments, segments);
+    const originalPositions = geometry.attributes.position.clone();
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+      color: 0x1e293b,
+      emissive: 0x0f172a,
+      specular: 0x38bdf8,
+      shininess: 100,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.85
+    }));
+    scene.add(mesh);
+    const boxHelper = new THREE.BoxHelper(mesh, 0x334155);
+    scene.add(boxHelper);
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clock = new THREE.Clock();
+    let running = !reduce;
+    document.addEventListener('visibilitychange', () => { running = !document.hidden && !reduce; });
+
+    function deform(t){
+      const positions = geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++){
+        const x0 = originalPositions.getX(i);
+        const y0 = originalPositions.getY(i);
+        const z0 = originalPositions.getZ(i);
+        positions.setXYZ(
+          i,
+          x0 + 0.15 * Math.sin(t * 2 + y0) * (y0 / height),
+          y0 + 0.1 * Math.cos(t * 1.5 + x0),
+          z0 + 0.15 * Math.sin(t * 2 + z0)
+        );
+      }
+      positions.needsUpdate = true;
+      geometry.computeVertexNormals();
+      mesh.rotation.y = t * 0.2;
+      boxHelper.update();
+    }
+
+    function resize(){
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(container);
+    resize();
+    deform(reduce ? 1.2 : 0);
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      if (running) deform(clock.getElapsedTime());
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
