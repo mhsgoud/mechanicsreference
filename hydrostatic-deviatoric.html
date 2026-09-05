@@ -3,43 +3,64 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hydrostatic and Deviatoric Strain — Mechanics Reference</title>
-  <meta name="description" content="Volume change without shape change, then shape change at constant volume. The same split applies to stress." />
+  <title>Principal Stretches and Invariants — Mechanics Reference</title>
+  <meta name="description" content="Interactive principal stretches: scale a reference cube by λ₁, λ₂, λ₃ and read the invariants of C and the volume ratio J." />
   <link rel="canonical" href="https://mechanicsreference.com/hydrostatic-deviatoric.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0a0f1d;--accent:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
-    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
-    #stage canvas{display:block;width:100%;height:100%}
-    #ui{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
-    #formula,#phase{margin:0}
-    #formula{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--navy)}
-    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
-    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
-    html.embed,html.embed body{height:100%;background:var(--plate)}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden;color:#e2e8f0}
+    #stage{height:min(56vh,480px);min-height:360px}
+    #three-canvas{position:relative;height:100%;background:var(--plate)}
+    #three-canvas canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%}
+    #readout{
+      position:absolute;z-index:3;top:0;left:0;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-right:1px solid #334155;border-bottom:1px solid #334155;
+      font:12px/1.5 "JetBrains Mono",ui-monospace,monospace;pointer-events:none;
+    }
+    #readout strong{display:block;margin-bottom:4px;font:700 11px "Source Sans 3",sans-serif;color:var(--accent)}
+    #readout div{color:#e2e8f0}
+    #readout span{color:var(--accent)}
+    #dash{
+      position:absolute;z-index:3;top:0;right:0;width:min(270px,48%);
+      display:flex;flex-direction:column;gap:10px;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-left:1px solid #334155;border-bottom:1px solid #334155;
+    }
+    .control{font-size:.75rem;color:#cbd5e1}
+    .control label{display:flex;justify-content:space-between;margin-bottom:4px}
+    .control span{font:500 .74rem "JetBrains Mono",ui-monospace,monospace;color:var(--accent)}
+    .control input[type=range]{width:100%;accent-color:var(--accent)}
+    .lock{display:flex;align-items:center;gap:8px;font-size:.75rem;color:#cbd5e1}
+    .lock input{accent-color:var(--accent)}
+    .control.locked{opacity:.45}
+    .control.locked input{pointer-events:none}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed #stage{flex:1;height:auto}
-    html.embed #ui{background:#fff}
-    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #dash{width:min(210px,52%)}
+    }
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -49,85 +70,159 @@
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#principal-stretches-and-invariants">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#principal-stretches-and-invariants">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
-      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#principal-stretches-and-invariants">Invariants</a></p>
-      <h1>Volume and shape</h1>
-      <p class="standfirst">The hydrostatic part of a strain changes volume and leaves the shape. The deviator changes the shape and leaves the volume. The same split on stress is the path to von Mises: metals yield on the deviator.</p>
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#principal-stretches-and-invariants">Principal stretches</a></p>
+      <h1>Principal stretches and invariants</h1>
+      <p class="standfirst">Change λ₁, λ₂, and λ₃. The cube stretches along the principal axes; the readout is I₁, I₂, I₃ of C and the volume ratio J. Lock J = 1 to keep the deformation incompressible.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage"></div>
-      <div id="ui">
-        <p id="formula">ε = (tr ε / 3) I + ε′</p>
-        <p id="phase"></p>
+      <div id="stage">
+        <div id="three-canvas" aria-label="Interactive principal-stretch visualizer">
+          <div id="readout">
+            <strong>Invariants of C</strong>
+            <div>I₁ <span id="val-i1">3.890</span></div>
+            <div>I₂ <span id="val-i2">4.330</span></div>
+            <div>I₃ <span id="val-i3">1.440</span></div>
+            <div>J <span id="val-j">1.200</span></div>
+          </div>
+          <div id="dash">
+            <div class="control">
+              <label>λ₁ (X) <span id="l1-val">1.50</span></label>
+              <input type="range" id="lambda1" min="0.2" max="3" step="0.05" value="1.5">
+            </div>
+            <div class="control">
+              <label>λ₂ (Y) <span id="l2-val">1.00</span></label>
+              <input type="range" id="lambda2" min="0.2" max="3" step="0.05" value="1">
+            </div>
+            <div class="control" id="l3-wrap">
+              <label>λ₃ (Z) <span id="l3-val">0.80</span></label>
+              <input type="range" id="lambda3" min="0.2" max="3" step="0.05" value="0.8">
+            </div>
+            <label class="lock"><input type="checkbox" id="incompressible"> Lock incompressible (J = 1)</label>
+          </div>
+        </div>
       </div>
     </div>
   </main>
-  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#principal-stretches-and-invariants">Invariants</a></span></div></footer>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#principal-stretches-and-invariants">Principal stretches</a></span></div></footer>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-    const stage = document.getElementById('stage');
-    const phase = document.getElementById('phase');
+    const state = {lambda1: 1.5, lambda2: 1.0, lambda3: 0.8, incompressible: false};
+    const container = document.getElementById('three-canvas');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-    camera.position.set(5.2, 3.2, 6.4);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
+    scene.background = new THREE.Color(0x0a0f1d);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(4, 3, 5);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-    const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    stage.appendChild(labels.domElement);
+    container.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; controls.target.set(0, 0.2, 0);
-    scene.add(new THREE.HemisphereLight(0xc9d6ee, 0x1a2740, 1.7));
-    const key = new THREE.DirectionalLight(0xffffff, 1.5); key.position.set(3,6,4); scene.add(key);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+    controls.minDistance = 2.5;
+    controls.maxDistance = 12;
 
-    function box(color) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({color, roughness:0.7, transparent:true, opacity:0.92}));
-      scene.add(m);
-      scene.add(new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({color:0xf4efe6, transparent:true, opacity:0.35})));
-      return m;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+    scene.add(new THREE.AxesHelper(1.6));
+
+    const refLine = new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)),
+      new THREE.LineBasicMaterial({color: 0x64748b})
+    );
+    scene.add(refLine);
+
+    const defMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshPhongMaterial({color: 0x38bdf8, transparent: true, opacity: 0.55, depthWrite: false})
+    );
+    defMesh.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1)),
+      new THREE.LineBasicMaterial({color: 0x0284c7})
+    ));
+    scene.add(defMesh);
+
+    const dirX = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), 1, 0xef4444);
+    const dirY = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 1, 0x22c55e);
+    const dirZ = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 1, 0x3b82f6);
+    scene.add(dirX, dirY, dirZ);
+
+    const el = {
+      i1: document.getElementById('val-i1'),
+      i2: document.getElementById('val-i2'),
+      i3: document.getElementById('val-i3'),
+      j: document.getElementById('val-j'),
+      l1: document.getElementById('l1-val'),
+      l2: document.getElementById('l2-val'),
+      l3: document.getElementById('l3-val'),
+      s1: document.getElementById('lambda1'),
+      s2: document.getElementById('lambda2'),
+      s3: document.getElementById('lambda3'),
+      wrap3: document.getElementById('l3-wrap'),
+      lock: document.getElementById('incompressible')
+    };
+
+    function update(){
+      const l1 = state.lambda1, l2 = state.lambda2, l3 = state.lambda3;
+      defMesh.scale.set(l1, l2, l3);
+      dirX.setLength(l1 * 0.75 + 0.25);
+      dirY.setLength(l2 * 0.75 + 0.25);
+      dirZ.setLength(l3 * 0.75 + 0.25);
+      const a = l1 * l1, b = l2 * l2, c = l3 * l3;
+      el.i1.textContent = (a + b + c).toFixed(3);
+      el.i2.textContent = (a * b + b * c + c * a).toFixed(3);
+      el.i3.textContent = (a * b * c).toFixed(3);
+      el.j.textContent = (l1 * l2 * l3).toFixed(3);
+      el.l1.textContent = l1.toFixed(2);
+      el.l2.textContent = l2.toFixed(2);
+      el.l3.textContent = l3.toFixed(2);
+      el.s3.value = String(Math.min(3, Math.max(0.2, l3)));
     }
-    const left = box(0x7eabdc); left.position.x = -1.7;
-    const right = box(0xe39a4a); right.position.x = 1.7;
-    const ghostL = box(0x7eabdc); ghostL.material.opacity = 0.12; ghostL.position.x = -1.7;
-    const ghostR = box(0xe39a4a); ghostR.material.opacity = 0.12; ghostR.position.x = 1.7;
 
-    function tag(text, pos) {
-      const d=document.createElement('div'); d.className='label'; d.textContent=text;
-      const o=new CSS2DObject(d); o.position.copy(pos); scene.add(o);
+    function enforceIncompressibility(){
+      state.lambda3 = 1 / (state.lambda1 * state.lambda2);
+      update();
     }
-    tag('hydrostatic', new THREE.Vector3(-1.7, 1.55, 0));
-    tag('deviatoric', new THREE.Vector3(1.7, 1.55, 0));
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clock = new THREE.Clock();
-    let running = !reduce;
-    document.addEventListener('visibilitychange', ()=>{ running = !document.hidden && !reduce; });
-
-    function frame(t) {
-      const s = 0.5 + 0.5*Math.sin(t*0.85);
-      const vol = 1 + 0.28*s;
-      left.scale.setScalar(vol);
-      const λ = 1 + 0.45*s;
-      const μ = 1 / Math.sqrt(λ);
-      right.scale.set(λ, μ, μ);
-      phase.textContent = `Left J = ${ (vol**3).toFixed(2) } (shape fixed).  Right J = 1 (volume fixed).`;
+    function onLambdaChange(){
+      if (state.incompressible) enforceIncompressibility();
+      else update();
     }
-    function resize(){ const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); labels.setSize(w,h); }
-    new ResizeObserver(resize).observe(stage); resize();
-    frame(reduce ? 1.2 : 0);
-    (function loop(){ requestAnimationFrame(loop); if(running) frame(clock.getElapsedTime()); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+
+    el.s1.addEventListener('input', (e) => { state.lambda1 = parseFloat(e.target.value); onLambdaChange(); });
+    el.s2.addEventListener('input', (e) => { state.lambda2 = parseFloat(e.target.value); onLambdaChange(); });
+    el.s3.addEventListener('input', (e) => { state.lambda3 = parseFloat(e.target.value); update(); });
+    el.lock.addEventListener('change', (e) => {
+      state.incompressible = e.target.checked;
+      el.wrap3.classList.toggle('locked', state.incompressible);
+      el.s3.disabled = state.incompressible;
+      if (state.incompressible) enforceIncompressibility();
+    });
+    update();
+
+    function resize(){
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(container);
+    resize();
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
   </script>
 </body>
 </html>

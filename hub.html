@@ -1165,12 +1165,68 @@ const topics = [
     {name:"Green–Lagrange strain", expr:"E = ½(FᵀF − I)", tex:"\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)", note:"Lives on the reference placement. Vanishes in a rigid motion. When displacement gradients are small, the quadratic terms drop and E reduces to infinitesimal strain."},
     {name:"Almansi strain", expr:"e = ½(I − b⁻¹)", tex:"\\mathbf{e} = \\tfrac{1}{2}\\bigl(\\mathbf{I} - \\mathbf{b}^{-1}\\bigr)", note:"The spatial counterpart, with b = F Fᵀ. Same rigid-motion test, written on the current placement."}
   ], tags:["Green-Lagrange","Almansi","logarithmic strain","engineering strain","stretch"], scene:"rotationStrain"},
-  {part:"Part I – Continuum Mechanics", title:"Principal Stretches and Invariants", bullets:[
-    "The eigenvalues of U are the principal stretches λᵢ. The invariants of C (or of b) are I₁ = tr C, I₂ = ½[(tr C)² − tr(C²)], I₃ = det C = J². Isotropic hyperelastic laws are functions of those three numbers.",
-    "Hydrostatic, or volumetric, strain is the part that changes volume; the deviator is the rest, which changes shape at constant volume. In the small-strain limit the split is ε = (tr ε/3) I + ε′. The same split on stress is the path to von Mises.",
-    "A pure rotation leaves every invariant of C equal to that of I. A computation that reports strain after a large rotation but a small stretch has usually used a measure that still contains R.",
-    "The two blocks split that idea: the left changes volume and keeps its shape; the right changes shape and keeps its volume."
-  ], tags:["invariants","principal stretch","hydrostatic","deviatoric","J"], scene:"hydroDeviator"},
+  {part:"Part I – Continuum Mechanics", title:"Principal Stretches and Invariants",
+  lead:"Principal stretches are the pure extension or compression ratios along mutually orthogonal principal axes, with rigid rotation removed. The principal invariants are the scalar measures of that stretch state that do not change when the basis is rotated.",
+  bullets:[
+    "The figure is a reference unit cube scaled by λ₁, λ₂, λ₃ along the principal axes. The live numbers are I₁, I₂, I₃ of C and the volume ratio J. Lock J = 1 to keep the motion incompressible."
+  ], flow:[
+    {
+      section:"Kinematic Foundations",
+      lead:"The right Cauchy–Green tensor is built from F. Because C is symmetric and positive-definite, its eigenvalues are the squared principal stretches.",
+      items:[
+        {
+          name:"Right Cauchy–Green tensor",
+          tex:"\\mathbf{C} = \\mathbf{F}^{\\mathsf T}\\mathbf{F},\\qquad F_{ij}=\\dfrac{\\partial x_i}{\\partial X_j}",
+          body:"C is frame-invariant and lives on the reference configuration. A pure rotation leaves C = I."
+        },
+        {
+          name:"Principal stretches",
+          tex:"\\mathbf{C}\\,\\mathbf{N}_i = \\lambda_i^2\\,\\mathbf{N}_i",
+          body:"The eigenvalues λᵢ² of C are the squares of the principal stretches λ₁, λ₂, λ₃. Those stretches are the pure extension or compression ratios along the mutually orthogonal principal axes Nᵢ."
+        },
+        {
+          name:"Spectral form",
+          tex:"\\mathbf{C} = \\sum_{i=1}^{3}\\lambda_i^2\\,(\\mathbf{N}_i\\otimes\\mathbf{N}_i)",
+          body:"The deformation is a stretch along three principal directions, with no rigid rotation left in C."
+        }
+      ]
+    },
+    {
+      section:"Principal Invariants",
+      lead:"The characteristic equation of C yields three coordinate-independent scalars — the principal invariants.",
+      items:[
+        {
+          name:"Characteristic equation",
+          tex:"\\det(\\mathbf{C}-\\gamma\\mathbf{I}) = -\\gamma^3 + I_1\\gamma^2 - I_2\\gamma + I_3 = 0",
+          body:"I₁, I₂, and I₃ do not change under a rotation of the basis. Isotropic hyperelastic stored-energy functions are written in these three numbers."
+        },
+        {
+          name:"First invariant I₁",
+          tex:"I_1 = \\mathrm{tr}(\\mathbf{C}) = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2",
+          body:"Sum of the squared stretch ratios. It measures overall distortion."
+        },
+        {
+          name:"Second invariant I₂",
+          tex:"I_2 = \\tfrac12\\bigl[(\\mathrm{tr}\\,\\mathbf{C})^2-\\mathrm{tr}(\\mathbf{C}^2)\\bigr] = \\lambda_1^2\\lambda_2^2+\\lambda_2^2\\lambda_3^2+\\lambda_3^2\\lambda_1^2",
+          body:"A measure of the change in surface areas."
+        },
+        {
+          name:"Third invariant I₃",
+          tex:"I_3 = \\det(\\mathbf{C}) = \\lambda_1^2\\lambda_2^2\\lambda_3^2 = J^2",
+          body:"Square of the volumetric change ratio J = det F. For incompressible materials (rubber, many tissues) volume is conserved, so J = 1 and I₃ = 1."
+        }
+      ]
+    }
+  ], table:{
+    heading:"Principal invariants of C",
+    caption:"The same three scalars written in C and in the principal stretches.",
+    columns:["Invariant","In C","In principal stretches","Meaning"],
+    rows:[
+      ["I₁","tr(C)","λ₁² + λ₂² + λ₃²","Overall distortion"],
+      ["I₂","½[(tr C)² − tr(C²)]","λ₁²λ₂² + λ₂²λ₃² + λ₃²λ₁²","Change of area"],
+      ["I₃","det(C)","λ₁² λ₂² λ₃² = J²","Squared volume ratio"]
+    ]
+  }, tags:["invariants","principal stretch","Cauchy-Green","Jacobian","incompressible","I1","I2","I3"], scene:"hydroDeviator", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Velocity Gradient and Material Derivative",
   lead:"The velocity gradient measures how velocity varies from point to point. Split it into stretching and spin; the material derivative follows a particle through that field.",
   bullets:[
@@ -2503,7 +2559,7 @@ function renderTopicScene(topic){
     polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},
     tractionCut: {src:'traction-cut.html', title:'Interactive Cauchy inspector: rotate the cut (θ, φ), change σ, and split t = σ n into normal and shear.', tall:true, flush:true},
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
-    hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Hydrostatic and deviatoric strain'},
+    hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Unit cube scaled by the principal stretches λ₁, λ₂, λ₃. The readout is I₁, I₂, I₃ of C and the volume ratio J; lock J = 1 for an incompressible motion.', flush:true},
     velocityGradient: {src:'velocity-gradient.html', title:'Continuum element under L = D + W. Sliders set shear, spin, and dilatation; the red pathline is the material derivative of position.', tall:true, flush:true},
     vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
     workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
@@ -3805,7 +3861,7 @@ const PART_I_LEAD = {
   "Tensors and the Divergence Theorem": "The bookkeeping of components, and the integral identity that turns volume balance into surface traction.",
   "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
   "Finite Strain Measures": "Green–Lagrange, Almansi, and the one-dimensional stretch measures that agree only as λ → 1.",
-  "Principal Stretches and Invariants": "The eigenvalues of U, the invariants of C, and the split into change of volume and change of shape.",
+  "Principal Stretches and Invariants": "Pure stretch along the principal axes, and the three rotation-invariant scalars of C.",
   "Velocity Gradient and Material Derivative": "L = D + W: stretching, spin, and the material derivative that follows a particle.",
   "Cauchy Stress and Traction": "Force per current area on a cut: t = σ n, split into normal and shear. The figure lets you turn the plane and change σ.",
   "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
