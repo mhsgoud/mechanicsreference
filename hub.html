@@ -1141,13 +1141,60 @@ const topics = [
       ]
     }
   ], tags:["kinematics","deformation","deformation gradient","Jacobian","Cauchy-Green","polar decomposition","Green-Lagrange","Almansi","small strain","velocity gradient","motion","path line"], scenes:["continuumKinematics","deformationGradient"], sceneFirst:true},
-  {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem", bullets:[
-    "Vectors and second-order tensors are the language of the field equations. Components transform when the basis changes; the objects themselves do not. Index notation makes that bookkeeping compact: repeated indices are summed, and a comma denotes a derivative.",
-    "The divergence theorem turns a volume integral of a derivative into a surface integral. For the Cauchy stress it reads ∫ ∇·σ dV = ∫ σ n dA, which is why the local momentum equation and the statement of traction on the boundary are the same balance.",
-    "Coordinate transformations of a vector use a single rotation matrix; those of a stress or strain use the matrix on both sides. Principal directions are the eigenvectors of that tensor, independent of the basis in which it was first written."
-  ], equations:[
-    {name:"Divergence theorem (Cauchy stress)", expr:"∫_Ω ∇·σ dV = ∫_∂Ω σ n dA", tex:"\\int_{\\Omega}\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}\\,\\mathrm{d}V = \\int_{\\partial\\Omega}\\boldsymbol{\\sigma}\\,\\mathbf{n}\\,\\mathrm{d}A", note:"Turns a volume integral of a derivative into a surface integral. This is why the local momentum equation and the statement of traction on the boundary are the same balance."}
-  ], tags:["tensor","index notation","divergence theorem","transformation"]},
+  {part:"Part I – Continuum Mechanics", title:"Tensors and the Divergence Theorem",
+  lead:"The divergence theorem bridges local balance laws and boundary behavior: a volume integral of a tensor’s spatial derivative becomes a surface integral of that tensor acting on the outward normal.",
+  bullets:[
+    "The figure is a closed volume in a vector field F. Green arrows are the outward normal n; amber arrows are F. The two numbers are ∫(∇·F) dV and ∯(F·n) dS — they stay equal when you change the shape, the field, or the intensity."
+  ], flow:[
+    {
+      section:"Vector Formulation",
+      lead:"For a continuously differentiable vector field u(x) on a compact volume V bounded by a smooth closed surface S = ∂V with outward unit normal n.",
+      items:[
+        {
+          name:"Gauss’s theorem",
+          tex:"\\iiint_V (\\nabla\\cdot\\mathbf{u})\\,\\mathrm{d}V = \\iint_S (\\mathbf{u}\\cdot\\mathbf{n})\\,\\mathrm{d}S",
+          body:"The net source inside V equals the flux of u through the boundary. A source field has positive divergence; a uniform or purely rotational field has none, so the net flux vanishes."
+        },
+        {
+          name:"Index form",
+          tex:"\\int_V \\dfrac{\\partial u_i}{\\partial x_i}\\,\\mathrm{d}V = \\int_S u_i n_i\\,\\mathrm{d}S",
+          body:"Cartesian coordinates and the Einstein summation convention. A repeated index is summed; the objects themselves do not depend on the basis."
+        }
+      ]
+    },
+    {
+      section:"Tensor Generalization",
+      lead:"Conservation of linear momentum is written with a second-order tensor — the Cauchy stress σ. The same identity holds for any sufficiently smooth tensor field T.",
+      items:[
+        {
+          name:"Divergence of a second-order tensor",
+          tex:"\\iiint_V (\\nabla\\cdot\\mathbf{T})\\,\\mathrm{d}V = \\iint_S (\\mathbf{T}\\cdot\\mathbf{n})\\,\\mathrm{d}S",
+          body:"In components, ∫ (∂Tᵢⱼ/∂xⱼ) dV = ∫ Tᵢⱼ nⱼ dS. The surface term is the traction that the tensor produces on n."
+        },
+        {
+          name:"Cauchy’s stress principle",
+          tex:"\\mathbf{t}^{(\\mathbf{n})} = \\boldsymbol{\\sigma}\\,\\mathbf{n},\\qquad t_i=\\sigma_{ij}n_j",
+          body:"The traction on a surface element with normal n is the linear map of that normal. This is why ∇·σ in the volume and t on the boundary are the same balance."
+        },
+        {
+          name:"Linear momentum (quasi-static)",
+          tex:"\\int_V(\\nabla\\cdot\\boldsymbol{\\sigma}+\\mathbf{b})\\,\\mathrm{d}V=\\mathbf{0} \\;\\Longrightarrow\\; \\int_S\\boldsymbol{\\sigma}\\,\\mathbf{n}\\,\\mathrm{d}S + \\int_V\\mathbf{b}\\,\\mathrm{d}V=\\mathbf{0}",
+          body:"Integrating the internal divergence over a body recovers the total external surface force plus the body force b (per unit volume)."
+        }
+      ]
+    },
+    {
+      section:"Index Notation and Higher-Order Tensors",
+      lead:"The same contraction works for an n-th order tensor field A, with the divergence taken on one index.",
+      items:[
+        {
+          name:"General statement",
+          tex:"\\int_V A_{i_1 i_2\\dots k\\dots i_n,k}\\,\\mathrm{d}V = \\int_S A_{i_1 i_2\\dots k\\dots i_n} n_k\\,\\mathrm{d}S",
+          body:"Comma notation is partial differentiation: A_{…,k} ≡ ∂A_{…}/∂x_k. Repeated indices are summed. A vector uses one rotation matrix when the basis changes; a second-order tensor uses the matrix on both sides."
+        }
+      ]
+    }
+  ], tags:["tensor","index notation","divergence theorem","Gauss","flux","Cauchy stress","traction"], scene:"divergenceTheorem", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Polar Decomposition", bullets:[
     "Any invertible F factors uniquely as F = R U = V R, with R a rotation and U, V symmetric positive-definite stretches. U stretches in the reference placement, then R rotates; V stretches in the current placement after the same rotation.",
     "Neither order is more physical than the other. Both describe the same final map. Strain measures that are built from U or from C = U² are blind to R, which is the point: a rigid rotation must not look like stretch.",
@@ -2557,6 +2604,7 @@ function renderTopicScene(topic){
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
     linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
     polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},
+    divergenceTheorem: {src:'divergence-theorem.html', title:'A closed volume in a vector field. Green is n, amber is F; the two integrals stay equal for every shape and field.', flush:true},
     tractionCut: {src:'traction-cut.html', title:'Interactive Cauchy inspector: rotate the cut (θ, φ), change σ, and split t = σ n into normal and shear.', tall:true, flush:true},
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
     hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Unit cube scaled by the principal stretches λ₁, λ₂, λ₃. The readout is I₁, I₂, I₃ of C and the volume ratio J; lock J = 1 for an incompressible motion.', flush:true},
@@ -3858,7 +3906,7 @@ const PART_I_LEAD = {
   "Basic Equations": "The closed list of field equations that the rest of Part I expands, one subject at a time.",
   "Introduction to Continuum Mechanics": "A solid or fluid as a continuous medium: strain, stress, balance laws, constitutive closure, and the pipeline to a finite-element Newton step.",
   "Kinematics of Deformation": "How continuous bodies move, change shape, and rotate — without the forces that produce those motions.",
-  "Tensors and the Divergence Theorem": "The bookkeeping of components, and the integral identity that turns volume balance into surface traction.",
+  "Tensors and the Divergence Theorem": "The identity that turns a volume derivative into a surface flux — the same step that makes ∇·σ and traction one balance.",
   "Polar Decomposition": "Every invertible F splits uniquely into stretch and rotation — so rigid spin is never mistaken for strain.",
   "Finite Strain Measures": "Green–Lagrange, Almansi, and the one-dimensional stretch measures that agree only as λ → 1.",
   "Principal Stretches and Invariants": "Pure stretch along the principal axes, and the three rotation-invariant scalars of C.",

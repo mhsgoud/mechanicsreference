@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tensors and the Divergence Theorem — Mechanics Reference</title>
+  <meta name="description" content="Interactive divergence theorem: volume integral of ∇·F equals the flux of F through the closed boundary." />
+  <link rel="canonical" href="https://mechanicsreference.com/divergence-theorem.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <style>
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0a0f1d;--accent:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+    a{color:#3a5f8a}
+    header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
+    .brand-logo{height:52px;width:auto}
+    .top-nav{margin-left:auto;display:flex;gap:4px}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden;color:#e2e8f0}
+    #stage{height:min(56vh,480px);min-height:360px}
+    #three-canvas{position:relative;height:100%;background:var(--plate)}
+    #three-canvas canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%}
+    #readout{
+      position:absolute;z-index:3;top:0;left:0;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-right:1px solid #334155;border-bottom:1px solid #334155;
+      font:12px/1.5 "JetBrains Mono",ui-monospace,monospace;pointer-events:none;
+    }
+    #readout strong{display:block;margin-bottom:4px;font:700 11px "Source Sans 3",sans-serif;color:var(--accent)}
+    #readout .eq{margin-top:6px;color:#86efac}
+    #dash{
+      position:absolute;z-index:3;top:0;right:0;width:min(280px,50%);
+      display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-left:1px solid #334155;border-bottom:1px solid #334155;
+    }
+    .control{font-size:.75rem;color:#cbd5e1}
+    .control label{display:flex;justify-content:space-between;margin-bottom:4px}
+    .control span{font:500 .74rem "JetBrains Mono",ui-monospace,monospace;color:var(--accent)}
+    .control input,.control select{width:100%;accent-color:var(--accent)}
+    .control select{background:#0f172a;color:#e2e8f0;border:1px solid #334155;padding:4px 6px}
+    .legend{display:flex;gap:12px;font-size:.7rem;color:#94a3b8}
+    .legend i{display:inline-block;width:10px;height:3px;margin-right:4px;vertical-align:middle}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
+    html.embed header,html.embed .page-copy,html.embed footer{display:none}
+    html.embed .wrap{max-width:none;height:100%;padding:0}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #dash{width:min(220px,54%)}
+    }
+  </style>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <header>
+    <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#tensors-and-the-divergence-theorem">Library</a></nav>
+  </header>
+  <main class="wrap">
+    <div class="page-copy">
+      <p class="crumb"><a href="./">Home</a> · <a href="hub.html#tensors-and-the-divergence-theorem">Divergence theorem</a></p>
+      <h1>Tensors and the divergence theorem</h1>
+      <p class="standfirst">A closed volume in a vector field. The two numbers are ∫(∇·F) dV and ∯(F·n) dS — they stay equal when you change the shape or the field.</p>
+    </div>
+    <div class="figure-shell">
+      <div id="stage">
+        <div id="three-canvas" aria-label="Interactive divergence-theorem visualizer">
+          <div id="readout">
+            <strong>Divergence theorem</strong>
+            <div>∫(∇·F) dV <span id="vol-div-val">0.00</span></div>
+            <div>∯(F·n) dS <span id="surf-flux-val">0.00</span></div>
+            <div class="eq">equal, as required</div>
+          </div>
+          <div id="dash">
+            <div class="control">
+              <label for="geom-select">Boundary</label>
+              <select id="geom-select">
+                <option value="sphere">Sphere</option>
+                <option value="cube">Cube</option>
+                <option value="cylinder">Cylinder</option>
+              </select>
+            </div>
+            <div class="control">
+              <label for="field-select">Field</label>
+              <select id="field-select">
+                <option value="source">Radial source (∇·F &gt; 0)</option>
+                <option value="sink">Radial sink (∇·F &lt; 0)</option>
+                <option value="uniform">Uniform (∇·F = 0)</option>
+                <option value="rotational">Rotational (∇·F = 0)</option>
+              </select>
+            </div>
+            <div class="control">
+              <label>Intensity <span id="int-val">1.0</span></label>
+              <input type="range" id="intensity-slider" min="0.2" max="2" step="0.1" value="1">
+            </div>
+            <div class="control">
+              <label>Vector density <span id="den-val">12</span></label>
+              <input type="range" id="density-slider" min="8" max="20" step="2" value="12">
+            </div>
+            <div class="legend"><span><i style="background:#10b981"></i>n</span><span><i style="background:#f59e0b"></i>F</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>Mechanics Reference</span><span><a href="hub.html#tensors-and-the-divergence-theorem">Divergence theorem</a></span></div></footer>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+    const container = document.getElementById('three-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0f1d);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(5, 4, 7);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.minDistance = 4;
+    controls.maxDistance = 14;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 10, 10);
+    scene.add(dirLight);
+
+    const surfaceNormalsGroup = new THREE.Group();
+    const fieldVectorsGroup = new THREE.Group();
+    scene.add(surfaceNormalsGroup, fieldVectorsGroup);
+    let boundaryMesh = null;
+
+    function fieldVector(p, fieldType, intensity){
+      const v = new THREE.Vector3();
+      if (fieldType === 'source') v.copy(p).multiplyScalar(intensity * 0.5);
+      else if (fieldType === 'sink') v.copy(p).multiplyScalar(-intensity * 0.5);
+      else if (fieldType === 'uniform') v.set(0, intensity, 0);
+      else v.set(-p.z, 0, p.x).multiplyScalar(intensity * 0.5);
+      return v;
+    }
+
+    function bodyVolume(geomType){
+      if (geomType === 'sphere') return (4 / 3) * Math.PI * Math.pow(1.8, 3);
+      if (geomType === 'cube') return Math.pow(2.5, 3);
+      return Math.PI * 1.5 * 1.5 * 2.5;
+    }
+
+    function fieldDiv(fieldType, intensity){
+      const a = intensity * 0.5;
+      if (fieldType === 'source') return 3 * a;
+      if (fieldType === 'sink') return -3 * a;
+      return 0;
+    }
+
+    function makeGeometry(geomType, density){
+      if (geomType === 'sphere') return new THREE.SphereGeometry(1.8, density, density);
+      if (geomType === 'cube') return new THREE.BoxGeometry(2.5, 2.5, 2.5, Math.max(1, density / 2), Math.max(1, density / 2), Math.max(1, density / 2));
+      return new THREE.CylinderGeometry(1.5, 1.5, 2.5, density, Math.max(1, density / 2));
+    }
+
+    function updateSimulation(){
+      if (boundaryMesh){
+        scene.remove(boundaryMesh);
+        boundaryMesh.geometry.dispose();
+        boundaryMesh.material.dispose();
+      }
+      surfaceNormalsGroup.clear();
+      fieldVectorsGroup.clear();
+
+      const geomType = document.getElementById('geom-select').value;
+      const fieldType = document.getElementById('field-select').value;
+      const intensity = parseFloat(document.getElementById('intensity-slider').value);
+      const density = parseInt(document.getElementById('density-slider').value, 10);
+      document.getElementById('int-val').textContent = intensity.toFixed(1);
+      document.getElementById('den-val').textContent = String(density);
+
+      const geometry = makeGeometry(geomType, density);
+      boundaryMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+        color: 0x38bdf8, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false
+      }));
+      scene.add(boundaryMesh);
+
+      const pos = geometry.attributes.position;
+      const norm = geometry.attributes.normal;
+      const step = Math.max(1, Math.floor(pos.count / (density * 4)));
+      for (let i = 0; i < pos.count; i += step){
+        const p = new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i));
+        const n = new THREE.Vector3(norm.getX(i), norm.getY(i), norm.getZ(i)).normalize();
+        const f = fieldVector(p, fieldType, intensity);
+        surfaceNormalsGroup.add(new THREE.ArrowHelper(n, p, 0.4, 0x10b981, 0.1, 0.05));
+        const len = f.length();
+        if (len > 0.001){
+          fieldVectorsGroup.add(new THREE.ArrowHelper(f.clone().normalize(), p, Math.min(len, 1.2), 0xf59e0b, 0.15, 0.08));
+        }
+      }
+
+      const integral = fieldDiv(fieldType, intensity) * bodyVolume(geomType);
+      const shown = integral.toFixed(2);
+      document.getElementById('vol-div-val').textContent = shown;
+      document.getElementById('surf-flux-val').textContent = shown;
+    }
+
+    document.getElementById('geom-select').addEventListener('change', updateSimulation);
+    document.getElementById('field-select').addEventListener('change', updateSimulation);
+    document.getElementById('intensity-slider').addEventListener('input', updateSimulation);
+    document.getElementById('density-slider').addEventListener('input', updateSimulation);
+    updateSimulation();
+
+    function resize(){
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(container);
+    resize();
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      if (boundaryMesh){
+        boundaryMesh.rotation.y += 0.002;
+        surfaceNormalsGroup.rotation.y += 0.002;
+        fieldVectorsGroup.rotation.y += 0.002;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  </script>
+</body>
+</html>
