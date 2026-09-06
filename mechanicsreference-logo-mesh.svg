@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 128" role="img" aria-labelledby="title desc">
+  <title id="title">mechanicsreference.com</title>
+  <desc id="desc">Both letters of the MR monogram are covered by a triangular mesh, including all stems, diagonals, the R bowl and leg.</desc>
+  <defs>
+    <path id="letter-m" d="M8 112V16h22l28 36 28-36h22v96H86V51L58 86 30 51v61Z"/>
+    <path id="letter-r" d="M122 16h47c26 0 40 13 40 34 0 16-9 28-23 33l27 29h-30l-24-27h-14v27h-23Zm23 21v28h22c12 0 19-4 19-14s-7-14-19-14Z"/>
+    <pattern id="mesh-m" width="24" height="20" patternUnits="userSpaceOnUse">
+      <path d="M0 0H24M0 20H24M0 0L12 20L24 0" fill="none" stroke="#265579" stroke-width="1.05"/>
+      <circle cx="0" cy="0" r="1.3" fill="#265579"/><circle cx="24" cy="0" r="1.3" fill="#265579"/><circle cx="12" cy="20" r="1.3" fill="#265579"/>
+    </pattern>
+    <pattern id="mesh-r" width="24" height="20" patternUnits="userSpaceOnUse">
+      <path d="M0 0H24M0 20H24M0 0L12 20L24 0" fill="none" stroke="#b5efff" stroke-width="1.05"/>
+      <circle cx="0" cy="0" r="1.3" fill="#d7f7ff"/><circle cx="24" cy="0" r="1.3" fill="#d7f7ff"/><circle cx="12" cy="20" r="1.3" fill="#d7f7ff"/>
+    </pattern>
+  </defs>
+  <use href="#letter-m" fill="#edf6ff"/>
+  <use href="#letter-r" fill="#348bee"/>
+  <use href="#letter-m" fill="url(#mesh-m)"/>
+  <use href="#letter-r" fill="url(#mesh-r)"/>
+  <use href="#letter-m" fill="none" stroke="#edf6ff" stroke-width="1"/>
+  <use href="#letter-r" fill="none" stroke="#93dcff" stroke-width="1"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="-1.6">
+    <text x="238" y="58" fill="#edf6ff" font-size="53">mechanics</text>
+    <text x="238" y="108" fill="#348bee" font-size="44">reference.com</text>
+  </g>
+</svg>

@@ -38,7 +38,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <style>
     :root{
       --paper:#f7f6f2;
@@ -63,46 +63,105 @@
     a{color:var(--blue)}
     a:hover{color:var(--accent)}
 
-    header{
-      position:sticky;top:0;z-index:20;
-      background:#fff;
-      border-bottom:1px solid var(--rule);
-      display:flex;align-items:center;gap:20px;
-      padding:12px 28px;
+    .banner{
+      --ink:#06152d;--blue:#4da3ff;--cyan:#69e6ff;--muted:#a7b8d2;--line:rgba(185,214,255,.18);
+      position:relative;min-height:830px;overflow:hidden;isolation:isolate;
+      background:radial-gradient(circle at 72% 38%, #123662 0, #071b38 24%, #030d20 60%, #010713 100%);
+      color:#f4f8ff;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .brand-logo{display:block;height:52px;width:auto}
-    .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{
-      color:var(--navy);text-decoration:none;
-      font-size:0.92rem;font-weight:600;
-      padding:8px 12px;
+    .banner a{color:inherit}
+    .banner .grid{
+      position:absolute;inset:0;z-index:-1;opacity:.3;
+      background-image:linear-gradient(rgba(120,182,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(120,182,255,.09) 1px,transparent 1px);
+      background-size:68px 68px;
+      mask-image:linear-gradient(90deg,transparent 0%,#000 55%,transparent 100%);
+      transform:perspective(600px) rotateX(64deg) scale(1.8) translateY(31%);
+      transform-origin:center bottom;pointer-events:none;
     }
-    .top-nav a.active{box-shadow:inset 0 -2px 0 var(--accent)}
+    .banner .grain{
+      position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.04;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    }
+    .banner nav,.banner .hero-copy,.banner .eq-stats{
+      position:relative;z-index:2;max-width:1240px;margin:auto;padding-left:34px;padding-right:34px;
+    }
+    .banner nav{display:flex;justify-content:space-between;align-items:center;padding-top:28px}
+    .banner .brand{display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none}
+    .banner .brand img{display:block;width:340px;height:auto;max-width:100%}
+    .banner .brand:focus-visible{outline:2px solid var(--cyan);outline-offset:8px;border-radius:3px}
+    .banner .nav-link{
+      color:#c4d3e8;text-decoration:none;font-size:12px;letter-spacing:.12em;text-transform:uppercase;transition:.25s;
+    }
+    .banner .nav-link:hover{color:var(--cyan)}
+    .banner .hero-copy{padding-top:132px;padding-bottom:180px;max-width:1240px;pointer-events:none}
+    .banner .hero-copy .actions{pointer-events:auto}
+    .banner .eyebrow{
+      display:flex;align-items:center;gap:10px;color:var(--cyan);
+      font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+    }
+    .banner .eyebrow:before{content:"";width:29px;height:1px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+    .banner h1{
+      max-width:560px;margin:22px 0;font-size:clamp(48px,5.5vw,76px);
+      line-height:.94;letter-spacing:-.07em;font-weight:800;
+    }
+    .banner h1 span{
+      color:transparent;-webkit-text-stroke:1px rgba(205,230,255,.55);
+      text-shadow:0 0 26px rgba(85,185,255,.16);
+    }
+    .banner .lede{max-width:440px;color:var(--muted);font-size:17px;line-height:1.65;margin:0 0 30px}
+    .banner .actions{display:flex;gap:13px;align-items:center;flex-wrap:wrap}
+    .banner .button{
+      display:inline-flex;align-items:center;gap:11px;border-radius:999px;padding:14px 20px;
+      text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+      transition:transform .2s,box-shadow .2s,background .2s;
+    }
+    .banner .button:hover{transform:translateY(-3px);color:inherit}
+    .banner .primary{color:#031128;background:#e9f7ff;box-shadow:0 0 32px rgba(101,211,255,.28)}
+    .banner .primary:hover{box-shadow:0 0 42px rgba(101,211,255,.55);color:#031128}
+    .banner .secondary{color:#d9e9ff;border:1px solid var(--line);background:rgba(255,255,255,.035)}
+    .banner .secondary:hover{background:rgba(255,255,255,.09);color:#d9e9ff}
+    .banner .arrow{font-size:17px;line-height:0}
+    .banner .lab{
+      position:absolute;z-index:3;top:144px;right:max(34px,calc((100% - 1172px)/2));
+      width:47%;max-width:555px;
+    }
+    .banner .lab-heading{
+      font:10px ui-monospace,monospace;letter-spacing:.15em;color:#a6c5df;
+      display:flex;align-items:center;gap:9px;
+    }
+    .banner .lab-heading>span:last-child{margin-left:auto;color:#64809f}
+    .banner .live-dot{width:5px;height:5px;border-radius:50%;background:#80e8d9;box-shadow:0 0 12px #80e8d955}
+    .banner .lab h2{font-size:23px;letter-spacing:-.04em;font-weight:500;margin:18px 0 6px}
+    .banner .lab-intro{font-size:13px;color:#91a8c1;margin:0}
+    .banner .viewport{position:relative;height:255px;margin-top:10px}
+    .banner #scene{position:absolute;z-index:0;width:100%;height:100%;opacity:1;cursor:grab;touch-action:pan-y}
+    .banner #scene:active{cursor:grabbing}
+    .banner #scene:focus-visible{outline:1px solid #69e6ff}
+    .banner .view-caption{
+      position:absolute;left:8px;bottom:8px;font:9px ui-monospace,monospace;color:#9bb4cc;
+      pointer-events:none;letter-spacing:.07em;
+    }
+    .banner #reset-view{
+      position:absolute;right:0;bottom:0;color:#b3ccdf;border:1px solid #36516a;
+      background:#07182e;border-radius:5px;padding:7px 9px;cursor:pointer;font:10px ui-monospace,monospace;
+    }
+    .banner #fallback{position:absolute;inset:50px 20px;color:#dce8f5;font-size:14px}
+    .banner .legend{margin-top:18px;font:10px ui-monospace,monospace;color:#b2c5db}
+    .banner .color-scale{height:5px;margin-top:10px;border-radius:9px;background:linear-gradient(90deg,#2454dc,#18bed3,#8ede95,#f4d15c,#ef6047)}
+    .banner .scale-labels{display:flex;justify-content:space-between;margin-top:6px;color:#8da5c2}
+    .banner .load-row{display:flex;justify-content:space-between;margin-top:19px;font-size:12px;color:#adbed3}
+    .banner .load-row output{color:#f0f7ff;font:13px ui-monospace,monospace}
+    .banner #load{width:100%;margin:10px 0 15px;accent-color:#76d6f0;cursor:pointer}
+    .banner .readouts{display:flex;gap:30px;padding-top:14px;border-top:1px solid #aecbff22}
+    .banner .readouts span{display:block;font-size:10px;color:#90a6bf;margin-bottom:5px}
+    .banner .readouts strong{font:22px ui-monospace,monospace;color:#e9f5ff}
+    .banner .readouts small{font-size:11px;color:#85a8c5}
+    .banner .model-note{color:#8a9eb5;font-size:10px;line-height:1.7;margin-top:14px}
+    .banner .eq-stats{max-width:1172px;padding-left:0;padding-right:0;margin-top:48px;display:flex;gap:0;border-top:1px solid var(--line);padding-top:20px;padding-bottom:25px}
+    .banner .stat{width:auto;margin-right:65px;color:#8ea4c2;font-size:11px;letter-spacing:0;text-transform:none;font-family:ui-monospace,monospace}
+    .banner .stat strong{display:block;color:#f2f7ff;font:14px system-ui,sans-serif;letter-spacing:0;margin-bottom:9px}
 
-    .hero{
-      width:100%;
-      margin:0;
-      padding:0;
-      background:var(--paper);
-    }
-    .hero img{
-      display:block;
-      width:100%;
-      max-width:none;
-      height:auto;
-      margin:0;
-      border:none;
-      border-bottom:1px solid var(--rule);
-      background:#fff;
-    }
-    .hero-actions{
-      display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
-      max-width:1080px;
-      margin:0 auto;
-      padding:18px 28px 32px;
-      background:var(--paper);
-      border-bottom:1px solid var(--rule);
-    }
     .cta{
       display:inline-flex;align-items:center;justify-content:center;
       padding:11px 22px;
@@ -199,9 +258,35 @@
     }
     footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0}
 
+    @media (max-width:1100px){
+      .banner .hero-copy{padding-bottom:220px}
+      .banner h1{font-size:54px}
+      .banner .lede{max-width:38%;font-size:15px}
+      .banner .eyebrow{font-size:9px;letter-spacing:.1em}
+      .banner .actions{max-width:43%;gap:10px}
+      .banner .button{font-size:10px;padding:13px 16px}
+      .banner .eq-stats{margin-left:34px;margin-right:34px}
+    }
+    @media (max-width:800px){
+      .banner{min-height:0}
+      .banner .hero-copy{padding-top:65px;padding-bottom:45px}
+      .banner h1{font-size:clamp(48px,9vw,68px)}
+      .banner .lede{max-width:520px}
+      .banner .actions{max-width:none}
+      .banner .lab{position:relative;top:auto;right:auto;width:auto;max-width:none;margin:0 22px 35px;padding-top:26px;border-top:1px solid #aecbff22}
+      .banner .eq-stats{position:relative;margin:0 22px;padding:22px 0;flex-wrap:wrap;gap:22px}
+      .banner .stat{margin-right:12px}
+      .banner .viewport{height:245px}
+      .banner .lab h2{font-size:22px}
+    }
+    @media (max-width:720px){
+      .banner .brand img{width:238px}
+      .banner nav{gap:16px;flex-wrap:wrap}
+      .banner .nav-link{font-size:10px}
+      .banner nav,.banner .hero-copy,.banner .eq-stats{padding-left:22px;padding-right:22px}
+    }
     @media (max-width: 900px){
-      header,.wrap,footer,.hero-actions{padding-left:18px;padding-right:18px}
-      .brand-logo{height:44px}
+      .wrap,footer{padding-left:18px;padding-right:18px}
       .foundations{grid-template-columns:1fr}
       .foundation{
         padding:28px 0;
@@ -212,6 +297,9 @@
       .band{padding:56px 0}
       .band-head{margin-bottom:32px;text-align:left}
     }
+    @media (prefers-reduced-motion:reduce){
+      .banner *,.banner *:before,.banner *:after{animation:none!important;transition:none!important}
+    }
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -219,31 +307,55 @@
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-  <header>
-    <a href="./" aria-label="Mechanics Reference home">
-      <img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" />
-    </a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./" class="active" aria-current="page">Home</a>
-      <a href="hub.html">Library</a>
+  <section class="banner" aria-label="Mechanics Reference introduction">
+    <div class="grid" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <nav>
+      <a class="brand" href="./" aria-label="Mechanics Reference home">
+        <img src="mechanicsreference-logo-mesh.svg" width="640" height="128" alt="Mechanics Reference — MR finite-element mesh logo">
+      </a>
+      <a class="nav-link" href="hub.html">Explore the library ↗</a>
     </nav>
-  </header>
+    <div class="hero-copy">
+      <div class="eyebrow">Computational mechanics, clarified</div>
+      <h1>Build intuition.<br><span>Then solve.</span></h1>
+      <p class="lede">A visual reference for the ideas, equations, and engineering tools behind how things move, bend, flow, and fail.</p>
+      <div class="actions">
+        <a class="button primary" href="hub.html">Start exploring <span class="arrow">→</span></a>
+        <a class="button secondary" href="hub.html#basic-equations">Browse topics</a>
+      </div>
+    </div>
+    <section class="lab" aria-label="Interactive cantilever bending model">
+      <div class="lab-heading"><span class="live-dot"></span>THE CONTINUUM LAB <span>01 / BENDING</span></div>
+      <h2>A force. A field. A response.</h2>
+      <p class="lab-intro">Apply a tip load. See where bending stress builds.</p>
+      <div class="viewport">
+        <canvas id="scene" aria-label="3D cantilever beam, fixed at the left and loaded downward at the right. Drag to rotate." tabindex="0"></canvas>
+        <span class="view-caption">FIXED END ······················ FREE END ↓ P</span>
+        <button id="reset-view" type="button">Reset view ↺</button>
+        <p id="fallback" hidden>3D view unavailable. Load controls and beam calculations remain available.</p>
+      </div>
+      <div class="legend">
+        <span id="field-label">Bending stress magnitude |σxx| · MPa</span>
+        <div class="color-scale"></div>
+        <div class="scale-labels"><span>0</span><span>37.5</span><span>75</span></div>
+      </div>
+      <div class="load-row"><label for="load">Tip load P</label><output id="load-value" for="load">6.5 kN</output></div>
+      <input id="load" type="range" min="0" max="100" value="65" step="1" aria-label="Tip load as percent of 10 kilonewtons">
+      <div class="readouts" aria-live="polite">
+        <div><span>Peak bending stress</span><strong id="stress-value">48.8 <small>MPa</small></strong></div>
+        <div><span>Tip deflection</span><strong id="deflection-value">1.625 <small>mm</small></strong></div>
+      </div>
+      <p class="model-note">Linear elastic beam · deformation shown ×50<br>L = 1 m · section 100 × 80 mm · E = 200 GPa<br>Euler–Bernoulli approximation; colors show axial bending stress, not a full 3D stress solution.</p>
+    </section>
+    <div class="eq-stats">
+      <div class="stat"><strong>Equilibrium</strong>∇ · σ + b = 0</div>
+      <div class="stat"><strong>Constitutive law</strong>σ = C : ε</div>
+      <div class="stat"><strong>Kinematics</strong>ε = sym ∇u</div>
+    </div>
+  </section>
 
   <main>
-    <div class="hero">
-      <img
-        src="hero-banner.png"
-        alt="Mechanics Reference — computational mechanics and engineering: continuum theory, finite elements, and numerical methods"
-        width="1024"
-        height="512"
-        fetchpriority="high"
-      />
-    </div>
-    <div class="hero-actions">
-      <a class="cta cta-primary" href="hub.html">Open the library</a>
-      <a class="cta cta-ghost" href="hub.html#basic-equations">Read the theory</a>
-    </div>
-
     <div class="wrap">
       <section class="band" aria-labelledby="foundations-title">
         <div class="band-head">
@@ -299,5 +411,6 @@
       <span><a href="hub.html">Library</a></span>
     </div>
   </footer>
+  <script type="module" src="beam-scene.js"></script>
 </body>
 </html>
