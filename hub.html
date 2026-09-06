@@ -1976,11 +1976,46 @@ const topics = [
   // Part IV – Applications in Engineering
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
     "A crack is a surface across which displacement jumps and traction is either zero or given by a cohesive law. Linear elastic fracture mechanics (LEFM) treats the solid as linear up to an infinitely sharp tip. The near-tip field is then Williams’ expansion: stress of order r^{-1/2} times a stress intensity factor K. Three modes exist. Mode I opens the faces; mode II slides them in plane; mode III tears them out of plane.",
-    "Griffith’s argument is energetic. Advance of the crack by an area dA releases potential energy G = −dΠ/dA. In LEFM, Irwin’s relation G = K_I² / E′ identifies G with K (E′ = E in plane stress, E/(1−ν²) in plane strain). Fracture occurs when G reaches a material toughness Gc, or equivalently when K reaches Kc. The J-integral is the same G for a nonlinear elastic solid.",
+    "Griffith’s argument is energetic. Advance of the crack by an area dA releases potential energy G = −dΠ/dA. In LEFM, Irwin’s relation G = K_I² / E′ identifies G with K (E′ = E in plane stress, E/(1−ν²) in plane strain). Fracture occurs when G reaches a material toughness Gc, or equivalently when K reaches Kc. Under the classical homogeneous, quasi-static, traction-free crack assumptions, the J-integral recovers G for a nonlinear elastic solid.",
     "The 1/√r singularity is a consequence of linear elasticity at a sharp notch, not a physical infinite stress. Real materials yield, damage, or open cohesively in a process zone. LEFM remains valid under small-scale yielding: that zone is small compared with the crack length and the remaining ligament. When it is not, the characterizing parameter is J, a cohesive law, or a continuum damage length.",
     "Numerically the crack may be fitted to the mesh (and remeshed as it grows), enriched so that the jump lives inside the approximation (XFEM, GFEM, or an enriched mesh-free method), or smeared as a phase-field or damage band whose width is a material length. Each choice changes what the mesh must resolve.",
     "The next entries are the singular field, Mode I / II / mixed-mode cracking and kink criteria, the cohesive process zone, the contour integral that extracts G, the phase-field regularization that turns a sharp surface into a diffuse band, and—under Numerical Methods—the extended/generalized FEM that embeds the jump and tip asymptotics without remeshing."
-  ], tags:["fracture","LEFM","SIF","Griffith","Williams","singularity","cohesive","XFEM","phase-field"], illustrations:"fractureOverview"},
+  ], story:[
+    {heading:"Why a crack changes the meaning of strength", paragraphs:[
+      "A component can break below its tensile strength if it contains a sufficiently large crack. For a central through-crack of total length 2a in a large plate under remote tension σ, KⅠ = σ√(πa). A finite specimen needs a geometry factor Y: KⅠ = Yσ√(πa). Doubling the crack length increases K by √2 at the same load. A strength-only check misses this size effect.",
+      "K has units of MPa√m, not MPa. Compare it with toughness measured for the relevant temperature, rate, environment, and constraint. KⅠc denotes a valid plane-strain mode-I toughness; an apparent critical K from a thin sheet need not be the same property."
+    ]},
+    {heading:"Energy pays for new fracture surface", paragraphs:[
+      "G = −∂Π/∂A is evaluated along equilibrated states under the prescribed loading conditions. Π includes elastic energy and the potential of external loads. A is the projected crack area, counted once although two faces are created. For ideal brittle cleavage Gc = 2γ, where γ is the surface energy of one face. Real fracture resistance also includes dissipation in the process zone.",
+      "For pure mode I, G = KⅠ²/E′. In the infinite-plate experiment below, fixed remote stress makes G grow linearly with a. Doubling σ quadruples G. The crossing G = Gc predicts initiation for this ideal constant-resistance model; it does not simulate subsequent crack motion."
+    ]},
+    {heading:"Initiation and stability are different questions", paragraphs:[
+      "Write resistance as R(Δa) to allow a rising resistance curve. At G = R, an increment of extension is stable if ∂G/∂a < dR/da under the actual loading constraint; the opposite inequality promotes unstable extension. Equality requires further assessment. A rising R-curve can therefore support stable tearing.",
+      "Prescribed displacement can reduce the driving force as a specimen becomes more compliant, whereas fixed force often promotes instability. This depends on geometry and machine compliance. Changing the boundary conditions can change stability without changing the material."
+    ]},
+    {heading:"Three crack modes, one local coordinate system", paragraphs:[
+      "Take x along advance, y normal to the crack plane, and z along the front. Mode I separates the faces in y; mode II slides them in x; mode III displaces them in z. The Three.js explorer shows exaggerated relative motion, with the ligament connected ahead of the front. It is a kinematic illustration, not an elastic solution.",
+      "For an isotropic linear elastic solid, G = (KⅠ² + KⅡ²)/E′ + KⅢ²/(2μ), with shear modulus μ. E′ = E in plane stress and E/(1−ν²) in plane strain. Energy alone does not select a mixed-mode growth direction: a path criterion and sometimes a mixity-dependent resistance are also needed."
+    ]},
+    {heading:"A process zone replaces the mathematical singularity", paragraphs:[
+      "The elastic stress scales as K/√(2πr), but real material yields, debonds, or microcracks near the tip. An approximate mode-I Irwin zone size is rp ≈ (KⅠ/σy)²/(2π) in plane stress; the usual plane-strain estimate is one third of this. These estimates do not replace a toughness-test validity assessment.",
+      "LEFM needs an elastic K-dominant region outside the process zone and well inside the crack and ligament dimensions. With extensive plasticity, J and crack-tip opening displacement need their own validity conditions. Classical path-independent J assumes nonlinear elasticity, homogeneous material, quasi-static equilibrium, and traction-free crack faces. Arbitrary plastic unloading does not automatically preserve path independence."
+    ]},
+    {heading:"Choose a model for the mechanism", paragraphs:[
+      "For a known sharp crack with small-scale yielding, extract K or G and check convergence across several contours or domains. Maximum nodal stress is not a useful fracture criterion: it increases as a singular crack-tip mesh is refined.",
+      "A cohesive law resolves traction during separation: its peak controls strength and its area controls fracture energy. XFEM embeds a displacement jump in the approximation. Phase-field fracture resolves a diffuse band whose length scale, energy split, irreversibility, and mesh resolution affect the result.",
+      "Repeated loads can grow a crack while maximum K remains below monotonic toughness. Fatigue requires a growth law and loading history; the static G/Gc check below is not a fatigue-life prediction."
+    ]}
+  ], table:{heading:"Which description fits?",columns:["Situation","Useful description","Essential check"],rows:[
+    ["Small process zone, sharp crack","K or G / LEFM","Geometry factor, constraint, toughness validity"],
+    ["Substantial ductile tearing","J, CTOD, R-curve","Plastic history and specimen validity"],
+    ["Interface separation","Cohesive traction–separation law","Strength, fracture energy, zone resolution"],
+    ["Branching or complex topology","Phase-field fracture","Length scale, mesh, irreversibility"]
+  ]}, tags:["fracture","LEFM","SIF","Griffith","Williams","singularity","cohesive","XFEM","phase-field"], scene:"fractureLab", illustrations:"fractureOverview", sources:[
+    {label:"Griffith (1921), The phenomena of rupture and flow in solids",href:"https://doi.org/10.1098/rsta.1921.0006"},
+    {label:"Rice (1968), A path independent integral and the approximate analysis of strain concentration by notches and cracks",href:"https://doi.org/10.1115/1.3601206"},
+    {label:"Cambridge University Press: energy and stability of crack growth",href:"https://assets.cambridge.org/97805213/03309/excerpt/9780521303309_excerpt.pdf"}
+  ]},
   {part:"Part IV – Applications in Engineering", title:"Linear Elastic Fracture Mechanics", equations:[
     {name:"Williams field", expr:"σ_ij = K / √(2π r) · f_ij(θ)", tex:"\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)", note:"Leading term at a sharp crack in a linear elastic solid. The angular functions f depend on the mode. Stress is unbounded as r → 0; energy release is finite."},
     {name:"Irwin", expr:"G = K_I² / E′", tex:"G = \\dfrac{K_I^2}{E'}", note:"E′ = E in plane stress and E/(1−ν²) in plane strain. Mixed-mode energy release adds K_II² and K_III² / (2μ) terms."},
@@ -2704,6 +2739,7 @@ function renderTopicScene(topic){
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
+    fractureLab: {src:'fracture-lab.html', title:'Explore crack-face motion and the energy available for growth', tall:true},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
     cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking', tall:true},
     jIntegral: {src:'j-integral.html', title:'The J-integral'},
@@ -2809,38 +2845,18 @@ function bindSceneFrames(root){
 
 function renderTopicIllustrations(topic){
   if(topic.illustrations === 'fractureOverview'){
-    return `
-<section class="figure-section" aria-label="Fracture modes">
-  <h2>Figures</h2>
-  <div class="figure-grid">
-    <figure class="figure-card">
-      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line class="ink ink-thick" x1="28" y1="78" x2="118" y2="78"/>
-        <path class="ink" d="M 118 78 L 118 48"/>
-        <path class="ink" d="M 118 78 L 118 108"/>
-        <polygon points="118,48 114,58 122,58" fill="currentColor"/>
-        <polygon points="118,108 114,98 122,98" fill="currentColor"/>
-        <text x="40" y="70">I</text>
-        <line class="ink ink-thick" x1="148" y1="78" x2="232" y2="78"/>
-        <path class="ink" d="M 190 78 L 210 78"/>
-        <polygon points="210,78 200,74 200,82" fill="currentColor"/>
-        <text x="158" y="70">II</text>
-      </svg>
-      <figcaption><strong>Modes.</strong> I opens the faces; II slides them in plane. Mode III tears out of plane. The near-tip field of each is an intensity K times r<sup>−½</sup>.</figcaption>
-    </figure>
-    <figure class="figure-card">
-      <svg class="illustration-svg" viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line class="muted-line" x1="36" y1="120" x2="220" y2="120"/>
-        <line class="muted-line" x1="36" y1="120" x2="36" y2="28"/>
-        <path class="ink" d="M 44 36 Q 70 40 110 70 Q 160 100 210 112" fill="none"/>
-        <text x="222" y="124">r</text>
-        <text x="8" y="36">σ</text>
-        <text x="70" y="56">r<sup>−½</sup></text>
-      </svg>
-      <figcaption><strong>Singularity.</strong> Ligament stress in LEFM. The energy release remains finite; the stress does not. A process zone cuts the field off at f<sub>t</sub> or σ<sub>y</sub>.</figcaption>
-    </figure>
-  </div>
-</section>`;
+    return `<section class="figure-section" aria-label="Crack-tip length scales">
+<h2>A window in which LEFM works</h2>
+<figure class="figure-card"><svg viewBox="0 0 640 320" role="img" aria-labelledby="fracture-scales-title" style="width:100%;height:auto;background:#f7f6f2">
+<title id="fracture-scales-title">A small process zone sits inside an elastic K-dominant region, within the larger component.</title>
+<rect x="24" y="24" width="592" height="206" rx="8" fill="#e3e9ee" stroke="#8799ad"/>
+<circle cx="250" cy="127" r="88" fill="#cadce9" stroke="#456b88" stroke-dasharray="6 5"/>
+<circle cx="250" cy="127" r="23" fill="#e7a77f"/>
+<path d="M24 119 L250 127 L24 135" fill="#f7f6f2" stroke="#1e3a5f" stroke-width="3"/>
+<g fill="none" stroke="#50657b"><path d="M275 127 H400"/><path d="M315 70 H400"/></g>
+<g font-family="system-ui,sans-serif" font-size="17" fill="#1e3a5f"><text x="410" y="75">K-dominant region</text><text x="410" y="132">Process zone</text><text x="390" y="205">Component geometry</text><text x="40" y="108">Crack faces</text><text x="38" y="269">Process zone ≪ crack length and ligament</text><text x="38" y="298">Between them: elastic stresses governed by K</text></g>
+</svg><figcaption><strong>Three length scales.</strong> Orange marks the nonlinear process zone. Blue marks a surrounding elastic region where the leading K-field dominates. The circular boundaries are schematic, not a computed plastic-zone shape. If the process zone occupies much of the ligament, this separation of scales disappears.</figcaption></figure>
+<p>Explore <a href="hub.html#linear-elastic-fracture-mechanics">the crack-tip field</a>, <a href="hub.html#cohesive-cracking">cohesive separation</a>, <a href="hub.html#the-j-integral">the J-integral</a>, and <a href="hub.html#phase-field-modelling-of-fracture">phase-field fracture</a>.</p></section>`;
   }
   if(topic.illustrations === 'lefm'){
     return `

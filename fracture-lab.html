@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fracture mechanics explorer — Mechanics Reference</title>
+<style>
+:root{color-scheme:light;font:16px/1.55 system-ui,sans-serif;color:#24364b;background:#f7f6f2}*{box-sizing:border-box}body{margin:0;padding:20px}main{max-width:1100px;margin:auto}h1,h2{font-family:Georgia,serif;line-height:1.2}h1{font-size:26px}h2{font-size:21px;margin:0 0 12px}.eyebrow{color:#a44b21;font-size:12px;letter-spacing:.1em;text-transform:uppercase}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}section{min-width:0;background:white;border:1px solid #d8d4cb;padding:18px}#stage{height:280px;background:#17283e;position:relative}#stage canvas{display:block;width:100%;height:100%}#fallback{color:white;padding:20px}label{display:block;margin:12px 0 5px}input[type=range]{width:100%;accent-color:#b55529}select,button{font:inherit;padding:6px 12px;background:#f7f6f2;color:#24364b;border:1px solid #9da8b5;border-radius:4px}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #c57931;outline-offset:3px}.note{font-size:13px;color:#536274}#plot{display:block;width:100%;height:auto;background:#f7f6f2}output{font-variant-numeric:tabular-nums}#result{padding:12px;border-left:4px solid #b55529;background:#f7f6f2;min-height:86px}a{color:#355e89}@media(max-width:680px){body{padding:10px}.grid{grid-template-columns:1fr}section{padding:14px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head><body><main>
+<p class="eyebrow">Two experiments · geometry and energy</p>
+<h1>What makes a crack grow?</h1>
+<div class="grid">
+<section aria-labelledby="modes-title"><h2 id="modes-title">01 / Move the crack faces</h2>
+<div id="stage" role="img" aria-label="Three-dimensional edge crack with a connected ligament. Orange arrows indicate opposite face motions."><p id="fallback">Loading 3D view. Mode I opens in y, mode II slides in x, and mode III tears in z. The ligament ahead of the front stays connected.</p></div>
+<label for="mode">Loading mode</label><select id="mode"><option value="I">I · opening (y)</option><option value="II">II · sliding (x)</option><option value="III">III · tearing (z)</option></select>
+<label for="separation">Illustrated displacement <output id="sep-value">60%</output></label><input id="separation" type="range" min="0" max="100" value="60">
+<label for="view">Rotate view <output id="view-value">25°</output></label><input id="view" type="range" min="-70" max="70" value="25">
+<p class="note" id="mode-note">Mode I: opposite motion normal to the crack plane. The line through the thickness is the crack front.</p>
+<p class="note">x: advance · y: face normal · z: crack front. Exaggerated kinematics, not a computed stress or displacement field. Use the sliders or arrow keys to inspect.</p>
+</section>
+<section aria-labelledby="energy-title"><h2 id="energy-title">02 / Increase the driving force</h2>
+<p class="note">Independent model: an infinite plate with a central crack of total length 2a, under fixed remote tension. Mode I, plane stress, Y = 1.</p>
+<svg id="plot" viewBox="0 0 440 260" role="img" aria-labelledby="plot-title plot-desc"><title id="plot-title">Energy release rate versus crack half-length</title><desc id="plot-desc">The driving force increases linearly with half-length at fixed stress. A horizontal line marks fracture resistance.</desc></svg>
+<label for="stress">Remote stress σ <output id="stress-value"></output></label><input id="stress" type="range" min="10" max="200" step="5" value="100">
+<label for="length">Half-length a <output id="length-value"></output></label><input id="length" type="range" min="1" max="30" step="0.5" value="10">
+<label for="toughness">Resistance Gc <output id="toughness-value"></output></label><input id="toughness" type="range" min="0.5" max="10" step="0.1" value="5">
+<p id="result" role="status" aria-live="polite"></p><button id="reset" type="button">Reset experiments</button>
+<p class="note">E = 70 GPa. KⅠ = σ√(πa); G = KⅠ²/E. Example values are illustrative. Crossing Gc indicates the ideal initiation condition, not a safety assessment or a crack-growth simulation.</p>
+</section></div>
+<p><a href="hub.html#fracture-mechanics" target="_top">Read the fracture mechanics discussion →</a></p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function calculate(sigma,a,gc){const k=sigma*Math.sqrt(Math.PI*a/1000);return {k,g:k*k/70,critical:gc*70/(Math.PI*sigma*sigma)*1000};}
+function updateEnergy(){const sigma=+$('stress').value,a=+$('length').value,gc=+$('toughness').value;const {k,g,critical}=calculate(sigma,a,gc);
+  $('stress-value').textContent=sigma+' MPa';$('length-value').textContent=a.toFixed(1)+' mm';$('toughness-value').textContent=gc.toFixed(1)+' kJ/m²';
+  const ymax=Math.max(12,calculate(sigma,30,gc).g*1.12),x=a=>55+a/30*365,y=g=>215-g/ymax*180;
+  let svg='<title id="plot-title">Energy release rate versus crack half-length</title><desc>Blue driving force G and orange constant resistance Gc. The dot marks the selected half-length.</desc>';
+  for(let i=0;i<=4;i++){const v=ymax*i/4;svg+=`<path d="M55 ${y(v)}H420" stroke="#ddd9d1"/><text x="47" y="${y(v)+4}" text-anchor="end">${v.toFixed(1)}</text>`;}
+  for(const v of [0,10,20,30])svg+=`<text x="${x(v)}" y="234" text-anchor="middle">${v}</text>`;
+  svg+=`<path d="M55 35V215H420" fill="none" stroke="#536274"/><path d="M55 215L420 ${y(calculate(sigma,30,gc).g)}" stroke="#355e89" stroke-width="3"/><path d="M55 ${y(gc)}H420" stroke="#b55529" stroke-width="2" stroke-dasharray="7 4"/><circle cx="${x(a)}" cy="${y(g)}" r="5" fill="#355e89" stroke="white" stroke-width="2"/><text x="55" y="19">G (kJ/m²)</text><text x="265" y="19" fill="#b55529">— Gc = ${gc.toFixed(1)}</text><text x="245" y="254" text-anchor="middle">Crack half-length a (mm)</text>`;
+  $('plot').innerHTML='<g font-family="system-ui,sans-serif" font-size="12" fill="#24364b">'+svg+'</g>';
+  $('result').textContent=`KⅠ = ${k.toFixed(2)} MPa√m · G/Gc = ${(g/gc).toFixed(2)}. ${g>=gc?'Initiation condition reached.':'Below the static initiation threshold.'} Critical half-length: ${critical.toFixed(1)} mm${critical>30?' (outside plot)':''}.`;
+}
+for(const id of ['stress','length','toughness'])$(id).addEventListener('input',updateEnergy);
+$('reset').addEventListener('click',()=>{for(const [id,value] of Object.entries({stress:100,length:10,toughness:5,mode:'I',separation:60,view:25}))$(id).value=value;updateEnergy();updateLabels();window.renderCrack?.();});
+function updateLabels(){$('sep-value').textContent=$('separation').value+'%';$('view-value').textContent=$('view').value+'°';$('mode-note').textContent={I:'Mode I: opposite motion normal to the crack plane (y).',II:'Mode II: opposite sliding along the direction of advance (x).',III:'Mode III: opposite tearing parallel to the crack front (z).'}[$('mode').value]+' The ligament ahead of the front stays connected.';}
+for(const id of ['mode','separation','view'])$(id).addEventListener('input',()=>{updateLabels();window.renderCrack?.();});updateEnergy();
+</script>
+<script type="module">
+try{
+const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js');
+const stage=document.getElementById('stage'),renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.appendChild(renderer.domElement);document.getElementById('fallback').remove();
+const scene=new THREE.Scene();scene.background=new THREE.Color('#17283e');const camera=new THREE.PerspectiveCamera(36,1,.1,100);camera.position.set(5,3.8,6);camera.lookAt(0,0,0);scene.add(new THREE.HemisphereLight(0xffffff,0x53647c,2.4));const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(3,5,4);scene.add(light);
+const group=new THREE.Group();scene.add(group);const halves=[];
+for(const sign of [1,-1]){const geometry=new THREE.BoxGeometry(4,1.1,1.5,60,4,8);geometry.translate(0,sign*.55,0);const original=geometry.attributes.position.array.slice();const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:sign>0?0x9ebbd0:0x6389a6,roughness:.65,side:THREE.DoubleSide}));group.add(mesh);halves.push({mesh,original,sign});}
+const arrows=[];for(const sign of [1,-1]){const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,sign,0),new THREE.Vector3(-1.3,sign*.8,.9),.65,0xf2aa6b,.18,.1);group.add(arrow);arrows.push({arrow,sign});}
+const front=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-.8),new THREE.Vector3(0,0,.8)]),new THREE.LineBasicMaterial({color:0xffd2a5}));group.add(front);
+window.renderCrack=()=>{const mode=document.getElementById('mode').value,amp=+document.getElementById('separation').value/100*.55,axis={I:1,II:0,III:2}[mode];
+ for(const {mesh,original,sign} of halves){const p=mesh.geometry.attributes.position;for(let i=0;i<p.count;i++){const j=i*3;for(let k=0;k<3;k++)p.array[j+k]=original[j+k];const x=original[j],t=Math.max(0,-x/2);p.array[j+axis]+=sign*amp*t*t;}p.needsUpdate=true;mesh.geometry.computeVertexNormals();}
+ for(const {arrow,sign} of arrows){const direction=new THREE.Vector3();direction.setComponent(axis,sign);arrow.setDirection(direction);arrow.setLength(.35+amp,.16,.09);}
+ group.rotation.y=+document.getElementById('view').value*Math.PI/180;renderer.render(scene,camera);
+};
+new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();window.renderCrack();}).observe(stage);window.renderCrack();
+}catch(error){const fallback=document.getElementById('fallback');if(fallback)fallback.textContent='3D view unavailable. Mode I opens in y; mode II slides in x; mode III tears in z. The energy experiment remains available.';console.warn('Fracture 3D view unavailable:',error);}
+</script></body></html>
