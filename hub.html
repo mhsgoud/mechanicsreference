@@ -1412,16 +1412,57 @@ const topics = [
       ]
     }
   ], tags:["linear elasticity","hyperelasticity","elastoplasticity","viscoelasticity","finite strain","Hooke","objectivity"], scene:"constitutiveModels", sceneFirst:true},
-  {part:"Part I – Continuum Mechanics", title:"Work-Conjugate Stresses", bullets:[
-    "Power per reference volume can be written in several equivalent ways. Cauchy stress is conjugate to the rate of deformation D, up to the factor J: τ : D with Kirchhoff stress τ = J σ. The first Piola–Kirchhoff stress P = J σ F⁻ᵀ is conjugate to Ḟ. The second Piola–Kirchhoff stress S = F⁻¹ P is conjugate to Ė.",
-    "Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain, or an unrotated rate of σ with D, produces spurious dissipation in a rigid rotation.",
-    "When stretches and rotations are both small, P, S, and σ coincide to first order. The distinction matters as soon as either is finite.",
-    "The figure keeps the force on a face fixed. The Piola arrow is drawn on the reference square; the Cauchy arrow on the stretched square."
-  ], equations:[
-    {name:"First Piola–Kirchhoff", expr:"P = J σ F⁻ᵀ", tex:"\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Work-conjugate to Ḟ. Nominal stress: current force per reference area."},
-    {name:"Second Piola–Kirchhoff", expr:"S = F⁻¹ P = J F⁻¹ σ F⁻ᵀ", tex:"\\mathbf{S} = \\mathbf{F}^{-1}\\mathbf{P} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}", note:"Work-conjugate to Ė. A hyperelastic law S = ∂W/∂E is consistent with Green–Lagrange kinematics. When stretches and rotations are both small, P, S, and σ coincide to first order."},
-    {name:"Kirchhoff power", expr:"τ : D,   τ = J σ", tex:"\\boldsymbol{\\tau}:\\mathbf{D},\\qquad \\boldsymbol{\\tau}=J\\boldsymbol{\\sigma}", note:"Cauchy stress is conjugate to the rate of deformation D up to the factor J."}
-  ], tags:["Piola-Kirchhoff","Kirchhoff stress","work conjugate","energy"], scene:"workConjugates"},
+  {part:"Part I – Continuum Mechanics", title:"Work-Conjugate Stresses",
+  lead:"In nonlinear continuum mechanics the internal virtual-work rate per unit volume must stay invariant under a change of configuration. A stress measure is work-conjugate to a strain measure if their inner product is that work density.",
+  bullets:[
+    "The figure is a Saint Venant–Kirchhoff cube under axial stretch λₓ and shear γ_xy. Yellow is the first-Piola traction on the reference face; blue is the Cauchy traction on the deformed face. The live matrices are P, S, and σ from the same energy; ½ S : E is the stored-energy density."
+  ], flow:[
+    {
+      section:"Internal virtual-work equivalence",
+      lead:"The three pairings write the same virtual work on different placements.",
+      items:[
+        {
+          name:"Invariant work",
+          tex:"\\delta W_{\\mathrm{int}} = \\int_{\\Omega_0}\\mathbf{P}:\\delta\\mathbf{F}\\,\\mathrm{d}V_0 = \\int_{\\Omega_0}\\mathbf{S}:\\delta\\mathbf{E}\\,\\mathrm{d}V_0 = \\int_{\\Omega_t}\\boldsymbol{\\sigma}:\\delta\\mathbf{d}\\,\\mathrm{d}v",
+          body:"Those pairings are not a matter of taste. A stored-energy function differentiated with respect to E returns S, not σ. Using Cauchy stress with Green strain produces spurious dissipation in a rigid rotation. When stretches and rotations are both small, P, S, and σ coincide to first order."
+        }
+      ]
+    },
+    {
+      section:"Conjugate pairs",
+      items:[
+        {
+          name:"First Piola–Kirchhoff",
+          tex:"\\mathbf{P}\\ \\text{is conjugate to}\\ \\dot{\\mathbf{F}}\\quad\\text{on}\\ \\Omega_0",
+          body:"Nominal stress: current force per reference area. P = J σ F⁻ᵀ."
+        },
+        {
+          name:"Second Piola–Kirchhoff",
+          tex:"\\mathbf{S}\\ \\text{is conjugate to}\\ \\dot{\\mathbf{E}}\\quad\\text{on}\\ \\Omega_0",
+          body:"S = F⁻¹ P = J F⁻¹ σ F⁻ᵀ. A hyperelastic law S = ∂W/∂E is consistent with Green–Lagrange kinematics."
+        },
+        {
+          name:"Cauchy stress",
+          tex:"\\boldsymbol{\\sigma}\\ \\text{is conjugate to}\\ \\mathbf{d}\\quad\\text{on}\\ \\Omega_t",
+          body:"True stress: current force per current area. Equivalently τ : d with Kirchhoff stress τ = J σ, written per reference volume."
+        },
+        {
+          name:"Transformations",
+          tex:"J=\\det\\mathbf{F},\\qquad \\mathbf{P}=J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf T},\\qquad \\mathbf{S}=\\mathbf{F}^{-1}\\mathbf{P}=J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf T}",
+          body:"The figure uses a Saint Venant–Kirchhoff law S = λ (tr E) I + 2μ E, then pushes P = F S and σ = J⁻¹ P Fᵀ."
+        }
+      ]
+    }
+  ], table:{
+    heading:"Work-conjugate pairs",
+    caption:"Each stress measure pairs with one strain rate so that the inner product is internal work.",
+    columns:["Stress","Conjugate rate","Domain"],
+    rows:[
+      ["1st Piola–Kirchhoff P","Ḟ","Reference Ω₀"],
+      ["2nd Piola–Kirchhoff S","Ė","Reference Ω₀"],
+      ["Cauchy σ","d (rate of deformation)","Current Ωₜ"]
+    ]
+  }, tags:["Piola-Kirchhoff","Cauchy","work conjugate","Green-Lagrange","Saint Venant-Kirchhoff","energy"], scene:"workConjugates", sceneFirst:true},
   {part:"Part I – Continuum Mechanics", title:"Principal Stresses and von Mises",
   lead:"An interactive reference for principal stresses, 3D Mohr’s circles, and the von Mises and Tresca yield criteria.",
   bullets:[
@@ -2649,7 +2690,7 @@ function renderTopicScene(topic){
     constitutiveModels: {src:'constitutive-models.html', title:'A continuum mesh under a time-varying strain field. The constitutive map is what turns that deformation into stress.', flush:true},
     velocityGradient: {src:'velocity-gradient.html', title:'Continuum element under L = D + W. Sliders set shear, spin, and dilatation; the red pathline is the material derivative of position.', tall:true, flush:true},
     vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
-    workConjugates: {src:'work-conjugates.html', title:'Work-conjugate stresses'},
+    workConjugates: {src:'work-conjugates.html', title:'Saint Venant–Kirchhoff cube under stretch and shear. Yellow is P N on the reference face; blue is σ n on the deformed face. The matrices are the three work-conjugate stresses.', flush:true},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hyperelasticity: {src:'hyperelasticity.html', title:'Linear elastic steel versus hyperelastic rubber under the same compressive load. The rubber barrels because friction at the platens prevents uniform expansion of an incompressible solid.', tall:true},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
@@ -3953,7 +3994,7 @@ const PART_I_LEAD = {
   "Cauchy Stress and Traction": "Force per current area on a cut: t = σ n, split into normal and shear. The figure lets you turn the plane and change σ.",
   "Balance Laws & Conservation": "Mass, linear and angular momentum, and energy — the PDEs every continuum theory must satisfy.",
   "Constitutive Models": "The maps from kinematics to stress: linear elasticity, hyperelasticity, elastoplasticity, viscoelasticity, and finite strain.",
-  "Work-Conjugate Stresses": "Which stress pairs with which rate so that power is written without spurious dissipation.",
+  "Work-Conjugate Stresses": "P with Ḟ, S with Ė, σ with d — three writings of the same internal work.",
   "Principal Stresses and von Mises": "Principal stresses, Mohr’s circles, and the von Mises and Tresca yield checks on the same stress state.",
   "Objective Rates": "Rate forms that stay blind to a spinning basis — Jaumann and Green–Naghdi.",
   "Hooke’s Law": "Two isotropic moduli, the Navier–Cauchy displacement equation, and P- and S-waves at finite speeds.",

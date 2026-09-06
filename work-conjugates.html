@@ -4,42 +4,71 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Work-Conjugate Stresses — Mechanics Reference</title>
-  <meta name="description" content="The same force on a stretching face is Cauchy traction on current area and first Piola stress on reference area." />
+  <meta name="description" content="Interactive work-conjugate stresses: stretch and shear a cube and read P, S, and σ together with the stored-energy density." />
   <link rel="canonical" href="https://mechanicsreference.com/work-conjugates.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
   <style>
-    :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740}
-    *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
-    body{color:var(--ink);background:var(--paper);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.55}
+    :root{--paper:#f7f6f2;--ink:#1c2430;--soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#0d1117;--accent:#38bdf8}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{color:var(--ink);background:var(--paper);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
     a{color:#3a5f8a}
     header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:20px;padding:12px 28px}
     .brand-logo{height:52px;width:auto}
     .top-nav{margin-left:auto;display:flex;gap:4px}
-    .top-nav a{color:var(--navy);text-decoration:none;font-size:0.92rem;font-weight:600;padding:8px 12px}
-    .wrap{max-width:1100px;margin:0 auto;padding:0 28px 64px}
-    .crumb{padding:28px 0 8px;font-size:0.92rem;color:var(--ink-soft)}
-    h1{margin:0 0 12px;font-family:"Source Serif 4",Georgia,serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:600;color:var(--navy)}
-    .standfirst{margin:0 0 22px;max-width:42em;font-family:"Source Serif 4",Georgia,serif;font-size:1.12rem;color:var(--ink-soft)}
-    .figure-shell{border:1px solid var(--rule);background:#fff}
-    #stage{position:relative;background:var(--plate);height:min(56vh,440px)}
-    #stage canvas{display:block;width:100%;height:100%}
-    #ui{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 16px;border-top:1px solid var(--rule);font-size:0.88rem;color:var(--ink-soft)}
-    #formula,#phase{margin:0}
-    #formula{font-family:"JetBrains Mono",ui-monospace,monospace;color:var(--navy)}
-    .label{color:#f4efe6;font-size:13px;font-weight:700;text-shadow:0 1px 4px #000;pointer-events:none;font-family:"Source Sans 3",system-ui,sans-serif}
-    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
-    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1100px}
-    html.embed,html.embed body{height:100%;background:var(--plate)}
+    .top-nav a{color:var(--navy);text-decoration:none;font-size:.92rem;font-weight:600;padding:8px 12px}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 28px 64px}
+    .crumb{padding:28px 0 8px;font-size:.92rem;color:var(--soft)}
+    h1{margin:0 0 12px;font:600 clamp(1.8rem,4vw,2.5rem)/1.15 "Source Serif 4",Georgia,serif;color:var(--navy)}
+    .standfirst{margin:0 0 22px;max-width:48em;font:600 1.12rem/1.55 "Source Serif 4",Georgia,serif;color:var(--soft)}
+    .figure-shell{border:1px solid var(--rule);background:var(--plate);overflow:hidden;color:#e2e8f0}
+    #stage{height:min(56vh,480px);min-height:380px}
+    #three-canvas{position:relative;height:100%;background:var(--plate)}
+    #three-canvas canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%}
+    #readout{
+      position:absolute;z-index:3;top:0;left:0;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-right:1px solid #334155;border-bottom:1px solid #334155;
+      font:11px/1.45 "JetBrains Mono",ui-monospace,monospace;pointer-events:none;
+    }
+    #readout strong{display:block;margin-bottom:4px;font:700 11px "Source Sans 3",sans-serif;color:var(--accent)}
+    #readout .work{margin:6px 0 8px;color:#4ade80}
+    .mat{margin-bottom:6px}
+    .mat b{color:#94a3b8;font:700 10px "Source Sans 3",sans-serif}
+    .mat.p b{color:#fbbf24}
+    .mat.s b{color:#4ade80}
+    .mat.c b{color:#60a5fa}
+    #dash{
+      position:absolute;z-index:3;top:0;right:0;width:min(260px,48%);
+      display:flex;flex-direction:column;gap:8px;padding:10px 12px;
+      background:rgba(15,23,42,.92);border-left:1px solid #334155;border-bottom:1px solid #334155;
+    }
+    .control{font-size:.75rem;color:#cbd5e1}
+    .control label{display:flex;justify-content:space-between;margin-bottom:4px}
+    .control span{font:500 .74rem "JetBrains Mono",ui-monospace,monospace;color:var(--accent)}
+    .control input{width:100%;accent-color:var(--accent)}
+    .btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .btns button{
+      border:1px solid #334155;background:#1e293b;color:#e2e8f0;
+      padding:6px 4px;font:600 .68rem "Source Sans 3",sans-serif;cursor:pointer;
+    }
+    .btns button.on{background:#0369a1;border-color:#0284c7}
+    .legend{font-size:.68rem;color:#94a3b8}
+    .legend i{display:inline-block;width:10px;height:3px;margin-right:4px;vertical-align:middle}
+    footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:.9rem;color:var(--soft)}
+    footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
-    html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed #stage{flex:1;height:auto}
-    html.embed #ui{background:#fff}
-    @media (max-width:800px){header,.wrap,footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    html.embed .figure-shell,html.embed #stage{height:100%;min-height:0;border:0}
+    @media(max-width:700px){
+      header,.wrap,footer{padding-left:18px;padding-right:18px}
+      .brand-logo{height:44px}
+      #dash{width:min(210px,52%)}
+    }
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -49,22 +78,42 @@
 <body>
   <header>
     <a href="./"><img class="brand-logo" src="logo.png" alt="Mechanics Reference" width="240" height="80" /></a>
-    <nav class="top-nav" aria-label="Site">
-      <a href="./">Home</a>
-      <a href="hub.html#work-conjugate-stresses">Library</a>
-    </nav>
+    <nav class="top-nav" aria-label="Site"><a href="./">Home</a><a href="hub.html#work-conjugate-stresses">Library</a></nav>
   </header>
   <main class="wrap">
     <div class="page-copy">
       <p class="crumb"><a href="./">Home</a> · <a href="hub.html#work-conjugate-stresses">Work conjugates</a></p>
-      <h1>The same force, two areas</h1>
-      <p class="standfirst">A face is pulled with a constant force. On the reference square that force per reference area is the first Piola traction <i>P N</i>. On the stretched square the same force per current area is the Cauchy traction <i>t</i>. They are related by Nanson’s formula; they are not the same tensor.</p>
+      <h1>Work-conjugate stresses</h1>
+      <p class="standfirst">Stretch and shear a cube. The live tensors are P, S, and σ from the same Saint Venant–Kirchhoff energy; yellow is the Piola traction on the reference face, blue the Cauchy traction on the deformed face.</p>
     </div>
     <div class="figure-shell">
-      <div id="stage"></div>
-      <div id="ui">
-        <p id="formula">t da = P N dA</p>
-        <p id="phase"></p>
+      <div id="stage">
+        <div id="three-canvas" aria-label="Interactive work-conjugate stress visualizer">
+          <div id="readout">
+            <strong>Work-conjugate stresses</strong>
+            <div id="mode-label">Deformed configuration</div>
+            <div class="work">½ S : E = <span id="work-value">0.00</span></div>
+            <div class="mat p"><b>P (1st Piola)</b><div id="p-tensor"></div></div>
+            <div class="mat s"><b>S (2nd Piola)</b><div id="s-tensor"></div></div>
+            <div class="mat c"><b>σ (Cauchy)</b><div id="sigma-tensor"></div></div>
+          </div>
+          <div id="dash">
+            <div class="control">
+              <label>Axial stretch λ<sub>x</sub> <span id="stretch-val">1.20</span></label>
+              <input type="range" id="stretch-slider" min="0.5" max="2" step="0.01" value="1.20">
+            </div>
+            <div class="control">
+              <label>Shear γ<sub>xy</sub> <span id="shear-val">0.30</span></label>
+              <input type="range" id="shear-slider" min="-0.8" max="0.8" step="0.01" value="0.30">
+            </div>
+            <div class="btns">
+              <button type="button" id="btn-ref">Reference</button>
+              <button type="button" id="btn-deformed" class="on">Deformed</button>
+              <button type="button" id="btn-toggle-vectors" class="on" style="grid-column:1/-1">Traction vectors</button>
+            </div>
+            <div class="legend"><span><i style="background:#fbbf24"></i>P N</span> &nbsp; <span><i style="background:#3b82f6"></i>σ n</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -72,74 +121,162 @@
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/"}}</script>
   <script type="module">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-    const stage = document.getElementById('stage');
-    const phase = document.getElementById('phase');
+    let stretch = 1.2, shear = 0.3, showVectors = true, viewMode = 'deformed';
+    const E_mod = 100, nu = 0.3;
+    const lambda = (E_mod * nu) / ((1 + nu) * (1 - 2 * nu));
+    const mu = E_mod / (2 * (1 + nu));
+
+    const container = document.getElementById('three-canvas');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2740);
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
-    camera.position.set(0, 0, 10.5);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
+    scene.background = new THREE.Color(0x0d1117);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(3, 2.5, 4);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    stage.appendChild(renderer.domElement);
-    const labels = new CSS2DRenderer();
-    labels.domElement.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    stage.appendChild(labels.domElement);
+    container.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+    controls.target.set(0, 0, 0);
+    controls.minDistance = 2.5;
+    controls.maxDistance = 12;
 
-    function square(color) {
-      const g = new THREE.BufferGeometry();
-      const m = new THREE.Line(g, new THREE.LineBasicMaterial({color}));
-      scene.add(m);
-      return m;
-    }
-    function setSq(mesh, origin, sx, sy) {
-      const hx=sx/2, hy=sy/2, o=origin;
-      const p=[[-hx,-hy],[hx,-hy],[hx,hy],[-hx,hy],[-hx,-hy]].map(([x,y])=>[o.x+x,o.y+y,0]).flat();
-      mesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(p,3));
-    }
-    const left = square(0x7eabdc), right = square(0xe39a4a);
-    const pArr = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 1, 0x6dcc9c, 0.16, 0.09);
-    const tArr = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 1, 0xef4444, 0.16, 0.09);
-    scene.add(pArr, tArr);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    dirLight.position.set(5, 8, 5);
+    scene.add(dirLight);
+    const grid = new THREE.GridHelper(6, 12, 0x30363d, 0x161b22);
+    grid.position.y = -1;
+    scene.add(grid);
 
-    function tag(text, pos) {
-      const d=document.createElement('div'); d.className='label'; d.textContent=text;
-      const o=new CSS2DObject(d); o.position.copy(pos); scene.add(o);
-    }
-    tag('reference  P N', new THREE.Vector3(-2.9, 2.15, 0));
-    tag('current  t', new THREE.Vector3(2.9, 2.15, 0));
+    const refMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({color: 0x48515c, wireframe: true, transparent: true, opacity: 0.4})
+    );
+    scene.add(refMesh);
+    const defGeo = new THREE.BoxGeometry(1, 1, 1, 8, 8, 8);
+    const origPos = defGeo.attributes.position.clone();
+    const defMesh = new THREE.Mesh(defGeo, new THREE.MeshStandardMaterial({
+      color: 0x3a86ff, roughness: 0.3, metalness: 0.1, transparent: true, opacity: 0.7, side: THREE.DoubleSide
+    }));
+    scene.add(defMesh);
+    const vectorGroup = new THREE.Group();
+    scene.add(vectorGroup);
 
-    const force = 1.15;
-    const Aref = 1.6;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clock = new THREE.Clock();
-    let running = !reduce;
-    document.addEventListener('visibilitychange', ()=>{ running = !document.hidden && !reduce; });
-
-    function frame(t) {
-      const λ = 1 + 0.7 * (0.5 + 0.5*Math.sin(t*0.8));
-      const w = 1.6, h = 1.6 / λ;
-      setSq(left, new THREE.Vector3(-2.9,0,0), 1.6, 1.6);
-      setSq(right, new THREE.Vector3(2.9,0,0), 1.6*λ, h);
-      const P = force / Aref;
-      const tmag = force / h;
-      pArr.position.set(-2.9 + 0.8, 0, 0);
-      pArr.setDirection(new THREE.Vector3(1,0,0));
-      pArr.setLength(0.55 + 0.55*P, 0.14, 0.08);
-      tArr.position.set(2.9 + 0.8*λ, 0, 0);
-      tArr.setDirection(new THREE.Vector3(1,0,0));
-      tArr.setLength(0.45 + 0.28*tmag, 0.14, 0.08);
-      phase.textContent = `λ = ${λ.toFixed(2)}   P = ${P.toFixed(2)} (on the reference face)   t = ${tmag.toFixed(2)} (on the current face)`;
+    function computeMechanics(){
+      const F = [[stretch, shear, 0], [0, 1, 0], [0, 0, 1]];
+      const detF = stretch;
+      const C = [
+        [F[0][0] * F[0][0], F[0][0] * F[0][1], 0],
+        [F[0][0] * F[0][1], F[0][1] * F[0][1] + 1, 0],
+        [0, 0, 1]
+      ];
+      const E = [
+        [0.5 * (C[0][0] - 1), 0.5 * C[0][1], 0],
+        [0.5 * C[0][1], 0.5 * (C[1][1] - 1), 0],
+        [0, 0, 0]
+      ];
+      const trE = E[0][0] + E[1][1] + E[2][2];
+      const S = [
+        [lambda * trE + 2 * mu * E[0][0], 2 * mu * E[0][1], 0],
+        [2 * mu * E[0][1], lambda * trE + 2 * mu * E[1][1], 0],
+        [0, 0, lambda * trE + 2 * mu * E[2][2]]
+      ];
+      const P = [
+        [F[0][0] * S[0][0] + F[0][1] * S[1][0], F[0][0] * S[0][1] + F[0][1] * S[1][1], 0],
+        [F[1][0] * S[0][0] + F[1][1] * S[1][0], F[1][0] * S[0][1] + F[1][1] * S[1][1], 0],
+        [0, 0, S[2][2]]
+      ];
+      const invJ = 1 / detF;
+      const sigma = [
+        [invJ * (P[0][0] * F[0][0] + P[0][1] * F[0][1]), invJ * (P[0][0] * F[1][0] + P[0][1] * F[1][1]), 0],
+        [invJ * (P[1][0] * F[0][0] + P[1][1] * F[0][1]), invJ * (P[1][0] * F[1][0] + P[1][1] * F[1][1]), 0],
+        [0, 0, invJ * P[2][2]]
+      ];
+      const workDensity = 0.5 * (S[0][0] * E[0][0] + 2 * S[0][1] * E[0][1] + S[1][1] * E[1][1] + S[2][2] * E[2][2]);
+      return {F, S, P, sigma, workDensity};
     }
-    function resize(){ const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); labels.setSize(w,h); }
-    new ResizeObserver(resize).observe(stage); resize();
-    frame(reduce ? 1.2 : 0);
-    (function loop(){ requestAnimationFrame(loop); if(running) frame(clock.getElapsedTime()); controls.update(); renderer.render(scene,camera); labels.render(scene,camera); })();
+
+    function formatMatrix(m){
+      return `[${m[0][0].toFixed(1)}, ${m[0][1].toFixed(1)}]<br>[${m[1][0].toFixed(1)}, ${m[1][1].toFixed(1)}]`;
+    }
+
+    function addArrow(dir, origin, color){
+      const len = dir.length();
+      if (len < 1e-6) return;
+      vectorGroup.add(new THREE.ArrowHelper(dir.clone().normalize(), origin, Math.min(len, 1.6), color, 0.12, 0.06));
+    }
+
+    function updateScene(){
+      const {F, P, sigma, S, workDensity} = computeMechanics();
+      const pos = defGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++){
+        const x = origPos.getX(i), y = origPos.getY(i), z = origPos.getZ(i);
+        if (viewMode === 'deformed') pos.setXYZ(i, F[0][0] * x + F[0][1] * y, F[1][0] * x + F[1][1] * y, F[2][2] * z);
+        else pos.setXYZ(i, x, y, z);
+      }
+      pos.needsUpdate = true;
+      defGeo.computeVertexNormals();
+
+      vectorGroup.clear();
+      if (showVectors){
+        addArrow(new THREE.Vector3(P[0][0], P[1][0], 0).multiplyScalar(0.015), new THREE.Vector3(0.5, 0, 0), 0xffbe0b);
+        addArrow(new THREE.Vector3(sigma[0][0], sigma[1][0], 0).multiplyScalar(0.015), new THREE.Vector3(F[0][0] * 0.5, F[1][0] * 0.5, 0), 0x3a86ff);
+      }
+
+      document.getElementById('stretch-val').textContent = stretch.toFixed(2);
+      document.getElementById('shear-val').textContent = shear.toFixed(2);
+      document.getElementById('work-value').textContent = workDensity.toFixed(2);
+      document.getElementById('p-tensor').innerHTML = formatMatrix(P);
+      document.getElementById('s-tensor').innerHTML = formatMatrix(S);
+      document.getElementById('sigma-tensor').innerHTML = formatMatrix(sigma);
+    }
+
+    document.getElementById('stretch-slider').addEventListener('input', (e) => {
+      stretch = parseFloat(e.target.value);
+      updateScene();
+    });
+    document.getElementById('shear-slider').addEventListener('input', (e) => {
+      shear = parseFloat(e.target.value);
+      updateScene();
+    });
+    document.getElementById('btn-ref').addEventListener('click', () => {
+      viewMode = 'ref';
+      document.getElementById('mode-label').textContent = 'Reference (undeformed)';
+      document.getElementById('btn-ref').classList.add('on');
+      document.getElementById('btn-deformed').classList.remove('on');
+      updateScene();
+    });
+    document.getElementById('btn-deformed').addEventListener('click', () => {
+      viewMode = 'deformed';
+      document.getElementById('mode-label').textContent = 'Deformed configuration';
+      document.getElementById('btn-deformed').classList.add('on');
+      document.getElementById('btn-ref').classList.remove('on');
+      updateScene();
+    });
+    document.getElementById('btn-toggle-vectors').addEventListener('click', (e) => {
+      showVectors = !showVectors;
+      e.currentTarget.classList.toggle('on', showVectors);
+      updateScene();
+    });
+
+    function resize(){
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(container);
+    resize();
+    updateScene();
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
   </script>
 </body>
 </html>
