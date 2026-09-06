@@ -870,34 +870,9 @@ const topics = [
       ]
     },
     {
-      "section": "From continuum statement to discrete system",
-      "lead": "A strong-form PDE is not what a finite-element code solves. The weak form of momentum is the continuum statement that survives discretization; after shape functions and assembly it becomes a linear or nonlinear algebraic system.",
-      "items": [
-        {
-          "name": "Principle of virtual work",
-          "tex": "\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V",
-          "body": "A weak statement of linear momentum (quasi-static). Dynamics adds ∫ ρ a · δu. Finite elements replace the trial and test displacements with shape-function expansions on a mesh; the stress is evaluated from the constitutive law at the quadrature points.",
-          "bridge": "For linear elasticity that Galerkin projection is a stiffness system."
-        },
-        {
-          "name": "Discrete linear system",
-          "tex": "\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}",
-          "body": "After interpolation and assembly, the unknown nodal coefficients a satisfy a sparse stiffness equation whose right-hand side carries the applied loads. Boundary conditions partition the surface into essential (prescribed displacement) and natural (prescribed traction) data.",
-          "bridge": "When inertia and damping matter, the same discretization produces a second-order system in time."
-        },
-        {
-          "name": "Elastodynamics matrices",
-          "tex": "\\mathbf{M}\\ddot{\\hat{\\mathbf{u}}} + \\mathbf{C}\\dot{\\hat{\\mathbf{u}}} + \\mathbf{K}\\hat{\\mathbf{u}} = \\mathbf{F}^{\\mathrm{ext}}",
-          "body": "M comes from ρ NᵀN, K from BᵀℂB, and C is usually Rayleigh damping. Nonlinear problems replace Kû by an internal force residual R(û) that must be driven to zero.",
-          "bridge": "That residual is solved by linearization."
-        },
-        {
-          "name": "Newton–Raphson",
-          "tex": "\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})",
-          "body": "A residual R(u) = 0 is linearized at the current guess. The consistent tangent K_T is the Jacobian of that residual; when it is exact, convergence is quadratic. Every nonlinear finite-element increment is this step in disguise.",
-          "bridge": "The same continuum setting extends immediately to coupled multiphysics — heat, pore fluid, and viscous flow — without changing the balance structure."
-        }
-      ]
+      "section": "Bridge to Part II — numerical methods",
+      "lead": "The continuum statements remain the source of every discrete method. Their weak form, interpolation, quadrature, assembly, constraints, and nonlinear solution are developed in Part II.",
+      "items": [{"name":"Follow the discretization","body":"Start with Variational Principles for virtual work, then Finite Element Method (Introduction) for interpolation and assembly. Element families, integration, boundary conditions, solvers, and nonlinear methods continue from there."}]
     },
     {
       "section": "Coupled continua — heat, pore fluid, and flow",
@@ -2514,6 +2489,36 @@ const topics = [
     "In linear mechanics, solving a structural problem reduces to K u = F, where the stiffness matrix K is constant. In nonlinear continuum mechanics the residual and tangent stiffness depend on the current deformed state. The solution therefore cannot be obtained in a single step: the continuum equations must be repeatedly linearized and updated.",
     "The sequence below connects the concepts introduced in Chapter 1 of Bonet and Wood: strong form, virtual work, finite-element discretization, consistent linearization, and Newton–Raphson iteration."
   ], flow:[
+    {
+      "section": "Part II — from continuum statement to discrete system",
+      "lead": "A strong-form PDE is not what a finite-element code solves. The weak form of momentum is the continuum statement that survives discretization; after shape functions and assembly it becomes a linear or nonlinear algebraic system.",
+      "items": [
+        {
+          "name": "Principle of virtual work",
+          "tex": "\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V",
+          "body": "A weak statement of linear momentum (quasi-static). Dynamics adds ∫ ρ a · δu. Finite elements replace the trial and test displacements with shape-function expansions on a mesh; the stress is evaluated from the constitutive law at the quadrature points.",
+          "bridge": "For linear elasticity that Galerkin projection is a stiffness system."
+        },
+        {
+          "name": "Discrete linear system",
+          "tex": "\\mathbf{K}\\,\\mathbf{a} = \\mathbf{f}",
+          "body": "After interpolation and assembly, the unknown nodal coefficients a satisfy a sparse stiffness equation whose right-hand side carries the applied loads. Boundary conditions partition the surface into essential (prescribed displacement) and natural (prescribed traction) data.",
+          "bridge": "When inertia and damping matter, the same discretization produces a second-order system in time."
+        },
+        {
+          "name": "Elastodynamics matrices",
+          "tex": "\\mathbf{M}\\ddot{\\hat{\\mathbf{u}}} + \\mathbf{C}\\dot{\\hat{\\mathbf{u}}} + \\mathbf{K}\\hat{\\mathbf{u}} = \\mathbf{F}^{\\mathrm{ext}}",
+          "body": "M comes from ρ NᵀN, K from BᵀℂB, and C is usually Rayleigh damping. Nonlinear problems replace Kû by an internal force residual R(û) that must be driven to zero.",
+          "bridge": "That residual is solved by linearization."
+        },
+        {
+          "name": "Newton–Raphson",
+          "tex": "\\mathbf{K}_{T}\\,\\Delta\\mathbf{u} = -\\mathbf{R}(\\mathbf{u})",
+          "body": "A residual R(u) = 0 is linearized at the current guess. The consistent tangent K_T is the Jacobian of that residual; when it is exact, convergence is quadratic. Every nonlinear finite-element increment is this step in disguise.",
+          "bridge": "The same continuum setting extends immediately to coupled multiphysics — heat, pore fluid, and viscous flow — without changing the balance structure."
+        }
+      ]
+    },
     {
       section:"1. The Core Pipeline: From Continuum to Code",
       lead:"The core workflow of nonlinear finite-element analysis proceeds through five key stages.",
@@ -4885,7 +4890,7 @@ const PART_I_LEAD = {
 };
 
 const PART_I_BRIDGE = {
-  "Basic Equations": "The next entry is the narrative of why those continuum statements and a finite-element code are the same subject.",
+  "Basic Equations": "Part II carries the continuum statement into virtual work, interpolation, assembly, and the discrete system.",
   "Introduction to Continuum Mechanics": "That pipeline begins with a precise definition of motion — the kinematics of deformation.",
   "Kinematics of Deformation": "The language of those maps is tensors, and the divergence theorem turns volume statements into surface ones.",
   "Tensors and the Divergence Theorem": "Any invertible F then splits uniquely into stretch and rotation.",
