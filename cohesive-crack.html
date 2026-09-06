@@ -7,10 +7,18 @@
   <meta name="description" content="A cohesive zone replaces the 1/√r singularity with a traction–separation law. Finite tensile strength, fracture energy Gf, and a process zone of length E Gf / ft²." />
   <link rel="canonical" href="https://mechanicsreference.com/cohesive-crack.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <script>
+    (function(){
+      var embed = window.self !== window.top;
+      if (embed) document.documentElement.classList.add('embed');
+      if (!embed) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap';
+        document.head.appendChild(l);
+      }
+    })();
+  </script>
   <style>
     :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f;--plate:#1a2740;--accent:#c45c26}
     *{box-sizing:border-box} html,body{margin:0} html{scrollbar-gutter:stable}
@@ -43,15 +51,20 @@
     .modes button.on{background:var(--navy);color:#fff}
     footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft)}
     footer .wrap{display:flex;justify-content:space-between;padding:0;max-width:1180px}
-    html.embed,html.embed body{height:100%;background:var(--plate)}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:var(--plate)}
     html.embed header,html.embed .page-copy,html.embed footer,html.embed #legend{display:none}
     html.embed .wrap{max-width:none;height:100%;padding:0}
     html.embed .figure-shell{height:100%;border:0;display:flex;flex-direction:column}
-    html.embed .stage-row{flex:1;min-height:0}
-    html.embed #stage{height:auto}
-    html.embed .plot-cell canvas{min-height:0}
+    html.embed .stage-row{
+      flex:1 1 0;min-height:0;display:grid;
+      grid-template-columns:minmax(0,1.3fr) minmax(220px,1fr);
+    }
+    html.embed #stage{height:auto !important;min-height:0;position:relative}
+    html.embed #stage canvas{position:absolute;inset:0;width:100%;height:100%}
+    html.embed .plots{min-height:0}
+    html.embed .plot-cell canvas{min-height:0;height:100%}
     html.embed .plots .plot-cell:last-child{display:none}
-    html.embed #ui{background:#fff}
+    html.embed #ui{flex:0 0 auto;background:#fff}
     html.embed #formula{flex-basis:auto}
     @media (max-width:900px){
       .stage-row{grid-template-columns:1fr}

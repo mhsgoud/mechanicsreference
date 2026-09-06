@@ -324,17 +324,27 @@
 
     .card:has(.scene-frame){max-width:none}
     .scene-frame{
-      display:block;width:100%;height:min(38vh,340px);
-      min-height:180px;max-height:80vh;
+      display:block;width:100%;height:min(42vh,380px);
+      min-height:220px;max-height:85vh;
       resize:vertical;overflow:hidden;
       border:1px solid var(--rule);background:#1a2740;margin-top:8px;
+      position:relative;
     }
     .scene-frame iframe{
       display:block;width:100%;height:100%;border:0;background:#1a2740;
+      opacity:0;
     }
-    .scene-frame-tall{height:min(50vh,460px)}
+    .scene-frame.is-ready iframe{opacity:1}
+    .scene-placeholder{
+      position:absolute;inset:0;margin:0;
+      display:flex;align-items:center;justify-content:center;
+      color:#9aa8bc;font-size:0.92rem;pointer-events:none;
+    }
+    .scene-frame:not(.is-ready){cursor:pointer}
+    .scene-frame.is-ready .scene-placeholder{display:none}
+    .scene-frame-tall{height:min(72vh,660px)}
     .scene-frame-flush{
-      margin-top:0;border:0;height:min(46vh,420px);
+      margin-top:0;border:0;height:min(52vh,480px);
     }
     .figure-section.flush{
       margin-top:1.1rem;padding-top:0.7rem;
@@ -580,8 +590,6 @@
       .topic-nav .next{text-align:left}
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
@@ -2697,7 +2705,7 @@ function renderTopicScene(topic){
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
-    cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking'},
+    cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking', tall:true},
     jIntegral: {src:'j-integral.html', title:'The J-integral'},
     consolidation: {src:'consolidation.html', title:'One-dimensional consolidation'},
     consolidationGibson: {src:'consolidation.html#gibson', title:'Gibson consolidation'},
@@ -2737,11 +2745,66 @@ function renderTopicScene(topic){
 <section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
-  <div class="${frameClass}">
-    <iframe title="${page.title}" src="${page.src}" loading="lazy"></iframe>
+  <div class="${frameClass}" data-scene-src="${page.src}">
+    <p class="scene-placeholder">Interactive figure — loads when you scroll here</p>
+    <iframe title="${page.title}" allow="fullscreen"></iframe>
   </div>
 </section>`;
   }).join('');
+}
+
+let sceneFrameIO = null;
+let sceneLoadBusy = false;
+const sceneLoadQueue = [];
+
+function resetSceneLoader(){
+  if(sceneFrameIO){ sceneFrameIO.disconnect(); sceneFrameIO = null; }
+  sceneLoadQueue.length = 0;
+  sceneLoadBusy = false;
+}
+
+function queueSceneFrame(wrap){
+  if(!wrap || wrap.getAttribute('data-queued') === '1') return;
+  wrap.setAttribute('data-queued', '1');
+  sceneLoadQueue.push(wrap);
+  pumpSceneLoads();
+}
+
+function pumpSceneLoads(){
+  if(sceneLoadBusy || !sceneLoadQueue.length) return;
+  const wrap = sceneLoadQueue.shift();
+  const iframe = wrap.querySelector('iframe');
+  const src = wrap.getAttribute('data-scene-src');
+  if(!iframe || !src || iframe.getAttribute('src')){ pumpSceneLoads(); return; }
+  sceneLoadBusy = true;
+  wrap.classList.add('is-loading');
+  const placeholder = wrap.querySelector('.scene-placeholder');
+  if(placeholder) placeholder.textContent = 'Loading figure…';
+  iframe.addEventListener('load', function(){
+    wrap.classList.add('is-ready');
+    wrap.classList.remove('is-loading');
+    sceneLoadBusy = false;
+    pumpSceneLoads();
+  }, {once:true});
+  iframe.src = src;
+}
+
+function bindSceneFrames(root){
+  resetSceneLoader();
+  const frames = root ? root.querySelectorAll('.scene-frame[data-scene-src]') : [];
+  if(!frames.length) return;
+  const scrollRoot = document.getElementById('content');
+  sceneFrameIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      sceneFrameIO.unobserve(entry.target);
+      queueSceneFrame(entry.target);
+    });
+  }, {root: scrollRoot, rootMargin: '180px 0px', threshold: 0.01});
+  frames.forEach(function(frame){
+    sceneFrameIO.observe(frame);
+    frame.addEventListener('click', function(){ queueSceneFrame(frame); }, {once:true});
+  });
 }
 
 function renderTopicIllustrations(topic){
@@ -3847,7 +3910,29 @@ function renderBeamSimWidget(){
 }
 
 let beamSimRaf = 0;
+const mrScriptLoads = {};
+function loadScriptOnce(src, key){
+  if (mrScriptLoads[key]) return mrScriptLoads[key];
+  mrScriptLoads[key] = new Promise(function (resolve, reject) {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return mrScriptLoads[key];
+}
+function ensureThree(){
+  if (window.THREE && THREE.OrbitControls) return Promise.resolve();
+  return loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'three')
+    .then(function () {
+      return loadScriptOnce('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', 'orbit');
+    });
+}
 function mountBeamSimulator(){
+  ensureThree().then(mountBeamSimulatorNow);
+}
+function mountBeamSimulatorNow(){
   if (beamSimRaf) { cancelAnimationFrame(beamSimRaf); beamSimRaf = 0; }
   const container = document.getElementById('theory-canvas');
   if (!container || typeof THREE === 'undefined') return;
@@ -4184,6 +4269,7 @@ function renderContent(topic){
   if(topic.interactive === "beamSim"){
     mountBeamSimulator();
   }
+  bindSceneFrames(content);
   typesetMath(content);
 }
 
@@ -4362,6 +4448,8 @@ window.addEventListener('keydown', (e)=>{
     ok('lefm topic', topics.some(t => t.title === 'Linear Elastic Fracture Mechanics' && Array.isArray(t.scenes) && t.scenes.includes('lefm') && t.scenes.includes('lefmCenterCrack')));
     ok('mixed-mode cracking topic', topics.some(t => t.title === 'Mode I, II & Mixed-Mode Cracking' && t.illustrations === 'mixedModeCrack' && (t.equations||[]).length >= 3));
     ok('cohesive cracking topic', topics.some(t => t.title === 'Cohesive Cracking' && Array.isArray(t.scenes) && t.scenes.includes('cohesiveCrack') && t.scenes.includes('dcbCohesive') && t.scenes.includes('peelWells')));
+    const cohesiveSceneHtml = renderTopicScene({scenes:['cohesiveCrack','dcbCohesive','peelWells']});
+    ok('scene frames use data-src', /data-scene-src="dcb-cohesive.html"/.test(cohesiveSceneHtml) && !/<iframe[^>]+src=/.test(cohesiveSceneHtml));
     ok('j-integral topic', topics.some(t => t.title === 'The J-Integral' && t.scene === 'jIntegral'));
     ok('phase-field fracture topic', topics.some(t => t.title === 'Phase-Field Modelling of Fracture' && t.scene === 'phaseFieldFracture' && (t.equations||[]).length >= 3));
     ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));

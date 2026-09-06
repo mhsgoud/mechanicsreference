@@ -7,14 +7,27 @@
   <meta name="description" content="Displacement-controlled DCB specimen with a cohesive crack: load-displacement response from elastic opening through peak load to softening." />
   <link rel="canonical" href="https://mechanicsreference.com/dcb-cohesive.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    (function(){
+      var embed = window.self !== window.top;
+      if (embed) document.documentElement.classList.add('embed');
+      window.MR_EMBED = embed;
+      if (!embed) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Sans+3:wght@400;600&display=swap';
+        document.head.appendChild(l);
+        var mj = document.createElement('script');
+        mj.id = 'MathJax-script';
+        mj.async = true;
+        mj.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        document.head.appendChild(mj);
+      }
+    })();
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script>if (window.self !== window.top) document.documentElement.classList.add('embed');</script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{--paper:#f7f6f2;--ink:#1c2430;--ink-soft:#3d4756;--rule:#d8d4cb;--navy:#1e3a5f}
     body{margin:0;font-family:"Source Sans 3",system-ui,sans-serif;background:var(--paper);color:var(--ink)}
@@ -31,10 +44,40 @@
     .demo-root{background:#0f172a;color:#e2e8f0;padding-bottom:48px}
     .site-footer{border-top:1px solid var(--rule);padding:22px 28px 36px;font-size:0.9rem;color:var(--ink-soft);background:var(--paper)}
     .site-footer .wrap{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between}
-    html.embed,html.embed body{height:100%;background:#0f172a}
-    html.embed .site-header,html.embed .page-intro,html.embed .site-footer{display:none}
-    html.embed .demo-root{min-height:100%;padding:0} html.embed .demo-root > header{display:none}
-    html.embed .demo-root > .max-w-6xl{max-width:none;margin:0;padding:8px;height:100%}
+    html.embed,html.embed body{height:100%;overflow:hidden;background:#0f172a}
+    html.embed .site-header,html.embed .page-intro,html.embed .site-footer,
+    html.embed .demo-notes,html.embed .demo-extra{display:none !important}
+    html.embed .demo-root{height:100%;min-height:0;padding:0;overflow:hidden}
+    html.embed .demo-root > main{
+      max-width:none !important;margin:0 !important;padding:8px !important;
+      height:100%;display:flex;flex-direction:column;gap:8px;overflow:hidden;
+    }
+    html.embed .demo-panel{
+      flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px !important;
+    }
+    html.embed .demo-top{
+      flex:1 1 0;min-height:0;display:grid !important;
+      grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr) !important;
+      grid-template-rows:minmax(0,1fr) !important;
+      gap:8px;
+    }
+    html.embed .demo-stage,html.embed .demo-chart{
+      grid-column:auto !important;grid-row:auto !important;
+      height:auto !important;min-height:0 !important;max-height:none !important;
+    }
+    html.embed .demo-stage{position:relative !important}
+    html.embed #threejs-container{
+      position:absolute;inset:0;width:100%;height:100% !important;
+    }
+    html.embed .demo-chart{display:flex;flex-direction:column}
+    html.embed .demo-chart canvas{flex:1;min-height:0 !important;height:auto !important}
+    html.embed .demo-controls{flex:0 0 auto;margin-top:0 !important}
+    @media (max-width:720px){
+      html.embed .demo-top{
+        grid-template-columns:1fr !important;
+        grid-template-rows:minmax(0,1fr) minmax(140px,36%) !important;
+      }
+    }
     @media (max-width:800px){.site-header,.page-intro,.site-footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
   </style>
   <script>
@@ -62,9 +105,9 @@
     
 
     <main class="max-w-6xl mx-auto px-6 pb-12 space-y-6">
-        <div class="bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                <div class="lg:col-span-3 relative w-full h-[420px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+        <div class="demo-panel bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
+            <div class="demo-top grid grid-cols-1 lg:grid-cols-5 gap-4">
+                <div class="demo-stage lg:col-span-3 relative w-full h-[420px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
                     <div id="threejs-container" class="w-full h-full"></div>
                     <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
                         <strong>Drag</strong> to rotate | <strong>Scroll</strong> to zoom
@@ -79,7 +122,7 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
+                <div class="demo-chart lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
                     <div class="flex items-center justify-between mb-2">
                         <div class="text-xs font-semibold text-slate-300">Load–Displacement (refined XEFG)</div>
                         <label class="text-[10px] text-slate-400 flex items-center gap-1.5 cursor-pointer">
@@ -96,7 +139,7 @@
                 </div>
             </div>
 
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+            <div class="demo-controls mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
                 <div class="md:col-span-2 bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
                     <div class="flex items-center gap-3 mb-1">
                         <button id="playBtn" type="button"
@@ -108,7 +151,7 @@
                             Reset
                         </button>
                         <label for="dispSlider" class="block text-xs font-semibold text-slate-300 flex-1">
-                            Left load-node displacement $\delta$ (upper $+\delta$, lower $-\delta$):
+                            Left load-node displacement δ (upper +δ, lower −δ):
                             <span id="dispValue" class="text-indigo-400 font-mono">0.000</span> mm
                         </label>
                     </div>
@@ -125,19 +168,19 @@
 
                 <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-1.5 text-xs">
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Load ($F$):</span>
+                        <span class="text-slate-400">Load (F):</span>
                         <span id="loadVal" class="font-mono text-indigo-400">0.00 kN</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Upper-left $u_y$:</span>
+                        <span class="text-slate-400">Upper-left u<sub>y</sub>:</span>
                         <span id="topNodeVal" class="font-mono text-sky-400">+0.000 mm</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Lower-left $u_y$:</span>
+                        <span class="text-slate-400">Lower-left u<sub>y</sub>:</span>
                         <span id="botNodeVal" class="font-mono text-sky-400">−0.000 mm</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Crack length ($a$):</span>
+                        <span class="text-slate-400">Crack length (a):</span>
                         <span id="crackVal" class="font-mono text-rose-400">120 mm</span>
                     </div>
                     <div class="flex justify-between">
@@ -156,7 +199,7 @@
             </div>
 
             <!-- Cohesive traction charts -->
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="demo-extra mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-950 rounded-lg border border-slate-800 p-3">
                     <div class="text-xs font-semibold text-slate-300 mb-2">Cohesive traction along ligament $\sigma(x)$</div>
                     <canvas id="tracProfileChart" class="w-full h-[160px]"></canvas>
@@ -170,7 +213,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="demo-notes grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-700/50 text-sm space-y-2">
                 <h3 class="font-bold text-white text-base">Specimen &amp; Kinematics</h3>
                 <ul class="list-disc list-inside space-y-1 text-slate-300">
@@ -320,13 +363,21 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0f1d);
 
-        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 1, 2000);
+        const camera = new THREE.PerspectiveCamera(40, 1, 1, 2000);
         camera.position.set(0, 40, 620);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         container.appendChild(renderer.domElement);
+
+        function sizeRenderer() {
+            const w = Math.max(1, container.clientWidth);
+            const h = Math.max(1, container.clientHeight);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h, false);
+        }
+        sizeRenderer();
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -1236,17 +1287,32 @@
         });
 
         window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            sizeRenderer();
             resizeChart();
             resizeNamedChart(profileCanvas, profileCtx);
             resizeNamedChart(tslCanvas, tslCtx);
             refresh();
         });
+        new ResizeObserver(() => {
+            sizeRenderer();
+            resizeChart();
+            resizeNamedChart(profileCanvas, profileCtx);
+            resizeNamedChart(tslCanvas, tslCtx);
+            refresh();
+        }).observe(container);
+
+        let pageVisible = !document.hidden;
+        let stageInView = true;
+        document.addEventListener('visibilitychange', () => { pageVisible = !document.hidden; });
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver((entries) => {
+                stageInView = entries.some(e => e.isIntersecting);
+            }, { threshold: 0.05 }).observe(container);
+        }
 
         function animate() {
             requestAnimationFrame(animate);
+            if (!pageVisible || !stageInView) return;
             controls.update();
             renderer.render(scene, camera);
         }
