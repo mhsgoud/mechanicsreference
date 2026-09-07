@@ -3574,7 +3574,7 @@ function renderTopicScene(topic){
 <section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
-  <div class="${frameClass}" data-scene-src="${page.src}">
+  <div class="${frameClass}" data-scene-src="${page.src}"${topic.eager ? ' data-eager="1"' : ''}>
     <p class="scene-placeholder">Interactive figure — loads when you scroll here</p>
     <iframe title="${page.title}" allow="fullscreen"></iframe>
   </div>
@@ -3631,7 +3631,8 @@ function bindSceneFrames(root){
     });
   }, {root: scrollRoot, rootMargin: '180px 0px', threshold: 0.01});
   frames.forEach(function(frame){
-    sceneFrameIO.observe(frame);
+    if(frame.getAttribute('data-eager') === '1') queueSceneFrame(frame);
+    else sceneFrameIO.observe(frame);
     frame.addEventListener('click', function(){ queueSceneFrame(frame); }, {once:true});
   });
 }
@@ -5006,7 +5007,7 @@ function renderStorySections(sections){
 }
 
 function renderCohesiveStory(topic){
-  const figure = (key, number) => renderTopicScene({scenes:[key], figureNumber:number});
+  const figure = (key, number) => renderTopicScene({scenes:[key], figureNumber:number, eager:true});
   return `<div class="cohesive-story">
     <section class="cohesive-step">
       <div class="prose"><p class="regime">01 · The local fracture law</p><h2>A crack can still carry traction</h2>
@@ -5031,7 +5032,7 @@ function renderCohesiveStory(topic){
       </div>${figure('peelWells',3)}
     </section>
     <div class="prose"><h2>From a local law to a process zone</h2><p>${escHtml(topic.bullets[0])}</p><p>${escHtml(topic.bullets[1])}</p></div>
-    <details><summary>Explore cohesive laws and the crack-tip process zone</summary>${renderTopicScene({scenes:['cohesiveCrack'],figureLabel:'Process-zone detail'})}</details>
+    <details><summary>Explore cohesive laws and the crack-tip process zone</summary>${renderTopicScene({scenes:['cohesiveCrack'],figureLabel:'Process-zone detail',eager:false})}</details>
     <div class="prose"><h2>Discretization and fluid coupling</h2><p>${escHtml(topic.bullets[2])}</p><p>${escHtml(topic.bullets[3])}</p></div>
   </div>`;
 }
