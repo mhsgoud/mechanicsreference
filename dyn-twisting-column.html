@@ -95,6 +95,7 @@
           <label class="block text-slate-300 font-semibold mb-1">Time <span id="timeValue" class="text-sky-400 font-mono">—</span></label>
           <input id="frameSlider" type="range" min="0" max="0" step="1" value="0"
                  class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500">
+          <p id="sampleNote" class="mt-1 text-[10px] leading-snug text-slate-500">Stored state</p>
         </div>
         <div class="flex justify-between"><span class="text-slate-500">Increment</span><span id="incrVal" class="font-mono text-sky-300">—</span></div>
         <div class="flex justify-between"><span class="text-slate-500">Tip twist</span><span id="twistVal" class="font-mono text-amber-300">—</span></div>
@@ -137,7 +138,7 @@
         <div class="mt-auto space-y-1.5 pt-2 border-t border-slate-800">
           <div class="flex justify-between"><span class="text-slate-500">Nodes</span><span id="nNodeVal" class="font-mono text-slate-300">—</span></div>
           <div class="flex justify-between"><span class="text-slate-500">Hex elems</span><span id="nElemVal" class="font-mono text-slate-300">—</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Frames</span><span id="nFrameVal" class="font-mono text-slate-300">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Stored frames</span><span id="nFrameVal" class="font-mono text-slate-300">—</span></div>
           <div class="flex justify-between"><span class="text-slate-500">t<sub>max</sub></span><span id="tmaxVal" class="font-mono text-slate-300">—</span></div>
         </div>
       </div>
@@ -228,6 +229,9 @@
   const nodes0 = FEA.nodes0;
   const elems = FEA.elems;
   const frames = FEA.frames;
+  // The solver supplied discrete output states.  These visual substeps linearly
+  // interpolate nodal coordinates in time; they do not add solver data.
+  const INTERP_STEPS = 8;
   const nN = FEA.nNodes, nE = FEA.nElems;
   const zMax = Math.max(...nodes0.map(p => p[2]));
   const half = 0.5;
@@ -540,11 +544,27 @@
 
   let mesh = null, wire = null;
 
-  function frameCoords(fi, scale) {
-    const fr = frames[fi];
+  function sampleState(sample) {
+    const scaled = sample / INTERP_STEPS;
+    const lo = Math.min(frames.length - 1, Math.floor(scaled));
+    const hi = Math.min(frames.length - 1, lo + 1);
+    return { lo, hi, alpha: hi === lo ? 0 : scaled - lo };
+  }
+
+  function sampleTime(state) {
+    const a = frames[state.lo], b = frames[state.hi];
+    return a.time + state.alpha * (b.time - a.time);
+  }
+
+  function sampleCoord(state, i) {
+    const a = frames[state.lo].coords[i], b = frames[state.hi].coords[i], t = state.alpha;
+    return [a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), a[2] + t * (b[2] - a[2])];
+  }
+
+  function frameCoords(state, scale) {
     const coords = new Array(nN);
     for (let i = 0; i < nN; i++) {
-      const u0 = nodes0[i], u1 = fr.coords[i];
+      const u0 = nodes0[i], u1 = sampleCoord(state, i);
       coords[i] = [
         u0[0] + scale * (u1[0] - u0[0]),
         u0[1] + scale * (u1[1] - u0[1]),
@@ -554,13 +574,13 @@
     return coords;
   }
 
-  function nodalField(fi, field) {
-    const fr = frames[fi];
+  function nodalField(state, field) {
     const vals = new Float32Array(nN);
     for (let i = 0; i < nN; i++) {
-      const dx = fr.coords[i][0] - nodes0[i][0];
-      const dy = fr.coords[i][1] - nodes0[i][1];
-      const dz = fr.coords[i][2] - nodes0[i][2];
+      const p = sampleCoord(state, i);
+      const dx = p[0] - nodes0[i][0];
+      const dy = p[1] - nodes0[i][1];
+      const dz = p[2] - nodes0[i][2];
       if (field === 'UX') vals[i] = dx;
       else if (field === 'UY') vals[i] = dy;
       else if (field === 'UZ') vals[i] = dz;
@@ -582,7 +602,7 @@
     return { colors, vmin, vmax };
   }
 
-  function tipTwistDeg(fi) {
+  function tipTwistDeg(state) {
     // angle of a tip corner relative to undeformed
     let iCorner = -1;
     for (let i = 0; i < nN; i++) {
@@ -591,7 +611,7 @@
           Math.abs(nodes0[i][1] - half) < 1e-3) { iCorner = i; break; }
     }
     if (iCorner < 0) return 0;
-    const p0 = nodes0[iCorner], p1 = frames[fi].coords[iCorner];
+    const p0 = nodes0[iCorner], p1 = sampleCoord(state, iCorner);
     const a0 = Math.atan2(p0[1], p0[0]);
     const a1 = Math.atan2(p1[1], p1[0]);
     let d = (a1 - a0) * 180 / Math.PI;
@@ -601,20 +621,29 @@
   }
 
   function update() {
-    const fi = +document.getElementById('frameSlider').value;
+    const sample = +document.getElementById('frameSlider').value;
+    const state = sampleState(sample);
     const scale = +document.getElementById('scaleSlider').value;
     const field = document.getElementById('fieldSelect').value;
     const mode = document.getElementById('viewMode').value;
     document.getElementById('scaleValue').textContent = scale.toFixed(2);
-    document.getElementById('timeValue').textContent = frames[fi].time.toFixed(5);
-    document.getElementById('incrVal').textContent = String(frames[fi].increment);
-    const twist = tipTwistDeg(fi);
+    const time = sampleTime(state);
+    const isStored = state.alpha < 1e-9;
+    document.getElementById('timeValue').textContent = time.toFixed(5);
+    document.getElementById('incrVal').textContent = isStored
+      ? String(frames[state.lo].increment)
+      : `${frames[state.lo].increment} → ${frames[state.hi].increment}`;
+    document.getElementById('sampleNote').textContent = isStored
+      ? `Stored solver frame ${state.lo + 1} of ${frames.length}`
+      : `Linear visual interpolation · frames ${state.lo + 1}–${state.hi + 1}`;
+    const twist = tipTwistDeg(state);
     document.getElementById('twistVal').textContent = twist.toFixed(1) + '°';
     let umax = 0;
     for (let i = 0; i < nN; i++) {
-      const dx = frames[fi].coords[i][0] - nodes0[i][0];
-      const dy = frames[fi].coords[i][1] - nodes0[i][1];
-      const dz = frames[fi].coords[i][2] - nodes0[i][2];
+      const p = sampleCoord(state, i);
+      const dx = p[0] - nodes0[i][0];
+      const dy = p[1] - nodes0[i][1];
+      const dz = p[2] - nodes0[i][2];
       umax = Math.max(umax, Math.hypot(dx, dy, dz));
     }
     document.getElementById('umagVal').textContent = umax.toFixed(4);
@@ -625,7 +654,7 @@
 
     let colors = null;
     if (isContour) {
-      const vals = nodalField(fi, field);
+      const vals = nodalField(state, field);
       const r = colorsFromField(vals);
       colors = r.colors;
       document.getElementById('cbarMin').textContent = r.vmin.toExponential(2);
@@ -635,11 +664,11 @@
     }
 
     document.getElementById('dispOverlay').innerHTML =
-      't = ' + frames[fi].time.toFixed(5) + ' · tip twist ' + twist.toFixed(1) + '°' +
+      't = ' + time.toFixed(5) + ' · tip twist ' + twist.toFixed(1) + '°' +
       '<br>max |U| = ' + umax.toFixed(4) + ' · scale ' + scale.toFixed(2) + '×';
-    document.getElementById('statusBadge').textContent = 't = ' + frames[fi].time.toFixed(4);
+    document.getElementById('statusBadge').textContent = (isStored ? 'stored' : 'interpolated') + ' · t = ' + time.toFixed(4);
 
-    const coords = frameCoords(fi, scale);
+    const coords = frameCoords(state, scale);
     if (mesh) { root.remove(mesh); mesh.geometry.dispose(); }
     if (wire) { root.remove(wire); wire.geometry.dispose(); }
 
@@ -668,20 +697,21 @@
   fitCam();
 
   const slider = document.getElementById('frameSlider');
-  slider.max = String(frames.length - 1);
+  slider.max = String((frames.length - 1) * INTERP_STEPS);
   slider.value = '0'; // start undeformed / early so BCs are clear
   ['frameSlider','scaleSlider','fieldSelect','viewMode','wireToggle','undefToggle','fixtureToggle','bcToggle','dimToggle'].forEach(id => {
     document.getElementById(id).addEventListener('input', update);
     document.getElementById(id).addEventListener('change', update);
   });
 
-  // Base dwell ~450 ms/frame at 1× (~11 s for full history). Speed scales that.
-  const BASE_FRAME_MS = 450;
+  // Preserve the prior overall duration while rendering eight visual substeps
+  // between stored output states.
+  const BASE_SUBSTEP_MS = 450 / INTERP_STEPS;
   let playing = false, playTimer = null;
 
   function frameDelayMs() {
     const speed = Math.max(0.25, +document.getElementById('speedSlider').value || 1);
-    return Math.round(BASE_FRAME_MS / speed);
+    return Math.round(BASE_SUBSTEP_MS / speed);
   }
 
   function stopPlay() {
@@ -691,7 +721,7 @@
   function startPlay() {
     stopPlay();
     playTimer = setInterval(() => {
-      slider.value = String((+slider.value + 1) % frames.length);
+      slider.value = String((+slider.value + 1) % (+slider.max + 1));
       update();
     }, frameDelayMs());
   }
