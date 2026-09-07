@@ -79,6 +79,31 @@
       }
     }
     @media (max-width:800px){.site-header,.page-intro,.site-footer{padding-left:18px;padding-right:18px}.brand-logo{height:44px}}
+    /* Keep the drawing buffer's device-pixel size separate from its CSS size. */
+    #threejs-container canvas{display:block;width:100%;height:100%}
+    .demo-stage{display:flex;flex-direction:column;min-width:0}
+    .stage-toolbar,.stage-footer{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:#111d30;font-size:11px;color:#cbd5e1}
+    .stage-toolbar{flex-wrap:wrap;border-bottom:1px solid #293a52}
+    .stage-toolbar button{padding:4px 9px;border:1px solid #526780;border-radius:5px;background:#20324b;color:#e2e8f0;cursor:pointer}
+    .stage-toolbar button:focus-visible{outline:2px solid #67e8f9;outline-offset:2px}
+    .stage-footer{flex-wrap:wrap;border-top:1px solid #293a52}
+    .stage-viewport{position:relative;flex:1;min-height:0}
+    #threejs-container,html.embed #threejs-container{position:absolute;inset:0;width:100%;height:100% !important}
+    #stageBadge{font-size:10px;padding:3px 7px;border-radius:4px}
+    #dispOverlay{font-variant-numeric:tabular-nums;color:#e2e8f0}
+    .stage-key{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:#94a3b8}
+    .stage-key i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+    html.embed .demo-top{grid-template-columns:minmax(0,1.8fr) minmax(210px,1fr) !important}
+    @media(max-width:720px){
+      html.embed .demo-root > main{overflow-y:auto}
+      html.embed .demo-panel{flex:1 0 auto;min-height:660px}
+      html.embed .demo-top{grid-template-columns:1fr !important;grid-template-rows:minmax(340px,1fr) 140px !important}
+      html.embed .demo-controls{grid-template-columns:minmax(0,1fr) !important;gap:6px}
+      html.embed .demo-controls > :last-child{display:none}
+      .stage-toolbar,.stage-footer{padding:6px 8px}
+    }
+
+    .scale-switch{display:flex;align-items:center;gap:7px;font-size:11px;color:#fbbf24}
   </style>
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -108,27 +133,19 @@
         <div class="demo-panel bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-xl">
             <div class="demo-top grid grid-cols-1 lg:grid-cols-5 gap-4">
                 <div class="demo-stage lg:col-span-3 relative w-full h-[420px] bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
-                    <div id="threejs-container" class="w-full h-full"></div>
-                    <div class="absolute top-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded text-xs text-slate-300 border border-slate-700">
-                        <strong>Drag</strong> to rotate | <strong>Scroll</strong> to zoom
+                    <div class="stage-toolbar">
+                      <strong>Small deformation · DCB</strong><button id="fitBtn" type="button">Fit view</button>
+                      <span id="stageBadge">Stage: Elastic</span>
+                      <label class="scale-switch"><input id="trueScaleToggle" type="checkbox">Magnify displacement ×150</label>
                     </div>
-                    <div id="stageBadge" class="absolute top-3 right-3 bg-emerald-900/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-emerald-300 border border-emerald-700">
-                        Stage: Elastic
-                    </div>
-                    <div id="dispOverlay" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-2 rounded text-xs text-slate-300 border border-slate-700 font-mono leading-relaxed">
-                        Left-node δ = 0.000 mm<br>
-                        Top +δ · Bottom −δ<br>
-                        <span class="text-amber-400/90">view ×150 (true scale invisible)</span>
-                    </div>
+                    <div class="stage-viewport"><div id="threejs-container" aria-label="Small-deformation double-cantilever mesh"></div></div>
+                    <div class="stage-footer"><div id="dispOverlay"></div><span>Drag to pan · scroll to zoom</span></div>
                 </div>
 
                 <div class="demo-chart lg:col-span-2 bg-slate-950 rounded-lg border border-slate-800 p-3 flex flex-col">
                     <div class="flex items-center justify-between mb-2">
                         <div class="text-xs font-semibold text-slate-300">Load–Displacement (refined XEFG)</div>
-                        <label class="text-[10px] text-slate-400 flex items-center gap-1.5 cursor-pointer">
-                            <input id="trueScaleToggle" type="checkbox" class="accent-indigo-500">
-                            True scale
-                        </label>
+
                     </div>
                     <canvas id="ldChart" class="w-full flex-1 min-h-[280px]"></canvas>
                     <div class="mt-2 flex flex-wrap gap-3 text-[10px] text-slate-400">
@@ -151,11 +168,11 @@
                             Reset
                         </button>
                         <label for="dispSlider" class="block text-xs font-semibold text-slate-300 flex-1">
-                            Left load-node displacement δ (upper +δ, lower −δ):
+                            Right load-node displacement δ (upper +δ, lower −δ):
                             <span id="dispValue" class="text-indigo-400 font-mono">0.000</span> mm
                         </label>
                     </div>
-                    <input id="dispSlider" type="range" min="0" max="0.45" step="0.0005" value="0"
+                    <input id="dispSlider" type="range" min="0" max="0.45" step="0.0005" value="0.27"
                            class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500">
                     <div class="flex justify-between text-[10px] text-slate-500 mt-1 px-0.5">
                         <span>0</span>
@@ -172,11 +189,11 @@
                         <span id="loadVal" class="font-mono text-indigo-400">0.00 kN</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Upper-left u<sub>y</sub>:</span>
+                        <span class="text-slate-400">Upper-right u<sub>y</sub>:</span>
                         <span id="topNodeVal" class="font-mono text-sky-400">+0.000 mm</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400">Lower-left u<sub>y</sub>:</span>
+                        <span class="text-slate-400">Lower-right u<sub>y</sub>:</span>
                         <span id="botNodeVal" class="font-mono text-sky-400">−0.000 mm</span>
                     </div>
                     <div class="flex justify-between">
@@ -219,9 +236,9 @@
                 <ul class="list-disc list-inside space-y-1 text-slate-300">
                     <li><strong>Length / height:</strong> 400 mm × 200 mm</li>
                     <li><strong>Initial notch $a_0$:</strong> 120 mm</li>
-                    <li><strong>$\delta$ on the curve:</strong> vertical displacement of the <em>upper/lower left load nodes</em> (not CMOD)</li>
-                    <li><strong>Motion:</strong> upper-left node $u_y=+\delta$, lower-left $u_y=-\delta$; arms meet at crack tip $x=a$</li>
-                    <li><strong>Support:</strong> pinned at right midplane</li>
+                    <li><strong>$\delta$ on the curve:</strong> vertical displacement of the <em>upper/lower right load nodes</em> (not CMOD)</li>
+                    <li><strong>Motion:</strong> upper-right node $u_y=+\delta$, lower-right $u_y=-\delta$; arms meet at crack tip $x=a$, with $x$ measured from the loaded end</li>
+                    <li><strong>Support:</strong> pinned at left midplane</li>
                 </ul>
             </div>
 
@@ -363,8 +380,9 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0f1d);
 
-        const camera = new THREE.PerspectiveCamera(40, 1, 1, 2000);
-        camera.position.set(0, 40, 620);
+        const camera = new THREE.OrthographicCamera(-260, 260, 260, -260, 1, 2000);
+        camera.position.set(0, 0, 1000);
+        camera.lookAt(0, 0, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -373,14 +391,27 @@
         function sizeRenderer() {
             const w = Math.max(1, container.clientWidth);
             const h = Math.max(1, container.clientHeight);
-            camera.aspect = w / h;
+            const halfHeight = Math.max(235, 270 * h / w);
+            camera.left = -halfHeight * w / h;
+            camera.right = halfHeight * w / h;
+            camera.top = halfHeight;
+            camera.bottom = -halfHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(w, h, false);
         }
         sizeRenderer();
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
+        controls.enableDamping = false;
+        controls.enableRotate = false;
+        controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+        document.getElementById('fitBtn').addEventListener('click', () => {
+            controls.target.set(0, 0, 0);
+            camera.position.set(0, 0, 1000);
+            camera.zoom = 1;
+            sizeRenderer();
+            controls.update();
+        });
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.7));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
@@ -395,7 +426,7 @@
 
         // Engineering δ ≤ 0.45 mm is invisible on a 400 mm specimen → amplify for teaching view
         const VISUAL_AMPLIFY = 150;
-        let useTrueScale = false;
+        let useTrueScale = true;
 
         function visualOpen(delta) {
             return useTrueScale ? delta : delta * VISUAL_AMPLIFY;
@@ -435,6 +466,33 @@
         specimenGroup.add(topArm);
         specimenGroup.add(bottomArm);
         scene.add(specimenGroup);
+        // Explicit Q4 edges avoid diagonal triangulation lines in the teaching mesh.
+        function makeGrid(arm) {
+            const edges = [];
+            for (let j=0;j<=numSegsY;j++) for (let i=0;i<numSegsX;i++) edges.push(j*(numSegsX+1)+i,j*(numSegsX+1)+i+1);
+            for (let j=0;j<numSegsY;j++) for (let i=0;i<=numSegsX;i++) edges.push(j*(numSegsX+1)+i,(j+1)*(numSegsX+1)+i);
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(edges.length*3),3));
+            const line = new THREE.LineSegments(geometry,new THREE.LineBasicMaterial({color:0x15283c,transparent:true,opacity:0.55}));
+            specimenGroup.add(line);
+            return {arm,edges,geometry};
+        }
+        const grids = [makeGrid(topArm),makeGrid(bottomArm)];
+        function updateGrids() {
+            grids.forEach(({arm,edges,geometry}) => {
+                const src=arm.geometry.attributes.position, dst=geometry.attributes.position;
+                edges.forEach((node,i)=>dst.setXYZ(i,src.getX(node),src.getY(node),0.6));
+                dst.needsUpdate=true;
+                geometry.computeBoundingSphere();
+            });
+        }
+        const ghostGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(-200,-100,2),new THREE.Vector3(200,-100,2),
+            new THREE.Vector3(200,100,2),new THREE.Vector3(-200,100,2),new THREE.Vector3(-200,-100,2)]);
+        const ghost = new THREE.Line(ghostGeometry,new THREE.LineDashedMaterial({color:0xcbd5e1,dashSize:5,gapSize:4,transparent:true,opacity:0.65}));
+        ghost.computeLineDistances();
+        specimenGroup.add(ghost);
+
 
         // --- Bilinear cohesive zone model (engineering units) ---
         const SIGMA_C = 10.0;   // MPa peak traction
@@ -677,6 +735,12 @@
         const dimLine = new THREE.Line(dimGeo, new THREE.LineBasicMaterial({ color: 0xfbbf24 }));
         dimLine.visible = false;
         specimenGroup.add(dimLine);
+        // Match the peel figure: intact end on the left, opening on the right.
+        // Reflect the entire drawing, retaining the original model coordinates.
+        specimenGroup.scale.x = -1;
+        specimenGroup.traverse(object => {
+            if (object.isSprite) object.scale.x *= -1; // Keep billboard text readable.
+        });
 
         // --- Chart ---
         const chartCanvas = document.getElementById('ldChart');
@@ -691,6 +755,7 @@
         }
 
         function drawChart(delta, load) {
+            chartCtx.textBaseline = 'alphabetic';
             const w = chartCanvas.clientWidth;
             const h = chartCanvas.clientHeight;
             if (w < 10 || h < 10) return;
@@ -731,7 +796,7 @@
             chartCtx.fillStyle = '#94a3b8';
             chartCtx.font = '10px sans-serif';
             chartCtx.textAlign = 'center';
-            chartCtx.fillText('Left-node δ (mm)', pad.l + plotW / 2, h - 6);
+            chartCtx.fillText('Right-node δ (mm)', pad.l + plotW / 2, h - 6);
             chartCtx.save();
             chartCtx.translate(11, pad.t + plotH / 2);
             chartCtx.rotate(-Math.PI / 2);
@@ -810,7 +875,6 @@
             chartCtx.font = '10px monospace';
             chartCtx.textAlign = 'left';
             chartCtx.textBaseline = 'top';
-            chartCtx.fillText('δ=' + delta.toFixed(3) + '  F=' + load.toFixed(1), pad.l + 6, pad.t + 4);
         }
 
         // --- Cohesive traction charts ---
@@ -849,7 +913,7 @@
             profileCtx.fillStyle = '#94a3b8';
             profileCtx.font = '9px sans-serif';
             profileCtx.textAlign = 'center';
-            profileCtx.fillText('x (mm)', pad.l + plotW / 2, h - 4);
+            profileCtx.fillText('x from loaded end (mm)', pad.l + plotW / 2, h - 4);
             profileCtx.save();
             profileCtx.translate(11, pad.t + plotH / 2);
             profileCtx.rotate(-Math.PI / 2);
@@ -989,14 +1053,14 @@
                 const th = sign * theta;
                 const yLocal = y0 - yNA;
 
-                const c = Math.cos(th);
-                const s = Math.sin(th);
-                pos.setX(i, x0 - yLocal * s);
-                pos.setY(i, yNA + wArm + yLocal * c);
+                // Linearized beam displacement; amplification is applied to u only.
+                pos.setX(i, x0 - yLocal * th);
+                pos.setY(i, y0 + wArm);
             }
 
             pos.needsUpdate = true;
             geometry.computeVertexNormals();
+            geometry.computeBoundingSphere();
         }
 
         function interfaceOpening(xAbs, a, tipDefl) {
@@ -1036,16 +1100,7 @@
 
         // Solve NA tip deflection so the OUTER left load-node u_y equals target δ
         function tipDeflForLoadNode(a, targetUy) {
-            if (Math.abs(targetUy) < 1e-12) return 0;
-            const aEff = Math.max(a, a0);
-            let tipDefl = targetUy;
-            for (let k = 0; k < 8; k++) {
-                const st = cantileverState(0, aEff, tipDefl);
-                const uy = st.w - (H_half / 2) * (1 - Math.cos(st.theta));
-                if (Math.abs(uy) < 1e-9) break;
-                tipDefl *= targetUy / uy;
-            }
-            return tipDefl;
+            return targetUy; // In linear kinematics all points on the end section share u_y.
         }
 
         function updateFromDisplacement(delta) {
@@ -1060,23 +1115,20 @@
             deformArm(topArm.geometry, H_half / 2, +1, a, tipDefl);
             deformArm(bottomArm.geometry, -H_half / 2, -1, a, tipDefl);
 
-            const stressTint = Math.min(1, load / 57);
-            topArm.material.color.setRGB(
-                0.22 + 0.55 * stressTint,
-                0.74 - 0.35 * stressTint,
-                0.97 - 0.65 * stressTint
-            );
-            bottomArm.material.color.copy(topArm.material.color);
+            topArm.material.color.setHex(0x67cce3);
+            bottomArm.material.color.setHex(0x879fd5);
+            updateGrids();
+            ghost.visible = !useTrueScale;
 
             // Left load-node positions (outer corners) — these define curve δ
             const tip = cantileverState(0, Math.max(a, a0), tipDefl);
             const thTop = tip.theta;
             const thBot = -tip.theta;
             const yLocalOuter = H_half / 2;
-            const topTipX = -L / 2 - yLocalOuter * Math.sin(thTop);
-            const topTipY = H_half / 2 + tip.w + yLocalOuter * Math.cos(thTop);
-            const botTipX = -L / 2 - (-yLocalOuter) * Math.sin(thBot);
-            const botTipY = -H_half / 2 - tip.w + (-yLocalOuter) * Math.cos(thBot);
+            const topTipX = -L / 2 - yLocalOuter * thTop;
+            const topTipY = H_half / 2 + tip.w + yLocalOuter;
+            const botTipX = -L / 2 - (-yLocalOuter) * thBot;
+            const botTipY = -H_half / 2 - tip.w + (-yLocalOuter);
 
             // Measured nodal δ on the deformed figure (should match slider)
             const measuredTop = topTipY - H_half;
@@ -1177,14 +1229,11 @@
             document.getElementById('tracTipVal').textContent = tipSigma.toFixed(2) + ' MPa';
 
             const scaleNote = useTrueScale
-                ? '<span class="text-emerald-400/90">true scale (1:1)</span>'
-                : '<span class="text-amber-400/90">view ×' + VISUAL_AMPLIFY + ' (true δ invisible)</span>';
-            const visTop = useTrueScale ? measuredTop : measuredTop / VISUAL_AMPLIFY;
+                ? '<strong style="color:#6ee7b7">Displacement ×1 · true scale</strong>'
+                : '<strong style="color:#fbbf24">Displacement ×150 · exaggerated view</strong>';
             document.getElementById('dispOverlay').innerHTML =
-                'Curve δ (left nodes) = ' + delta.toFixed(3) + ' mm<br>' +
-                'σ<sub>max</sub> = ' + maxSigma.toFixed(2) + ' MPa · tip σ = ' + tipSigma.toFixed(2) + '<br>' +
-                'tip δ<sub>n</sub> = ' + tipSep.toFixed(4) + ' mm<br>' +
-                scaleNote;
+                scaleNote + '<br>δ = ' + delta.toFixed(3) + ' mm · L = 400 mm · δ/L = ' + (100*delta/L).toFixed(3) + '%' +
+                '<br><span style="color:#94a3b8">Small-deformation kinematics' + (useTrueScale ? '' : ' · dashed outline = reference') + '</span>';
 
             const stateEl = document.getElementById('stateVal');
             stateEl.textContent = stage.label;
@@ -1204,7 +1253,7 @@
                 residual: 'absolute top-3 right-3 bg-slate-800/80 backdrop-blur px-3 py-1.5 rounded text-xs font-semibold text-slate-300 border border-slate-600'
             };
             stateEl.className = colors[stage.key];
-            badge.className = badgeColors[stage.key];
+            badge.className = badgeColors[stage.key].replace('absolute top-3 right-3 ', '');
 
             drawChart(delta, load);
             drawTractionProfile(cohesiveStations, a);
@@ -1282,7 +1331,7 @@
         });
 
         document.getElementById('trueScaleToggle').addEventListener('change', (e) => {
-            useTrueScale = e.target.checked;
+            useTrueScale = !e.target.checked;
             refresh();
         });
 

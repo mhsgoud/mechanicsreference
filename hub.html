@@ -343,6 +343,14 @@
     .scene-frame:not(.is-ready){cursor:pointer}
     .scene-frame.is-ready .scene-placeholder{display:none}
     .scene-frame-tall{height:min(72vh,660px)}
+    .cohesive-story{margin-top:24px}
+    .cohesive-step{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,1.8fr);gap:32px;align-items:start;margin:32px 0 48px;padding-top:24px;border-top:1px solid var(--rule)}
+    .cohesive-step h2{margin-top:0;font-size:1.45rem}
+    .cohesive-step .figure-section{margin:0;padding:0;border:0;min-width:0}
+    .cohesive-step .scene-frame{height:620px;max-height:none}
+    .cohesive-step .reading-cue{border-left:3px solid #3a7990;padding:12px 16px;background:#edf2f3;font-size:.95rem}
+    .cohesive-step .regime{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:#3a7990;font-weight:600}
+    @media(max-width:1150px){.cohesive-step{grid-template-columns:1fr;gap:12px}.cohesive-step .prose{max-width:70ch}.cohesive-step .scene-frame{height:600px}}
     .scene-frame-flush{
       margin-top:0;border:0;height:min(52vh,480px);
     }
@@ -3526,6 +3534,7 @@ function renderTopicScene(topic){
     fractureLab: {src:'fracture-lab.html', title:'Explore crack-face motion and the energy available for growth', tall:true},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
     cohesiveCrack: {src:'cohesive-crack.html', title:'Cohesive cracking', tall:true},
+    cohesiveBonds: {src:'cohesive-bonds.html', title:'Cohesive bonds and the traction–separation law', tall:true},
     jIntegral: {src:'j-integral.html', title:'The J-integral'},
     consolidation: {src:'consolidation.html', title:'One-dimensional consolidation'},
     consolidationGibson: {src:'consolidation.html#gibson', title:'Gibson consolidation'},
@@ -3559,7 +3568,7 @@ function renderTopicScene(topic){
   return keys.map((key, i) => {
     const page = pages[key];
     if(!page) return '';
-    const heading = keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1));
+    const heading = topic.figureLabel || (topic.figureNumber ? 'Figure ' + topic.figureNumber : keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1)));
     const frameClass = ['scene-frame', page.tall ? 'scene-frame-tall' : '', page.flush ? 'scene-frame-flush' : ''].filter(Boolean).join(' ');
     return `
 <section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
@@ -4996,7 +5005,39 @@ function renderStorySections(sections){
   `).join("")}</div>`;
 }
 
+function renderCohesiveStory(topic){
+  const figure = (key, number) => renderTopicScene({scenes:[key], figureNumber:number});
+  return `<div class="cohesive-story">
+    <section class="cohesive-step">
+      <div class="prose"><p class="regime">01 · The local fracture law</p><h2>A crack can still carry traction</h2>
+        <p>In a cohesive zone, opposing crack faces still transmit traction as they separate. A zero-thickness interface represents this gradual loss of load-carrying capacity. The bonds in Figure 1 make that interface visible: they stretch, soften and disappear when separation is complete.</p>
+        <p>The bilinear law has three defining parameters: initial stiffness K, peak strength f<sub>t</sub>, and fracture energy G<sub>f</sub>. Damage starts at δ<sub>0</sub> = f<sub>t</sub>/K. For this triangular loading envelope, G<sub>f</sub> = ½ f<sub>t</sub> δ<sub>f</sub>; it is an energy per interface area, not a failure displacement.</p>
+        <p class="reading-cue">Figure 1: open the interface through the peak and into softening. Move the slider back to see unloading with reduced stiffness. After failure, closing the gap does not restore the bonds; “Reset damage” starts again.</p>
+      </div>${figure('cohesiveBonds',1)}
+    </section>
+    <section class="cohesive-step">
+      <div class="prose"><p class="regime">02 · Small deformation</p><h2>Crack growth with almost unchanged geometry</h2>
+        <p>The double-cantilever specimen is 400 mm long. Each loaded end moves by at most 0.45 mm: δ/L ≤ 0.001125, or 0.113%. At true scale the arms remain almost in their original position, even as the interface softens and the crack advances.</p>
+        <p>Small-deformation kinematics linearize displacement gradients about the reference geometry. The cohesive law can still be nonlinear: a falling load–displacement curve does not, by itself, imply large deformation.</p>
+        <p class="reading-cue">Figure 2: start at true scale, then turn on “Magnify displacement ×150” to inspect the opening. Magnification changes the drawing only; the displacement and load values remain physical.</p>
+      </div>${figure('dcbCohesive',2)}
+    </section>
+    <section class="cohesive-step">
+      <div class="prose"><p class="regime">03 · Large deformation</p><h2>The changing geometry becomes part of the problem</h2>
+        <p>In the 10 mm peel specimen, an opening of u = 2 mm per arm already gives u/L = 20%. At the end of the slider, u/L reaches 85.3%. The arms visibly turn and separate without displacement magnification.</p>
+        <p>Large rotations require the geometry and interface directions to be updated during the analysis. The Wells L–L example combines a geometrically nonlinear interface with a neo-Hookean bulk. The viewer illustrates the changing shape alongside the supplied load–displacement history.</p>
+        <p class="reading-cue">Figure 3: watch the arms open at ×1 displacement scale. Compare their changing shape with Figure 2 at true scale. Automatic camera fitting changes the zoom, not the deformation scale.</p>
+        <p>These are different specimens and cohesive laws, not two solutions of one benchmark. Compare their kinematics and displacement-to-length ratios, rather than their absolute loads.</p>
+      </div>${figure('peelWells',3)}
+    </section>
+    <div class="prose"><h2>From a local law to a process zone</h2><p>${escHtml(topic.bullets[0])}</p><p>${escHtml(topic.bullets[1])}</p></div>
+    <details><summary>Explore cohesive laws and the crack-tip process zone</summary>${renderTopicScene({scenes:['cohesiveCrack'],figureLabel:'Process-zone detail'})}</details>
+    <div class="prose"><h2>Discretization and fluid coupling</h2><p>${escHtml(topic.bullets[2])}</p><p>${escHtml(topic.bullets[3])}</p></div>
+  </div>`;
+}
+
 function renderContent(topic){
+  const cohesiveStory = topic.title === 'Cohesive Cracking';
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
   const lead = topicLead(topic);
 
@@ -5031,14 +5072,14 @@ function renderContent(topic){
       ${partPathHtml(topic)}
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
-      <div class="prose">${prose}</div>
+      ${cohesiveStory ? renderCohesiveStory(topic) : `<div class="prose">${prose}</div>`}
       ${storyBlock}
-      ${topic.sceneFirst ? sceneBlock : ""}
+      ${!cohesiveStory && topic.sceneFirst ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
       ${tableBlock}
       ${subsectionBlock}
-      ${topic.sceneFirst ? "" : sceneBlock}
+      ${cohesiveStory || topic.sceneFirst ? "" : sceneBlock}
       ${illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}

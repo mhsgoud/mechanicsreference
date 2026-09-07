@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cohesive bonds — Mechanics Reference</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font:14px/1.5 system-ui,sans-serif;background:#0f172a;color:#e2e8f0}
+    main{height:100vh;min-height:560px;display:flex;flex-direction:column;padding:12px;gap:10px;max-width:1180px;margin:auto}
+    .toolbar,.controls,.metrics{background:#142137;border:1px solid #2c405b;border-radius:8px;padding:12px}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .toolbar strong{font-size:13px}.hint{color:#94a3b8;font-size:11px}
+    button{font:inherit;font-size:12px;border:1px solid #526780;border-radius:5px;background:#243852;color:#e2e8f0;padding:5px 10px;cursor:pointer}
+    button:focus-visible,input:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
+    .visuals{flex:1;min-height:0;display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+    .stage,.plot{position:relative;min-height:0;background:#0a0f1d;border:1px solid #25374e;border-radius:8px;overflow:hidden}
+    #view{position:absolute;inset:0}canvas{display:block;width:100%;height:100%}
+    .stage .hint{position:absolute;bottom:8px;left:12px;pointer-events:none}
+    .plot{display:flex;flex-direction:column;padding:12px}.plot strong{font-size:12px}.plot canvas{flex:1;min-height:0}
+    .metrics{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;font-variant-numeric:tabular-nums}
+    #state{color:#34d399}.controls label{display:block;font-size:13px;margin-bottom:8px}input{width:100%;accent-color:#34d399}
+    .ticks{display:flex;justify-content:space-between;font-size:10px;color:#94a3b8}
+    .note{font-size:11px;color:#94a3b8;margin:0}
+    @media(max-width:720px){main{min-height:660px}.visuals{grid-template-columns:1fr;grid-template-rows:minmax(200px,1fr) 150px}.toolbar,.metrics,.controls{padding:8px}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="toolbar"><strong>Across a cohesive interface</strong><span id="state" role="status">Elastic</span><div><button id="fit" type="button">Fit view</button> <button id="reset" type="button">Reset damage</button></div></div>
+  <div class="visuals">
+    <div class="stage"><div id="view" aria-label="Two blocks joined by cohesive bonds"></div><span class="hint">Drag to rotate · scroll to zoom · schematic bonds</span></div>
+    <div class="plot"><strong>Traction t versus separation δ</strong><canvas id="law" aria-label="Bilinear cohesive law with current traction marker"></canvas></div>
+  </div>
+  <div class="metrics"><span>Traction <strong id="traction">0 MPa</strong></span><span>Damage <strong id="damage">0%</strong></span><span>K = 100 MPa/mm · f<sub>t</sub> = 10 MPa · G<sub>f</sub> = 7.5 N/mm</span></div>
+  <div class="controls"><label for="opening">Interface separation δ: <strong id="delta">0.00</strong> mm</label><input id="opening" type="range" min="0" max="2" step="0.01" value="0.06"><div class="ticks"><span>Closed · 0</span><span>Peak · 0.10 mm</span><span>Failure · 1.50 mm</span><span>2</span></div></div>
+  <p class="note">Green: elastic · amber: softening · bonds disappear at failure. Unloading follows the damaged stiffness; closing the gap does not heal bonds. Reset starts a new loading cycle.</p>
+</main>
+<script>
+(() => {
+  'use strict';
+  // Adapted from the user-supplied "Understanding Cohesive Cracking & Cohesive Zone Models".
+  const K=100, ft=10, d0=ft/K, df=1.5;
+  const view=document.getElementById('view'), slider=document.getElementById('opening');
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0a0f1d);
+  const camera=new THREE.PerspectiveCamera(38,1,.1,100);
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));view.appendChild(renderer.domElement);
+  const controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;
+  controls.minDistance=4;controls.maxDistance=24;
+  scene.add(new THREE.AmbientLight(0xffffff,.75));
+  const light=new THREE.DirectionalLight(0xffffff,.85);light.position.set(3,7,6);scene.add(light);
+  const geometry=new THREE.BoxGeometry(4,.8,2);
+  function block(color){
+    const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color,roughness:.75}));
+    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:0xb7d2e7,transparent:true,opacity:.35})));
+    scene.add(mesh);return mesh;
+  }
+  const top=block(0x67cce3),bottom=block(0x879fd5);
+  const bonds=[],bondGeometry=new THREE.CylinderGeometry(.025,.025,1,8);
+  for(const z of [-.65,0,.65]) for(let i=0;i<13;i++){
+    const mesh=new THREE.Mesh(bondGeometry,new THREE.MeshStandardMaterial({color:0x34d399,roughness:.55}));
+    mesh.position.set(-1.8+i*.3,0,z);scene.add(mesh);bonds.push(mesh);
+  }
+  const chart=document.getElementById('law'),ctx=chart.getContext('2d');
+  let maximum=0,delta=Number(slider.value),damage=0,traction=0;
+  function envelope(d){return d<=d0?K*d:d<df?ft*(df-d)/(df-d0):0;}
+  function drawLaw(){
+    const r=chart.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+    chart.width=Math.max(1,Math.round(r.width*dpr));chart.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);
+    const w=r.width,h=r.height,p={l:34,r:12,t:18,b:32};
+    const x=d=>p.l+d/2*(w-p.l-p.r),y=t=>h-p.b-t/12*(h-p.t-p.b);
+    ctx.font='10px system-ui';ctx.lineWidth=1;ctx.strokeStyle='#283c55';ctx.fillStyle='#94a3b8';
+    [0,5,10].forEach(t=>{ctx.beginPath();ctx.moveTo(x(0),y(t));ctx.lineTo(x(2),y(t));ctx.stroke();ctx.fillText(t,p.l-22,y(t)+3);});
+    ctx.textAlign='center';[0,.5,1,1.5,2].forEach(d=>ctx.fillText(d.toFixed(1),x(d),h-p.b+14));
+    ctx.fillText('δ (mm)',w/2,h-3);ctx.textAlign='left';ctx.fillText('t (MPa)',p.l,11);
+    ctx.fillStyle='rgba(167,139,250,.12)';ctx.beginPath();ctx.moveTo(x(0),y(0));ctx.lineTo(x(d0),y(ft));ctx.lineTo(x(df),y(0));ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#a78bfa';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x(0),y(0));ctx.lineTo(x(d0),y(ft));ctx.lineTo(x(df),y(0));ctx.lineTo(x(2),y(0));ctx.stroke();
+    if(maximum>d0&&maximum<df){ctx.strokeStyle='#94a3b8';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x(0),y(0));ctx.lineTo(x(maximum),y(envelope(maximum)));ctx.stroke();ctx.setLineDash([]);}
+    ctx.fillStyle=damage===1?'#f87171':damage>0?'#fbbf24':'#34d399';ctx.beginPath();ctx.arc(x(delta),y(traction),4,0,Math.PI*2);ctx.fill();
+  }
+  function update(){
+    delta=Number(slider.value);maximum=Math.max(maximum,delta);
+    damage=maximum<=d0?0:maximum>=df?1:1-envelope(maximum)/(K*maximum);
+    traction=(1-damage)*K*delta;
+    top.position.y=.4+delta/2;bottom.position.y=-.4-delta/2;
+    const color=damage===1?0xf87171:damage>0?0xfbbf24:0x34d399;
+    bonds.forEach(b=>{b.visible=damage<1&&delta>.001;b.scale.y=Math.max(.001,delta);b.material.color.setHex(color);});
+    document.getElementById('delta').textContent=delta.toFixed(2);
+    document.getElementById('traction').textContent=traction.toFixed(2)+' MPa';
+    document.getElementById('damage').textContent=(100*damage).toFixed(1)+'%';
+    const state=document.getElementById('state');state.textContent=damage===1?'Failed interface':delta<maximum&&damage>0?'Unloading / reloading':damage>0?'Softening':'Elastic';state.style.color='#'+color.toString(16);
+    drawLaw();
+  }
+  function fit(){const distance=Math.max(9,7/camera.aspect);camera.position.set(distance*.48,distance*.32,distance*.82);controls.target.set(0,0,0);controls.update();}
+  function resize(){const w=Math.max(1,view.clientWidth),h=Math.max(1,view.clientHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);fit();drawLaw();}
+  slider.addEventListener('input',update);
+  document.getElementById('reset').addEventListener('click',()=>{maximum=0;slider.value='0';update();});
+  document.getElementById('fit').addEventListener('click',fit);
+  new ResizeObserver(resize).observe(view);
+  let visible=true;new IntersectionObserver(entries=>{visible=entries.some(e=>e.isIntersecting);}).observe(view);
+  function animate(){requestAnimationFrame(animate);if(document.hidden||!visible)return;controls.update();renderer.render(scene,camera);}
+  update();resize();animate();
+})();
+</script>
+</body>
+</html>
