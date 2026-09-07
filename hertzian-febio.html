@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hertzian contact — FEBio — Mechanics Reference</title>
+  <link rel="canonical" href="https://mechanicsreference.com/hertzian-febio.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1020; font-family: "Segoe UI", system-ui, sans-serif; color: #e8eefc; }
+    #c { display: block; width: 100%; height: 100%; }
+    .panel {
+      position: absolute; top: 16px; left: 16px; width: 320px;
+      background: rgba(12, 18, 36, 0.86); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 14px 16px; backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+    h1 { font-size: 15px; margin: 0 0 4px; letter-spacing: 0.02em; }
+    .sub { font-size: 11px; color: #9aa8c7; margin-bottom: 12px; }
+    label { display: block; font-size: 11px; color: #b8c4de; margin: 10px 0 4px; }
+    select, input[type=range] { width: 100%; }
+    select {
+      background: #18233f; color: #fff; border: 1px solid #2a3a66; border-radius: 8px; padding: 6px 8px;
+    }
+    .row { display: flex; justify-content: space-between; font-size: 11px; color: #d5def0; }
+    .bar { height: 10px; border-radius: 99px; margin-top: 10px;
+      background: linear-gradient(90deg, #30123b, #4662d7, #36c5cb, #a4fc3c, #fafa15, #f68f39, #a52c60); }
+    .minmax { display: flex; justify-content: space-between; font-size: 10px; color: #9aa8c7; margin-top: 4px; }
+    .hint { margin-top: 12px; font-size: 10px; color: #7f8eae; line-height: 1.4; }
+    .playrow { display: flex; gap: 8px; align-items: center; }
+    .playrow input[type=range] { flex: 1; }
+    button#play {
+      flex: 0 0 64px; height: 28px; border: 0; border-radius: 8px; cursor: pointer;
+      background: #3d6cff; color: #fff; font-weight: 600; font-size: 12px;
+    }
+    button#play[aria-pressed="true"] { background: #8b4dff; }
+    #plot { display: block; width: 100%; height: 150px; margin-top: 10px; background: #0e1730; border-radius: 8px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 12px; font-size: 10px; color: #c5d0e8; margin-top: 6px; }
+    .legend i { display: inline-block; width: 12px; height: 2px; vertical-align: middle; margin-right: 4px; }
+    .stats { font-size: 10px; color: #b8c4de; margin-top: 8px; line-height: 1.45; }
+    .warn { color: #f0c36a; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="panel">
+    <h1>Hertzian contact — FEBio surface results</h1>
+    <div class="sub" id="meta">Loading FEBio surface…</div>
+    <label for="caseSel">FEBio run</label>
+    <select id="caseSel">
+      <option value="demo">Studio demo · μ = 0.7, sliding Fx</option>
+      <option value="mu0">Frictionless · μ = 0, Fx = 0</option>
+    </select>
+    <label for="field">Color field</label>
+    <select id="field">
+      <option value="contactPressure">Contact pressure</option>
+      <option value="vonMises">von Mises stress</option>
+      <option value="dispMag">Displacement magnitude</option>
+    </select>
+    <label>Time step <span class="row"><span id="tlabel">—</span></span></label>
+    <div class="playrow">
+      <button id="play" type="button" aria-pressed="false">Play</button>
+      <input id="frame" type="range" min="0" max="0" value="0" />
+    </div>
+    <label>Warp scale <span class="row"><span id="wlabel">1.00</span></span></label>
+    <input id="warp" type="range" min="0" max="20" step="0.1" value="1" />
+    <div class="bar"></div>
+    <div class="minmax"><span id="vmin">0</span><span id="vmax">1</span></div>
+    <label>p(x) vs Hertz</label>
+    <canvas id="plot" width="580" height="270"></canvas>
+    <div class="legend">
+      <span><i style="background:#7ec8ff"></i>FE</span>
+      <span><i style="background:#ffd166"></i>Hertz (R, half-space)</span>
+      <span><i style="background:#5ee0a0"></i>Hertz shape (a from FE)</span>
+    </div>
+    <div class="stats" id="hstats">—</div>
+    <div class="hint">Orbit: left drag · zoom: wheel · pan: right drag. The frictionless case is the direct Hertz comparison; the sliding case shows where tangential load departs from that assumption.</div>
+  </div>
+  <script src="hertzian_data.js"></script>
+  <script src="hertzian_compare.js"></script>
+  <script src="hertzian_mu0_data.js"></script>
+  <script src="hertzian_compare_mu0.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const cases = {
+      demo: { data: window.HERTZIAN, cmp: window.HERTZ_COMPARE, label: "μ = 0.7, Fx sliding" },
+      mu0: { data: window.HERTZIAN_MU0, cmp: window.HERTZ_COMPARE_MU0, label: "μ = 0, Fx = 0" },
+    };
+    let data = cases.demo.data;
+    if (!data) {
+      document.getElementById("meta").textContent = "Missing hertzian_data.js — run vtk_to_threejs.py after FEBio finishes.";
+      throw new Error("no data");
+    }
+
+    const canvas = document.getElementById("c");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1020);
+    scene.fog = new THREE.Fog(0x0b1020, 18, 55);
+
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.05, 200);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0x9bb0d4, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 1.15);
+    key.position.set(8, 14, 10);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x7aa2ff, 0.35);
+    fill.position.set(-10, 4, -6);
+    scene.add(fill);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(data.vertices, 3));
+    geo.setIndex(data.indices);
+    geo.computeVertexNormals();
+    const colors = new Float32Array(data.nSurfaceNodes * 3);
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      metalness: 0.08,
+      roughness: 0.42,
+      side: THREE.DoubleSide,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo, 25),
+      new THREE.LineBasicMaterial({ color: 0x101828, transparent: true, opacity: 0.22 })
+    );
+    mesh.add(edges);
+
+    const grid = new THREE.GridHelper(16, 16, 0x24314f, 0x182238);
+    grid.position.y = data.bounds[1] - 0.02;
+    scene.add(grid);
+
+    const box = new THREE.Box3().setFromArray(data.vertices);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    controls.target.copy(center);
+    camera.position.set(center.x, center.y, center.z + Math.max(size.x, size.y) * 1.35);
+    camera.up.set(0, 1, 0);
+
+    const turbo = (t) => {
+      t = Math.min(1, Math.max(0, t));
+      const r = Math.min(1, Math.max(0, 1.5 - Math.abs(4 * t - 3)));
+      const g = Math.min(1, Math.max(0, 1.5 - Math.abs(4 * t - 2)));
+      const b = Math.min(1, Math.max(0, 1.5 - Math.abs(4 * t - 1)));
+      return [r, g, b];
+    };
+
+    const fieldEl = document.getElementById("field");
+    const frameEl = document.getElementById("frame");
+    const warpEl = document.getElementById("warp");
+    const playEl = document.getElementById("play");
+    frameEl.max = String(data.nFrames - 1);
+    const tHertz = data.times.findIndex((t) => Math.abs(t - 1) < 1e-6);
+    if (tHertz >= 0) frameEl.value = String(tHertz);
+    document.getElementById("meta").textContent =
+      `${data.nSurfaceNodes.toLocaleString()} surface nodes · ${data.nTriangles.toLocaleString()} tris · ${data.nFrames} frames`;
+
+    const rest = data.vertices;
+    const pos = geo.getAttribute("position");
+    let cmp = cases.demo.cmp;
+    const caseEl = document.getElementById("caseSel");
+    const plot = document.getElementById("plot");
+    const pctx = plot.getContext("2d");
+
+    function nearestCompare(t) {
+      if (!cmp) return null;
+      return cmp.frames.reduce((b, f) => (Math.abs(f.time - t) < Math.abs(b.time - t) ? f : b));
+    }
+
+    function drawCompare(t) {
+      const W = plot.width, H = plot.height;
+      pctx.clearRect(0, 0, W, H);
+      const fr = nearestCompare(t);
+      if (!fr) {
+        document.getElementById("hstats").textContent = "Missing hertzian_compare.js";
+        return;
+      }
+      const pad = { l: 46, r: 12, t: 12, b: 28 };
+      const xmin = -1.2, xmax = 1.2;
+      const fe = fr.xFE.map((x, i) => [x, fr.pFE[i]]).filter(([x]) => x >= xmin && x <= xmax);
+      const pmax = Math.max(fr.p0 || 0, fr.pmax || 0, 1);
+      const xmap = (x) => pad.l + (x - xmin) / (xmax - xmin) * (W - pad.l - pad.r);
+      const ymap = (p) => pad.t + (1 - p / pmax) * (H - pad.t - pad.b);
+
+      pctx.strokeStyle = "#2a3a66";
+      pctx.lineWidth = 1;
+      pctx.beginPath();
+      pctx.moveTo(pad.l, pad.t);
+      pctx.lineTo(pad.l, H - pad.b);
+      pctx.lineTo(W - pad.r, H - pad.b);
+      pctx.stroke();
+      pctx.fillStyle = "#9aa8c7";
+      pctx.font = "16px Segoe UI, sans-serif";
+      pctx.fillText("x", W / 2, H - 6);
+      pctx.save();
+      pctx.translate(14, H / 2);
+      pctx.rotate(-Math.PI / 2);
+      pctx.fillText("p", 0, 0);
+      pctx.restore();
+
+      function polyline(xs, ps, color, width) {
+        pctx.strokeStyle = color;
+        pctx.lineWidth = width;
+        pctx.beginPath();
+        let started = false;
+        for (let i = 0; i < xs.length; i++) {
+          if (xs[i] < xmin || xs[i] > xmax) continue;
+          const X = xmap(xs[i]), Y = ymap(ps[i]);
+          if (!started) { pctx.moveTo(X, Y); started = true; }
+          else pctx.lineTo(X, Y);
+        }
+        pctx.stroke();
+      }
+
+      polyline(fr.xH, fr.pH, "#ffd166", 2.4);
+      const afe = fr.aFE || 0;
+      const p0fe = afe > 0 ? 2 * Math.abs(fr.Fy) / (Math.PI * afe) : 0;
+      const xs = [], ps = [];
+      for (let i = 0; i <= 80; i++) {
+        const x = afe * (-1 + 2 * i / 80);
+        const s = 1 - (x / (afe || 1)) ** 2;
+        xs.push(x);
+        ps.push(s > 0 ? p0fe * Math.sqrt(s) : 0);
+      }
+      polyline(xs, ps, "#5ee0a0", 2.2);
+
+      pctx.fillStyle = "#7ec8ff";
+      for (const [x, p] of fe) {
+        if (p <= 0 && Math.abs(x) > 0.9) continue;
+        pctx.beginPath();
+        pctx.arc(xmap(x), ymap(p), 2.2, 0, Math.PI * 2);
+        pctx.fill();
+      }
+
+      const p0err = fr.p0 ? (100 * (fr.pmax / fr.p0 - 1)) : 0;
+      const aerr = fr.a ? (100 * (fr.aFE / fr.a - 1)) : 0;
+      const fxNote = fr.fxSmall ? "" : '<span class="warn">Fx is large — Hertz assumes frictionless normal load.</span><br>';
+      document.getElementById("hstats").innerHTML =
+        fxNote +
+        `R = ${cmp.R.toFixed(2)} (gap fit) · E* = ${cmp.Estar.toFixed(0)}<br>` +
+        `F<sub>y</sub> = ${fr.Fy.toFixed(0)} · F<sub>x</sub> = ${fr.Fx.toFixed(1)}<br>` +
+        `p<sub>0</sub> FE / Hertz = ${fr.pmax.toFixed(1)} / ${fr.p0.toFixed(1)} (${p0err >= 0 ? "+" : ""}${p0err.toFixed(1)}%)<br>` +
+        `a FE / Hertz = ${fr.aFE.toFixed(3)} / ${fr.a.toFixed(3)} (${aerr >= 0 ? "+" : ""}${aerr.toFixed(1)}%)`;
+    }
+
+    function apply() {
+      const fi = Number(frameEl.value);
+      const fr = data.frames[fi];
+      const warp = Number(warpEl.value);
+      const field = fr[fieldEl.value];
+      let lo = Infinity, hi = -Infinity;
+      for (let i = 0; i < field.length; i++) {
+        lo = Math.min(lo, field[i]);
+        hi = Math.max(hi, field[i]);
+      }
+      if (!(hi > lo)) { lo = 0; hi = 1; }
+      for (let i = 0; i < data.nSurfaceNodes; i++) {
+        pos.setXYZ(
+          i,
+          rest[3 * i] + warp * fr.displacement[3 * i],
+          rest[3 * i + 1] + warp * fr.displacement[3 * i + 1],
+          rest[3 * i + 2] + warp * fr.displacement[3 * i + 2]
+        );
+        const col = turbo((field[i] - lo) / (hi - lo));
+        colors[3 * i] = col[0];
+        colors[3 * i + 1] = col[1];
+        colors[3 * i + 2] = col[2];
+      }
+      pos.needsUpdate = true;
+      geo.getAttribute("color").needsUpdate = true;
+      geo.computeVertexNormals();
+      document.getElementById("tlabel").textContent = `t = ${fr.time}`;
+      document.getElementById("wlabel").textContent = warp.toFixed(2);
+      document.getElementById("vmin").textContent = lo.toExponential(2);
+      document.getElementById("vmax").textContent = hi.toExponential(2);
+      drawCompare(fr.time);
+    }
+
+    let playing = false;
+    let lastStep = 0;
+    const msPerFrame = 280;
+
+    function setPlaying(on) {
+      playing = on;
+      playEl.textContent = on ? "Pause" : "Play";
+      playEl.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+
+    playEl.addEventListener("click", () => setPlaying(!playing));
+    caseEl.addEventListener("change", () => {
+      const c = cases[caseEl.value];
+      if (!c || !c.data) return;
+      data = c.data;
+      cmp = c.cmp;
+      frameEl.max = String(data.nFrames - 1);
+      const t1 = data.times.findIndex((t) => Math.abs(t - 1) < 1e-6);
+      frameEl.value = String(t1 >= 0 ? t1 : data.nFrames - 1);
+      document.getElementById("meta").textContent =
+        `${data.nSurfaceNodes.toLocaleString()} surface nodes · ${data.nTriangles.toLocaleString()} tris · ${data.nFrames} frames · ${c.label}`;
+      setPlaying(false);
+      apply();
+    });
+    fieldEl.addEventListener("change", apply);
+    frameEl.addEventListener("input", () => {
+      setPlaying(false);
+      apply();
+    });
+    warpEl.addEventListener("input", apply);
+    apply();
+
+    function resize() {
+      const w = innerWidth, h = innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    function tick(now) {
+      if (playing && now - lastStep >= msPerFrame) {
+        lastStep = now;
+        const next = (Number(frameEl.value) + 1) % data.nFrames;
+        frameEl.value = String(next);
+        apply();
+      }
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  </script>
+</body>
+</html>
