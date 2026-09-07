@@ -2749,13 +2749,13 @@ const topics = [
     "Internal degrees of freedom that do not couple to neighbouring elements can be eliminated at the element level. Partitioning K into retained and condensed blocks, the Schur complement K_rr − K_rc K_cc⁻¹ K_cr is the stiffness seen by the retained unknowns.",
     "The same block elimination appears in domain decomposition, mixed methods, and the condensation of hierarchical bases. It reduces the global system; it does not change the underlying approximation. Static condensation of a bubble or of an internal pressure does not turn an unstable mixed pair into a stable one."
   ], tags:["Schur","condensation","hierarchical","GPU"]},
-  {part:"Part III – Advanced FEM Concepts", title:"Time-Dependent Problems", bullets:[
+  {part:"Part IV – Applications in Engineering", title:"Time-Dependent Problems", bullets:[
     "When inertia or rate-dependent constitutive response matters, the discrete system is a set of ordinary differential equations, M ä + C ȧ + R(a) = f. Implicit integrators solve a coupled system at each step; explicit integrators update from the previous step and are limited by a CFL condition on the smallest element.",
     "Newmark’s method is the usual implicit family, with average acceleration (β = 1/4, γ = 1/2) unconditionally stable for linear problems. Explicit central difference with a lumped mass is the usual explicit member; it never forms a tangent.",
     "Wave propagation and crash analysis often take the explicit route. Quasi-static evolution, implicit dynamics, and viscoelasticity usually do not. Numerical dissipation in the integrator is a modelling choice, not a free parameter for hiding an unstable constitutive rate.",
     "The first two figures are FLagSHyP dynamics: a swinging square in free vibration, then a clamped column given an initial spin. The third is rate-dependent (Perzyna) damage on a tapered specimen — a constitutive ODE, not an inertial one."
   ], tags:["dynamics","implicit","explicit","wave","crash","Newmark","Perzyna"], scenes:["swingingSquare","twistingColumn","perzynaDamage"]},
-  {part:"Part III – Advanced FEM Concepts", title:"Contact and Friction", equations:[
+  {part:"Part IV – Applications in Engineering", title:"Contact and Friction", equations:[
     {name:"Frictionless KKT", expr:"g ≤ 0,   p ≥ 0,   p g = 0", tex:"g \\le 0,\\quad p \\ge 0,\\quad p\\,g = 0", note:"Gap g, contact pressure p, and complementarity: either the surfaces are open (p = 0) or they press with g = 0. Never both open and pressing."},
     {name:"Hertz pressure", expr:"p(x) = p₀ √(1 − (x/a)²)", tex:"p(x) = p_0\\sqrt{1-(x/a)^2}", note:"Smooth elliptic profile on a contact patch of half-width a. Peak at the centre, zero at the edges — no crack-tip singularity."},
     {name:"Effective modulus", expr:"1/E* = (1−ν₁²)/E₁ + (1−ν₂²)/E₂", tex:"\\dfrac{1}{E^*} = \\dfrac{1-\\nu_1^2}{E_1} + \\dfrac{1-\\nu_2^2}{E_2}", note:"Two dissimilar elastic bodies collapse to a single modulus E* and an equivalent radius R*."},
