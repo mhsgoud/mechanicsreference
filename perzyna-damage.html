@@ -95,6 +95,7 @@
           <label class="block text-slate-300 font-semibold mb-1">Step <span id="stepValue" class="text-rose-400 font-mono">—</span></label>
           <input id="frameSlider" type="range" min="0" max="0" step="1" value="0"
                  class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500">
+          <p id="sampleNote" class="mt-1 text-[10px] leading-snug text-slate-500">Stored damage state</p>
         </div>
         <div class="flex justify-between"><span class="text-slate-500">Top U<sub>Y</sub></span><span id="tipUVal" class="font-mono text-sky-300">—</span></div>
         <div class="flex justify-between"><span class="text-slate-500">Reaction</span><span id="reacVal" class="font-mono text-amber-300">—</span></div>
@@ -106,7 +107,7 @@
         </div>
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Play speed <span id="speedValue" class="text-rose-400 font-mono">1.0</span>×</label>
-          <input id="speedSlider" type="range" min="0.25" max="2" step="0.25" value="1"
+          <input id="speedSlider" type="range" min="0.5" max="3" step="0.25" value="1"
                  class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500">
         </div>
         <div>
@@ -133,7 +134,7 @@
         <div class="mt-auto space-y-1.5 pt-2 border-t border-slate-800">
           <div class="flex justify-between"><span class="text-slate-500">Nodes</span><span id="nNodeVal" class="font-mono text-slate-300">—</span></div>
           <div class="flex justify-between"><span class="text-slate-500">Q4 elems</span><span id="nElemVal" class="font-mono text-slate-300">—</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Frames</span><span id="nFrameVal" class="font-mono text-slate-300">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Stored frames</span><span id="nFrameVal" class="font-mono text-slate-300">—</span></div>
         </div>
       </div>
     </div>
@@ -256,13 +257,28 @@
   const uFinal = FEA.uFinal;
   const frames = FEA.frames;
   const nN = FEA.nNodes, nE = FEA.nElems;
+  // Visual-only intermediate states make the sparse saved history continuous.
+  // Values are linearly interpolated between adjacent stored solver states.
+  const INTERP_STEPS = 6;
 
-  function coordsAt(fi, dispScale) {
+  function sampleState(sample) {
+    const scaled = sample / INTERP_STEPS;
+    const lo = Math.min(frames.length - 1, Math.floor(scaled));
+    const hi = Math.min(frames.length - 1, lo + 1);
+    return { lo, hi, alpha: hi === lo ? 0 : scaled - lo };
+  }
+
+  function blend(state, key) {
+    const a = frames[state.lo][key], b = frames[state.hi][key];
+    return a + state.alpha * (b - a);
+  }
+
+  function coordsAt(state, dispScale) {
     // uFinal[i] = [UX, UY] in the same axes as nodes0 = [X, Y]
     // (matches MATLAB Plot_displaced: a(:,1)=ux, a(:,2)=uy).
     // Stored top UY is negative (control sign); negate UY so the top moves
     // in the +Y direction of the BC arrows (tension sense).
-    const lf = frames[fi].loadFactor;
+    const lf = blend(state, 'loadFactor');
     const mode = document.getElementById('dispMode').value;
     const out = new Array(nN);
     for (let i = 0; i < nN; i++) {
@@ -421,21 +437,38 @@
 
   let mesh = null, wire = null;
 
+  function interpolatedDamage(state) {
+    const a = frames[state.lo].damage, b = frames[state.hi].damage, t = state.alpha;
+    if (t === 0) return a;
+    const out = new Float32Array(nE);
+    for (let i = 0; i < nE; i++) out[i] = a[i] + t * (b[i] - a[i]);
+    return out;
+  }
+
   function update() {
-    const fi = +document.getElementById('frameSlider').value;
+    const sample = +document.getElementById('frameSlider').value;
+    const state = sampleState(sample);
+    const isStored = state.alpha < 1e-9;
     const scale = +document.getElementById('scaleSlider').value;
     const mode = document.getElementById('viewMode').value;
     document.getElementById('scaleValue').textContent = String(Math.round(scale));
-    document.getElementById('stepValue').textContent = String(frames[fi].step);
-    document.getElementById('tipUVal').textContent = frames[fi].tipU.toFixed(4);
-    document.getElementById('reacVal').textContent = frames[fi].reaction.toFixed(3);
-    const dmax = Math.max(...frames[fi].damage);
+    document.getElementById('stepValue').textContent = isStored
+      ? String(frames[state.lo].step)
+      : `${frames[state.lo].step} → ${frames[state.hi].step}`;
+    document.getElementById('sampleNote').textContent = isStored
+      ? `Stored solver frame ${state.lo + 1} of ${frames.length}`
+      : `Linear visual interpolation · frames ${state.lo + 1}–${state.hi + 1}`;
+    const tipU = blend(state, 'tipU'), reaction = blend(state, 'reaction');
+    document.getElementById('tipUVal').textContent = tipU.toFixed(4);
+    document.getElementById('reacVal').textContent = reaction.toFixed(3);
+    const damage = interpolatedDamage(state);
+    const dmax = Math.max(...damage);
     document.getElementById('damVal').textContent = dmax.toFixed(3);
     document.getElementById('cbarMax').textContent = mode === 'umag' ? 'max' : '1';
     document.getElementById('cbarMin').textContent = mode === 'umag' ? '0' : '0';
     document.getElementById('cbarLabel').textContent = mode === 'umag' ? '|U|' : 'damage ω';
 
-    const coords = coordsAt(fi, scale);
+    const coords = coordsAt(state, scale);
     let colors;
     if (mode === 'steel') {
       colors = Array.from({ length: nN }, () => [0.65, 0.70, 0.75]);
@@ -448,7 +481,7 @@
       }
       colors = Array.from({ length: nN }, (_, i) => jetColor(vals[i] / vmax));
     } else {
-      const nd = nodalFromElem(frames[fi].damage);
+      const nd = nodalFromElem(damage);
       colors = Array.from({ length: nN }, (_, i) => damageColor(nd[i]));
     }
 
@@ -462,13 +495,13 @@
     bcGroup.visible = document.getElementById('bcToggle').checked;
 
     document.getElementById('dispOverlay').innerHTML =
-      'step ' + frames[fi].step + ' · tip U = ' + frames[fi].tipU.toFixed(4) +
-      '<br>R = ' + frames[fi].reaction.toFixed(3) + ' · max ω = ' + dmax.toFixed(3);
-    document.getElementById('statusBadge').textContent = 'step ' + frames[fi].step;
-    drawChart(fi);
+      (isStored ? 'step ' + frames[state.lo].step : 'interpolated') + ' · tip U = ' + tipU.toFixed(4) +
+      '<br>R = ' + reaction.toFixed(3) + ' · max ω = ' + dmax.toFixed(3);
+    document.getElementById('statusBadge').textContent = isStored ? 'stored step ' + frames[state.lo].step : 'interpolated state';
+    drawChart(tipU, reaction);
   }
 
-  function drawChart(activeFi) {
+  function drawChart(activeTipU, activeReaction) {
     const canvas = document.getElementById('ldChart');
     const ctx = canvas.getContext('2d');
     const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -491,7 +524,7 @@
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
-    const ax = Math.abs(frames[activeFi].tipU), ay = frames[activeFi].reaction;
+    const ax = Math.abs(activeTipU), ay = activeReaction;
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath(); ctx.arc(X(ax), Y(ay), 4, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#94a3b8'; ctx.font = '11px ui-monospace, monospace';
@@ -500,22 +533,24 @@
   }
 
   const slider = document.getElementById('frameSlider');
-  slider.max = String(frames.length - 1);
-  slider.value = String(frames.length - 1);
+  slider.max = String((frames.length - 1) * INTERP_STEPS);
+  slider.value = String((frames.length - 1) * INTERP_STEPS);
 
   ['frameSlider','scaleSlider','viewMode','dispMode','wireToggle','undefToggle','bcToggle'].forEach(id => {
     document.getElementById(id).addEventListener('input', update);
     document.getElementById(id).addEventListener('change', update);
   });
 
-  const BASE_MS = 420;
+  // 35 ms substeps give smooth motion and complete the history about twice as
+  // fast as the former 420 ms per stored state.
+  const BASE_SUBSTEP_MS = 35;
   let playing = false, playTimer = null;
-  function delay() { return Math.round(BASE_MS / Math.max(0.25, +document.getElementById('speedSlider').value)); }
+  function delay() { return Math.round(BASE_SUBSTEP_MS / Math.max(0.5, +document.getElementById('speedSlider').value)); }
   function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } }
   function startPlay() {
     stopPlay();
     playTimer = setInterval(() => {
-      slider.value = String((+slider.value + 1) % frames.length);
+      slider.value = String((+slider.value + 1) % (+slider.max + 1));
       update();
     }, delay());
   }
