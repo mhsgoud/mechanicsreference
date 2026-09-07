@@ -343,7 +343,11 @@
     .scene-frame:not(.is-ready){cursor:pointer}
     .scene-frame.is-ready .scene-placeholder{display:none}
     .scene-frame-tall{height:min(72vh,660px)}
+    .fracture-path{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0;padding:14px 0;border-block:1px solid var(--rule);font-size:.85rem}
+    .fracture-path a[aria-current]{font-weight:700;text-decoration:underline;text-underline-offset:4px}
     .cohesive-story{margin-top:24px}
+    .analytical-figure{container-type:inline-size}
+    @container(max-width:650px){.analytical-figure .scene-frame{height:920px!important}}
     .cohesive-step{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,1.8fr);gap:32px;align-items:start;margin:32px 0 48px;padding-top:24px;border-top:1px solid var(--rule)}
     .cohesive-step h2{margin-top:0;font-size:1.45rem}
     .cohesive-step .figure-section{margin:0;padding:0;border:0;min-width:0}
@@ -2817,8 +2821,12 @@ const topics = [
     "Mode I is opening: σ_yy on the ligament is K_I / √(2π r). Mode II is in-plane shear; mode III is antiplane tearing. A mixed-mode crack may turn. Maximum hoop stress is one commonly used direction criterion for brittle, isotropic materials. J gives the total energy release rate; interaction integrals separate the individual mode intensities.",
     "Griffith required that the energy released by an increment of crack area pay the surface energy. Irwin identified that release rate with K²/E′. Toughness is then a critical Kc or a critical Gc. The J-integral evaluates the same G from a contour that need not sit in the singular zone.",
     "The unbounded stress is an artefact of the linear model. Cut it off with a yield stress and a plastic zone appears; cut it off with a tensile strength and a cohesive zone appears. When the process zone is small compared with the crack and remaining ligament, an outer K-dominant region can describe initiation. Otherwise consider elastic–plastic fracture mechanics, cohesive separation, or another model appropriate to the mechanism.",
-    "The interactive figure is a plate with an edge crack: switch mode I and mode II to see the Williams stress. Mode definitions, mixity, kink angle, and mixed-mode failure envelopes are expanded in the next entry."
-  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding","mode I","mode II","mixed-mode"], scenes:["lefm","lefmCenterCrack"], illustrations:"lefm"},
+    "The figures distinguish an exact infinite-plate central-crack solution from the local Williams field, then compare a traction-free crack with a rigid line inclusion under antiplane shear. Distance probes expose the singularity independently of the bounded colour scale."
+  ], tags:["LEFM","Williams","stress intensity","singularity","Griffith","Irwin","small-scale yielding","mode I","mode II","mixed-mode","anticrack","rigid inclusion"], scenes:["lefm","lefmCenterCrack","anticrack"], sources:[
+    {label:"MIT OpenCourseWare: Introduction to Fracture Mechanics",href:"https://ocw.mit.edu/courses/3-11-mechanics-of-materials-fall-1999/e5bca953e1dbd0cd0376f0f77033dc0d_MIT3_11F99_frac.pdf"},
+    {label:"Dal Corso, Shahzad & Bigoni: antiplane singularities, annihilation and invisibility",href:"https://arxiv.org/abs/1605.04942"},
+    {label:"Goudarzi, Dal Corso, Bigoni & Simone (2021): Dispersion of rigid line inclusions as stiffeners and shear band instability triggers",href:"https://doi.org/10.1016/j.ijsolstr.2020.11.006"}
+  ]},
   {part:"Part IV – Applications in Engineering", title:"Mode I, II & Mixed-Mode Cracking", equations:[
     {name:"Mode I opening", expr:"σ_θθ(θ=0) = K_I / √(2π r)", tex:"\\sigma_{\\theta\\theta}(\\theta=0) = \\dfrac{K_I}{\\sqrt{2\\pi r}}", note:"Symmetric opening of the faces. Remote tension normal to the crack is the archetype. Propagation under pure mode I continues in the crack plane for an isotropic brittle solid."},
     {name:"Mode mixity", expr:"ψ = arctan(K_II / K_I)", tex:"\\psi = \\arctan(K_{II}/K_I)", note:"Phase angle of the in-plane tip field. ψ = 0 is pure mode I; |ψ| → 90° is pure mode II. Interface cracks need a length scale in the definition of ψ because of the oscillatory singularity."},
@@ -3547,6 +3555,8 @@ function renderTopicScene(topic){
     hertzContact: {src:'contact.html', title:'Hertz contact of two bodies'},
     beamContact: {src:'contact-beam.html', title:'Double-cantilever ContactFEA', tall:true},
     lefmCenterCrack: {src:'lefm-center-crack.html', title:'Center crack and tip singularity', tall:true},
+    anticrack: {src:'anticrack.html', title:'Crack versus rigid inclusion: boundary conditions and singularity', tall:true},
+    mixedFields: {src:'lefm.html?mode=Mixed', title:'Opening, sliding, tearing and mixed-mode tip fields', tall:true},
     dcbCohesive: {src:'dcb-cohesive.html', title:'DCB cohesive crack', tall:true},
     peelWells: {src:'peel-wells.html', title:'Wells (2002) growing cohesive peel', tall:true},
     fiberInterface: {src:'fiber-interface.html', title:'Inclined fiber interface debonding', tall:true},
@@ -3571,7 +3581,7 @@ function renderTopicScene(topic){
     const heading = topic.figureLabel || (topic.figureNumber ? 'Figure ' + topic.figureNumber : keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1)));
     const frameClass = ['scene-frame', page.tall ? 'scene-frame-tall' : '', page.flush ? 'scene-frame-flush' : ''].filter(Boolean).join(' ');
     return `
-<section class="figure-section${page.flush ? ' flush' : ''}" aria-label="${page.title}">
+<section class="figure-section${page.flush ? ' flush' : ''}${['lefm','lefmCenterCrack','anticrack','mixedFields'].includes(key)?' analytical-figure':''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
   <p class="figure-caption">${page.title}</p>
   <div class="${frameClass}" data-scene-src="${page.src}"${topic.eager ? ' data-eager="1"' : ''}>
@@ -5037,8 +5047,26 @@ function renderCohesiveStory(topic){
   </div>`;
 }
 
+function fracturePath(topic){
+  const names=['Fracture Mechanics','Linear Elastic Fracture Mechanics','Mode I, II & Mixed-Mode Cracking','Cohesive Cracking'];
+  if(!names.includes(topic.title))return '';
+  return `<nav class="fracture-path" aria-label="Fracture learning sequence">${names.map((name,i)=>`<a href="#${slug(name)}" ${name===topic.title?'aria-current="page"':''}>${i+1}. ${['General concepts','LEFM & singularities','Modes & crack direction','Cohesive process zone'][i]}</a>`).join('<span aria-hidden="true">→</span>')}</nav>`;
+}
+function renderFractureStory(topic){
+  const figure=(key,n)=>renderTopicScene({scenes:[key],figureNumber:n,eager:true});
+  const step=(label,title,body,key,n)=>`<section class="cohesive-step"><div class="prose"><p class="regime">${label}</p><h2>${title}</h2>${body}</div>${figure(key,n)}</section>`;
+  if(topic.title==='Fracture Mechanics')return `<div class="prose"><p>Fracture mechanics asks how an existing flaw changes the load a body can carry, when that flaw grows, and whether growth is stable. Keep three ideas separate: the driving force supplied by the structure, the resistance of the material, and the mechanism operating near the crack tip.</p></div>${renderStorySections(topic.story.slice(0,2))}${step('Explore the fundamentals','Opening, sliding and tearing','<p>Take x along crack advance, y normal to the faces, and z along the crack front. Mode I opens in y, mode II slides in x, and mode III tears in z. Real loading can combine these motions.</p><p>The figure connects these kinematics to an energy balance. Increase crack size or remote tension and compare the available energy release rate G with resistance Gc. The displayed face motions are exaggerated illustrations; the energy calculation is an ideal infinite-plate model.</p><p class="reading-cue">First identify each mode. Then double the stress: G increases fourfold. Reaching Gc indicates initiation in this model; stability is a separate question.</p>','fractureLab',1)}${renderStorySections(topic.story.filter((_,i)=>[2,4,5].includes(i)))}`;
+  if(topic.title==='Mode I, II & Mixed-Mode Cracking')return step('Superpose the elastic fields','Same intensity, different angular pattern','<p>Mode I opens the faces; mode II slides them within the plane; mode III tears them along the crack front. The field explorer uses x along advance and y normal to the crack faces, with z out of the screen.</p><p>For mixed I–II loading, KⅠ = K cos ψ and KⅡ = K sin ψ. Changing ψ at fixed K changes the angular stress distribution while leaving (KⅠ² + KⅡ²)/E′ unchanged. Equal energy release does not imply an equal crack direction.</p><p class="reading-cue">Select Mixed I + II and reverse ψ to reflect the asymmetric field. The map shows σyy for mixed loading, τxy for pure mode II, and τyz for mode III. These are different stress components; the mode buttons identify which is plotted.</p>','mixedFields',1)+`<div class="prose">${topic.bullets.slice(1,4).map(p=>`<p>${escHtml(p)}</p>`).join('')}</div>`;
+  return `<div class="prose"><p>LEFM describes a sharp crack in a linear elastic body when the nonlinear process zone is small compared with the crack and remaining ligament. Geometry and load set the stress intensity factors K; the leading fields near the tip then have a universal square-root form. Follow the three figures from a complete elastic solution to its local asymptote, then to a defect with a different boundary condition.</p></div>`+
+    step('01 · Whole field → tip field','Stress rises without a finite tip value','<p>Consider an infinite plate with a central crack of total length 2a under tension σ∞. Along the line ahead of the right tip, x = a + r, the exact opening stress is σyy = σ∞(a + r)/√[r(2a + r)]. Far away it approaches σ∞; near the tip it approaches KⅠ/√(2πr), where KⅠ = σ∞√(πa).</p><p>A finite specimen changes K through a geometry factor; it does not remove the sharp-tip singularity. A bounded colour scale or a coarse mesh can hide the divergence, but cannot regularize the elastic model.</p><p class="reading-cue">Figure 1: move the probe toward r/a = 0. The exact and asymptotic curves converge. On log–log axes their near-tip slope is −½: moving 100 times closer makes stress 10 times larger. The apparent slit width is schematic.</p>','lefmCenterCrack',1)+
+    step('02 · Modes and angular dependence','K sets the amplitude; the mode sets the pattern','<p>The Williams field is σij = Σ Kₘ fᵐij(θ)/√(2πr) plus less singular terms. The map shows a local neighbourhood of one tip, not the boundary-value solution for a finite plate. The white line represents traction-free crack faces.</p><p>Mode I opens the faces, mode II slides them in plane, and mode III tears them out of plane. Mixed loading superposes the elastic fields. A zero value of one stress component on one ray does not mean the entire tip field is nonsingular.</p><p class="reading-cue">Figure 2: switch modes, then combine opening and sliding. Colours show sign and saturate at ±20 MPa; use the distance probe to read the actual stress. Face-motion arrows indicate the mode and are not computed displacements.</p><p>The singular stress has finite locally integrated elastic energy: energy density scales as 1/r while the area element is r dr dθ. A physical process zone still replaces the mathematical infinity. LEFM needs an outer elastic region where K dominates.</p>','lefm',2)+
+    step('03 · A different tip constraint','Anticrack: a rigid inclusion can also be singular','<p>A crack releases traction and permits a displacement jump. A perfectly bonded rigid line inclusion constrains the surrounding displacement to a rigid-body motion and transfers traction. Such an inclusion is often called an anticrack. Its tips can concentrate stress despite the opposite boundary condition.</p><p>Figure 3 compares exact antiplane solutions: displacement w is along z, the crack has τyz = 0 on its faces, and the stationary rigid line has w = 0. Both defects have half-length a and see the same remote shear vector. Depending on its direction, one singular amplitude can vanish.</p><p class="reading-cue">Try α = 0°: the crack leaves this uniform field unchanged while the inclusion has singular tips. At α = 90° the roles reverse. At 45° the ahead-of-tip curves coincide, although the angular fields and boundary conditions differ.</p><p>Goudarzi, Dal Corso, Bigoni and Simone (2021) study the related in-plane problem: rigid line inclusions can stiffen a composite while their tip concentrations promote shear-band initiation. Orientation and interactions matter. Their in-plane neutrality angles and effective-modulus curves are not the antiplane curves shown here. Continue to <a href="#fiber-neutrality-and-rigid-line-inclusions">fibre neutrality and rigid line inclusions</a> for that composite context.</p>','anticrack',3)+
+    `<div class="prose"><h2>From a singular field to a fracture criterion</h2><p>For homogeneous isotropic elasticity, G = (KⅠ² + KⅡ²)/E′ + KⅢ²/(2μ). Compare this driving force with the appropriate fracture resistance. Mixed-mode initiation and direction require a material model or criterion; a stress map alone predicts neither.</p><p>Maximum nodal stress at a sharp tip increases under mesh refinement. Assess converged K or G instead. When the process zone must be resolved, move to a <a href="#cohesive-cracking">cohesive traction–separation law</a>: finite strength and fracture energy describe progressive separation.</p></div>`;
+}
 function renderContent(topic){
   const cohesiveStory = topic.title === 'Cohesive Cracking';
+  const fractureStory = ['Fracture Mechanics','Linear Elastic Fracture Mechanics','Mode I, II & Mixed-Mode Cracking'].includes(topic.title);
+  const customStory = cohesiveStory || fractureStory;
   const prose = (topic.bullets||[]).map(x => `<p>${escHtml(x)}</p>`).join('');
   const lead = topicLead(topic);
 
@@ -5073,15 +5101,17 @@ function renderContent(topic){
       ${partPathHtml(topic)}
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
-      ${cohesiveStory ? renderCohesiveStory(topic) : `<div class="prose">${prose}</div>`}
-      ${storyBlock}
-      ${!cohesiveStory && topic.sceneFirst ? sceneBlock : ""}
+      ${fracturePath(topic)}
+      ${topic.title==='Fiber Neutrality and Rigid Line Inclusions' ? `<div class="prose"><h2>Stiffening and local failure can coexist</h2><p>A perfectly bonded rigid line inclusion is also called an anticrack: it constrains displacement while transmitting traction. Unlike a traction-free crack, it may stiffen a composite, yet still produce singular tip stresses. <a href="https://doi.org/10.1016/j.ijsolstr.2020.11.006">Goudarzi, Dal Corso, Bigoni and Simone (2021)</a> examine how inclusion orientation and interactions connect macroscopic stiffening with concentrations that can trigger shear bands. The <a href="#linear-elastic-fracture-mechanics">LEFM crack–anticrack comparison</a> illustrates the boundary-condition distinction with exact antiplane fields; the in-plane and fibre models below have different neutrality conditions.</p></div>` : ''}
+      ${cohesiveStory ? renderCohesiveStory(topic) : fractureStory ? renderFractureStory(topic) : `<div class="prose">${prose}</div>`}
+      ${fractureStory ? '' : storyBlock}
+      ${!customStory && topic.sceneFirst ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
       ${tableBlock}
       ${subsectionBlock}
-      ${cohesiveStory || topic.sceneFirst ? "" : sceneBlock}
-      ${illustrationsBlock}
+      ${customStory || topic.sceneFirst ? "" : sceneBlock}
+      ${fractureStory && topic.title!=='Mode I, II & Mixed-Mode Cracking' ? '' : illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
       ${topicBridgeHtml(topic)}
@@ -5175,6 +5205,10 @@ function initFromHash(){
   const byHash = topics.find(t => slug(t.title) === h);
   return byHash || topics.find(t => t.title === "Basic Equations") || topics[0];
 }
+window.addEventListener('hashchange',()=>{
+  const topic=topics.find(t=>slug(t.title)===location.hash.slice(1));
+  if(topic && topic.title!==activeTitle){selectTopic(topic.title);content.scrollTop=0;}
+});
 
 // ---- Search ---------------------------------------------------------------
 const searchInput = document.getElementById('searchInput');
