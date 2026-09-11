@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XFEM stress intensity factors — Mechanics Reference</title>
+  <meta name="description" content="MXFEM 1.2 domain J-integral SIFs for center crack, edge crack, and hole initiation versus Feddersen and Tada handbook values." />
+  <link rel="canonical" href="https://mechanicsreference.com/xfem/sif.html" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <base href="/xfem/" />
+  <link rel="stylesheet" href="/xfem/style.css" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add("embedded");</script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="panel">
+    <div class="nav">
+      <a class="library" href="/hub.html#extended-generalized-finite-element-methods-xfem-gfem" target="_top">Library</a>
+      <a class="on" href="/xfem/sif.html">SIF</a>
+      <a href="/xfem/paris.html">Paris growth</a>
+      <a href="/xfem/inclusion.html">Inclusion</a>
+    </div>
+    <h1>Stress intensity factors</h1>
+    <div class="sub" id="meta">MXFEM 1.2 domain J-integral vs handbook KI</div>
+    <label for="caseSel">Benchmark</label>
+    <select id="caseSel">
+      <option value="centerFull">1 · Center crack (full)</option>
+      <option value="centerHalf">1 · Center crack (half)</option>
+      <option value="edge">2 · Edge crack</option>
+      <option value="holeAngle">7 · Initiation angle at a hole</option>
+    </select>
+    <label for="field">Color field</label>
+    <select id="field">
+      <option value="svm">von Mises (Williams + far-field)</option>
+      <option value="syy">σyy</option>
+      <option value="disp">Displacement magnitude</option>
+    </select>
+    <label>Load factor <span class="row"><span id="tlabel">—</span></span></label>
+    <div class="playrow">
+      <button id="play" type="button" aria-pressed="false">Play</button>
+      <input id="frame" type="range" min="0" max="40" value="40" />
+    </div>
+    <label>Warp scale <span class="row"><span id="wlabel">1.00</span></span></label>
+    <input id="warp" type="range" min="0" max="3" step="0.05" value="1" />
+    <div class="bar"></div>
+    <div class="minmax"><span id="vmin">0</span><span id="vmax">1</span></div>
+    <canvas id="plot" width="620" height="300"></canvas>
+    <div class="legend">
+      <span><i style="background:#7ec8ff"></i>MXFEM KI</span>
+      <span><i style="background:#ffd166"></i>Handbook KI</span>
+      <span><i style="background:#ff5a6a"></i>Crack</span>
+    </div>
+    <table class="table" id="siftable"></table>
+    <div class="stats" id="stats">—</div>
+    <div class="hint">Mesh is a visualization grid colored by the Williams field using the published MXFEM KI, KII. Orbit: left drag · zoom: wheel.</div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { SIF_CASES, centerCrackKI, edgeCrackKI } from "/xfem/data.js";
+    import { createViewer } from "/xfem/xfem-view.js";
+
+    const nLoad = 41;
+    const caseEl = document.getElementById("caseSel");
+    const stats = document.getElementById("stats");
+    const table = document.getElementById("siftable");
+    let current = SIF_CASES.centerFull;
+    let rebuildOnce = true;
+
+    function extraMeshes(group, spec) {
+      if (spec.hole) {
+        const g = new THREE.CircleGeometry(spec.hole.r, 48);
+        const m = new THREE.MeshBasicMaterial({ color: 0x050814, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(g, m);
+        mesh.position.set(spec.hole.cx, spec.hole.cy, 0.01);
+        group.add(mesh);
+      }
+    }
+
+    function getFrame(i) {
+      const load = i / (nLoad - 1);
+      const c = current;
+      const tips = (c.tips || []).map((t) => ({
+        ...t,
+        KI: (t.KI || 0) * load,
+        KII: (t.KII || 0) * load,
+      }));
+      const rows = [];
+      if (c.KI_theory != null) {
+        rows.push({
+          label: "KI",
+          values: [c.KI_mxfem.reduce((a, b) => a + b, 0) / c.KI_mxfem.length, c.KI_theory],
+          colors: ["#7ec8ff", "#ffd166"],
+        });
+        rows.push({
+          label: "KII",
+          values: [c.KII_mxfem.reduce((a, b) => a + b, 0) / c.KII_mxfem.length, c.KII_theory],
+          colors: ["#ff8fab", "#c5d0e8"],
+        });
+      } else {
+        rows.push({
+          label: "θ rad",
+          values: [c.theta_mxfem, c.theta_theory],
+          colors: ["#7ec8ff", "#ffd166"],
+        });
+      }
+      const rebuild = rebuildOnce;
+      rebuildOnce = false;
+      return {
+        ...c,
+        rebuild,
+        refit: rebuild,
+        load,
+        crack: c.crack0,
+        tips,
+        label: `λ = ${load.toFixed(2)}`,
+        chart: { kind: "bars", rows },
+      };
+    }
+
+    function fillTable(c) {
+      if (c.KI_theory != null) {
+        const ki = c.KI_mxfem.reduce((a, b) => a + b, 0) / c.KI_mxfem.length;
+        const err = (100 * (ki / c.KI_theory - 1)).toFixed(2);
+        table.innerHTML = `
+          <tr><th></th><th>MXFEM</th><th>Theory</th><th>Error</th></tr>
+          <tr><td>K<sub>I</sub></td><td>${c.KI_mxfem.map((v) => v.toFixed(4)).join(", ")}</td>
+              <td>${c.KI_theory.toFixed(4)}</td><td class="${Math.abs(err) < 3 ? "ok" : "warn"}">${err}%</td></tr>
+          <tr><td>K<sub>II</sub></td><td>${c.KII_mxfem.map((v) => v.toExponential(2)).join(", ")}</td>
+              <td>${c.KII_theory.toFixed(1)}</td><td></td></tr>`;
+        const book = c.id === "edge"
+          ? `Tada edge-crack Y(a/W): K<sub>I</sub> = ${edgeCrackKI(1, 1, 3).toFixed(4)}`
+          : `Feddersen center-crack: K<sub>I</sub> = ${centerCrackKI(1, 1, 6).toFixed(4)}`;
+        stats.innerHTML = `${c.bc}<br>${book}`;
+      } else {
+        table.innerHTML = `
+          <tr><th></th><th>MXFEM</th><th>Theory</th></tr>
+          <tr><td>θ (rad)</td><td>${c.theta_mxfem.toExponential(3)}</td><td>${c.theta_theory}</td></tr>`;
+        stats.innerHTML = `Max hoop-stress initiation from a hole in uniaxial tension. MXFEM fminbnd → θ ≈ 0 (equator).`;
+      }
+      document.getElementById("meta").textContent = c.subtitle;
+    }
+
+    const viewer = createViewer({
+      canvas: document.getElementById("c"),
+      nFrames: nLoad,
+      getFrame,
+      extraMeshes,
+      msPerFrame: 60,
+    });
+    document.getElementById("frame").value = String(nLoad - 1);
+    fillTable(current);
+    viewer.apply();
+
+    caseEl.addEventListener("change", () => {
+      current = SIF_CASES[caseEl.value];
+      rebuildOnce = true;
+      fillTable(current);
+      viewer.setPlaying(false);
+      viewer.apply();
+    });
+  </script>
+</body>
+</html>

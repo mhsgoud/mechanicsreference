@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XFEM crack path past an inclusion — Mechanics Reference</title>
+  <meta name="description" content="MXFEM 1.2 crack paths past hard and soft circular inclusions compared with Bordas 2006, on a fixed XFEM mesh." />
+  <link rel="canonical" href="https://mechanicsreference.com/xfem/inclusion.html" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <base href="/xfem/" />
+  <link rel="stylesheet" href="/xfem/style.css" />
+  <script>if (window.self !== window.top) document.documentElement.classList.add("embedded");</script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="panel">
+    <div class="nav">
+      <a class="library" href="/hub.html#extended-generalized-finite-element-methods-xfem-gfem" target="_top">Library</a>
+      <a href="/xfem/sif.html">SIF</a>
+      <a href="/xfem/paris.html">Paris growth</a>
+      <a class="on" href="/xfem/inclusion.html">Inclusion</a>
+    </div>
+    <h1>Growth past an inclusion</h1>
+    <div class="sub" id="meta">MXFEM Benchmark 6 · path vs Bordas (2006)</div>
+    <label for="caseSel">Inclusion</label>
+    <select id="caseSel">
+      <option value="hard">Hard · E<sub>inc</sub> / E<sub>m</sub> = 10</option>
+      <option value="soft">Soft · E<sub>inc</sub> / E<sub>m</sub> = 0.1</option>
+    </select>
+    <label for="field">Color field</label>
+    <select id="field">
+      <option value="svm">von Mises (Williams + far-field)</option>
+      <option value="syy">σyy</option>
+      <option value="disp">Displacement magnitude</option>
+    </select>
+    <label>Growth step <span class="row"><span id="tlabel">—</span></span></label>
+    <div class="playrow">
+      <button id="play" type="button" aria-pressed="false">Play</button>
+      <input id="frame" type="range" min="0" max="35" value="0" />
+    </div>
+    <label>Warp scale <span class="row"><span id="wlabel">1.00</span></span></label>
+    <input id="warp" type="range" min="0" max="3" step="0.05" value="0" />
+    <div class="bar"></div>
+    <div class="minmax"><span id="vmin">0</span><span id="vmax">1</span></div>
+    <canvas id="plot" width="620" height="300"></canvas>
+    <div class="legend">
+      <span><i style="background:#ffd166"></i>Bordas (2006)</span>
+      <span><i style="background:#ff5a6a"></i>MXFEM path</span>
+    </div>
+    <div class="stats" id="stats">—</div>
+    <div class="hint">Red tube = undeformed MXFEM crack (same coordinates as mxfemVSbordas.m). Gold = Bordas 2006. Warp only deforms the plate, not the path. Hard inclusion (below) pushes the crack up; soft pulls it down.</div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import {
+      HARD_MXFEM, HARD_BORDAS, SOFT_MXFEM, SOFT_BORDAS, INCLUSION_META, edgeCrackKI,
+    } from "/xfem/data.js";
+    import { createViewer } from "/xfem/xfem-view.js";
+
+    const cases = {
+      hard: {
+        name: "Hard inclusion",
+        path: HARD_MXFEM,
+        ref: HARD_BORDAS,
+        Em: 1e9,
+        Ei: 1e10,
+        note: "E<sub>m</sub> = 1 GPa · E<sub>inc</sub> = 10 GPa · crack turns slightly up, away from the stiff particle.",
+      },
+      soft: {
+        name: "Soft inclusion",
+        path: SOFT_MXFEM,
+        ref: SOFT_BORDAS,
+        Em: 1e10,
+        Ei: 1e9,
+        note: "E<sub>m</sub> = 10 GPa · E<sub>inc</sub> = 1 GPa · crack is drawn down toward the compliant particle.",
+      },
+    };
+
+    const caseEl = document.getElementById("caseSel");
+    const stats = document.getElementById("stats");
+    let cur = cases.hard;
+    let rebuildOnce = true;
+
+    function extraMeshes(group, spec) {
+      const inc = spec.inclusion;
+      if (!inc) return;
+      const g = new THREE.CircleGeometry(inc.r, 48);
+      const col = spec.Ei > spec.Em ? 0x3d6cff : 0xf68f39;
+      const m = new THREE.MeshStandardMaterial({
+        color: col, transparent: true, opacity: 0.35, metalness: 0.1, roughness: 0.5, side: THREE.DoubleSide,
+      });
+      const mesh = new THREE.Mesh(g, m);
+      mesh.position.set(inc.cx, inc.cy, 0.05);
+      group.add(mesh);
+      const ring = new THREE.LineLoop(
+        new THREE.BufferGeometry().setFromPoints(
+          Array.from({ length: 64 }, (_, i) => {
+            const t = (i / 64) * Math.PI * 2;
+            return new THREE.Vector3(inc.cx + inc.r * Math.cos(t), inc.cy + inc.r * Math.sin(t), 0.06);
+          })
+        ),
+        new THREE.LineBasicMaterial({ color: col })
+      );
+      group.add(ring);
+    }
+
+    function getFrame(i) {
+      const path = cur.path.slice(0, Math.max(2, i + 1));
+      const tip = path[path.length - 1];
+      const prev = path[path.length - 2];
+      const ang = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]);
+      const a = Math.hypot(tip[0] - path[0][0], tip[1] - path[0][1]);
+      const KI = edgeCrackKI(1, Math.max(a, 0.5), 4);
+      const KII = KI * Math.sin(ang) * 0.45;
+      const rebuild = rebuildOnce;
+      rebuildOnce = false;
+      return {
+        ...INCLUSION_META,
+        rebuild,
+        refit: rebuild,
+        E: cur.Em,
+        Em: cur.Em,
+        Ei: cur.Ei,
+        inclusion: { ...INCLUSION_META.inclusion, E: cur.Ei },
+        load: 1,
+        crack: path,
+        refCrack: cur.ref,
+        tips: [{ x: tip[0], y: tip[1], angle: ang, KI, KII, blend: 1.2 }],
+        label: `step ${i} / ${cur.path.length - 1} · tip (${tip[0].toFixed(2)}, ${tip[1].toFixed(3)})`,
+        chart: {
+          x: cur.path.map((p) => p[0]),
+          xlabel: "x",
+          ylabel: "y",
+          ymin: 3.2,
+          ymax: 4.25,
+          series: [
+            { y: cur.ref.map((p) => p[1]), x: cur.ref.map((p) => p[0]), color: "#ffd166", width: 2.2 },
+            { y: cur.path.map((p) => p[1]), color: "#ff5a6a", width: 2.2, dots: true },
+          ],
+          cursor: tip[0],
+        },
+      };
+    }
+
+    const viewer = createViewer({
+      canvas: document.getElementById("c"),
+      nFrames: cur.path.length,
+      getFrame,
+      extraMeshes,
+      msPerFrame: 120,
+      onFrame() {
+        stats.innerHTML = `${cur.note}<br>4 × 8 plate · inclusion (2, 2) r = 1 · Δa = 0.1 · ${INCLUSION_META.bc}`;
+        document.getElementById("meta").textContent = `MXFEM Benchmark 6 · ${cur.name} vs Bordas 2006`;
+      },
+    });
+
+    caseEl.addEventListener("change", () => {
+      cur = cases[caseEl.value];
+      rebuildOnce = true;
+      viewer.setFrames(cur.path.length);
+      document.getElementById("frame").value = "0";
+      viewer.setPlaying(false);
+      viewer.apply();
+    });
+  </script>
+</body>
+</html>

@@ -175,6 +175,24 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mechanicsreference.com/xfem/sif.html</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mechanicsreference.com/xfem/paris.html</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mechanicsreference.com/xfem/inclusion.html</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mechanicsreference.com/contact.html</loc>
     <lastmod>2026-08-21</lastmod>
     <changefreq>monthly</changefreq>
@@ -266,7 +284,7 @@
   </url>
   <url>
     <loc>https://mechanicsreference.com/hub.html#extended-generalized-finite-element-methods-xfem-gfem</loc>
-    <lastmod>2026-08-23</lastmod>
+    <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
