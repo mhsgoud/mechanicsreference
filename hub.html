@@ -343,6 +343,7 @@
     .scene-frame:not(.is-ready){cursor:pointer}
     .scene-frame.is-ready .scene-placeholder{display:none}
     .scene-frame-tall{height:min(72vh,660px)}
+    .scene-frame-studio{height:min(90vh,900px)}
     .fracture-path{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0;padding:14px 0;border-block:1px solid var(--rule);font-size:.85rem}
     .fracture-path a[aria-current]{font-weight:700;text-decoration:underline;text-underline-offset:4px}
     .cohesive-story{margin-top:24px}
@@ -2873,8 +2874,8 @@ const topics = [
     "The internal energy combines degraded tensile energy, retained compressive energy, and G_c times the crack-density integral. External-load work completes the potential energy. Sharp-crack convergence results apply to specific variational functionals and assumptions; they should not be assumed for every energy split or numerical variant. AT2 (quadratic) is the most common density; AT1 (linear in d) has compact support and an elastic threshold before damage nucleates. Hybrid and anisotropic splits decide which part of the strain energy drives d.",
     "The displacement problem and the phase-field problem are usually staggered: fix d and solve for u, then fix u and solve for d, iterating within the load step. A monolithic Newton solve couples both unknowns and needs a careful tangent. Irreversibility — cracks do not heal — is enforced by a history field or by bound constraints on d.",
     "Compared with XFEM or remeshing, the topology of the crack never appears explicitly: branching, coalescence, and nucleation emerge from minimizing the same energy. The price is resolution of ℓ and a well-chosen split so that compression and shear are not spuriously degraded. Cohesive length scales and phase-field lengths are related but not identical: ℓ here is a regularization parameter tied to G_c and the peak stress of the effective traction–separation response.",
-    "The figure is an edge crack represented as a diffuse band. Change ℓ and the crack length a. AT2 gives an exponential profile; AT1 a compact quadratic one; the sharp limit collapses the band onto a surface."
-  ], tags:["phase-field","damage","fracture","regularization","Griffith","Ambrosio-Tortorelli","AT1","AT2","length scale"], scene:"phaseFieldFracture", illustrations:"phaseField", sources:[{label:"Bourdin, Francfort & Marigo, The variational approach to fracture, J. Elasticity 91 (2008)", href:"https://doi.org/10.1007/s10659-007-9107-3"},{label:"Miehe, Hofacker & Welschinger, A phase field model for rate-independent crack propagation, Comput. Methods Appl. Mech. Eng. 199 (2010)", href:"https://doi.org/10.1016/j.cma.2010.04.011"}]},
+    "The figures start with a diffuse-band profile you can drive with ℓ and tensile energy, then the AT1/AT2 length-scale inspector, and a notched-plate simulation of crack growth with the recorded load–displacement response."
+  ], tags:["phase-field","damage","fracture","regularization","Griffith","Ambrosio-Tortorelli","AT1","AT2","length scale"], scene:"phaseFieldFracture", scenes:["phaseFieldExplainer","phaseFieldFracture","phaseFieldSimulation"], illustrations:"phaseField", sources:[{label:"Bourdin, Francfort & Marigo, The variational approach to fracture, J. Elasticity 91 (2008)", href:"https://doi.org/10.1007/s10659-007-9107-3"},{label:"Miehe, Hofacker & Welschinger, A phase field model for rate-independent crack propagation, Comput. Methods Appl. Mech. Eng. 199 (2010)", href:"https://doi.org/10.1016/j.cma.2010.04.011"}]},
   {part:"Part IV – Applications in Engineering", title:"Fiber-Reinforced Composites", bullets:[
     "A unidirectional ply is a transversely isotropic solid. The fibre direction is the 1-axis; the plane of isotropy is 2–3. Five independent constants remain: E₁, E₂, ν₁₂, G₁₂, G₂₃. The reduced stiffness Q relating in-plane stress to in-plane strain is the 3×3 matrix used in classical lamination theory.",
     "Off-axis, the same ply is anisotropic in the plate axes. The transformed stiffness Q̄(θ) is Q rotated with the fibre angle. Longitudinal stiffness falls rapidly as θ leaves 0°; at 45° shear coupling is large. A single off-axis ply under uniaxial load therefore shears.",
@@ -3564,6 +3565,8 @@ function renderTopicScene(topic){
     fiberBox: {src:'fiber-box.html', title:'Single fiber RVE under tension', tall:true},
     fiberPullout: {src:'fiber-pullout.html', title:'Fiber pull-out vs reference models', tall:true},
     phaseFieldFracture: {src:'phase-field-fracture.html', title:'Phase-field fracture', tall:true},
+    phaseFieldExplainer: {src:'phase-field-explainer.html', title:'How a diffuse phase field becomes a crack', tall:true},
+    phaseFieldSimulation: {src:'fracture-viewer/index.html', title:'Notched plate simulation: deformed shape, crack growth, and load response', studio:true},
     pVersionFem: {src:'p-version-fem.html', title:'p-version FEM and Lobatto modes', tall:true},
     beamSolidReduced: {src:'beam-solid-reduced.html', title:'Solid elements vs beam elements — same cantilever', tall:true},
     constraintMethods: {src:'constraint-methods.html', title:'Penalty, Lagrange multipliers, and Nitsche on the same tied seam', tall:true},
@@ -3580,7 +3583,7 @@ function renderTopicScene(topic){
     const page = pages[key];
     if(!page) return '';
     const heading = topic.figureLabel || (topic.figureNumber ? 'Figure ' + topic.figureNumber : keys.length === 1 ? 'Figure' : (i === 0 ? 'Figure' : 'Figure ' + (i + 1)));
-    const frameClass = ['scene-frame', page.tall ? 'scene-frame-tall' : '', page.flush ? 'scene-frame-flush' : ''].filter(Boolean).join(' ');
+    const frameClass = ['scene-frame', page.studio ? 'scene-frame-studio' : (page.tall ? 'scene-frame-tall' : ''), page.flush ? 'scene-frame-flush' : ''].filter(Boolean).join(' ');
     return `
 <section class="figure-section${page.flush ? ' flush' : ''}${['lefm','lefmCenterCrack','anticrack','mixedFields'].includes(key)?' analytical-figure':''}" aria-label="${page.title}">
   <p class="section-label">${heading}</p>
@@ -5328,7 +5331,7 @@ window.addEventListener('keydown', (e)=>{
     const cohesiveSceneHtml = renderTopicScene({scenes:['cohesiveCrack','dcbCohesive','peelWells']});
     ok('scene frames use data-src', /data-scene-src="dcb-cohesive.html"/.test(cohesiveSceneHtml) && !/<iframe[^>]+src=/.test(cohesiveSceneHtml));
     ok('j-integral topic', topics.some(t => t.title === 'The J-Integral' && t.scene === 'jIntegral'));
-    ok('phase-field fracture topic', topics.some(t => t.title === 'Phase-Field Modelling of Fracture' && t.scene === 'phaseFieldFracture' && (t.equations||[]).length >= 3));
+    ok('phase-field fracture topic', topics.some(t => t.title === 'Phase-Field Modelling of Fracture' && Array.isArray(t.scenes) && t.scenes.includes('phaseFieldExplainer') && t.scenes.includes('phaseFieldFracture') && t.scenes.includes('phaseFieldSimulation') && (t.equations||[]).length >= 3));
     ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));
     ok('embedded fiber models topic', topics.some(t => t.title === 'Embedded Fiber Models' && Array.isArray(t.scenes) && t.scenes.includes('fiberInterface') && t.scenes.includes('fiberBox') && t.scenes.includes('fiberPullout') && t.scenes.includes('matfibCenterFiber')));
     ok('metal plasticity scene', topics.some(t => t.title === 'Metal Plasticity' && t.scene === 'elastoPlasticCantilever'));
