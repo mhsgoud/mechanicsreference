@@ -12,6 +12,9 @@
       ]
     }
   ],
+  "rewrites": [
+    { "source": "/fracture-viewer", "destination": "/fracture-viewer/index.html" }
+  ],
   "redirects": [
     {
       "source": "/theory.html",
