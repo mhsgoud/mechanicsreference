@@ -289,6 +289,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://mechanicsreference.com/hub.html#xfem-crack-growth</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://mechanicsreference.com/hub.html#discontinuous-galerkin-method</loc>
     <lastmod>2026-08-23</lastmod>
     <changefreq>monthly</changefreq>
