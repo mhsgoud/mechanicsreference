@@ -67,6 +67,7 @@
         { "@type": "ListItem", "position": 21, "name": "Time-Dependent Problems" },
         { "@type": "ListItem", "position": 22, "name": "Contact and Friction" },
         { "@type": "ListItem", "position": 22, "name": "Box Deformation: Shells and Plasticity" },
+        { "@type": "ListItem", "position": 22, "name": "Steel Joint: Plasticity and Moment–Rotation" },
         { "@type": "ListItem", "position": 22, "name": "Three-Point Bending of a Hollow Profile" },
         { "@type": "ListItem", "position": 22, "name": "Inflating a Pillow" },
         { "@type": "ListItem", "position": 23, "name": "Fracture Mechanics" },
@@ -694,6 +695,7 @@
         <li><a href="hub.html#time-dependent-problems">Time-Dependent Problems</a></li>
         <li><a href="hub.html#contact-and-friction">Contact and Friction</a></li>
         <li><a href="hub.html#box-deformation-shells-and-plasticity">Box Deformation: Shells and Plasticity</a></li>
+        <li><a href="hub.html#steel-joint-plasticity-and-moment-rotation">Steel Joint: Plasticity and Moment–Rotation</a></li>
         <li><a href="hub.html#three-point-bending-of-a-hollow-profile">Three-Point Bending of a Hollow Profile</a></li>
         <li><a href="hub.html#inflating-a-pillow">Inflating a Pillow</a></li>
         <li><a href="hub.html#fracture-mechanics">Fracture Mechanics</a></li>
@@ -2788,6 +2790,14 @@ const topics = [
     "The figure interpolates geometry and fields between the 93 saved increments. Scaling deformation changes only the picture. The supplied loading sequence does not quantify unloaded springback. No contact pairs appear in this input, so visually approaching or overlapping walls should not be interpreted as a simulated self-contact constraint. Open the full-page viewer for playback, field controls, and the VTU and input downloads."
   ], tags:["Kasten","box","shells","CalculiX","plasticity","large deformation","buckling"], sources:[{label:"Open the full-page Kasten viewer",href:"/kasten-viewer/"},{label:"Download Kasten final-state VTU",href:"/kasten-viewer/Kasten_deformed.vtu"},{label:"CalculiX input for this example",href:"/kasten-viewer/Kasten.inp"}]},
 
+  {part:"Part IV – Applications in Engineering", title:"Steel Joint: Plasticity and Moment–Rotation", sceneFirst:true, scenes:["steelJointResults"], bullets:[
+    "This OOFEM result set shows a steel joint with J2 plasticity and an interface damage material. The viewer displays the exported tetrahedral region through 58 saved states. The source mesh has 22,639 nodes and 73,891 tetrahedra; the browser receives the exterior faces only — 19,757 surface nodes and 39,538 triangles. Other input elements that are not in the VTU are not reconstructed.",
+    "Although the files sit next to CalculiX examples, the input and solver log identify this run as OOFEM. The steel material uses E = 210000, Poisson ratio 0.3, and yield stress 275 in an N–mm convention. Von Mises stress is calculated from the exported nodal stress tensor. Colour limits rescale at each frame, so compare the numeric legend as well as the colours.",
+    "The deformed_x2 files already contain coordinates amplified by two. The viewer recovers the unwarped geometry and applies the scale once. The default ×2 matches the supplied export; choose True scale ×1 for the physical displacement, or ×0 for the reference mesh. No symmetry copies are introduced.",
+    "The synchronized moment–rotation curve follows control node 50004: rotation magnitude in milliradians and moment magnitude in kN·m, using a reference moment of 1e6 N·mm. The export index starts at zero, corresponding to solution step 1. Playback interpolates geometry and fields between saved states; interpolated frames are not newly solved equilibria.",
+    "The input requested 80 steps, but only 58 result states are available. The solver log ends with an error and iterative-solver warnings. Treat the displayed curve as a partial saved response, not evidence of successful completion or ultimate joint capacity. No later states or zero-load point have been invented. Open the full-page viewer for playback, the discussion, and the CSV, VTU, and input downloads."
+  ], tags:["steel joint","OOFEM","plasticity","moment rotation","connection"], sources:[{label:"Open the full-page steel-joint viewer",href:"/steeljoint-viewer/"},{label:"Moment–rotation CSV",href:"/steeljoint-viewer/moment_rotation.csv"},{label:"Download deformed VTU (×2 export)",href:"/steeljoint-viewer/steeljoint_deformed_x2.vtu"},{label:"OOFEM input",href:"/steeljoint-viewer/stycnik-plasticity.oofem.in"}]},
+
   {part:"Part IV – Applications in Engineering", title:"Three-Point Bending of a Hollow Profile", sceneFirst:true, scenes:["threePointBending"], bullets:[
     "This CalculiX example subjects a hollow aluminium profile to three-point bending with steel loading and support bodies. It combines large deformation, plasticity, surface-to-surface penalty contact, and symmetry reduction. The animation retains all 52 saved increments, with 5,175 nodes and 3,296 linear hexahedral cells. The Full beam option reconstructs the specimen and contact tools by reflecting the solved quarter across x = 0 and y = 0. Switch it off to inspect the original mesh. This reconstruction assumes the imposed symmetries; it cannot reveal asymmetric deformation modes.",
     "Loading and restraints. The static step enables geometric nonlinearity and prescribes −20 in displacement component 3 on NLOAD. Displacement component 1 is constrained on Nxsym, component 2 on Nysym, and component 3 on Nsupport. The prescribed displacement ramps linearly over step time 0 to 1. The first exported state is at time 0.01, so the viewer begins after loading has started. Animation time is a static load parameter, not a measured loading rate.",
@@ -3618,6 +3628,7 @@ function renderTopicScene(topic){
     xfemParis: {src:'/xfem/paris.html', title:'Paris-law growth: MXFEM a(N) versus closed-form integration on a fixed mesh', studio:true},
     xfemInclusion: {src:'/xfem/inclusion.html', title:'Crack path past hard and soft inclusions versus Bordas (2006)', studio:true},
     kasten: {src:'/kasten-viewer/index.html', title:'Kasten shell box: deformation, stress, and plastic strain across 93 saved states', studio:true},
+    steelJointResults: {src:'/steeljoint-viewer/index.html', title:'Steel joint: saved OOFEM deformation and moment–rotation response', studio:true},
     threePointBending: {src:'/3pb-viewer/index.html', title:'Three-point bending: hollow-profile deformation and synchronized load–displacement response', studio:true},
     pillowInflation: {src:'/pillow-viewer/index.html', title:'Inflating a pillow: animated deformation and pressure–uplift response', studio:true},
     pVersionFem: {src:'p-version-fem.html', title:'p-version FEM and Lobatto modes', tall:true},
@@ -5372,10 +5383,11 @@ window.addEventListener('keydown', (e)=>{
     ok('truss elements topic', topics.some(t => t.title === 'Truss Elements' && t.illustrations === 'trussElements' && (t.equations||[]).length >= 3));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('hertzFebio') && t.scenes.includes('beamContact')));
     ok('kasten box deformation topic', topics.some(t => t.title === 'Box Deformation: Shells and Plasticity' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('kasten')));
+    ok('steel joint topic', topics.some(t => t.title === 'Steel Joint: Plasticity and Moment–Rotation' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('steelJointResults')));
     ok('three-point bending topic', topics.some(t => t.title === 'Three-Point Bending of a Hollow Profile' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('threePointBending')));
     ok('pillow inflation topic', topics.some(t => t.title === 'Inflating a Pillow' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('pillowInflation')));
-    const studioHtml = renderTopicScene({scenes:['kasten','threePointBending','pillowInflation']});
-    ok('studio viewers use absolute src', /data-scene-src="\/kasten-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/3pb-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/pillow-viewer\/index.html"/.test(studioHtml));
+    const studioHtml = renderTopicScene({scenes:['kasten','steelJointResults','threePointBending','pillowInflation']});
+    ok('studio viewers use absolute src', /data-scene-src="\/kasten-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/steeljoint-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/3pb-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/pillow-viewer\/index.html"/.test(studioHtml));
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));

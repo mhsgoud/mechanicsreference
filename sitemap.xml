@@ -193,8 +193,20 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://mechanicsreference.com/steeljoint-viewer/</loc>
+    <lastmod>2026-09-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://mechanicsreference.com/hub.html#box-deformation-shells-and-plasticity</loc>
     <lastmod>2026-09-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mechanicsreference.com/hub.html#steel-joint-plasticity-and-moment-rotation</loc>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
