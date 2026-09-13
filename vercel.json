@@ -24,12 +24,20 @@
         { "key": "Content-Type", "value": "application/octet-stream" },
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
+    },
+    {
+      "source": "/kasten-viewer/:file(.*).gz",
+      "headers": [
+        { "key": "Content-Type", "value": "application/octet-stream" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
   ],
   "rewrites": [
     { "source": "/fracture-viewer", "destination": "/fracture-viewer/index.html" },
     { "source": "/3pb-viewer", "destination": "/3pb-viewer/index.html" },
-    { "source": "/pillow-viewer", "destination": "/pillow-viewer/index.html" }
+    { "source": "/pillow-viewer", "destination": "/pillow-viewer/index.html" },
+    { "source": "/kasten-viewer", "destination": "/kasten-viewer/index.html" }
   ],
   "redirects": [
     {
