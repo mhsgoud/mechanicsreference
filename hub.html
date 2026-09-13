@@ -66,6 +66,8 @@
         { "@type": "ListItem", "position": 20, "name": "Static Condensation & Schur Complement" },
         { "@type": "ListItem", "position": 21, "name": "Time-Dependent Problems" },
         { "@type": "ListItem", "position": 22, "name": "Contact and Friction" },
+        { "@type": "ListItem", "position": 22, "name": "Three-Point Bending of a Hollow Profile" },
+        { "@type": "ListItem", "position": 22, "name": "Inflating a Pillow" },
         { "@type": "ListItem", "position": 23, "name": "Fracture Mechanics" },
         { "@type": "ListItem", "position": 24, "name": "Linear Elastic Fracture Mechanics" },
         { "@type": "ListItem", "position": 24, "name": "Mode I, II & Mixed-Mode Cracking" },
@@ -690,6 +692,8 @@
         <li><a href="hub.html#static-condensation-schur-complement">Static Condensation &amp; Schur Complement</a></li>
         <li><a href="hub.html#time-dependent-problems">Time-Dependent Problems</a></li>
         <li><a href="hub.html#contact-and-friction">Contact and Friction</a></li>
+        <li><a href="hub.html#three-point-bending-of-a-hollow-profile">Three-Point Bending of a Hollow Profile</a></li>
+        <li><a href="hub.html#inflating-a-pillow">Inflating a Pillow</a></li>
         <li><a href="hub.html#fracture-mechanics">Fracture Mechanics</a></li>
         <li><a href="hub.html#linear-elastic-fracture-mechanics">Linear Elastic Fracture Mechanics</a></li>
         <li><a href="hub.html#mode-i-ii-mixed-mode-cracking">Mode I, II &amp; Mixed-Mode Cracking</a></li>
@@ -2773,6 +2777,21 @@ const topics = [
     "Figure 1 is the ideal Hertz construction: increase the approach δ and watch the elliptic pressure grow with the patch. Figure 2 shows FEBio surface data for frictionless normal contact and for a sliding case, with the finite-element pressure profile plotted against Hertz. Figure 3 is a ContactFEA hex-mesh double-cantilever: both arms bend from a fixed wall, tip loads close a 5 mm gap, and the MATLAB Newton–Raphson path is plotted as tip force versus tip U₂."
   ], tags:["contact","friction","KKT","mortar","penalty","Hertz","ContactFEA","FEBio"], scenes:["hertzContact","hertzFebio","beamContact"]},
 
+  {part:"Part IV – Applications in Engineering", title:"Three-Point Bending of a Hollow Profile", sceneFirst:true, scenes:["threePointBending"], bullets:[
+    "This CalculiX example subjects a hollow aluminium profile to three-point bending with steel loading and support bodies. It combines large deformation, plasticity, surface-to-surface penalty contact, and symmetry reduction. The animation retains all 52 saved increments, with 5,175 nodes and 3,296 linear hexahedral cells. The Full beam option reconstructs the specimen and contact tools by reflecting the solved quarter across x = 0 and y = 0. Switch it off to inspect the original mesh. This reconstruction assumes the imposed symmetries; it cannot reveal asymmetric deformation modes.",
+    "Loading and restraints. The static step enables geometric nonlinearity and prescribes −20 in displacement component 3 on NLOAD. Displacement component 1 is constrained on Nxsym, component 2 on Nysym, and component 3 on Nsupport. The prescribed displacement ramps linearly over step time 0 to 1. The first exported state is at time 0.01, so the viewer begins after loading has started. Animation time is a static load parameter, not a measured loading rate.",
+    "Material and contact. The aluminium input gives E = 70000, Poisson ratio 0.3, and plastic data pairs (160, 0), (208, 0.04), and (480, 0.3), representing yield stress versus equivalent plastic strain. The steel bodies are elastic with E = 210000 and Poisson ratio 0.3. Two surface-to-surface contact pairs use a linear pressure–overclosure law. The friction keyword is commented out: the contact in this input is frictionless.",
+    "Load–displacement curve. Displacement is 20 times step time in mm, and full-specimen load is −4 times the summed vertical NLOAD reaction divided by 1000, in kN. The factor four accounts for symmetry reduction. The magenta theoretical elastic reference is 45.974 kN at 1.90476 mm, a stiffness of 24.136 kN/mm. It is shown only over the supplied elastic range. Departure of the nonlinear response from this line reflects plasticity, changing geometry, and contact together; the comparison does not isolate their contributions.",
+    "Interpretation and limits. Compare the changing curve slope with the deformed shape and the PEEQ field. Color limits vary by frame. The figure interpolates geometry and fields between saved equilibrium states; it does not solve intermediate states. There is no unloading step, so springback is not determined. Open the full-page viewer for the playback bar, field controls, and downloadable VTU, CSV, and input."
+  ], tags:["three-point bending","3PB","hollow profile","aluminium","contact","plasticity","symmetry","load displacement","CalculiX"], sources:[{label:"Open the full-page 3PB viewer",href:"/3pb-viewer/"},{label:"Download the final VTU",href:"/3pb-viewer/Biegung_deformed.vtu"},{label:"Download load–displacement CSV",href:"/3pb-viewer/load-displacement.csv"},{label:"CalculiX input",href:"/3pb-viewer/Biegung.inp"}]},
+
+  {part:"Part IV – Applications in Engineering", title:"Inflating a Pillow", sceneFirst:true, scenes:["pillowInflation"], bullets:[
+    "A uniform pressure inflates an initially flat elastic sheet. The local CalculiX model includes large deformation, with pressure ramped to 0.01 in the first step and held in a second step with tighter convergence controls. Explore all 11 exported states, displacement magnitude, and von Mises stress.",
+    "The solved region is one quarter of the upper sheet. Full pillow reflects that result across x = 0, y = 0 and z = 0, following the example’s postprocessing. Switch it off to inspect the original region. The reconstruction assumes those symmetries and cannot reveal asymmetric modes.",
+    "The synchronized pressure–uplift curve combines the prescribed pressure with the maximum saved vertical displacement. No reaction-force history is available in the source output. A linear-elastic material does not imply a straight pressure–displacement curve under large deformation. The example is known to be sensitive to shell formulation and nonlinear convergence.",
+    "Open the full-page viewer for playback, field controls, and the local input and CSV. Source: the CalculiX Examples Pillow model."
+  ], tags:["pillow","inflation","shell","pressure","large deformation","symmetry","CalculiX"], sources:[{label:"Open the full-page pillow viewer",href:"/pillow-viewer/"},{label:"CalculiX Pillow example",href:"https://github.com/calculix/CalculiX-Examples/tree/master/Pillow"},{label:"Pressure–uplift CSV",href:"/pillow-viewer/pressure-displacement.csv"},{label:"Local analysis input",href:"/pillow-viewer/static.inp"}]},
+
   // Part IV – Applications in Engineering
   {part:"Part IV – Applications in Engineering", title:"Fracture Mechanics", bullets:[
     "A crack is a surface across which displacement jumps and traction is either zero or given by a cohesive law. Linear elastic fracture mechanics (LEFM) treats the solid as linear up to an infinitely sharp tip. The near-tip field is then Williams’ expansion: stress of order r^{-1/2} times a stress intensity factor K. Three modes exist. Mode I opens the faces; mode II slides them in plane; mode III tears them out of plane.",
@@ -3587,6 +3606,8 @@ function renderTopicScene(topic){
     xfemSif: {src:'/xfem/sif.html', title:'MXFEM SIFs: center crack, edge crack, and hole initiation versus Feddersen and Tada', studio:true},
     xfemParis: {src:'/xfem/paris.html', title:'Paris-law growth: MXFEM a(N) versus closed-form integration on a fixed mesh', studio:true},
     xfemInclusion: {src:'/xfem/inclusion.html', title:'Crack path past hard and soft inclusions versus Bordas (2006)', studio:true},
+    threePointBending: {src:'/3pb-viewer/index.html', title:'Three-point bending: hollow-profile deformation and synchronized load–displacement response', studio:true},
+    pillowInflation: {src:'/pillow-viewer/index.html', title:'Inflating a pillow: animated deformation and pressure–uplift response', studio:true},
     pVersionFem: {src:'p-version-fem.html', title:'p-version FEM and Lobatto modes', tall:true},
     beamSolidReduced: {src:'beam-solid-reduced.html', title:'Solid elements vs beam elements — same cantilever', tall:true},
     constraintMethods: {src:'constraint-methods.html', title:'Penalty, Lagrange multipliers, and Nitsche on the same tied seam', tall:true},
@@ -5338,6 +5359,10 @@ window.addEventListener('keydown', (e)=>{
     ok('shell elements topic', topics.some(t => t.title === 'Shell Elements' && t.illustrations === 'shellElements' && (t.equations||[]).length >= 3));
     ok('truss elements topic', topics.some(t => t.title === 'Truss Elements' && t.illustrations === 'trussElements' && (t.equations||[]).length >= 3));
     ok('contact topic', topics.some(t => t.title === 'Contact and Friction' && Array.isArray(t.scenes) && t.scenes.includes('hertzContact') && t.scenes.includes('hertzFebio') && t.scenes.includes('beamContact')));
+    ok('three-point bending topic', topics.some(t => t.title === 'Three-Point Bending of a Hollow Profile' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('threePointBending')));
+    ok('pillow inflation topic', topics.some(t => t.title === 'Inflating a Pillow' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('pillowInflation')));
+    const studioHtml = renderTopicScene({scenes:['threePointBending','pillowInflation']});
+    ok('studio viewers use absolute src', /data-scene-src="\/3pb-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/pillow-viewer\/index.html"/.test(studioHtml));
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
