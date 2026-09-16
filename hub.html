@@ -616,7 +616,7 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <link rel="stylesheet" href="library-navigation.css?v=20260916-3">
+  <link rel="stylesheet" href="library-navigation.css?v=part2-review">
 </head>
 <body>
   <div class="app">
@@ -2599,16 +2599,17 @@ const topics = [
     }
   ], tags:["potential energy","Galerkin","virtual work","variation","strong form","weak form","residual","linearization","tangent stiffness","Newton-Raphson","Bonet Wood"]},
   {part:"Part II – Numerical Methods", title:"Finite Element Method (Introduction)", bullets:[
-    "The finite element method is a Galerkin discretisation of a weak form. On each element the unknown field is interpolated by shape functions, uʰ = Σ N_a a_a. Substituting into virtual work, and requiring the residual to vanish for every test function in the same space, produces a finite algebraic system.",
-    "Element contributions are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated at Gauss points and assembled into a global sparse matrix using the map from local to global degrees of freedom. Essential boundary conditions are then imposed on that system.",
-    "Accuracy is controlled by the mesh size h, the polynomial degree p, and the regularity of the solution. A crack tip, a sharp corner, or an incompressible constraint can destroy the textbook rates unless the interpolation is chosen for that pathology. The continuum theory does not by itself pick an element."
-  ], tags:["FEM","weak form","discretization","elements","Galerkin"]},
+    "Divide the domain into elements and write uʰ = Σ Nᵢaᵢ. The basis functions describe how each coefficient influences the field. For a conforming displacement formulation, adjacent elements agree on their shared boundary. Testing the weak form with the discrete basis gives one equation for each unconstrained degree of freedom.",
+    "In linear elasticity, each element contributes kₑ = ∫ BᵀCB dV and a load vector. B converts nodal displacement into strain, and C converts strain into stress. Quadrature evaluates these integrals; connectivity places them in the global system. Supports then remove rigid-body freedom and complete the problem.",
+    "Keep three errors separate: the physical model may omit important behavior, the finite-dimensional space may approximate the solution poorly, and the algebraic solve may be incomplete. A small solver residual only addresses the last of these. Start with a simple benchmark, then refine h or increase p and track the quantity you actually need."
+  ], tags:["FEM","weak form","discretization","elements","Galerkin"], lead:"Approximate a field with a finite set of coefficients while retaining the weak balance statement."},
 
   // Interactive element chooser topic
   {part:"Part II – Numerical Methods", title:"Element Types & Families (Chooser)", interactive:"elementChooser", bullets:[
-    "Not every element is safe for every problem. Low-order displacement elements lock in thin bending and near incompressibility; reduced integration can introduce hourglass modes; wave problems are limited by numerical dispersion.",
-    "The families in common use—C0 Lagrangian elements, high-order and spectral bases, mixed displacement–pressure pairs, discontinuous Galerkin, and virtual elements—exist because each of those failure modes has a standard remedy. Choose a setting below to see which families are appropriate."
-  ], tags:["element types","Lagrangian","h-version","p-version","hp-FEM","spectral","mixed","DG","VEM","locking","hourglassing","dispersion"]},
+    "Begin with what the structure must do. Axial members suggest trusses; bending and shear suggest beams or shells; local three-dimensional stresses may require solids. Geometry alone does not select the formulation: thickness, material compressibility, contact, and expected gradients also matter.",
+    "Next ask what the discrete space might suppress or admit incorrectly. Overly restrictive shear or volumetric behavior can lock; under-integration can admit hourglass modes; inadequate resolution can disperse waves. Higher order, mixed fields, assumed strains, and stabilization address different problems and should not be treated as interchangeable switches.",
+    "Use the chooser to narrow the candidates, then validate with a benchmark that excites the relevant behavior. Check convergence in displacement, energy, and the stress or reaction of interest. The sections that follow explain why the candidate families behave differently."
+  ], tags:["element types","Lagrangian","h-version","p-version","hp-FEM","spectral","mixed","DG","VEM","locking","hourglassing","dispersion"], lead:"Choose an approximation for the deformation modes and constraints that dominate the problem."},
 
   {part:"Part II – Numerical Methods", title:"Virtual Element Method", bullets:[
     "The virtual element method (VEM) is a Galerkin discretisation on meshes of arbitrary polygons (2-D) or polyhedra (3-D). Degrees of freedom live on the vertices—and, at higher order, on edges, faces, and moments inside the element—but the basis functions inside an element are never constructed explicitly. That is the “virtual” part: the space exists mathematically; the code never evaluates N_a(x) in the interior.",
@@ -2680,11 +2681,11 @@ const topics = [
   ], tags:["meshing","mesh generation","Delaunay","advancing front","octree","hex-dominant","quality","sizing field","anisotropic","unfitted","embedded","cut cells","CutFEM","XFEM","FCM","finite cell","Nitsche","penalty"]},
 
   {part:"Part II – Numerical Methods", title:"Shape Functions & Isoparametric Mapping", bullets:[
-    "Geometry and unknown fields are interpolated from nodal values with the same shape functions: x(ξ) = Σ N_a(ξ) x_a and u(ξ) = Σ N_a(ξ) a_a. That is the isoparametric construction. Derivatives in physical space come from the chain rule, ∇_x N = J⁻ᵀ ∇_ξ N, with Jacobian J = ∂x/∂ξ of the parent-to-physical map.",
-    "Continuity of the interpolation, and the polynomial degree, control both accuracy and locking. A linear tetrahedron and a quadratic hexahedron are not interchangeable approximations of the same continuum problem. Completeness — the ability to represent rigid motion and constant strain — is what the patch test checks.",
-    "The parent element is a line, triangle, square, tetrahedron, or cube. Distortion of the physical element degrades the map: a vanishing Jacobian is an illegal mesh, and a large aspect ratio inflates the condition number even when the Jacobian stays positive.",
+    "For an isoparametric element, x(ξ) = Σ Nₐ(ξ)xₐ and uʰ(ξ) = Σ Nₐ(ξ)aₐ use the same basis. Partition of unity, ΣNₐ = 1, reproduces constant fields. With suitable completeness and continuity, the element can represent rigid translation and constant strain.",
+    "The mapping Jacobian Jₘ = ∂x/∂ξ converts gradients by ∇ₓN = Jₘ⁻ᵀ∇ξN and volumes by dV = det(Jₘ)dξ. This mapping Jacobian is distinct from the deformation gradient of the physical motion. A collapsed or inverted map cannot be repaired by adding integration points.",
+    "For a straight two-node bar, N₁ = (1−ξ)/2 and N₂ = (1+ξ)/2 on [−1,1]. The physical derivatives are −1/L and 1/L, giving constant axial strain. In a distorted quadrilateral the Jacobian varies, so derivative products need not remain polynomial even when the parent shape functions are polynomial.",
     "The figure on the left is the parent square in (ξ, η). The same nodal shape functions send it to the warped quadrilateral on the right."
-  ], tags:["shape functions","isoparametric","tri","quad","tet","hex"], illustrations:"isoparametric"},
+  ], tags:["shape functions","isoparametric","tri","quad","tet","hex"], illustrations:"isoparametric", lead:"Use a parent element to interpolate geometry, displacement, and their derivatives."},
   {part:"Part II – Numerical Methods", title:"p-Version FEM & Lobatto Shape Functions", bullets:[
     "The p-version holds the mesh fixed and raises the polynomial degree of the shape functions. For smooth solutions the error then falls exponentially in p — typically far fewer degrees of freedom than refining an h-mesh at low order. Near singularities an hp strategy restores that exponential rate: geometric refinement at the tip, high order in the smooth remainder.",
     "Hierarchical Lobatto (integrated Legendre) bases are the usual enrichment. Vertex modes ℓ₀ and ℓ₁ are the linear hats; every mode with k ≥ 2 carries the factor (ξ² − 1) and vanishes at the endpoints. On a quadrilateral the 2-D basis is built by tensor products: four vertex modes, four edge modes per new order k, then interior bubbles ℓᵢ(ξ) ℓⱼ(η) with i, j ≥ 2.",
@@ -2692,20 +2693,20 @@ const topics = [
     "Algebraic rates on a sequence of meshes still read ‖u − uʰ‖_{L²} = O(h^{p+1}) and ‖∇(u − uʰ)‖ = O(h^p) when the solution is smooth. The p-version claim is that climbing those steeper families on a coarse mesh often beats refining a linear one. Quadrature must integrate at least degree 2p − 2, or the expected rates silently disappear."
   ], tags:["p-version","hp-FEM","Lobatto","hierarchical","shape functions","spectral","bubble","edge modes","conditioning"], scene:"pVersionFem", sources:[{label:"Šolín, Segeth & Doležel, Higher-Order Finite Element Methods, Chapman & Hall/CRC (2004)", href:"https://www.crcpress.com/Higher-Order-Finite-Element-Methods/Solin-Segeth-Dolezel/p/book/9781584884385"}]},
   {part:"Part II – Numerical Methods", title:"Numerical Integration & Gauss Quadrature", bullets:[
-    "Element matrices are integrals of products of shape-function derivatives and constitutive moduli. Those integrals are evaluated by Gauss quadrature on the parent element: ∫ f dV ≈ Σ_q w_q f(ξ_q) det J(ξ_q).",
-    "The number of points must be high enough to integrate the chosen polynomial, or deliberately reduced when under-integration is part of the formulation. Full integration of a bilinear quadrilateral uses 2×2 points; reduced integration uses one, and then hourglass control is required.",
-    "The locations of the points are not a visualisation. They are the only places the constitutive law is evaluated. A stress contour that is not tied to those points is interpolated, not computed."
-  ], tags:["gauss","integration","quadrature"], illustrations:"gaussQuad"},
+    "Map the integral to the parent element and evaluate Σw_q f(ξ_q)det(Jₘ(ξ_q)). The weights account for integration measure, not a physical load distribution. Stress and material history are commonly evaluated at these quadrature points, which need not coincide with nodes.",
+    "An n-point Gauss–Legendre rule integrates one-dimensional polynomials through degree 2n−1 exactly. Tensor-product rules apply this fact coordinate by coordinate. Thus two points integrate ξ² exactly, while one point samples only its zero value at the center and misses the integral entirely. Try that distinction in the lab below.",
+    "Choose the rule for the whole integrand: interpolation derivatives, geometry, material coefficients, and constitutive response. The usual 2×2 rule for a bilinear quadrilateral is a conventional full rule, not a promise of exactness under arbitrary distortion. Reduced integration can relieve a constraint but may create zero-energy modes; it needs a formulation designed for that choice."
+  ], tags:["gauss","integration","quadrature"], illustrations:"gaussQuad", lead:"Replace each element integral by weighted samples without losing the behavior the element must represent.", scene:"quadratureLab", sceneFirst:true, sources:[{label:"NIST DLMF: Gauss quadrature", href:"https://dlmf.nist.gov/3.5"}]},
   {part:"Part II – Numerical Methods", title:"Assembly of the Global Stiffness Matrix", bullets:[
-    "Each element contributes a small dense matrix K^e = ∫ Bᵀ ℂ B dV. Assembly scatters those contributions into a global sparse matrix using the map from local to global degrees of freedom: K[I, J] += K^e[i, j] whenever local index i maps to global I.",
-    "Boundary conditions are applied to that global system after assembly, or by construction of the constrained space. The sparsity pattern is the connectivity of the mesh; it is also the graph that a fill-reducing ordering will later try to tame.",
-    "In a nonlinear analysis the same scatter is done for the residual force and for the consistent tangent, every Newton iteration. Duplicate entries that land on the same (I, J) must be summed, not overwritten."
-  ], tags:["assembly","stiffness","global","matrix"]},
+    "Each element has local numbering and a map to global unknowns. Scatter-add its stiffness and force contributions through that map. If two elements touch the same degree of freedom, their contributions add; writing one value over the other loses an equilibrium contribution.",
+    "For two axial elements with stiffnesses k₁ and k₂, joining nodes 1–2 and 2–3, the middle diagonal becomes k₁+k₂. The off-diagonal entries are −k₁ and −k₂. With no supports, every row sums to zero: uniform translation changes no strain, so the stiffness has a rigid mode.",
+    "Sparse assembly stores only coupled entries, often first as coordinate triplets that are later summed and compressed. Matrix-free methods instead apply element actions without explicitly forming all entries. Either approach must use the same connectivity, constraints, and residual convention. The next step is to impose boundary data."
+  ], tags:["assembly","stiffness","global","matrix"], lead:"Shared degrees of freedom turn independent element contributions into global equilibrium.", scene:"assemblyLab", sceneFirst:true},
   {part:"Part II – Numerical Methods", title:"Boundary Conditions & Loads", bullets:[
-    "Essential, or Dirichlet, conditions prescribe the unknown field on part of the boundary: a fixed displacement, a prescribed temperature. They remove degrees of freedom from the algebraic system, or they are imposed weakly by Nitsche or by a penalty.",
-    "Natural, or Neumann, conditions appear in the weak form as boundary integrals: a traction, a heat flux. A concentrated force is a distributional special case of the same idea — a Dirac on the boundary, or at a node.",
-    "Mixing the two inconsistently — prescribing a displacement and a conjugate traction on the same degree of freedom — is a modelling error, not a solver problem. On a symmetry plane the normal displacement is essential and the shear traction is natural, or the reverse, never both of a conjugate pair."
-  ], tags:["boundary","Dirichlet","Neumann","loads"]},
+    "Essential conditions prescribe a field value, such as a displacement. Natural conditions specify the conjugate boundary flux, such as traction, through the weak form. An unspecified traction boundary is traction-free in the usual displacement formulation; it is not automatically a fixed support.",
+    "Partition unknowns into free and prescribed sets. With u_c known, solve K_ff u_f = f_f − K_fc u_c. The second term matters for settlement or imposed motion. Recover reactions from the original rows, r_c = K_cf u_f + K_cc u_c − f_c, rather than from rows overwritten to enforce a support.",
+    "Check that supports eliminate unwanted rigid modes without suppressing intended deformation. Symmetry requires compatible geometry, loading, and material: normal displacement is zero and tangential traction is zero. Distribute traction using the element boundary integral; concentrated loads can create local singularities, so peak stress near a point load may not converge."
+  ], tags:["boundary","Dirichlet","Neumann","loads"], lead:"Make the model physically well posed before asking a solver to invert its matrix.", sources:[{label:"MFEM: boundary conditions and linear systems", href:"https://mfem.org/fem_bc/"}]},
   {part:"Part II – Numerical Methods", title:"Constrained FEM", equations:[
     {name:"Linear constraint", expr:"C u = g", tex:"\\mathbf{C}\\,\\mathbf{u} = \\mathbf{g}", note:"Rows of C pick combinations of degrees of freedom. A single-point Dirichlet is one row with a unit entry; a multi-point tie has two (or more) nonzero entries."},
     {name:"Lagrange saddle point", expr:"[K, Cᵀ; C, 0] [u; λ] = [f; g]", tex:"\\begin{bmatrix} \\mathbf{K} & \\mathbf{C}^{\\mathsf T} \\\\ \\mathbf{C} & \\mathbf{0} \\end{bmatrix}\\begin{bmatrix} \\mathbf{u} \\\\ \\boldsymbol{\\lambda} \\end{bmatrix} = \\begin{bmatrix} \\mathbf{f} \\\\ \\mathbf{g} \\end{bmatrix}", note:"Multipliers λ are the reactions that enforce the constraints. The system is indefinite; a positive-definite solver will not do."},
@@ -2720,10 +2721,10 @@ const topics = [
     "The interactive scene ties two blocks across a non-matching seam and solves all three routes on the same mesh at once, so the accuracy, the matrix size, and the conditioning can be read off rather than argued about. Nitsche appears there as the consistent third option: a penalty-like primal system that is exact, provided its stabilisation stays above the threshold that keeps the matrix positive definite."
   ], tags:["constraints","MPC","Lagrange","penalty","master-slave","Dirichlet","PBC","tying","Nitsche","mortar","non-matching mesh","tied contact","saddle point","conditioning"], illustrations:"constrainedFem", scene:"constraintMethods"},
   {part:"Part II – Numerical Methods", title:"Solving Linear Systems", bullets:[
-    "After assembly the discrete problem is a linear system, or a sequence of them. Direct factorisation (Cholesky, LU) is robust at moderate size; iterative methods with preconditioning are required when a dense factor will not fit.",
-    "The condition number, driven by mesh size, material contrast, and constraints, decides how hard the solve is. A formulation that is correct on paper can still be unsolvable if that number is left unattended. Near incompressibility, thin shells, and contact constraints are the usual offenders.",
-    "Symmetric positive-definite systems take conjugate gradients; indefinite mixed systems take MINRES or GMRES with a block preconditioner. A black-box positive-definite solver on a saddle-point matrix will not do."
-  ], tags:["solver","iterative","direct","condition number","GPU"]},
+    "After assembly and boundary enforcement, identify symmetry, definiteness, nullspaces, and scaling. A supported linear elastic displacement model is often symmetric positive definite. Mixed constraints can make it indefinite; follower loads or other couplings can make it nonsymmetric.",
+    "Cholesky applies to positive-definite systems; LU is more general. Sparse direct factorization can create substantial fill-in. For iterative methods, CG requires an SPD operator and compatible SPD preconditioning. MINRES handles symmetric indefinite operators with suitable SPD preconditioning; GMRES handles nonsymmetric systems.",
+    "A preconditioner makes the system easier to solve without changing the desired solution. Track a scaled residual and, when available, a quantity-of-interest estimate. A small residual can coexist with appreciable error in an ill-conditioned system. Before changing solvers, check missing supports, unit scaling, distorted elements, and extreme penalties."
+  ], tags:["solver","iterative","direct","condition number","GPU"], lead:"Match the linear solver to the constrained matrix, then distinguish residual accuracy from solution accuracy."},
   {part:"Part II – Numerical Methods", title:"Mixed Methods and Locking", bullets:[
     "A displacement-only interpolation of an incompressible, or nearly incompressible, solid cannot represent ∇ · u = 0 without locking: the only fields that satisfy the constraint are too poor to represent bending or even uniform compression. The same happens in thin plates with a shear-deformable kinematic, and in Stokes flow.",
     "The remedy is a mixed method. Displacement and pressure are interpolated independently, and the constraint ∇ · u = 0 (or a nearly incompressible volumetric law) is enforced weakly. Inf-sup stable pairs — Taylor–Hood, Q2–P1, Q1–P0 with stabilisation — are the catalogue.",
@@ -3594,6 +3595,8 @@ function renderTopicScene(topic){
     workConjugates: {src:'work-conjugates.html', title:'Saint Venant–Kirchhoff cube under stretch and shear. Yellow is P N on the reference face; blue is σ n on the deformed face. The matrices are the three work-conjugate stresses.', flush:true},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
     hyperelasticity: {src:'/hyperelasticity.html?v=2', title:'Material lab: compare linear elasticity and incompressible neo-Hookean compression. Move the load slider or play a loading cycle.', tall:true},
+    quadratureLab: {src:'/numerics-lab.html?mode=quadrature', title:'Gauss quadrature: compare sampled and exact integrals', tall:true},
+    assemblyLab: {src:'/numerics-lab.html?mode=assembly', title:'Assembly: two elements, shared equilibrium, and a support reaction', tall:true},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
@@ -5013,6 +5016,24 @@ function topicBridge(topic){
 }
 
 function partPathHtml(topic){
+  if(topic.part === 'Part II – Numerical Methods'){
+    const siblings=partTopics(topic.part),idx=siblings.indexOf(topic);
+    const stageTitles=['Variational Principles','Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)','Assembly of the Global Stiffness Matrix','Element Types & Families (Chooser)'];
+    const stageNames=['Formulate','Discretize','Assemble & solve','Choose the space'];
+    const stageIdx=stageTitles.map(title=>siblings.findIndex(t=>t.title===title));
+    const formulate=new Set(['Variational Principles','Finite Element Method (Introduction)']);
+    const discretize=new Set(['Mesh Generation & Embedded/Unfitted Methods (FEM/FCM)','Shape Functions & Isoparametric Mapping','p-Version FEM & Lobatto Shape Functions','Numerical Integration & Gauss Quadrature']);
+    const assemble=new Set(['Assembly of the Global Stiffness Matrix','Boundary Conditions & Loads','Constrained FEM','Solving Linear Systems']);
+    let current=3;
+    if(formulate.has(topic.title)) current=0;
+    else if(discretize.has(topic.title)) current=1;
+    else if(assemble.has(topic.title)) current=2;
+    return `<nav class="methods-path" aria-label="Part II learning sequence"><span>PART II · ${idx+1} / ${siblings.length}</span>${stageNames.map((name,j)=>{
+      const i=stageIdx[j];
+      const href=i>=0?'#'+slug(siblings[i].title):'#';
+      return `<a href="${href}" ${j===current?'aria-current="step"':''}>${j+1}. ${name}</a>`;
+    }).join('')}</nav>`;
+  }
   if(topic.part !== PART_I) return "";
   const siblings = partTopics(topic.part);
   const idx = siblings.findIndex(t => t.title === topic.title);
@@ -5421,6 +5442,13 @@ window.addEventListener('keydown', (e)=>{
     ok('gibson consolidation topic', topics.some(t => t.title === 'Gibson Consolidation' && t.scene === 'consolidationGibson'));
     ok('gpu fem pipeline topic', topics.some(t => t.title === 'GPUs in the FEM Pipeline' && t.scene === 'gpuFem'));
     ok('library navigation stylesheet', !!document.querySelector('link[href*="library-navigation.css"]'));
+    ok('gauss quadrature lab', topics.some(t => t.title === 'Numerical Integration & Gauss Quadrature' && t.scene === 'quadratureLab'));
+    ok('assembly lab', topics.some(t => t.title === 'Assembly of the Global Stiffness Matrix' && t.scene === 'assemblyLab'));
+    const quadHtml = renderTopicScene({scene:'quadratureLab'});
+    const assemblyHtml = renderTopicScene({scene:'assemblyLab'});
+    ok('gauss quadrature scene src', /data-scene-src="\/numerics-lab.html\?mode=quadrature"/.test(quadHtml));
+    ok('assembly scene src', /data-scene-src="\/numerics-lab.html\?mode=assembly"/.test(assemblyHtml));
+    ok('part II methods path', /methods-path/.test(partPathHtml(topics.find(t => t.title === 'Finite Element Method (Introduction)'))));
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){
