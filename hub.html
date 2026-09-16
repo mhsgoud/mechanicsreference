@@ -7,7 +7,7 @@
   <meta name="description" content="Library of continuum mechanics, finite elements, and numerical methods: kinematics, constitutive theory, discretization, and solvers." />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Mechanics Reference" />
-  <meta name="theme-color" content="#f7f6f2" />
+  <meta name="theme-color" content="#f5f7fa" />
   <link rel="canonical" href="https://mechanicsreference.com/hub.html" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="logo.png" />
@@ -616,6 +616,7 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="library-navigation.css?v=20260916-3">
 </head>
 <body>
   <div class="app">
@@ -5321,6 +5322,7 @@ window.addEventListener('keydown', (e)=>{
 
 // ---- Keyboard navigation --------------------------------------------------
 window.addEventListener('keydown', (e)=>{
+  if(document.querySelector('.library-browser[open]')) return;
   if(e.ctrlKey && e.key.toLowerCase() === 'k'){
     e.preventDefault();
     openMobileSidebar();
@@ -5416,6 +5418,7 @@ window.addEventListener('keydown', (e)=>{
     ok('one-d consolidation topic', topics.some(t => t.title === 'One-Dimensional Consolidation' && t.scene === 'consolidation'));
     ok('gibson consolidation topic', topics.some(t => t.title === 'Gibson Consolidation' && t.scene === 'consolidationGibson'));
     ok('gpu fem pipeline topic', topics.some(t => t.title === 'GPUs in the FEM Pipeline' && t.scene === 'gpuFem'));
+    ok('library navigation stylesheet', !!document.querySelector('link[href*="library-navigation.css"]'));
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){
@@ -5428,5 +5431,6 @@ window.addEventListener('keydown', (e)=>{
 renderSidebar('');
 selectTopic(initFromHash().title);
 </script>
+<script src="library-navigation.js?v=20260916-2"></script>
 </body>
 </html>
