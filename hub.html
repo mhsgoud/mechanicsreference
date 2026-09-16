@@ -2278,10 +2278,10 @@ const topics = [
       ]
     },
     {
-      "heading": "The Barrelling Effect",
+      "heading": "What the material lab shows",
       "paragraphs": [
-        "In the simulation, friction at the top and bottom platens (no-slip boundaries) prevents the rubber from expanding uniformly. Because the material is incompressible, it bulges outward at mid-height — barrelling.",
-        "The load–displacement curve next to the stands shows the same load on both specimens. The linear solid is a nearly vertical wall of stiffness; the hyperelastic solid accommodates large strain and hardens nonlinearly as molecular chains straighten."
+        "The material lab assumes frictionless platens and homogeneous deformation. For the incompressible neo-Hookean specimen, λ lateral = λ⁻¹ᐟ² keeps J = 1. The compressive nominal stress magnitude is μ(λ⁻² − λ). A stiff linear comparison uses E = 125μ and Poisson ratio 0.3.",
+        "The graph and geometry use the same analytical law. The load control varies nominal compressive stress from 0 to 5μ. This is a comparison of chosen stiffnesses and constitutive laws, not universal steel-versus-rubber data. Frictional barrelling would require a spatially varying solution and is not simulated here."
       ]
     }
   ],
@@ -2298,7 +2298,7 @@ const topics = [
         {
           "name": "Incompressibility",
           "tex": "J = \\lambda_1\\lambda_2\\lambda_3 = 1",
-          "body": "Most hyperelastic polymers experience virtually zero volume change under load (Poisson’s ratio near ½). Incompressibility is enforced by J = 1, with pressure a Lagrange multiplier rather than a constitutive output. That is why the rubber block must barrel when the platens prevent free lateral expansion."
+          "body": "Most hyperelastic polymers experience virtually zero volume change under load (Poisson’s ratio near ½). Incompressibility is enforced by J = 1, with pressure a Lagrange multiplier rather than a constitutive output. In this frictionless illustration the block expands uniformly sideways; constrained platens can instead produce barrelling."
         },
         {
           "name": "Non-linear stiffness",
@@ -3593,7 +3593,7 @@ function renderTopicScene(topic){
     vonMises: {src:'von-mises.html', title:'Principal-stress cube, 3D Mohr’s circles, and live von Mises versus Tresca checks. The cube scales with σ₁, σ₂, σ₃; the outer Mohr circle is τ_max.', tall:true},
     workConjugates: {src:'work-conjugates.html', title:'Saint Venant–Kirchhoff cube under stretch and shear. Yellow is P N on the reference face; blue is σ n on the deformed face. The matrices are the three work-conjugate stresses.', flush:true},
     principalStretches: {src:'principal-stretches.html', title:'Principal stretches'},
-    hyperelasticity: {src:'hyperelasticity.html', title:'Linear elastic steel versus hyperelastic rubber under the same compressive load. The rubber barrels because friction at the platens prevents uniform expansion of an incompressible solid.', tall:true},
+    hyperelasticity: {src:'/hyperelasticity.html?v=2', title:'Material lab: compare linear elasticity and incompressible neo-Hookean compression. Move the load slider or play a loading cycle.', tall:true},
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
@@ -5171,15 +5171,16 @@ function renderContent(topic){
       <h1>${escHtml(topic.title)}</h1>
       ${lead ? `<p class="topic-lead">${escHtml(lead)}</p>` : ""}
       ${fracturePath(topic)}
+      ${topic.title==='Hyperelasticity'?sceneBlock:""}
       ${topic.title==='Fiber Neutrality and Rigid Line Inclusions' ? `<div class="prose"><h2>Stiffening and local failure can coexist</h2><p>A perfectly bonded rigid line inclusion is also called an anticrack: it constrains displacement while transmitting traction. Unlike a traction-free crack, it may stiffen a composite, yet still produce singular tip stresses. <a href="https://doi.org/10.1016/j.ijsolstr.2020.11.006">Goudarzi, Dal Corso, Bigoni and Simone (2021)</a> examine how inclusion orientation and interactions connect macroscopic stiffening with concentrations that can trigger shear bands. The <a href="#linear-elastic-fracture-mechanics">LEFM crack–anticrack comparison</a> illustrates the boundary-condition distinction with exact antiplane fields; the in-plane and fibre models below have different neutrality conditions.</p></div>` : ''}
       ${cohesiveStory ? renderCohesiveStory(topic) : fractureStory ? renderFractureStory(topic) : `<div class="prose">${prose}</div>`}
       ${fractureStory ? '' : storyBlock}
-      ${!customStory && topic.sceneFirst ? sceneBlock : ""}
+      ${!customStory && topic.sceneFirst && topic.title!=='Hyperelasticity' ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
       ${tableBlock}
       ${subsectionBlock}
-      ${customStory || topic.sceneFirst ? "" : sceneBlock}
+      ${customStory || topic.sceneFirst || topic.title==='Hyperelasticity' ? "" : sceneBlock}
       ${fractureStory && topic.title!=='Mode I, II & Mixed-Mode Cracking' ? '' : illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
@@ -5394,6 +5395,7 @@ window.addEventListener('keydown', (e)=>{
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
     ok('hooke has navier-cauchy', topics.some(t => t.title === "Hooke’s Law" && Array.isArray(t.flow) && t.flow.some(s => (s.items||[]).some(e => /Navier/i.test(e.name)))));
+    ok('hyperelasticity material lab', topics.some(t => t.title === 'Hyperelasticity' && t.scene === 'hyperelasticity' && Array.isArray(t.story) && t.story.some(s => /material lab/i.test(s.heading))));
     ok('fluids has navier-stokes equation', topics.some(t => t.title === 'Fluids: Continuity and Navier–Stokes' && (t.equations||[]).some(e => /Navier/i.test(e.name))));
     ok('thermoelasticity in thermodynamics', topics.some(t => t.title === 'Thermodynamics of Continua' && (t.equations||[]).some(e => /Thermoelastic/i.test(e.name))));
     ok('arc-length topic', topics.some(t => t.title === 'Path Following and Arc-Length'));
