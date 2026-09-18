@@ -616,7 +616,7 @@
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <link rel="stylesheet" href="library-navigation.css?v=part2-review">
+  <link rel="stylesheet" href="library-navigation.css?v=compact-gutters-20260918">
 </head>
 <body>
   <div class="app">
@@ -690,6 +690,8 @@
         <li><a href="hub.html#nonlinear-fem">Nonlinear FEM</a></li>
         <li><a href="hub.html#total-and-updated-lagrangian">Total and Updated Lagrangian</a></li>
         <li><a href="hub.html#column-buckling">Column Buckling</a></li>
+        <li><a href="hub.html#plasticity-formulations-return-mapping">Plasticity Formulations &amp; Return Mapping</a></li>
+        <li><a href="hub.html#viscoplastic-localization-gradient-damage">Viscoplastic Localization &amp; Gradient Damage</a></li>
         <li><a href="hub.html#newton-raphson-iteration-in-fem">Newton–Raphson Iteration in FEM</a></li>
         <li><a href="hub.html#path-following-and-arc-length">Path Following and Arc-Length</a></li>
         <li><a href="hub.html#static-condensation-schur-complement">Static Condensation &amp; Schur Complement</a></li>
@@ -2750,6 +2752,158 @@ const topics = [
     "In shells and plates the same structure appears as many closely spaced eigenvalues. A linear buckling load is a warning, not a capacity, once plasticity or large rotation enters.",
     "The figure is an imperfect Euler strut. Deflection grows as P approaches π² EI / L²; past that load the linear eigenproblem no longer describes the path."
   ], tags:["buckling","Euler","eigenvalue","geometric stiffness"], scene:"columnBuckling"},
+{
+  "part": "Part III – Advanced FEM Concepts",
+  "title": "Plasticity Formulations & Return Mapping",
+  "lead": "At each integration point, turn a strain increment and the last accepted material history into stress, updated history, and a consistent tangent.",
+  "scene": "returnMappingLab",
+  "sceneFirst": true,
+  "tags": [
+    "plasticity",
+    "return mapping",
+    "J2",
+    "radial return",
+    "isotropic hardening",
+    "kinematic hardening",
+    "algorithmic tangent",
+    "plane stress",
+    "finite strain"
+  ],
+  "bullets": [
+    "The global finite-element iteration enforces equilibrium; the local constitutive update enforces the material law. A return map is that local update. It starts from the last converged plastic strain and hardening variables, assumes the increment is elastic, then corrects the trial stress if the yield condition is violated.",
+    "The lab below isolates a backward-Euler update for small-strain associative J2 plasticity with isotropic elasticity and linear isotropic hardening. It displays a normalized deviatoric plane, where radius equals equivalent stress q. Each slider change recomputes one increment from the same committed state; it does not accumulate a loading history."
+  ],
+  "story": [
+    {
+      "heading": "Choose the formulation before choosing the algorithm",
+      "paragraphs": [
+        "A plasticity model specifies a yield function f, a flow potential g, and evolution laws for internal variables. Associated flow uses g = f; nonassociated flow uses a different potential and generally produces a nonsymmetric tangent. Perfect plasticity fixes the yield surface, isotropic hardening changes its size, and kinematic hardening translates it through a backstress. Combined hardening can model both effects under cyclic loading.",
+        "J2 plasticity is pressure independent and has isochoric plastic flow. Pressure-sensitive materials need other yield and flow laws; corners or multiple active surfaces require more general return algorithms. Rate-independent plasticity enforces a yield constraint, while viscoplasticity introduces a rate law and may permit overstress. Radial return is a special construction, not a universal projection for all materials."
+      ]
+    },
+    {
+      "heading": "Trial state, admissibility, correction",
+      "paragraphs": [
+        "At the start of the increment, retain εᵖₙ and accumulated equivalent plastic strain αₙ. Compute σᵗʳ = Cₑ:(εₙ₊₁ − εᵖₙ), split it into mean stress and deviator sᵗʳ, and evaluate qᵗʳ = √(3sᵗʳ:sᵗʳ/2). The current strength is σᵧ₀ + Hαₙ.",
+        "If fᵗʳ ≤ 0, accept the elastic trial state and leave the plastic variables unchanged. Otherwise solve consistency for a nonnegative plastic increment. For this linear-hardening model it has the closed form below. The deviatoric stress contracts radially; mean stress is unchanged by the correction. Hardening means the corrected stress lies on the expanded surface, not the old one."
+      ]
+    },
+    {
+      "heading": "Local Newton versus global Newton",
+      "paragraphs": [
+        "With nonlinear isotropic hardening, solve r(Δα) = qᵗʳ − 3GΔα − σᵧ(αₙ + Δα) = 0 locally. Its derivative is −3G − dσᵧ/dα. Bracketing, safeguarding, or substepping can help difficult updates. A failed local solve should be reported so the global increment can be reduced rather than accepting an inadmissible state.",
+        "The global solve then assembles stress contributions into equilibrium. Its material tangent must differentiate the actual discrete update, C_alg = ∂σₙ₊₁/∂εₙ₊₁, including plastic correction and internal-variable evolution. Using the elastic tensor after yield is not a consistent tangent. Quadratic Newton convergence is local and requires suitable smoothness, a nonsingular Jacobian, and sufficiently accurate local solves."
+      ]
+    },
+    {
+      "heading": "Plane stress and finite deformation",
+      "paragraphs": [
+        "Plane strain fixes out-of-plane strain, not out-of-plane stress; a three-dimensional constitutive update is still needed. Plane stress instead requires σ₃₃ = 0 and appropriate transverse shear conditions, typically by solving for out-of-plane strain together with the plastic variables and condensing the tangent. Performing a 3D update and simply discarding σ₃₃ is not equivalent.",
+        "At finite strain, the additive small-strain split is replaced in many models by F = FₑFₚ. Stress measures, elastic energy, plastic evolution, and frame transformations must be consistent. Objective-rate formulations are another family. The small-strain radial formula illustrated here should not be applied directly to arbitrary large rotations or stretches."
+      ]
+    },
+    {
+      "heading": "Commit history only after equilibrium converges",
+      "paragraphs": [
+        "Every global trial iterate should be evaluated from the same committed state at the beginning of the increment. Keep trial plastic strain and hardening separate. Commit them only after global convergence; discard them when a step is rejected. Otherwise Newton iterations can create artificial plastic accumulation.",
+        "Verify an elastic step, first yield, unloading and reloading, and a nonproportional path. Check f ≤ tolerance, Δα ≥ 0, plastic incompressibility for J2, and material dissipation. Compare the algorithmic tangent against finite differences while holding the committed state fixed; stay away from an elastic–plastic switching point when checking a smooth branch."
+      ]
+    }
+  ],
+  "equations": [
+    {
+      "name": "Small-strain J2 yield condition",
+      "tex": "\\boldsymbol\\varepsilon=\\boldsymbol\\varepsilon^e+\\boldsymbol\\varepsilon^p,\\quad f=q-(\\sigma_{y0}+H\\alpha),\\quad q=\\sqrt{\\tfrac32\\mathbf s:\\mathbf s}",
+      "note": "G is shear modulus; H is isotropic hardening modulus; α is accumulated equivalent plastic strain. The lab assumes H ≥ 0."
+    },
+    {
+      "name": "Plastic increment and corrected stress",
+      "tex": "\\Delta\\alpha=\\frac{\\langle f^{\\mathrm{tr}}\\rangle_+}{3G+H},\\quad\\mathbf s_{n+1}=\\left(1-\\frac{3G\\Delta\\alpha}{q^{\\mathrm{tr}}}\\right)\\mathbf s^{\\mathrm{tr}},\\quad\\alpha_{n+1}=\\alpha_n+\\Delta\\alpha",
+      "note": "Use the stress correction on the plastic branch, where qᵗʳ > 0. On the elastic branch keep the trial stress, avoiding division by zero."
+    },
+    {
+      "name": "Associated plastic flow and complementarity",
+      "tex": "\\Delta\\boldsymbol\\varepsilon^p=\\Delta\\alpha\\frac{3\\mathbf s_{n+1}}{2q_{n+1}},\\quad f_{n+1}\\le0,\\quad\\Delta\\alpha\\ge0,\\quad\\Delta\\alpha f_{n+1}=0",
+      "note": "Backward-Euler flow with the plastic multiplier normalized to equivalent plastic strain. Mean stress is unaffected by this deviatoric correction."
+    }
+  ],
+  "sources": [
+    {
+      "label": "MOOSE: radial-return stress updates",
+      "href": "https://mooseframework.inl.gov/moose/source/materials/RadialReturnStressUpdate.html"
+    }
+  ]
+},
+{
+  "part": "Part III – Advanced FEM Concepts",
+  "title": "Viscoplastic Localization & Gradient Damage",
+  "lead": "Follow the Perzyna example from distributed deformation to a localized damage band, and connect the recorded response to rate dependence, softening, and spatial regularization.",
+  "scene": "perzynaDamage",
+  "sceneFirst": true,
+  "tags": [
+    "viscoplasticity",
+    "Perzyna",
+    "shear band",
+    "localization",
+    "gradient damage",
+    "softening",
+    "rate dependence",
+    "Final_8.mat"
+  ],
+  "bullets": [
+    "This is the saved 2d_Perzyna example from Final_8.mat: a tapered plane-strain specimen with 675 nodes and 624 Q4 elements, an exponential damage law, and a weaker patch. Bottom rollers restrain vertical motion, one corner removes horizontal rigid translation, and the top edge has prescribed vertical displacement.",
+    "The signed top displacement decreases toward −0.2 in the stored coordinate convention. With the top above the fixed bottom, this represents compression. The older viewer called the case uniaxial tension; the interpretation here follows the actual displacement data. Damage ω is the plotted internal variable, so the visible band is a damage-localization band associated with the shear-band example, not a direct plot of plastic shear strain."
+  ],
+  "story": [
+    {
+      "heading": "Read the band together with the global response",
+      "paragraphs": [
+        "Begin with the early snapshots, then pass through the peak reaction and into the descending branch. Identify where damage first increases, whether it is near the weaker patch, and how the high-damage region develops across the specimen. Geometry, boundary conditions, and the seeded heterogeneity can all influence the localization pattern; a single contour cannot isolate their contributions.",
+        "The embedded reaction curve contains 200 samples. Its largest recorded magnitude is 131.475 at top displacement −0.0085; the last curve sample is 2.2475 at −0.1995, in the export’s units. These are sampled values, not an independently resolved peak or a calibrated capacity. The falling reaction under increasing compression is consistent with structural softening as damage develops, but the curve alone does not identify a unique failure mechanism.",
+        "Damage approaching one indicates severe degradation under the model’s convention. It is not equivalent to a resolved displacement jump or a fully traction-free crack. To establish plastic shearing and its direction, inspect plastic strain or strain-rate components as well as the damage field."
+      ]
+    },
+    {
+      "heading": "How this differs from the radial-return illustration",
+      "paragraphs": [
+        "The preceding J2 lab enforces a rate-independent yield condition at the end of an increment. In a Perzyna-type viscoplastic formulation, a rate law relates an inelastic rate to positive overstress; finite-rate states can remain outside the rate-independent surface. The time increment and rate parameters enter the constitutive update and therefore its algorithmic tangent.",
+        "For example, a common schematic form is α̇ = τ⁻¹⟨f/σref⟩ⁿ with a compatible flow direction. This illustrates a family of overstress laws; it is not asserted to be the exact evolution equation used by Final_8.mat. The browser export identifies Perzyna and gradient-enhanced exponential damage but does not include the full material routine, viscosity parameters, or physical time history. Those are needed for a quantitative rate-sensitivity interpretation."
+      ]
+    },
+    {
+      "heading": "Viscosity and a gradient length play different roles",
+      "paragraphs": [
+        "Rate dependence controls how rapidly inelastic evolution can develop relative to loading. A spatial gradient term couples neighboring material points and introduces a length scale into localization. These mechanisms should be assessed separately: temporal smoothing is not, by itself, evidence of a mesh-independent band width.",
+        "At fixed material parameters and loading rate, refine the mesh until several elements resolve the band and check its width, dissipated energy, and global response. Then reduce the time increment at the same physical rate. Finally vary loading rate or viscosity to study the material rate effect. The current export is one result set and cannot establish those convergence trends or identify the gradient length."
+      ]
+    },
+    {
+      "heading": "What the animation actually contains",
+      "paragraphs": [
+        "The export records 400 analysis steps but includes 40 selected damage snapshots from dd_hist. The 200-point reaction curve is sampled separately. The viewer’s step control therefore traverses selected output states rather than every equilibrium solution.",
+        "Only the final displacement field is embedded. Earlier displayed shapes use u_final multiplied by U/U_end, with an additional user-selected magnification. Damage is saved history; intermediate displacement and displacement-magnitude contours are reconstructions. Use the damage field and reaction curve to discuss evolution, and do not infer intermediate strain paths or band kinematics from the animated shape.",
+        "The default vertical-only view omits horizontal displacement from the display. Switch to Full U when examining the final deformed configuration, and distinguish true scale from the default amplified view. Playback speed changes presentation speed, not the simulated material rate."
+      ]
+    },
+    {
+      "heading": "Connection to the finite-element implementation",
+      "paragraphs": [
+        "A rate-dependent local update must use the current increment consistently while preserving the last committed state through global Newton iterations. A gradient-enhanced formulation additionally requires spatial coupling through the chosen nonlocal or gradient field. A collection of uncoupled radial returns does not implement that coupling.",
+        "Document which fields are solved together, their boundary conditions, and whether the solution is monolithic or staggered. Evaluate equilibrium, constitutive convergence, and the gradient-field residual before committing history. If a step is rejected, restore all committed variables together. This connects the band calculation to the return-mapping discussion without conflating plastic flow with damage evolution."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "label": "Open the saved Perzyna damage viewer",
+      "href": "/perzyna-damage.html"
+    },
+    {
+      "label": "NEML: Perzyna viscoplastic flow-rule formulation",
+      "href": "https://neml.readthedocs.io/en/stable/vp_flow/perzyna.html"
+    }
+  ]
+},
   {part:"Part III – Advanced FEM Concepts", title:"Newton–Raphson Iteration in FEM", bullets:[
     "Newton–Raphson linearises the residual at the current guess and solves K_T Δa = −R(a) for a correction. The coefficient matrix is the consistent tangent: the derivative of internal force with respect to the unknowns, including the constitutive linearisation at every quadrature point.",
     "Near the root the convergence is quadratic when that tangent is exact. An approximate tangent — elastic, modified Newton, BFGS — still converges, more slowly, and may stall. Line search keeps a step from increasing the residual when the guess is far from the root.",
@@ -3600,6 +3754,7 @@ function renderTopicScene(topic){
     hookePoisson: {src:'hooke-poisson.html', title:'Poisson contraction during uniaxial tension. Source: VectorMine / Getty Images', tall:true},
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
+    returnMappingLab: {src:'/return-mapping.html', title:'J2 return mapping: elastic predictor, plastic correction, and an expanding yield surface', tall:true},
     trussLab: {src:'truss-lab.html', title:'Interactive truss laboratory: axial projection and a loaded two-bar assembly', tall:true},
     fractureLab: {src:'fracture-lab.html', title:'Explore crack-face motion and the energy available for growth', tall:true},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
@@ -3642,7 +3797,7 @@ function renderTopicScene(topic){
     steelConnection: {src:'steel-connection.html', title:'Structural steel fin-plate connection', tall:true},
     swingingSquare: {src:'dyn-swinging-square.html', title:'Swinging square — free vibration', tall:true},
     twistingColumn: {src:'dyn-twisting-column.html', title:'Twisting column — dynamic beam test', tall:true},
-    perzynaDamage: {src:'perzyna-damage.html', title:'Perzyna time-dependent damage', tall:true},
+    perzynaDamage: {src:'/perzyna-damage.html', title:'Perzyna time-dependent damage', tall:true},
     matfibCenterFiber: {src:'matfib-center-fiber.html', title:'MatFib center-fiber RVE', tall:true}
   };
   const keys = topic.scenes || (topic.scene ? [topic.scene] : []);
@@ -5205,7 +5360,7 @@ function renderContent(topic){
       ${fractureStory && topic.title!=='Mode I, II & Mixed-Mode Cracking' ? '' : illustrationsBlock}
       ${interactiveBlock}
       ${sourceBlock}
-      ${topicBridgeHtml(topic)}
+      ${topic.title==='Plasticity Formulations & Return Mapping'?'<p class="topic-bridge">Related: <a href="#viscoplastic-localization-gradient-damage">Perzyna localization example</a> · <a href="#metal-plasticity">Metal Plasticity</a> · <a href="#nonlinear-fem">Nonlinear FEM</a> · <a href="#newton-raphson-iteration-in-fem">Global Newton iteration</a></p>':''}${topic.title==='Viscoplastic Localization & Gradient Damage'?'<p class="topic-bridge">Continue with <a href="#plasticity-formulations-return-mapping">return mapping and committed history</a>, <a href="#time-dependent-problems">time-dependent problems</a>, or <a href="#phase-field-modelling-of-fracture">phase-field fracture</a>.</p>':''}${topicBridgeHtml(topic)}
       ${topicNavHtml(topic)}
     </article>
   `;
@@ -5449,6 +5604,9 @@ window.addEventListener('keydown', (e)=>{
     ok('gauss quadrature scene src', /data-scene-src="\/numerics-lab.html\?mode=quadrature"/.test(quadHtml));
     ok('assembly scene src', /data-scene-src="\/numerics-lab.html\?mode=assembly"/.test(assemblyHtml));
     ok('part II methods path', /methods-path/.test(partPathHtml(topics.find(t => t.title === 'Finite Element Method (Introduction)'))));
+    ok('return mapping topic', topics.some(t => t.title === 'Plasticity Formulations & Return Mapping' && t.scene === 'returnMappingLab'));
+    ok('return mapping scene src', /data-scene-src="\/return-mapping.html"/.test(renderTopicScene({scene:'returnMappingLab'})));
+    ok('viscoplastic localization topic', topics.some(t => t.title === 'Viscoplastic Localization & Gradient Damage' && t.scene === 'perzynaDamage'));
 
     badge.textContent = `All ${results.filter(r=>r.pass).length}/${results.length} tests passed ✓`;
   }catch(e){

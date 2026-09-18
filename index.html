@@ -301,6 +301,7 @@
       .banner *,.banner *:before,.banner *:after{animation:none!important;transition:none!important}
     }
   </style>
+  <link rel="stylesheet" href="homepage-explorer.css?v=compact-controls-6">
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
@@ -312,51 +313,36 @@
     <div class="grain" aria-hidden="true"></div>
     <nav>
       <a class="brand" href="./" aria-label="Mechanics Reference home">
-        <img src="mechanicsreference-logo-mesh.svg" width="640" height="128" alt="Mechanics Reference — MR finite-element mesh logo">
+        <img src="mechanicsreference-logo-mesh.svg?v=fem-letter-3" width="330" height="112" alt="Mechanics Reference — finite elements integrated into the letter M">
       </a>
       <a class="nav-link" href="hub.html">Explore the library ↗</a>
     </nav>
+    <div class="hero-layout">
     <div class="hero-copy">
-      <div class="eyebrow">Computational mechanics, clarified</div>
-      <h1>Build intuition.<br><span>Then solve.</span></h1>
-      <p class="lede">A visual reference for the ideas, equations, and engineering tools behind how things move, bend, flow, and fail.</p>
-      <div class="actions">
-        <a class="button primary" href="hub.html">Start exploring <span class="arrow">→</span></a>
-        <a class="button secondary" href="hub.html#introduction-to-continuum-mechanics">Browse topics</a>
-      </div>
+      <div class="eyebrow">An interactive mechanics reference</div>
+      <h1>Continuum mechanics.<br><span>Finite elements.<br>Numerical methods.</span></h1>
+      <p class="lede">Explore mechanics theory, finite-element formulations, and solution methods through interactive figures and worked simulation examples.</p>
+      <div class="actions"><a class="button primary" href="hub.html">Explore the library <span class="arrow">→</span></a><a class="button secondary" href="#examples">Real simulations ↓</a></div>
+      <div class="hero-route"><span>01 / CONTINUUM</span><span>02 / FINITE ELEMENTS</span><span>03 / SOLUTION</span></div>
     </div>
-    <section class="lab" aria-label="Interactive cantilever bending model">
-      <div class="lab-heading"><span class="live-dot"></span>THE CONTINUUM LAB <span>01 / BENDING</span></div>
-      <h2>A force. A field. A response.</h2>
-      <p class="lab-intro">Apply a tip load. See where bending stress builds.</p>
-      <div class="viewport">
-        <canvas id="scene" aria-label="3D cantilever beam, fixed at the left and loaded downward at the right. Drag to rotate." tabindex="0"></canvas>
-        <span class="view-caption">FIXED END ······················ FREE END ↓ P</span>
-        <button id="reset-view" type="button">Reset view ↺</button>
-        <p id="fallback" hidden>3D view unavailable. Load controls and beam calculations remain available.</p>
-      </div>
-      <div class="legend">
-        <span id="field-label">Bending stress magnitude |σxx| · MPa</span>
-        <div class="color-scale"></div>
-        <div class="scale-labels"><span>0</span><span>37.5</span><span>75</span></div>
-      </div>
-      <div class="load-row"><label for="load">Tip load P</label><output id="load-value" for="load">6.5 kN</output></div>
-      <input id="load" type="range" min="0" max="100" value="65" step="1" aria-label="Tip load as percent of 10 kilonewtons">
-      <div class="readouts" aria-live="polite">
-        <div><span>Peak bending stress</span><strong id="stress-value">48.8 <small>MPa</small></strong></div>
-        <div><span>Tip deflection</span><strong id="deflection-value">1.625 <small>mm</small></strong></div>
-      </div>
-      <p class="model-note">Linear elastic beam · deformation shown ×50<br>L = 1 m · section 100 × 80 mm · E = 200 GPa<br>Euler–Bernoulli approximation; colors show axial bending stress, not a full 3D stress solution.</p>
-    </section>
-    <div class="eq-stats">
-      <div class="stat"><strong>Equilibrium</strong>∇ · σ + b = 0</div>
-      <div class="stat"><strong>Constitutive law</strong>σ = C : ε</div>
-      <div class="stat"><strong>Kinematics</strong>ε = sym ∇u</div>
-    </div>
+    <section class="lab" data-perspective="mechanics" aria-label="Interactive mechanics introduction">
+      <div class="lab-heading">PLATE UNDER UNIAXIAL TENSION <span>LIVE EXPLORER</span></div>
+      <div class="mode-tabs" role="group" aria-label="Model perspective"><button data-mode="mechanics" aria-pressed="true">01 Mechanics</button><button data-mode="mesh" aria-pressed="false">02 Finite elements</button><button data-mode="solution" aria-pressed="false">03 Solution</button></div>
+      <h2 id="lab-title">Tensile loading of a perforated plate</h2>
+      <p class="lab-intro" id="lab-intro">Apply equal and opposite forces through the grips. Increase the load to observe the exaggerated deformation.</p>
+      <div class="viewport"><canvas id="scene" aria-label="Plate with a circular hole under horizontal tension. Drag to rotate." tabindex="0"></canvas><span class="view-caption">← TENSION · PLATE WITH A HOLE · TENSION →</span><button id="reset-view">Reset view ↺</button><div id="response" hidden><svg viewBox="0 0 420 115" role="img" aria-label="Normalized linear elastic load displacement response"><path d="M40 10V88H405" fill="none" stroke="#607c9e"/><path d="M40 88L385 15" fill="none" stroke="#79b6ff" stroke-width="2"/><circle id="curve-dot" r="5" fill="#ffbe80"/><text x="180" y="110">Displacement u / u₀</text><text x="5" y="12">P / P₀</text><text x="280" y="50">Linear elastic</text></svg></div><p id="fallback" hidden>3D view unavailable. The controls and response chart remain available.</p></div>
+      <div class="explorer-tools"><label id="field-control">Show <select id="field"><option value="stress">Stress concentration</option><option value="displacement">Displacement magnitude</option></select></label><label id="mesh-control" hidden>Mesh <select id="density"><option value="12">Coarse</option><option value="24" selected>Medium</option><option value="48">Fine</option></select></label><button id="play" aria-pressed="false">▶ Animate</button></div>
+      <div class="legend"><span id="field-label">Illustrative axial stress / reference traction</span><div class="color-scale"></div><div class="scale-labels"><span>0</span><span id="scale-mid">1.5</span><span id="scale-max">3</span></div></div>
+      <div class="load-row"><label for="load">Load</label><output id="load-value">60%</output></div><input id="load" type="range" min="0" max="100" value="60" aria-label="Applied load percentage">
+      <a class="topic-link" id="topic-link" href="hub.html#introduction-to-continuum-mechanics">Read more →</a>
+      <p class="model-note">Illustrative model · exaggerated deformation</p>
+    </section></div>
+
   </section>
 
   <main>
     <div class="wrap">
+      <section class="example-band" id="examples" aria-labelledby="examples-title"><div><p class="f-label">SIMULATION EXAMPLES</p><h2 id="examples-title">Explore real simulations</h2><p>Explore deformation, material response, and loading histories from numerical simulations.</p></div><div class="example-grid"><a href="/3pb-viewer/"><span>01 / PLASTICITY</span><strong>Three-point bending</strong><small>Deformation & load response ↗</small></a><a href="/pillow-viewer/"><span>02 / LARGE DEFORMATION</span><strong>Inflating a pillow</strong><small>Pressure & shape change ↗</small></a><a href="/kasten-viewer/"><span>03 / SHELLS</span><strong>Box deformation</strong><small>Shells & plasticity ↗</small></a><a href="/steeljoint-viewer/"><span>04 / CONNECTIONS</span><strong>Steel joint</strong><small>Explore the assembled model ↗</small></a><a href="hub.html#viscoplastic-localization-gradient-damage"><span>05 / LOCALIZATION</span><strong>Shear-band formation</strong><small>Viscoplasticity & gradient damage →</small></a></div></section>
       <section class="band" aria-labelledby="foundations-title">
         <div class="band-head">
           <h2 id="foundations-title">How the subject is organized</h2>
@@ -411,6 +397,6 @@
       <span><a href="hub.html">Library</a></span>
     </div>
   </footer>
-  <script type="module" src="beam-scene.js"></script>
+  <script type="module" src="homepage-explorer.js?v=compact-controls-6"></script>
 </body>
 </html>
