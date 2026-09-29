@@ -38,8 +38,7 @@
     "hasPart": {
       "@type": "ItemList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Basic Equations" },
-        { "@type": "ListItem", "position": 2, "name": "Introduction to Continuum Mechanics" },
+        { "@type": "ListItem", "position": 1, "name": "Introduction to Continuum Mechanics" },
         { "@type": "ListItem", "position": 2, "name": "Kinematics of Deformation" },
         { "@type": "ListItem", "position": 3, "name": "Balance Laws & Conservation" },
         { "@type": "ListItem", "position": 4, "name": "Constitutive Models" },
@@ -661,7 +660,6 @@
       <h2>All topics</h2>
       <p>JavaScript is required to search. The entries are listed below.</p>
       <ul>
-        <li><a href="hub.html#basic-equations">Basic Equations</a></li>
         <li><a href="hub.html#introduction-to-continuum-mechanics">Introduction to Continuum Mechanics</a></li>
         <li><a href="hub.html#kinematics-of-deformation">Kinematics of Deformation</a></li>
         <li><a href="hub.html#tensors-and-the-divergence-theorem">Tensors and the Divergence Theorem</a></li>
@@ -761,339 +759,65 @@ const topics = [
   // Part I – Continuum Mechanics
   {
   "part": "Part I – Continuum Mechanics",
-  "title": "Basic Equations",
-  "bullets": [
-    "A continuum theory is closed by a short list of field equations. Motion is measured by strain; internal forces by stress. Mass, momentum, and energy are conserved or balanced, a constitutive model relates stress to deformation, and a weak form of momentum is what a finite element method actually discretizes.",
-    "The development below follows that order: kinematics, then stress, then the balance laws, then constitutive closure, then the passage to elastodynamics and to a discrete system on a mesh."
-  ],
-  "flow": [
-    {
-      "section": "Continuum hypothesis — fields replace particles",
-      "lead": "Continuum mechanics treats matter as continuously distributed on a region Ω rather than resolving atoms, grains, fibres, or pores individually. Density, velocity, stress, temperature, and other state variables are therefore fields defined at every admissible material or spatial point.",
-      "items": [
-        {
-          "name": "Continuum body and fields",
-          "tex": "\\Omega_t\\subset\\mathbb{R}^3,\\qquad \\rho=\\rho(\\mathbf{x},t),\\quad \\mathbf{v}=\\mathbf{v}(\\mathbf{x},t),\\quad \\boldsymbol{\\sigma}=\\boldsymbol{\\sigma}(\\mathbf{x},t)",
-          "body": "Pointwise continuum fields represent local averages over a representative volume, not the value at a single molecule. The averaging volume must contain enough microstructure to be representative while remaining small relative to macroscopic gradients.",
-          "bridge": "That separation of scales is the continuum hypothesis in operational form."
-        },
-        {
-          "name": "Scale separation",
-          "tex": "\\ell_{\\mathrm{micro}}\\ll\\ell_{\\mathrm{RVE}}\\ll\\ell_{\\mathrm{macro}}",
-          "body": "When no intermediate representative scale exists—near atomistic defects, very rarefied gases, or microstructures comparable to the component size—a classical local continuum model may fail and a discrete, nonlocal, or multiscale description is required.",
-          "bridge": "Once the hypothesis is accepted, motion is described by a map between configurations."
-        },
-        {
-          "name": "Unified scope",
-          "body": "The same kinematics and balance laws organize elastic, plastic, viscoelastic, and fractured solids; Newtonian and non-Newtonian fluids; and coupled theories such as thermo-mechanics, poromechanics, and fluid–structure interaction. Their constitutive closures and additional fields distinguish them."
-        }
-      ]
-    },
-    {
-      "section": "Kinematics — how motion is measured",
-      "lead": "A material point occupies a reference place X and a current place x. The map between them is the kinematics of the continuum. Strain is built from that map; nothing about force has entered yet.",
-      "items": [
-        {
-          "name": "Motion and displacement",
-          "tex": "\\mathbf{x}=\\boldsymbol{\\chi}(\\mathbf{X},t),\\qquad \\mathbf{u}(\\mathbf{X},t)=\\mathbf{x}-\\mathbf{X}",
-          "body": "The motion χ sends each material point X in the reference configuration Ω₀ to its current position x in Ωₜ. Displacement is the difference between those positions; velocity and acceleration are time derivatives of the motion at fixed X.",
-          "bridge": "The local spatial variation of this map is the deformation gradient."
-        },
-        {
-          "name": "Deformation gradient",
-          "tex": "F = \\dfrac{\\partial \\mathbf{x}}{\\partial \\mathbf{X}}",
-          "body": "The deformation gradient is the linear part of the motion: it sends a material line element dX to its image dx = F dX. Rigid translation never appears in F. Rotation, stretch, and shear do. Every finite-strain measure below is built from this single tensor.",
-          "bridge": "Volume change is the determinant of the same map."
-        },
-        {
-          "name": "Jacobian",
-          "tex": "J = \\det\\mathbf{F} = \\dfrac{\\mathrm{d}v}{\\mathrm{d}V}",
-          "body": "J is the local ratio of current volume to reference volume. Mass balance on the reference placement is simply ρ₀ = ρ J. Incompressibility is the constraint J = 1 (equivalently ∇ · v = 0 in the spatial description).",
-          "bridge": "Change of squared length, not of volume alone, defines strain."
-        },
-        {
-          "name": "Green–Lagrange strain",
-          "tex": "\\mathbf{E} = \\tfrac{1}{2}\\bigl(\\mathbf{F}^{\\mathsf{T}}\\mathbf{F} - \\mathbf{I}\\bigr)",
-          "body": "Green–Lagrange strain lives on the reference placement. It vanishes in a rigid motion, which is the requirement that strain must meet. When displacement gradients are small, the quadratic terms drop and E reduces to the infinitesimal strain used in linear solid mechanics.",
-          "bridge": "That small-gradient limit is the strain of most introductory finite-element courses."
-        },
-        {
-          "name": "Infinitesimal strain",
-          "tex": "\\boldsymbol{\\varepsilon} = \\tfrac{1}{2}\\bigl(\\nabla\\mathbf{u} + (\\nabla\\mathbf{u})^{\\mathsf{T}}\\bigr)",
-          "body": "The symmetric gradient of the displacement is enough when rotations and stretches are both small. It is the strain that enters isotropic Hooke’s law below, and the strain that a linear elastic finite-element code actually forms from the shape-function derivatives."
-        }
-      ]
-    },
-    {
-      "section": "Stress — how forces are carried",
-      "lead": "Once kinematics are set, the next question is how internal forces are distributed. Traction on a cut is force per area; Cauchy’s theorem says that traction is linear in the outward normal, and the coefficient of that map is the stress tensor.",
-      "items": [
-        {
-          "name": "Cauchy traction",
-          "tex": "\\mathbf{t} = \\boldsymbol{\\sigma}\\,\\mathbf{n}",
-          "body": "The traction t on a current surface with outward unit normal n is force per current area. Without couple stresses, angular momentum will require σ = σᵀ — an algebraic restriction, not a differential equation. Turn the cut and the same σ produces a different t.",
-          "bridge": "Finite-element meshes are often written on the undeformed placement, so the same force must also be measured per reference area."
-        },
-        {
-          "name": "First Piola–Kirchhoff stress",
-          "tex": "\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}",
-          "body": "P is the nominal stress: current force measured per reference area. It is work-conjugate to Ḟ. Total Lagrangian finite elements discretize balance written with P; Updated Lagrangian keeps rewriting the same physics on the current mesh with σ.",
-          "bridge": "Hyperelastic stored-energy functions are usually differentiated with respect to Green strain, which returns a different stress."
-        },
-        {
-          "name": "Second Piola–Kirchhoff stress",
-          "tex": "\\mathbf{S} = J\\,\\mathbf{F}^{-1}\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}",
-          "body": "S lives entirely on the reference placement and is work-conjugate to Ė. A hyperelastic law of the form S = ∂W/∂E is therefore consistent with the kinematics already introduced. When stretches and rotations are both small, P, S, and σ coincide to first order."
-        }
-      ]
-    },
-    {
-      "section": "Balance laws — what must hold for every continuum",
-      "lead": "Kinematics and stress are definitions. The balance laws are statements of physics: mass is conserved, linear and angular momentum are balanced, and energy is conserved once heat is admitted. With a stress (and a heat flux) in hand, those statements become field equations.",
-      "items": [
-        {
-          "name": "Conservation of mass",
-          "tex": "\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0",
-          "body": "Local mass balance in the current placement. The referential form is ρ₀ = ρ J — the same statement once volume change is expressed through the deformation gradient. If the motion is incompressible, continuity reduces to ∇ · v = 0.",
-          "bridge": "Forces on a part of the body must equal the rate of change of its linear momentum."
-        },
-        {
-          "name": "Linear momentum (spatial)",
-          "tex": "\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}",
-          "body": "Cauchy’s first law. The divergence of stress and the body force balance inertia. At rest, a = 0 and the equation is ∇ · σ + ρ b = 0. Globally, ∫ t dA + ∫ ρ b dV = d/dt ∫ ρ v dV on any part of the body; the divergence theorem recovers the local form.",
-          "bridge": "The same balance pulled back to the undeformed placement is what Total Lagrangian codes assemble."
-        },
-        {
-          "name": "Linear momentum (referential)",
-          "tex": "\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
-          "body": "Identical physics on the reference mesh, with Div the reference divergence. Choosing spatial or referential form is bookkeeping that matches Updated versus Total Lagrangian discretizations — not a change of constitutive model.",
-          "bridge": "Angular momentum closes the stress description."
-        },
-        {
-          "name": "Angular momentum",
-          "tex": "\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}",
-          "body": "In the absence of couple stresses, Cauchy’s second law is symmetry of σ (equivalently P Fᵀ = F Pᵀ). It is an algebraic restriction on the stress, not a PDE to be discretized.",
-          "bridge": "Energy balance brings temperature and heat into the same continuum setting."
-        },
-        {
-          "name": "Energy (local)",
-          "tex": "\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r",
-          "body": "The first law: the rate of internal energy equals stress power σ : D, minus heat efflux, plus supply r. Fourier’s law q = −k ∇θ is the usual closure for conduction. Many purely mechanical analyses postpone this equation until after momentum and a constitutive law are already closed."
-        }
-      ]
-    },
-    {
-      "section": "Constitutive closure and elastodynamics",
-      "lead": "Balance laws do not determine the stress. A constitutive model relates stress to deformation (or to its rate). The isotropic linear solid is the first closure; substituting it into momentum yields elastodynamics.",
-      "items": [
-        {
-          "name": "Hooke’s law (isotropic)",
-          "tex": "\\boldsymbol{\\sigma} = \\lambda\\,\\mathrm{tr}(\\boldsymbol{\\varepsilon})\\,\\mathbf{I} + 2\\mu\\,\\boldsymbol{\\varepsilon}",
-          "body": "Linear isotropic elasticity in Lamé form — equivalently σ = ℂ : ε. Two independent moduli fix the entire response. Fluids use the same momentum equation once Newton’s viscous law replaces Hooke’s law.",
-          "bridge": "Substitute this law and the infinitesimal strain into Cauchy’s first law."
-        },
-        {
-          "name": "Navier–Cauchy equation",
-          "tex": "(\\lambda + \\mu)\\boldsymbol{\\nabla}(\\boldsymbol{\\nabla}\\cdot\\mathbf{u}) + \\mu\\nabla^2\\mathbf{u} + \\mathbf{b} = \\rho\\dfrac{\\partial^2\\mathbf{u}}{\\partial t^2}",
-          "body": "The displacement form of isotropic linear elastodynamics. The static problem drops the right-hand side. Index form of momentum before substitution is σ_{ij,j} + b_i = ρ ü_i.",
-          "bridge": "Helmholtz potentials uncouple that vector equation into waves that travel at finite speeds."
-        },
-        {
-          "name": "Helmholtz wave split",
-          "tex": "\\mathbf{u} = \\boldsymbol{\\nabla}\\phi + \\boldsymbol{\\nabla}\\times\\boldsymbol{\\psi},\\quad \\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\psi}=0",
-          "body": "With this decomposition, elastodynamics splits into a compressional P-wave at c_p = √((λ+2μ)/ρ) and a shear S-wave at c_s = √(μ/ρ). Static mechanics neglects inertia; dynamic response is carried by these finite wave speeds — the distinction the beam simulator below illustrates."
-        }
-      ]
-    },
-    {
-      "section": "Bridge to Part II — numerical methods",
-      "lead": "The continuum statements remain the source of every discrete method. Their weak form, interpolation, quadrature, assembly, constraints, and nonlinear solution are developed in Part II.",
-      "items": [{"name":"Follow the discretization","body":"Start with Variational Principles for virtual work, then Finite Element Method (Introduction) for interpolation and assembly. Element families, integration, boundary conditions, solvers, and nonlinear methods continue from there."}]
-    },
-    {
-      "section": "Coupled continua — heat, pore fluid, and flow",
-      "lead": "Once momentum and a solid constitutive law are closed, additional fields enter through the same balance laws. Temperature couples to stress through thermal expansion; pore pressure couples through Biot’s effective stress; a fluid replaces Hooke’s law by a viscous law. The library entries Multiphase Porous Materials, Heat Transfer & Multiphysics, and Fluids develop each case in full.",
-      "items": [
-        {
-          "name": "Thermoelasticity",
-          "tex": "\\boldsymbol{\\sigma} = \\lambda(\\mathrm{tr}\\,\\boldsymbol{\\varepsilon})\\mathbf{I} + 2\\mu\\boldsymbol{\\varepsilon} - (3\\lambda+2\\mu)\\alpha(T-T_0)\\mathbf{I}",
-          "body": "Thermal expansion enters the stress as an isotropic eigenstress. The heat equation gains a coupling term −(3λ+2μ)α T₀ ∂_t(∇ · u): deformation does work on the thermal field. Two-way thermoelasticity exchanges energy between displacement and temperature; one-way coupling keeps only the thermal stress in momentum.",
-          "bridge": "A saturated porous solid replaces the thermal field by one or more pore pressures."
-        },
-        {
-          "name": "Multiphase Biot momentum",
-          "tex": "\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma}' - \\alpha\\boldsymbol{\\nabla}(S_w p_w + S_n p_n) + \\mathbf{b} = \\rho\\ddot{\\mathbf{u}}",
-          "body": "The skeleton constitutive law sees the effective stress σ′. Total stress is recovered by Biot’s split with wetting and non-wetting pressures weighted by saturations. Phase mass balances use Darcy relative velocities v_α = −(K k_{rα}/μ_α)(∇p_α − ρ_α g). Terzaghi’s principle is the saturated limit α = 1. The library entry Multiphase Porous Materials, and the consolidation figures, are the full mixture setting.",
-          "bridge": "The same momentum equation describes a fluid once viscosity replaces elasticity."
-        },
-        {
-          "name": "Newtonian viscous stress",
-          "tex": "\\boldsymbol{\\sigma}=-p\\mathbf{I}+2\\mu_f\\mathbf{D}+\\lambda_f\\,\\mathrm{tr}(\\mathbf{D})\\mathbf{I},\\qquad \\mathbf{D}=\\tfrac{1}{2}\\bigl(\\nabla\\mathbf{v}+(\\nabla\\mathbf{v})^{\\mathsf T}\\bigr)",
-          "body": "A Newtonian fluid relates stress to the rate of deformation rather than to accumulated strain. For an incompressible fluid tr(D) = ∇ · v = 0, so the bulk-viscous term vanishes and pressure enforces the constraint.",
-          "bridge": "Substitution into momentum gives Navier–Stokes."
-        },
-        {
-          "name": "Incompressible Navier–Stokes",
-          "tex": "\\rho\\bigl(\\partial_t\\mathbf{v} + \\mathbf{v}\\cdot\\nabla\\mathbf{v}\\bigr) = -\\nabla p + \\mu\\nabla^2\\mathbf{v} + \\rho\\mathbf{b}",
-          "body": "Cauchy’s first law closed by Newton’s law of viscosity, together with ∇ · v = 0. The continuum structure is unchanged: balance of momentum plus a constitutive map from kinematics to stress. The library entry Fluids: Continuity and Navier–Stokes takes this further.",
-          "bridge": "On a mesh, coupled fields produce block systems rather than a single K a = f."
-        }
-      ]
-    },
-    {
-      "section": "Coupled discrete systems",
-      "lead": "Galerkin projection of a coupled continuum theory yields block matrices. The displacement block is still a momentum residual; the extra rows enforce energy or mass balance for the secondary field.",
-      "items": [
-        {
-          "name": "Thermoelastic block system",
-          "tex": "\\begin{bmatrix}\\mathbf{M}_{uu}&\\mathbf{0}\\\\\\mathbf{0}&\\mathbf{0}\\end{bmatrix}\\begin{Bmatrix}\\ddot{\\hat{\\mathbf{u}}}\\\\\\ddot{\\hat{\\mathbf{T}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{C}_{uu}&\\mathbf{0}\\\\\\mathbf{C}_{Tu}&\\mathbf{C}_{TT}\\end{bmatrix}\\begin{Bmatrix}\\dot{\\hat{\\mathbf{u}}}\\\\\\dot{\\hat{\\mathbf{T}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{K}_{uu}&\\mathbf{K}_{uT}\\\\\\mathbf{0}&\\mathbf{K}_{TT}\\end{bmatrix}\\begin{Bmatrix}\\hat{\\mathbf{u}}\\\\\\hat{\\mathbf{T}}\\end{Bmatrix}=\\begin{Bmatrix}\\mathbf{F}_u\\\\\\mathbf{F}_T\\end{Bmatrix}",
-          "body": "Displacement–temperature coupling after spatial discretization. K_uT carries thermal stress into momentum; C_Tu carries mechanical heating into the energy balance. Staggered or monolithic time integrators solve the same block structure.",
-          "bridge": "Poromechanics is the analogous u–p system for a saturated skeleton."
-        },
-        {
-          "name": "Poromechanics (u–p)",
-          "tex": "\\begin{bmatrix}\\mathbf{M}_{uu}&\\mathbf{0}\\\\\\mathbf{0}&\\mathbf{0}\\end{bmatrix}\\begin{Bmatrix}\\ddot{\\hat{\\mathbf{u}}}\\\\\\ddot{\\hat{\\mathbf{p}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{C}_{uu}&\\mathbf{0}\\\\\\mathbf{Q}_{pu}&\\mathbf{S}_{pp}\\end{bmatrix}\\begin{Bmatrix}\\dot{\\hat{\\mathbf{u}}}\\\\\\dot{\\hat{\\mathbf{p}}}\\end{Bmatrix}+\\begin{bmatrix}\\mathbf{K}_{uu}&-\\mathbf{Q}_{up}\\\\\\mathbf{0}&\\mathbf{H}_{pp}\\end{bmatrix}\\begin{Bmatrix}\\hat{\\mathbf{u}}\\\\\\hat{\\mathbf{p}}\\end{Bmatrix}=\\begin{Bmatrix}\\mathbf{F}_u\\\\\\mathbf{Q}_p\\end{Bmatrix}",
-          "body": "Biot solid–fluid coupling on a mesh. Q couples volumetric strain to pressure storage; H is the Darcy permeability operator; S_pp is fluid compressibility storage. Undrained response is nearly incompressible and equal-order u–p elements lock — the same issue as rubber, treated under Mixed Methods and Locking. One-Dimensional Consolidation, Gibson Consolidation, and the Mandel–Cryer Effect are the classical tests of this coupling."
-        }
-      ]
-    },
-    {
-      "section": "Where the library continues",
-      "lead": "Fracture, fibre composites, contact, and GPU performance sit on the same foundations. Each has its own library entry; the identities below are the bridges from Basic Equations into those topics.",
-      "items": [
-        {
-          "name": "Williams field (LEFM)",
-          "tex": "\\sigma_{ij} = \\dfrac{K}{\\sqrt{2\\pi r}}\\,f_{ij}(\\theta)",
-          "body": "A sharp crack in a linear solid is singular: stress unbounded as r → 0, energy release finite. Modes I–III each have an intensity factor K. Linear Elastic Fracture Mechanics, the J-integral, cohesive cracking, and phase-field fracture are the next entries in the library.",
-          "bridge": "A unidirectional composite replaces an isotropic ℂ by a transversely isotropic ply law."
-        },
-        {
-          "name": "Classical lamination (membrane–bending)",
-          "tex": "\\mathbf{N} = \\mathbf{A}\\boldsymbol{\\varepsilon}_0 + \\mathbf{B}\\boldsymbol{\\kappa},\\quad \\mathbf{M} = \\mathbf{B}\\boldsymbol{\\varepsilon}_0 + \\mathbf{D}\\boldsymbol{\\kappa}",
-          "body": "Force and moment resultants on a laminate midplane. A is membrane stiffness, D bending, B the coupling a symmetric stack removes. Fiber-Reinforced Composites, Embedded Fiber Models, and Fiber Neutrality develop the discrete-fibre and CLT routes.",
-          "bridge": "Contact adds inequalities on the same virtual-work statement."
-        },
-        {
-          "name": "Contact complementarity",
-          "tex": "g \\le 0,\\quad p \\ge 0,\\quad p\\,g = 0",
-          "body": "Gap, pressure, and the requirement that one of them vanish. Friction adds a tangential law and a nonsymmetric contact tangent. Contact and Friction, and the Hertz and beam-contact figures, are the computational side of that constraint."
-        }
-      ]
-    }
-  ],
-  "tags": [
-    "basic equations",
-    "continuum",
-    "continuum hypothesis",
-    "RVE",
-    "scale separation",
-    "theory",
-    "strain",
-    "stress",
-    "conservation",
-    "momentum",
-    "Hooke",
-    "Navier-Cauchy",
-    "Newtonian fluid",
-    "elastodynamics",
-    "multiphase",
-    "Biot",
-    "thermoelasticity",
-    "virtual work",
-    "FEM",
-    "Newton-Raphson"
-  ],
-  "scene": "linearMomentum",
-  "interactive": "beamSim",
-  "theoryExtra": true,
-  "story": [
-    {
-      "heading": "From physical question to solvable problem",
-      "paragraphs": [
-        "A complete problem specifies a body, unknown fields, initial conditions, boundary conditions, and material parameters. The equations below become a prediction only when these choices are consistent. Here X denotes a material coordinate, x a current coordinate, b a force per unit mass, and ρb a force per unit current volume. Grad and Div act on X; grad and div act on x.",
-        "Consider a uniform bar of length L and area A, clamped at one end and pulled by force N at the other. With small strain, no body force, and a linear elastic modulus E, balance gives constant stress N/A, the material law gives strain N/(EA), and kinematics gives end displacement NL/(EA). Each step answers a different question: force balance, material response, and geometry."
-      ]
-    },
-    {
-      "heading": "Check the boundary data before solving",
-      "paragraphs": [
-        "On a given boundary component, prescribe either displacement or its corresponding traction, not both independently. Supports supply reaction forces. Dynamics also needs initial displacement and velocity. For a free body, check rigid-body modes; for an incompressible body, check the pressure constraint and its boundary conditions."
-      ]
-    }
-  ]
-},
-  {
-  "part": "Part I – Continuum Mechanics",
   "title": "Introduction to Continuum Mechanics",
-  "lead": "In continuum mechanics, a solid or a fluid is treated as a continuous, undivided medium rather than a collection of discrete particles. This macroscopic approximation allows us to describe the physical behavior of materials using continuous field variables.",
-  "bullets": [
-    "In this framework, motion and deformation are measured by strain, while internal forces are measured by stress."
-  ],
+  "lead": "A continuum model connects deformation, internal forces, and material response. A complete problem also specifies the geometry, loads, supports, and, for dynamics, initial conditions.",
+  "bullets": [],
   "flow": [
     {
-      "section": "Basic Governing Equations",
-      "lead": "At the core of continuum mechanics are the balance laws. Regardless of the material, the conservation of mass and momentum must hold. This is expressed through equilibrium equations, most notably Cauchy’s first law of motion. Depending on the chosen frame of reference, this balance of linear momentum is written as:",
+      "section": "Continuum hypothesis",
+      "lead": "Density, displacement, and stress describe local averages over many microscopic constituents. The averaging scale must resolve the variation relevant to the problem.",
       "items": [
         {
-          "name": "Current placement (spatial formulation)",
-          "tex": "\\boldsymbol{\\nabla}\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}"
-        },
-        {
-          "name": "Reference mesh (material formulation)",
-          "tex": "\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
-          "body": "These equations establish the fundamental strong form of the field problem, balancing internal stresses (σ or P) with body forces (b or B) and inertial terms (a or A)."
+          "name": "A useful separation of scales",
+          "tex": "\\ell_{\\mathrm{micro}}\\ll\\ell_{\\mathrm{average}}\\ll\\ell_{\\mathrm{variation}}",
+          "body": "A homogeneous model may predict a composite coupon’s deflection while missing stresses at a fibre interface. Choose the scale and fields to match the quantity you need to predict."
         }
       ]
     },
     {
-      "section": "Constitutive Models",
-      "lead": "While the balance laws apply universally, they do not close the system of equations. A constitutive model is required to describe how the stress depends on the deformation, or the rate of deformation, for a specific material.",
+      "section": "Three equations that work together",
+      "lead": "For a small-strain, static, linear elastic solid, the displacement u determines strain, the material law determines stress, and momentum balance enforces equilibrium. These assumptions define this particular model; they are not requirements of continuum mechanics.",
       "items": [
         {
-          "name": "What the constitutive law does",
-          "body": "The constitutive law is what distinguishes elasticity from plasticity, and a viscous fluid from an elastic solid, entirely independent of how the problem will eventually be solved numerically."
+          "name": "Kinematics → strain",
+          "tex": "\\boldsymbol{\\varepsilon}=\\tfrac12(\\nabla\\mathbf{u}+\\nabla\\mathbf{u}^{\\mathsf T})",
+          "body": "Displacement includes rigid translation and rotation; infinitesimal strain measures the deformation to first order."
+        },
+        {
+          "name": "Material law → stress",
+          "tex": "\\boldsymbol{\\sigma}=\\mathbb{C}:\\boldsymbol{\\varepsilon}",
+          "body": "The elastic stiffness tensor C supplies the material properties. Plasticity, viscosity, and finite-strain elasticity require different constitutive descriptions."
+        },
+        {
+          "name": "Balance → equilibrium",
+          "tex": "\\nabla\\!\\cdot\\boldsymbol{\\sigma}+\\rho\\mathbf{b}=\\mathbf{0}",
+          "body": "Here b is body force per unit mass. In dynamics the right-hand side becomes ρa; balance still needs a constitutive law."
+        },
+        {
+          "name": "Boundary data → a specific problem",
+          "tex": "\\mathbf{u}=\\bar{\\mathbf{u}}\\ \\text{on }\\Gamma_u,\\qquad \\boldsymbol{\\sigma}\\mathbf{n}=\\bar{\\mathbf{t}}\\ \\text{on }\\Gamma_t",
+          "body": "Prescribe displacement or the corresponding traction component on each boundary portion. Supports generate reactions; enough constraints are needed to remove unwanted rigid-body motion."
         }
       ]
     },
     {
-      "section": "Linear vs. Nonlinear Formulations",
-      "lead": "The complexity of the continuum model depends heavily on the scale of deformation.",
+      "section": "Worked example: a bar in axial tension",
+      "lead": "Take a uniform bar of length L, cross-sectional area A, and Young’s modulus E. Fix its left end and apply an axial end force N. Assume small strain and neglect body forces and local end effects.",
       "items": [
         {
-          "name": "Linear continuum models",
-          "body": "Assume deformations are small enough that changes in geometry can be safely ignored when writing equilibrium and strain equations (the small-deformation shortcut)."
-        },
-        {
-          "name": "Nonlinear models",
-          "body": "Place no such restrictions. Kinematics, stress, equilibrium, and constitutive laws remain the exact same subjects, but they must account for geometric and material nonlinearity without simplifications."
+          "name": "Force → stress → strain → displacement",
+          "tex": "\\sigma=\\frac{N}{A},\\qquad\\varepsilon=\\frac{\\sigma}{E},\\qquad u(x)=\\frac{Nx}{EA},\\qquad\\delta=\\frac{NL}{EA}",
+          "body": "Equilibrium gives constant axial force, elasticity gives strain, and integration with u(0) = 0 gives displacement. Doubling the force doubles the extension; doubling E or A halves it. No mesh is needed for this one-dimensional solution."
         }
       ]
     },
     {
-      "section": "Transition to Computational Mechanics",
-      "lead": "Formulating the continuous governing equations is only the first step; solving them for complex geometries requires numerical methods, including finite elements, finite volumes, finite differences, and spectral methods. To transition from continuum theory to a discrete numerical model, the problem undergoes a specific pipeline:",
+      "section": "From a continuum model to finite elements",
+      "lead": "For more complex problems, a weak form converts the field equations into integral statements. Shape functions approximate the unknown fields, element contributions are assembled, and the resulting algebraic system is solved.",
       "items": [
         {
-          "name": "1. Weak form",
-          "body": "The strong form of the balance laws is replaced by a weak statement, such as the principle of virtual work or a Galerkin projection."
-        },
-        {
-          "name": "2. Discretization",
-          "body": "The continuous domain is approximated using a mesh of nodes and elements. Unknown fields and geometry are interpolated using shape functions."
-        },
-        {
-          "name": "3. Assembly",
-          "body": "Integrals on individual elements are evaluated (typically via Gauss quadrature) and assembled into a global system of algebraic equations for the nodal degrees of freedom."
-        }
-      ]
-    },
-    {
-      "section": "Solving Nonlinear Systems",
-      "lead": "For nonlinear continuum mechanics, discretization yields a finite set of nonlinear algebraic equations. These cannot be solved in a single step and rely on Newton–Raphson iteration.",
-      "items": [
-        {
-          "name": "Linearization and the consistent tangent",
-          "body": "The bridge between pure continuum theory and the Newton–Raphson method is linearization. Each iteration requires calculating directional derivatives to linearize the nonlinear equations. This produces a consistent tangent (or Jacobian) of the residual—the exact matrix structure assembled in nonlinear finite element codes—which is solved repeatedly until the residual vanishes."
+          "name": "Keep physical assumptions separate from numerical choices",
+          "body": "Small deformation does not imply a linear material: a small-strain plasticity problem can still be nonlinear. Changing geometry, material response, or contact conditions may require incremental solution and iteration. Refining the mesh improves the discrete approximation but cannot correct inappropriate loads, supports, or material assumptions."
         }
       ]
     }
@@ -1113,22 +837,11 @@ const topics = [
     "assembly",
     "Newton-Raphson",
     "tangent",
-    "linearization"
-  ],
-  "story": [
-    {
-      "heading": "What a material point represents",
-      "paragraphs": [
-        "A continuum point represents an average over many microscopic constituents. The averaging scale should be large enough to smooth atomic, grain, or pore fluctuations and small enough to resolve the variation that matters to the problem. A homogeneous effective material may describe a composite coupon while being inappropriate for the stress at an individual fibre interface.",
-        "Start with the quantity you need to predict. A beam model may be sufficient for deflection, a three-dimensional continuum may be needed near a joint, and a discrete or enriched model may be needed at an interface. Increasing model detail does not remove uncertainty in loads, boundary conditions, or material parameters."
-      ]
-    },
-    {
-      "heading": "Separate motion from material response",
-      "paragraphs": [
-        "A rigidly translated body has nonzero displacement and zero strain. A stretched rubber strip and a stretched steel strip can have the same deformation gradient but very different stresses. Kinematics describes the motion; constitutive behavior explains the material response; balance connects stress to applied forces."
-      ]
-    }
+    "linearization",
+    "basic equations",
+    "continuum hypothesis",
+    "RVE",
+    "scale separation"
   ]
 },
   {
@@ -5344,7 +5057,6 @@ function partTopics(part){
 const PART_I = "Part I – Continuum Mechanics";
 
 const PART_I_ARC = {
-  "Basic Equations": "Overview",
   "Introduction to Continuum Mechanics": "Overview",
   "Kinematics of Deformation": "Kinematics",
   "Tensors and the Divergence Theorem": "Kinematics",
@@ -5366,7 +5078,6 @@ const PART_I_ARC = {
 };
 
 const PART_I_LEAD = {
-  "Basic Equations": "The closed list of field equations that the rest of Part I expands, one subject at a time.",
   "Introduction to Continuum Mechanics": "A solid or fluid as a continuous medium: strain, stress, balance laws, constitutive closure, and the pipeline to a finite-element Newton step.",
   "Kinematics of Deformation": "How continuous bodies move, change shape, and rotate — without the forces that produce those motions.",
   "Tensors and the Divergence Theorem": "The identity that turns a volume derivative into a surface flux — the same step that makes ∇·σ and traction one balance.",
@@ -5388,7 +5099,6 @@ const PART_I_LEAD = {
 };
 
 const PART_I_BRIDGE = {
-  "Basic Equations": "Part II carries the continuum statement into virtual work, interpolation, assembly, and the discrete system.",
   "Introduction to Continuum Mechanics": "That pipeline begins with a precise definition of motion — the kinematics of deformation.",
   "Kinematics of Deformation": "The language of those maps is tensors, and the divergence theorem turns volume statements into surface ones.",
   "Tensors and the Divergence Theorem": "Any invertible F then splits uniquely into stretch and rotation.",
@@ -5699,13 +5409,24 @@ function selectTopic(title, opts={}){
   if(opts.fromSidebar) closeMobileSidebar();
 }
 
+function resolveHashSlug(h){
+  if(h === 'basic-equations') return 'introduction-to-continuum-mechanics';
+  return h;
+}
 function initFromHash(){
-  const h = location.hash.replace('#','');
+  const h = resolveHashSlug(location.hash.replace('#',''));
+  if(location.hash.replace('#','') === 'basic-equations'){
+    history.replaceState(null, '', '#introduction-to-continuum-mechanics');
+  }
   const byHash = topics.find(t => slug(t.title) === h);
-  return byHash || topics.find(t => t.title === "Basic Equations") || topics[0];
+  return byHash || topics.find(t => t.title === "Introduction to Continuum Mechanics") || topics[0];
 }
 window.addEventListener('hashchange',()=>{
-  const topic=topics.find(t=>slug(t.title)===location.hash.slice(1));
+  const raw = location.hash.slice(1);
+  if(raw === 'basic-equations'){
+    history.replaceState(null, '', '#introduction-to-continuum-mechanics');
+  }
+  const topic=topics.find(t=>slug(t.title)===resolveHashSlug(raw));
   if(topic && topic.title!==activeTitle){selectTopic(topic.title);content.scrollTop=0;}
 });
 
@@ -5820,8 +5541,8 @@ window.addEventListener('keydown', (e)=>{
     ok('pillow inflation topic', topics.some(t => t.title === 'Inflating a Pillow' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('pillowInflation')));
     const studioHtml = renderTopicScene({scenes:['kasten','steelJointResults','threePointBending','pillowInflation']});
     ok('studio viewers use absolute src', /data-scene-src="\/kasten-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/steeljoint-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/3pb-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/pillow-viewer\/index.html"/.test(studioHtml));
-    ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
-    ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
+    ok('overview consolidated', !topics.some(t => t.title === 'Basic Equations') && topics.some(t => t.title === 'Introduction to Continuum Mechanics' && Array.isArray(t.flow) && t.flow.some(f => /Continuum hypothesis/i.test(f.section))));
+    ok('introduction has kinematics bridge', topics.some(t => t.title === 'Introduction to Continuum Mechanics' && (t.flow||[]).some(s => (s.items||[]).some(e => /Kinematics/i.test(e.name)))));
     ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (((t.equations||[]).length >= 5) || ((t.flow||[]).reduce((n,s)=>n+((s.items||[]).length),0) >= 5))));
     ok('hooke has navier-cauchy', topics.some(t => t.title === "Hooke’s Law" && Array.isArray(t.flow) && t.flow.some(s => (s.items||[]).some(e => /Navier/i.test(e.name)))));
     ok('hyperelasticity material lab', topics.some(t => t.title === 'Hyperelasticity' && t.scene === 'hyperelasticity' && Array.isArray(t.story) && t.story.some(s => /material lab/i.test(s.heading))));
