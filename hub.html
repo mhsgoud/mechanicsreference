@@ -608,7 +608,10 @@
       .topic-nav{grid-template-columns:1fr}
       .topic-nav .next{text-align:left}
     }
-  </style>
+  .figure-section:has([data-scene-src*="traction-cut"]){container-type:inline-size}
+.scene-frame[data-scene-src*="traction-cut"]{height:830px!important}
+@container(max-width:700px){.scene-frame[data-scene-src*="traction-cut"]{height:1370px!important}}
+</style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/contrib/auto-render.min.js"></script>
@@ -617,6 +620,13 @@
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
   <link rel="stylesheet" href="library-navigation.css?v=compact-gutters-20260918">
+<style>
+.overview-reading{margin:24px 0;padding:18px;border:1px solid var(--border,#334155);border-radius:12px}
+.overview-reading h2{margin:0 0 8px}.overview-reading p{margin:0 0 14px}
+.overview-reading>div{display:flex;flex-wrap:wrap;gap:8px}
+.overview-reading a{display:inline-block;padding:8px 12px;border:1px solid var(--border,#334155);border-radius:7px;text-decoration:none}
+.overview-reading a:hover,.overview-reading a:focus-visible{background:#243956;color:#fff}
+</style>
 </head>
 <body>
   <div class="app">
@@ -1627,40 +1637,29 @@ const topics = [
   {
   "part": "Part I – Continuum Mechanics",
   "title": "Cauchy Stress and Traction",
-  "lead": "Independent derivation of the traction vector, Cauchy’s stress theorem, and the split of t into normal and shear on a cut.",
+  "lead": "The stress tensor describes the local force state. The traction vector gives the force per unit current area transmitted across one specified plane. Changing the plane changes the traction, even when the stress tensor stays fixed.",
   "bullets": [
-    "At an interior point P, an infinitesimal current surface dA is defined by an outward unit normal n. The contact force across that surface is dF. The Cauchy traction is force per current area: t⁽ⁿ⁾ = lim dF/dA as dA → 0. It depends on x and on the plane n. Cauchy’s lemma is Newton’s third law on the cut: t⁽⁻ⁿ⁾ = −t⁽ⁿ⁾."
+    "Choose the uniaxial preset and rotate the cut from 0° to 45°. The applied stress remains 100 MPa, but the inclined cut carries both normal and shear traction. The scene and both plots show the same calculation."
   ],
   "flow": [
     {
-      "section": "Cauchy’s Stress Theorem",
-      "lead": "There exists a second-order tensor field σ, independent of n, such that the traction on any plane is the linear map of that normal.",
+      "section": "Working equations",
+      "lead": "Hold the stress tensor fixed and vary only the cut orientation.",
       "items": [
         {
-          "name": "Cauchy’s theorem",
-          "tex": "\\mathbf{t}^{(\\mathbf{n})} = \\boldsymbol{\\sigma}\\,\\mathbf{n}\\qquad\\Longrightarrow\\qquad t_i=\\sigma_{ij}n_j",
-          "body": "In matrix form the same statement is t = σ n. Angular momentum without couple stresses forces σ = σᵀ — an algebraic restriction, not a PDE."
+          "name": "Traction and its decomposition",
+          "tex": "\\mathbf t=\\boldsymbol\\sigma\\mathbf n,\\qquad \\sigma_n=\\mathbf n^T\\boldsymbol\\sigma\\mathbf n,\\qquad \\mathbf t_s=\\mathbf t-\\sigma_n\\mathbf n",
+          "body": "The decomposition satisfies n · t_s = 0 and ‖t‖² = σₙ² + ‖t_s‖²."
         },
         {
-          "name": "First Piola–Kirchhoff stress",
-          "tex": "\\mathbf{P} = J\\,\\boldsymbol{\\sigma}\\,\\mathbf{F}^{-\\mathsf{T}}",
-          "body": "Current force measured per reference area. Total Lagrangian codes discretize balance written with P; Updated Lagrangian keeps σ on the current mesh."
-        }
-      ]
-    },
-    {
-      "section": "Decomposition: Normal and Shear",
-      "lead": "The traction vector on a given plane splits into a part along n and a part lying in the plane. Neither replaces the full tensor.",
-      "items": [
-        {
-          "name": "Normal stress",
-          "tex": "\\sigma_n = \\mathbf{t}^{(\\mathbf{n})}\\cdot\\mathbf{n} = \\mathbf{n}^{\\mathsf T}\\boldsymbol{\\sigma}\\,\\mathbf{n}",
-          "body": "σ_n > 0 is tension on the cut; σ_n < 0 is compression. The corresponding vector is t_n = σ_n n."
+          "name": "Plane-stress transformation",
+          "tex": "\\sigma_n=c+d\\cos2\\theta+\\sigma_{xy}\\sin2\\theta,\\qquad \\tau=-d\\sin2\\theta+\\sigma_{xy}\\cos2\\theta",
+          "body": "Here c = (σxx + σyy)/2 and d = (σxx − σyy)/2. θ is the angle of the normal, not the cut line."
         },
         {
-          "name": "Shear stress",
-          "tex": "\\mathbf{t}_s = \\mathbf{t}^{(\\mathbf{n})} - \\sigma_n\\mathbf{n},\\qquad \\tau_n=\\lVert\\mathbf{t}_s\\rVert=\\sqrt{\\lVert\\mathbf{t}^{(\\mathbf{n})}\\rVert^2-\\sigma_n^2}",
-          "body": "t_s is tangent to the plane. Turn θ and φ in the figure: σ is fixed, but t, σ_n, and τ_n all change."
+          "name": "Mohr circle",
+          "tex": "(\\sigma_n-c)^2+\\tau^2=R^2,\\qquad R=\\sqrt{d^2+\\sigma_{xy}^2}",
+          "body": "The in-plane principal stresses are c ± R. A zero-radius circle is handled as a single point."
         }
       ]
     }
@@ -1677,86 +1676,56 @@ const topics = [
   "sceneFirst": true,
   "story": [
     {
-      "heading": "The cut selects the force per area",
+      "heading": "1. Specify a plane before asking for traction",
       "paragraphs": [
-        "For uniaxial tension σ = diag(s,0,0), choose n = (cos θ,sin θ,0). Then t = (s cos θ,0,0), normal stress is s cos²θ, and shear magnitude is |s sin θ cos θ|. At 45°, both magnitudes are |s|/2. A uniaxial stress state can therefore produce shear traction on an inclined plane.",
-        "The traction vector is generally not parallel to the normal. Principal planes are special: their normals are eigenvectors of σ and their shear traction vanishes. Reversing the normal reverses traction while leaving the scalar normal stress unchanged."
+        "At a material point, imagine a small internal cut with unit normal n. The contact force on a current area da is dF = t(n) da. Traction is a vector with stress units; it is not the total force and it is not the full stress tensor.",
+        "A tensor stores the tractions for every possible orientation. With tᵢ = σᵢⱼnⱼ, column j is the traction on a face whose normal is the coordinate vector eⱼ. For the classical continuum without couple stresses, angular momentum implies a symmetric Cauchy stress tensor."
       ]
     },
     {
-      "heading": "Check area and sign conventions",
+      "heading": "2. Why the relation is linear",
       "paragraphs": [
-        "Cauchy stress uses current area. First Piola stress converts a reference area normal to a current force through PN dA = σn da. With tension positive, hydrostatic compression is σ = −pI for p > 0. Do not mix this pressure convention with mean tensile stress tr σ/3."
+        "Consider a shrinking tetrahedron with one oblique face and three coordinate faces. The coordinate-face areas are the signed projections of the oblique area. Surface forces scale with length squared, while bounded body-force and inertia contributions scale with length cubed. Force balance in the limit therefore relates the oblique traction to the coordinate-face tractions: t(n) = σn.",
+        "The two sides of an internal cut have opposite normals and opposite tractions: t(−n) = −t(n). Use Reverse normal in the explorer: the force vector reverses, but the scalar normal stress and shear magnitude do not."
       ]
+    },
+    {
+      "heading": "3. Separate normal and tangential action",
+      "paragraphs": [
+        "Project t onto n to obtain the signed normal stress σₙ = n · t. Its vector contribution is σₙn. Subtract it from t to obtain the shear traction vector, which lies in the cut plane. Positive σₙ denotes tension; negative σₙ denotes compression.",
+        "The explorer restricts n to the xy-plane and uses plane stress. It defines m = (−sin θ, cos θ, 0), so τ = m · t is signed. The shear magnitude is |τ|. In general three dimensions, the plane has two independent tangential directions; the invariant shear magnitude is ‖t − σₙn‖."
+      ]
+    },
+    {
+      "heading": "4. Read the plots as two views of the same result",
+      "paragraphs": [
+        "The angle plot shows how σₙ and τ vary while the stress tensor is held fixed. Mohr’s circle plots those same two values against each other. A physical rotation θ corresponds to a 2θ rotation around the circle; the direction depends on the stated shear-sign convention.",
+        "Principal planes have zero shear traction. The circle intersects the normal-stress axis at the two in-plane principal stresses. Its radius gives the maximum in-plane shear magnitude. Because this is plane stress, the third principal stress is zero: the absolute maximum shear over all three-dimensional planes may exceed the in-plane value.",
+        "Equal biaxial compression makes the in-plane circle collapse to a point. This is not three-dimensional hydrostatic compression: σzz remains zero in the explorer."
+      ]
+    },
+    {
+      "heading": "5. From traction to forces and boundary conditions",
+      "paragraphs": [
+        "For uniform traction, the resultant is F = tA; for a nonuniform field, integrate t over the loaded surface. A prescribed traction boundary supplies σn = t̄ to the continuum problem. A traction-free boundary has σn = 0, which does not require every component of σ to vanish.",
+        "Cauchy stress uses current area. At finite deformation, first Piola–Kirchhoff stress acts on reference area: PN dA = σn da, with P = JσF⁻ᵀ. Keep the area measure and normal consistent when interpreting a force or an FE result."
+      ]
+    }
+  ],
+  "eager": true,
+  "figureLabel": "Interactive stress transformation",
+  "sources": [
+    {
+      "label": "Traction vectors: tensor mapping and normal/shear projections",
+      "href": "https://www.continuummechanics.org/tractionvector.html"
     }
   ]
 },
   {
   "part": "Part I – Continuum Mechanics",
   "title": "Balance Laws & Conservation",
-  "equations": [
-    {
-      "name": "Mass (spatial)",
-      "expr": "∂ρ/∂t + ∇ · (ρ v) = 0",
-      "tex": "\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0",
-      "note": "Continuity. Referential: ρ₀ = ρ J."
-    },
-    {
-      "name": "Mass (integral, material part)",
-      "expr": "d/dt ∫_Pₜ ρ dv = 0",
-      "tex": "\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\,\\mathrm{d}v=0",
-      "note": "The total mass of every material part Pₜ = χ(P₀,t) is constant. Applying Reynolds transport and localization gives the spatial continuity equation above."
-    },
-    {
-      "name": "Linear momentum (spatial)",
-      "expr": "∇ · σ + ρ b = ρ a",
-      "tex": "\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}",
-      "note": "Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."
-    },
-    {
-      "name": "Linear momentum (integral)",
-      "expr": "∫_∂Ω t dA + ∫_Ω ρ b dV = d/dt ∫_Ω ρ v dV",
-      "tex": "\\displaystyle\\int_{\\partial\\Omega}\\mathbf{t}\\,\\mathrm{d}A + \\int_{\\Omega}\\rho\\mathbf{b}\\,\\mathrm{d}V = \\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\Omega}\\rho\\mathbf{v}\\,\\mathrm{d}V",
-      "note": "Statement on a material region Ω following the particles. A fixed control volume also requires momentum flux through its boundary."
-    },
-    {
-      "name": "Linear momentum (referential)",
-      "expr": "Div P + ρ₀ B = ρ₀ A",
-      "tex": "\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
-      "note": "Same physics on the reference placement; used by Total Lagrangian FEM."
-    },
-    {
-      "name": "Angular momentum",
-      "expr": "σ = σᵀ",
-      "tex": "\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}",
-      "note": "No couple stresses. Equivalently P Fᵀ = F Pᵀ."
-    },
-    {
-      "name": "Total energy (integral)",
-      "expr": "d/dt ∫_Pₜ ρ(e + |v|²/2) dv = external mechanical power + heat supply",
-      "tex": "\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\left(e+\\tfrac12\\mathbf{v}\\cdot\\mathbf{v}\\right)\\mathrm{d}v=\\int_{\\partial\\mathcal{P}_t}\\mathbf{t}\\cdot\\mathbf{v}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho\\mathbf{b}\\cdot\\mathbf{v}\\,\\mathrm{d}v-\\int_{\\partial\\mathcal{P}_t}\\mathbf{q}\\cdot\\mathbf{n}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho r\\,\\mathrm{d}v",
-      "note": "Rate of kinetic plus internal energy equals traction and body-force power, net heat inflow, and volumetric heat supply. Combining this with momentum localizes to the internal-energy equation."
-    },
-    {
-      "name": "Energy",
-      "expr": "ρ ė = σ : D − ∇ · q + ρ r",
-      "tex": "\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r",
-      "note": "Internal energy, stress power, heat flux, and supply."
-    },
-    {
-      "name": "Principle of virtual work",
-      "expr": "∫ σ : ∇δu dV = ∫ t · δu dA + ∫ ρ b · δu dV",
-      "tex": "\\displaystyle\\int \\boldsymbol{\\sigma} : \\nabla\\delta\\mathbf{u}\\,\\mathrm{d}V = \\int \\mathbf{t}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}A + \\int \\rho\\mathbf{b}\\cdot\\delta\\mathbf{u}\\,\\mathrm{d}V",
-      "note": "Weak statement of linear momentum (quasi-static). Dynamics adds ∫ ρ a · δu. This is the continuum statement a finite-element code actually discretizes; Variational Principles takes the Galerkin step."
-    }
-  ],
   "bullets": [
-    "Mass, linear momentum, angular momentum, and energy are conserved in every continuum theory — or balanced, once heat flux and external power are admitted. Once a stress (and a heat flux) are introduced, the local forms of those statements become partial differential equations.",
-    "Linear momentum on a deforming body is Cauchy’s first law: ∇ · σ + ρ b = ρ a. Globally, the resultant of tractions and body forces equals the rate of change of linear momentum of that part. The divergence theorem turns the surface term into ∇·σ and yields the PDE.",
-    "Part of the boundary is supported, with prescribed displacement and an unknown reaction. Applied tractions act on the free surface and move with it. The acceleration a is that of the material points. Those boundary partitions are data; they do not replace the balance laws.",
-    "The same statement written on the reference placement uses the first Piola–Kirchhoff stress: Div P + ρ₀ B = ρ₀ A. Choosing spatial or referential form is a bookkeeping choice that matches Updated versus Total Lagrangian discretizations.",
-    "Angular momentum, in the absence of couple stresses, requires the Cauchy stress to be symmetric. Energy balance introduces temperature and heat flux; mechanical theories often close it later, after momentum and a constitutive law are already on the table.",
-    "The figure is a body on a small support. Reactions and free-surface tractions close the global momentum balance while the local equation holds in the interior."
+    "Start with the mass example, then compare translation and rotation. The energy tab uses the same translating body, so its work and kinetic energy can be checked against the momentum calculation. These are exact reduced examples with explicitly stated assumptions."
   ],
   "tags": [
     "balance",
@@ -1770,17 +1739,130 @@ const topics = [
   "scene": "linearMomentum",
   "story": [
     {
-      "heading": "Material bodies and fixed control volumes",
+      "heading": "1. Choose the region you are balancing",
       "paragraphs": [
-        "A material region follows the same particles. Its momentum changes through external forces; no mass crosses its moving boundary. A fixed control volume permits mass to enter and leave, so its momentum balance also contains the outward convective flux ∫∂Ω ρv(v·n) da. Omitting that flux is incorrect for flow through a stationary region.",
-        "A uniform bar accelerating at a has a net external force ma. A supported bar at rest has zero resultant after support reactions are included. Equilibrium does not mean every traction is zero; it means their resultant and moment balance the other contributions."
+        "A material region moves with the same particles. With no mass sources, its mass is constant. Its momentum and energy can still change because the surroundings exert forces, do work, or transfer heat. “Conservation” does not mean every quantity inside the region stays constant.",
+        "A fixed control volume stays in space while material may cross its boundary. Its balances include transport terms as well as storage and sources. This is essential for a flowing fluid; omitting momentum flux can give an incorrect force even in steady flow."
       ]
     },
     {
-      "heading": "Use integral checks alongside local residuals",
+      "heading": "2. Mass connects density to volume change",
       "paragraphs": [
-        "Check total mass, resultant force, moment, and energy over the complete body. A small algebraic residual is useful but does not diagnose a missing load, incorrect unit, or wrong boundary convention. In a classical nonpolar continuum, angular momentum implies symmetric Cauchy stress; the first Piola stress need not be symmetric."
+        "For a material region, m = ∫ρ dv is fixed. Locally, mass balance gives ρJ = ρ₀, where J = det F is the local volume ratio. Density therefore falls when a material element expands. The mass tab prescribes a homogeneous dilation and tracks the same particles; it does not assume an elastic or fluid constitutive law.",
+        "Incompressibility imposes J = 1 along the motion, or div v = 0. Mass conservation alone does not impose incompressibility: a compressible material conserves mass while changing density."
       ]
+    },
+    {
+      "heading": "3. Sum external forces before interpreting motion",
+      "paragraphs": [
+        "Linear momentum changes through boundary tractions and body forces. Here b is force per unit mass, so ρb is force per current volume. In the translation example, the resultants F and Q give a = (F − Q)/m. Starting from rest, v = at and x = ½at².",
+        "Equal opposing forces produce zero acceleration but need not produce zero internal stress. Static equilibrium requires both force and moment balance; zero resultant alone is insufficient. The rigid block intentionally suppresses deformation so the global force balance is easy to verify. A continuum stress field requires additional kinematics, material laws, and boundary conditions."
+      ]
+    },
+    {
+      "heading": "4. A force couple isolates angular momentum",
+      "paragraphs": [
+        "A pair of equal and opposite forces cancels in the force sum but produces a moment when the lines of action are separated. In the angular-momentum tab, M = Fh changes Hᶻ at the rate dHᶻ/dt = M. The centre of mass stays fixed while the block rotates.",
+        "For a classical continuum without independent body couples or couple stresses, localization of angular-momentum balance gives σ = σᵀ. This symmetry is not a statement that the body cannot rotate. The first Piola–Kirchhoff stress is generally nonsymmetric; the equivalent referential condition is PFᵀ = FPᵀ."
+      ]
+    },
+    {
+      "heading": "5. Energy includes more than kinetic energy",
+      "paragraphs": [
+        "The energy tab is the rigid, non-dissipative special case: the total external work equals the increase in kinetic energy. Count both forces. Q does negative work for positive displacement but positive work if the body moves in the opposite direction. The sign follows force dotted with displacement, not the name of the load.",
+        "A deformable continuum also stores internal energy. Stress power σ:D transfers mechanical power into that internal energy; heat enters through flux and volumetric supply. Internal energy can include elastic storage and thermal changes. Plasticity and viscosity can dissipate mechanical energy without violating total energy balance. The second law places additional restrictions on that dissipation."
+      ]
+    },
+    {
+      "heading": "6. What to check in a finite-element result",
+      "paragraphs": [
+        "Compare applied loads, support reactions, and inertia in a common coordinate system. Check their moments about a specified origin. Monitor total mass and include external work, kinetic energy, stored energy, and dissipation in an energy audit. A converged algebraic residual can still belong to a model with missing loads or incorrect units.",
+        "Quasi-static analysis neglects inertia because it is small relative to the relevant force scale; it does not require every velocity to be zero. Spatial and reference formulations express the same physics, provided stresses, area measures, density, and body-force conventions are transformed consistently."
+      ]
+    }
+  ],
+  "lead": "Balance laws account for mass, force, moment, and energy. They apply to every material model: elasticity, plasticity, viscosity, and damage change the constitutive response, but not these balances.",
+  "sceneFirst": true,
+  "eager": true,
+  "figureLabel": "Explore the four balances",
+  "flow": [
+    {
+      "section": "Mass balance",
+      "lead": "No mass creation or removal; J = det F.",
+      "items": [
+        {
+          "name": "Mass (integral, material part)",
+          "tex": "\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\,\\mathrm{d}v=0",
+          "body": "The total mass of every material part Pₜ = χ(P₀,t) is constant. Applying Reynolds transport and localization gives the spatial continuity equation above."
+        },
+        {
+          "name": "Mass (spatial)",
+          "tex": "\\dfrac{\\partial\\rho}{\\partial t} + \\nabla\\cdot(\\rho\\mathbf{v}) = 0",
+          "body": "Continuity. Referential: ρ₀ = ρ J."
+        }
+      ]
+    },
+    {
+      "section": "Linear momentum",
+      "lead": "For a material region Ω(t); t = σn and b is force per unit mass.",
+      "items": [
+        {
+          "name": "Linear momentum (integral)",
+          "tex": "\\displaystyle\\int_{\\partial\\Omega}\\mathbf{t}\\,\\mathrm{d}A + \\int_{\\Omega}\\rho\\mathbf{b}\\,\\mathrm{d}V = \\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\Omega}\\rho\\mathbf{v}\\,\\mathrm{d}V",
+          "body": "Statement on a material region Ω following the particles. A fixed control volume also requires momentum flux through its boundary."
+        },
+        {
+          "name": "Linear momentum (spatial)",
+          "tex": "\\nabla\\cdot\\boldsymbol{\\sigma} + \\rho\\mathbf{b} = \\rho\\mathbf{a}",
+          "body": "Cauchy’s first law. Quasi-static: ∇ · σ + ρ b = 0."
+        },
+        {
+          "name": "Linear momentum (referential)",
+          "tex": "\\mathrm{Div}\\,\\mathbf{P} + \\rho_0\\mathbf{B} = \\rho_0\\mathbf{A}",
+          "body": "Same physics on the reference placement; used by Total Lagrangian FEM."
+        }
+      ]
+    },
+    {
+      "section": "Angular momentum",
+      "lead": "Classical nonpolar continuum, with no independent couples.",
+      "items": [
+        {
+          "name": "Angular momentum",
+          "tex": "\\boldsymbol{\\sigma} = \\boldsymbol{\\sigma}^{\\mathsf{T}}",
+          "body": "No couple stresses. Equivalently P Fᵀ = F Pᵀ."
+        }
+      ]
+    },
+    {
+      "section": "Energy balance",
+      "lead": "e is internal energy per unit mass; D = sym ∇v; q is outward heat-flux vector; r is heat supply per unit mass.",
+      "items": [
+        {
+          "name": "Total energy (integral)",
+          "tex": "\\dfrac{\\mathrm{d}}{\\mathrm{d}t}\\int_{\\mathcal{P}_t}\\rho\\left(e+\\tfrac12\\mathbf{v}\\cdot\\mathbf{v}\\right)\\mathrm{d}v=\\int_{\\partial\\mathcal{P}_t}\\mathbf{t}\\cdot\\mathbf{v}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho\\mathbf{b}\\cdot\\mathbf{v}\\,\\mathrm{d}v-\\int_{\\partial\\mathcal{P}_t}\\mathbf{q}\\cdot\\mathbf{n}\\,\\mathrm{d}a+\\int_{\\mathcal{P}_t}\\rho r\\,\\mathrm{d}v",
+          "body": "Rate of kinetic plus internal energy equals traction and body-force power, net heat inflow, and volumetric heat supply. Combining this with momentum localizes to the internal-energy equation."
+        },
+        {
+          "name": "Energy",
+          "tex": "\\rho\\,\\dot{e} = \\boldsymbol{\\sigma} : \\mathbf{D} - \\nabla\\cdot\\mathbf{q} + \\rho r",
+          "body": "Internal energy, stress power, heat flux, and supply."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "label": "University of Alberta — mass balance",
+      "href": "https://engcourses-uofa.ca/books/introduction-to-solid-mechanics/balance-equations/mass-balance/"
+    },
+    {
+      "label": "University of Alberta — linear and angular momentum balance",
+      "href": "https://engcourses-uofa.ca/books/introduction-to-solid-mechanics/balance-equations/momentum-balance/"
+    },
+    {
+      "label": "University of Alberta — continuum deformation energy",
+      "href": "https://engcourses-uofa.ca/energy/continuum-deformation-energy/"
     }
   ]
 },
@@ -2372,10 +2454,7 @@ const topics = [
   "part": "Part I – Continuum Mechanics",
   "title": "Metal Plasticity",
   "bullets": [
-    "Below a yield stress the response is elastic. Beyond it, metals flow at nearly constant volume. The elastic strain is recoverable; the plastic strain is a history, not a state derived from the current stretch alone.",
-    "J₂ plasticity yields when the von Mises stress reaches σ_y. The flow direction is the normal to that surface—associated flow. Isotropic hardening expands the cylinder; kinematic hardening translates it (the Bauschinger effect) by a backstress α.",
-    "In three dimensions the additive split ε = εᵉ + εᵖ is the small-strain statement; finite strain uses a multiplicative split F = Fᵉ Fᵖ. The return map at each quadrature point is itself a small Newton problem.",
-    "The figure is a FLagSHyP hexahedral cantilever with von Mises plasticity: the root yields first, and the plastic zone spreads as the tip displacement is increased."
+    "Use Unload to zero stress in the figure: the elastic strain returns to zero, but the gauge keeps a permanent extension. Then compare isotropic and kinematic hardening during reverse loading. The figures use an actual incremental uniaxial constitutive update, with geometry exaggerated for visibility."
   ],
   "tags": [
     "plasticity",
@@ -2385,20 +2464,102 @@ const topics = [
     "Bauschinger",
     "return map"
   ],
-  "scene": "elastoPlasticCantilever",
+  "scene": "metalPlasticityLab",
   "story": [
     {
-      "heading": "Loading, unloading, and permanent strain",
+      "heading": "1. Separate recoverable strain from permanent strain",
       "paragraphs": [
-        "In a small-strain uniaxial elastic–perfectly plastic test, stress rises with slope E until σy, then plastic strain accumulates at constant tensile stress. Unloading initially follows slope E and leaves a residual strain. At total strain 0.005 with E = 200 GPa and σy = 250 MPa, elastic strain is 0.00125 and plastic strain is 0.00375.",
-        "A rate-independent model uses an admissibility function f ≤ 0, a nonnegative plastic multiplier, and the complementarity condition that plastic flow occurs on the active yield surface. Associated J₂ flow is deviatoric, making plastic flow volume-preserving in the ideal model. Elastic volume change and damage-induced dilation are separate effects."
+        "At small strain, ε = εᵉ + εᵖ. The elastic law acts on εᵉ, so stress is determined by the difference between total strain and the stored plastic strain. The same total strain can therefore correspond to different stresses after different histories.",
+        "For E = 200 GPa and an initial yield stress of 250 MPa, first yield in monotonic uniaxial tension occurs at εy = 0.00125, or 0.125%. With perfect plasticity, loading to 0.6% gives 0.125% elastic strain and 0.475% plastic strain. Unloading to zero stress leaves that 0.475% strain. Returning total strain to zero instead would require compression."
       ]
     },
     {
-      "heading": "What the return map must accomplish",
+      "heading": "2. Yield is a stress condition, not a failure condition",
       "paragraphs": [
-        "Form an elastic trial stress, test yield, and correct the stress and internal variables if needed. A radial return is appropriate for standard isotropic J₂ models; it is not universal. Check yield consistency, nonnegative dissipation, and time-step convergence. A consistent algorithmic tangent improves Newton convergence but does not replace these material checks."
+        "For isotropic, pressure-insensitive J₂ plasticity without backstress, yielding begins when the von Mises equivalent stress reaches the current yield strength. Equivalent stress is formed from deviatoric stress; adding hydrostatic stress does not change this yield measure. This makes J₂ useful for many dense ductile metals, but it does not describe void growth, pressure-sensitive yielding, or fracture.",
+        "A high equivalent plastic strain indicates accumulated plastic deformation, not automatically a crack. Necking is a deformation instability, and fracture requires an additional criterion or constitutive mechanism. A rising engineering stress–strain curve, a falling nominal load, and a local yield condition describe different quantities."
       ]
+    },
+    {
+      "heading": "3. The flow rule determines the plastic strain increment",
+      "paragraphs": [
+        "The yield function says which stresses are admissible; it does not by itself prescribe the plastic strain direction. Associated flow takes that direction normal to the yield surface in stress space. For standard J₂ plasticity this flow is deviatoric, so plastic strain has zero trace in the small-strain theory. Elastic volume change remains possible.",
+        "Plastic flow is active only with a nonnegative multiplier on the yield surface. A state on the surface can unload elastically: being at yield is not sufficient to imply continued plastic loading. The explorer tracks this distinction at every strain increment."
+      ]
+    },
+    {
+      "heading": "4. Hardening changes the next yield event",
+      "paragraphs": [
+        "Perfect plasticity keeps the yield strength fixed. Isotropic hardening expands the elastic domain, increasing tensile and compressive yield magnitudes symmetrically about the original centre. Kinematic hardening translates the domain through a backstress; prior tensile plastic flow changes where reverse compressive yielding starts.",
+        "That directional change is the basis for representing the Bauschinger effect. Linear isotropic and linear kinematic models can have the same monotonic tensile curve while differing substantially on reversal. Real cyclic behavior may need combined or nonlinear hardening; a monotonic test alone cannot identify all of those parameters.",
+        "The explorer uses |σ − α| ≤ σy₀ + Hᵢp. Its backstress is α = Hₖεᵖ, while p accumulates the magnitude of plastic strain increments. Signed plastic strain can decrease during reversal, but accumulated plastic strain cannot."
+      ]
+    },
+    {
+      "heading": "5. Read the figures without confusing model and specimen",
+      "paragraphs": [
+        "The blue curve is the selected material history up to the current step. Its pale continuation shows the remaining prescribed history; grey curves show the other hardening models. Every model reaches the same tensile and compressive peak strains, then unloads to its own zero-stress residual strain.",
+        "The yield-interval figure is a one-dimensional slice: stress must stay between α − (σy₀ + Hᵢp) and α + (σy₀ + Hᵢp). A growing interval illustrates isotropic hardening; a moving centre illustrates kinematic hardening. It is not a plot of the complete three-dimensional yield surface.",
+        "The 3D gauge is a visualization of a spatially uniform material response. The model contains no grip stress concentrations, necking, buckling, or damage. The displayed lateral strain uses elastic Poisson contraction and the incompressible uniaxial plastic-flow relation, with all strains magnified by 25."
+      ]
+    },
+    {
+      "heading": "6. From a material test to an FE analysis",
+      "paragraphs": [
+        "An FE solver stores plastic strain and hardening variables at integration points. A strain increment produces an elastic trial stress. If that trial state violates yield, a constitutive update corrects the stress and internal variables. Linear uniaxial hardening admits a closed-form correction; general return maps may require a local nonlinear solve.",
+        "The consistent algorithmic tangent describes the derivative of that discrete stress update. It helps the global Newton method converge, but the global equilibrium solve and local material update are distinct. History must be committed only for an accepted increment. The separate return-mapping section develops this numerical step.",
+        "For calibration at modest strains, distinguish total strain from plastic strain. Beyond small strain, stress and strain measures must match the formulation: a true-stress curve cannot be paired blindly with engineering plastic strain. After necking, a force–extension record no longer gives a homogeneous local material curve without further analysis."
+      ]
+    }
+  ],
+  "lead": "Plasticity is permanent deformation produced by a loading history. A metal can unload with an elastic slope while retaining plastic strain. Yield criteria, flow rules, and hardening laws describe different parts of that response.",
+  "sceneFirst": true,
+  "eager": true,
+  "figureLabel": "Interactive material test",
+  "flow": [
+    {
+      "section": "Small-strain constitutive model",
+      "lead": "These equations describe the material point. Equilibrium and boundary conditions are solved separately.",
+      "items": [
+        {
+          "name": "Elastic response",
+          "tex": "\\boldsymbol\\sigma=\\mathbb C:(\\boldsymbol\\varepsilon-\\boldsymbol\\varepsilon^p)",
+          "body": "Elastic stiffness acts on recoverable strain. Large-strain theories instead require an appropriate finite-deformation framework, often F = FᵉFᵖ."
+        },
+        {
+          "name": "J₂ yield function with isotropic and kinematic hardening",
+          "tex": "f=\\sqrt{\\tfrac32(\\mathbf s-\\boldsymbol\\alpha):(\\mathbf s-\\boldsymbol\\alpha)}-(\\sigma_{y0}+R)\\le0",
+          "body": "s = dev σ; α is a deviatoric backstress and R is the isotropic hardening increment. The uniaxial explorer uses the corresponding scalar backstress convention."
+        },
+        {
+          "name": "Associated flow and loading conditions",
+          "tex": "\\dot{\\boldsymbol\\varepsilon}^p=\\dot\\lambda\\,\\frac{\\partial f}{\\partial\\boldsymbol\\sigma},\\qquad \\dot\\lambda\\ge0,\\quad f\\le0,\\quad\\dot\\lambda f=0",
+          "body": "Active plastic loading additionally satisfies consistency. During elastic unloading the plastic multiplier is zero."
+        },
+        {
+          "name": "Uniaxial plastic correction used in the figure",
+          "tex": "\\Delta\\gamma=\\frac{\\max(0,|\\sigma^{\\mathrm{tr}}-\\alpha_n|-\\sigma_{y0}-H_i p_n)}{E+H_i+H_k}",
+          "body": "σtr = E(εn+1 − εp_n). Update plastic strain in the sign of the effective trial stress, accumulate p by Δγ, and evolve backstress by Hk times the signed plastic increment."
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "label": "LS-DYNA — computational plasticity and permanent deformation",
+      "href": "https://www.dynasupport.com/tutorial/computational-plasticity"
+    },
+    {
+      "label": "COMSOL — elastoplastic material theory and hardening",
+      "href": "https://doc.comsol.com/6.4/doc/com.comsol.help.sme/sme_ug_theory.06.033.html"
+    },
+    {
+      "label": "Structural example: elasto-plastic cantilever",
+      "href": "elasto-plasto-cantilever.html"
+    },
+    {
+      "label": "Computed example: three-point bending and load–displacement response",
+      "href": "3pb-viewer/"
     }
   ]
 },
@@ -3256,18 +3417,107 @@ const topics = [
   ], tags:["structural battery","fiber electrode","Butler-Volmer","embedded","porous electrode"], illustrations:"fiberElectrode", sources:[{label:"Goudarzi, Discrete fiber models beyond classical applications, TU Delft (2020)", href:"https://doi.org/10.4233/uuid:4741efe6-9a5e-4782-8cef-6d7ed83a3b30"}]},
 
   // Part V – High-Performance Computing
-  {part:"Part V – High-Performance Computing", title:"GPUs in the FEM Pipeline", equations:[
-    {name:"Amdahl", expr:"S = 1 / (1 − p + p/s)", tex:"S = \\dfrac{1}{1 - p + p/s}", note:"Overall speedup when a fraction p of the wall time runs s times faster. A stage that is 5% of the analysis cannot save the job, however well it maps to CUDA."},
-    {name:"Element independence", expr:"Kᵉ = ∫ Bᵀ ℂ B dV   (no neighbour data)", tex:"\\mathbf{K}^{e} = \\displaystyle\\int \\mathbf{B}^{\\mathsf{T}}\\mathbb{C}\\,\\mathbf{B}\\,\\mathrm{d}V \\quad (\\text{no neighbour data})", note:"Constitutive evaluation and the element residual communicate only through assembly. That is why the Gauss-point loop is the first kernel worth moving."}
-  ], bullets:[
-    "A finite element analysis is not one kernel. It is a pipeline, and a GPU is useful only in the stages that expose thousands of identical arithmetic operations on data that already live in device memory. The first question is not how to write CUDA. It is which stage actually dominates, and whether that stage is data-parallel.",
-    "Geometry and mesh generation, file I/O, and most CAD clean-up are irregular and latency-bound. They stay on the host. Local kinematics — shape functions, the Jacobian of the isoparametric map, the strain–displacement matrix B at Gauss points — are independent per element and move easily, but they are cheap. The constitutive law at those same points is not: in plasticity, damage, or a coupled material it is often the majority of a nonlinear residual. No element needs its neighbour’s history variables to compute σ and ℂ. That loop is the usual first win.",
-    "Formation of the element matrix or residual is the same independence. Assembly then scatters those contributions into a global sparse pattern. The scatter is parallel, but it is a memory-bound race: two elements that share a node write the same entry. Graph colouring, atomic adds, or an assembled-on-the-fly matrix-free product are the three standard answers. Essential boundary conditions and multi-point constraints are sparse and serial; they rarely justify a device kernel of their own.",
-    "The linear solve is where the analysis type splits the story. A linear static implicit job is often a single sparse factorisation. Large supernodal fronts can use a GPU; a moderate three-dimensional mesh with a well-ordered CPU factorisation often should not. Nonlinear implicit analysis repeats residual and tangent formation, then an iterative Krylov solve. The sparse matrix–vector product y = Ax is what GPUs do well — provided A is assembled once and left on the device. Copying the tangent every Newton iteration through the host bus can erase the kernel gain. Preconditioners are mixed: a Jacobi scaling or the matvecs inside an AMG smoother move; ILU and the AMG setup tend not to.",
-    "Explicit dynamics drop the global tangent. A lumped mass, an internal force at Gauss points, and a gather to nodes: that is the strongest finite-element case for a GPU, which is why crash and wave codes moved first. Contact search is intermediate — a broad phase parallelises, a narrow phase may not. Postprocessing and rendering already have a device; the cost is sending the solution back.",
-    "Two rules decide whether the pipeline as a whole improves. Amdahl’s: only stages that own wall time can matter. Locality’s: the matrix and the history variables must stay on the device. A small model whose factorisation is faster than the PCIe copy will look worse on a GPU than on a CPU, and that is not a failure of the hardware.",
-    "The figure is the pipeline. Click a stage for why it does or does not move. Switch linear implicit, nonlinear implicit, and explicit: the time stack changes, and so does the case for the device. Raise the degrees of freedom until the copy is no longer the analysis."
-  ], tags:["GPU","FEM pipeline","assembly","SpMV","explicit","Amdahl","CUDA","matrix-free"], scene:"gpuFem", illustrations:"gpuPipeline"},
+  {
+  "part": "Part V – High-Performance Computing",
+  "title": "GPUs in the FEM Pipeline",
+  "lead": "GPU acceleration is a property of the complete algorithm and its data movement. The target is a shorter time to a verified solution, not a faster isolated kernel.",
+  "bullets": [
+    "Start with a hypothetical workload or enter measured CPU stage times. The explorer normalizes them for comparison and reports the estimated runtime in milliseconds. Use the roofline plot to examine a separate kernel bound; neither plot replaces an end-to-end benchmark."
+  ],
+  "scene": "gpuFem",
+  "sceneFirst": true,
+  "eager": true,
+  "figureLabel": "Interactive pipeline and cost model",
+  "tags": [
+    "GPU",
+    "FEM pipeline",
+    "assembly",
+    "matrix-free",
+    "preconditioner",
+    "Amdahl",
+    "memory bandwidth"
+  ],
+  "story": [
+    {
+      "heading": "1. Profile the workload you actually solve",
+      "paragraphs": [
+        "Separate preparation, operator setup, repeated element work, assembly or scatter, linear algebra, communication, and output. Count how often each occurs. One factorization, repeated Newton solves, and a million explicit steps have different profiles.",
+        "Compare the same physical problem, discretization, precision, and stopping criteria. Separate setup from repeated execution when reuse matters. Synchronize asynchronous GPU operations before interpreting wall-clock timings."
+      ]
+    },
+    {
+      "heading": "2. Local work still depends on shared data",
+      "paragraphs": [
+        "Element quadrature and local material updates often expose substantial parallel work after gathering nodal values. Variable constitutive iterations, branching, register use, and history storage can limit throughput. Nonlocal materials and contact add dependencies.",
+        "Elements sharing a degree of freedom contribute to the same output. Atomics, colouring, or gather-based reductions resolve those writes. Matrix-free methods also gather inputs and reduce outputs: avoiding a matrix does not remove mesh connectivity."
+      ]
+    },
+    {
+      "heading": "3. Memory traffic can dominate arithmetic",
+      "paragraphs": [
+        "Sparse matrix-vector multiplication reads values, indices, and scattered vector entries for relatively little arithmetic. Bandwidth, locality, and load balance often matter more than peak floating-point throughput.",
+        "High-order tensor-product operators can reuse basis data and use sum factorization. Partial assembly stores selected quadrature data and applies basis and restriction operations on demand. More fully matrix-free approaches may recompute additional data. These are storage-computation tradeoffs, not universal speed guarantees."
+      ]
+    },
+    {
+      "heading": "4. Accelerate the solver without losing convergence",
+      "paragraphs": [
+        "An implicit solve includes operator application, preconditioning, setup, vector updates, norms, and reductions. If a weaker preconditioner doubles the iterations, a faster operator may deliver little overall gain. The solve-work multiplier exposes this tradeoff.",
+        "GPU-capable multigrid, direct solvers, and triangular solves exist. Boundary conditions and constraints are not inherently CPU-only either. Suitability depends on matrix structure, memory, reuse, and implementation. Profile the complete backend.",
+        "Explicit dynamics can avoid a global linear solve with lumped mass, but stability limits the time step. Material work, contact, and communication remain. Compare time to the same physical end time and accuracy, not just cost per step."
+      ]
+    },
+    {
+      "heading": "5. Keep repeated operations near their data",
+      "paragraphs": [
+        "A device-resident loop retains connectivity, solution vectors, material history, operators, and preconditioner data across repeated operations. Host access may trigger transfers even when the arithmetic kernel runs on the GPU.",
+        "Transfer only what the host needs at the required frequency. Overlap can help when dependencies permit. Across multiple GPUs, halo exchange and global reductions add communication costs: single-device throughput does not prove scalability."
+      ]
+    },
+    {
+      "heading": "6. Measure speed and verify the mechanics",
+      "paragraphs": [
+        "Record total and stage times, iteration counts, achieved tolerances, peak memory, transfer volume, and accepted or rejected time steps. Compare displacements, reactions, energy, and material history at an appropriate numerical tolerance.",
+        "Parallel reductions and changed operation order can alter floating-point results. Mixed precision needs a convergence and accuracy assessment. Accelerate dominant repeated work and profile again, because the bottleneck changes."
+      ]
+    }
+  ],
+  "equations": [
+    {
+      "name": "End-to-end speedup",
+      "tex": "S=\\left[\\sum_i f_i/s_i+h\\right]^{-1}",
+      "note": "CPU fractions sum to one. Unchanged CPU stages use s_i = 1. h is additional overhead relative to the CPU baseline. A changed solver work count multiplies that stage term; the explorer assumes additive costs without overlap."
+    },
+    {
+      "name": "Amdahl limit with overhead",
+      "tex": "S=\\frac{1}{1-p+p/s+h},\\qquad S_{s\\to\\infty}=\\frac{1}{1-p+h}",
+      "note": "p is the accelerated fraction of original CPU time. Extra transfers and synchronization can erase a kernel gain."
+    },
+    {
+      "name": "Compute and bandwidth ceiling",
+      "tex": "P\\le\\min(P_{\\mathrm{peak}},B_{\\mathrm{effective}}I)",
+      "note": "Arithmetic intensity I is work per byte moved at the limiting memory level. This is a bound, not a runtime prediction: latency and dependencies can lower achieved performance."
+    }
+  ],
+  "sources": [
+    {
+      "label": "MFEM: performance and partial assembly",
+      "href": "https://mfem.org/performance/"
+    },
+    {
+      "label": "MFEM: assembly levels",
+      "href": "https://mfem.org/howto/assembly_levels/"
+    },
+    {
+      "label": "PETSc: GPU backend support",
+      "href": "https://petsc.org/main/overview/gpu_roadmap/"
+    },
+    {
+      "label": "PETSc: vectors and host/device data access",
+      "href": "https://petsc.org/main/manual/vec/"
+    }
+  ]
+},
   {part:"Part V – High-Performance Computing", title:"GPU Programming for Engineers", bullets:[
     "The previous entry is which stages move. This one is how they are written. Graphics processors execute many identical arithmetic operations at once, in warps, on a memory system that rewards coalesced access and punishes scattered writes.",
     "CUDA is the usual programming model. Threads are grouped into blocks that share on-chip memory; occupancy and occupancy-limiting resources (registers, shared memory) decide whether the arithmetic units stay busy. An element kernel that diverges on constitutive branches, or that gathers from an unstructured mesh without a colouring, will spend its time waiting rather than computing.",
@@ -3737,10 +3987,10 @@ function renderTopicScene(topic){
   const pages = {
     continuumKinematics: {src:'continuum-kinematics.html', title:'Motion χ(X,t): pick a material point on the reference body, play the path line, and read F = ∂x/∂X.', tall:true, flush:true},
     deformationGradient: {src:'deformation-gradient.html', title:'Deformation gradient'},
-    linearMomentum: {src:'linear-momentum.html', title:'Linear momentum'},
+    linearMomentum: {src:'/linear-momentum.html?v=balance-2', title:'Four balance-law examples with linked 3D motion, numerical checks, and plots.', tall:true, flush:true},
     polarDecomposition: {src:'polar-decomposition.html', title:'Polar decomposition'},
     divergenceTheorem: {src:'divergence-theorem.html', title:'A closed volume in a vector field. Green is n, amber is F; the two integrals stay equal for every shape and field.', flush:true},
-    tractionCut: {src:'traction-cut.html', title:'Interactive Cauchy inspector: rotate the cut (θ, φ), change σ, and split t = σ n into normal and shear.', tall:true, flush:true},
+    tractionCut: {src:'/traction-cut.html?v=2', title:'Rotate the cut and compare traction components, Mohr’s circle, and the angle plots. Drag the 3D view to orbit.', tall:true, flush:true},
     rotationStrain: {src:'rotation-strain.html', title:'Green versus infinitesimal strain'},
     hydroDeviator: {src:'hydrostatic-deviatoric.html', title:'Unit cube scaled by the principal stretches λ₁, λ₂, λ₃. The readout is I₁, I₂, I₃ of C and the volume ratio J; lock J = 1 for an incompressible motion.', flush:true},
     constitutiveModels: {src:'constitutive-models.html', title:'A continuum mesh under a time-varying strain field. The constitutive map is what turns that deformation into stress.', flush:true},
@@ -3755,6 +4005,7 @@ function renderTopicScene(topic){
     objectiveRates: {src:'objective-rates.html', title:'Three.js visualization: standard versus objective observer', tall:true},
     columnBuckling: {src:'column-buckling.html', title:'Euler buckling'},
     returnMappingLab: {src:'/return-mapping.html', title:'J2 return mapping: elastic predictor, plastic correction, and an expanding yield surface', tall:true},
+    metalPlasticityLab: {src:'/metal-plasticity-lab.html?v=1', title:'Load, unload, and reverse a uniaxial material test. Compare hardening, permanent strain, and the current yield interval.', tall:true, flush:true},
     trussLab: {src:'truss-lab.html', title:'Interactive truss laboratory: axial projection and a loaded two-bar assembly', tall:true},
     fractureLab: {src:'fracture-lab.html', title:'Explore crack-face motion and the energy available for growth', tall:true},
     lefm: {src:'lefm.html', title:'Linear elastic fracture mechanics'},
@@ -3764,7 +4015,7 @@ function renderTopicScene(topic){
     consolidation: {src:'consolidation.html', title:'One-dimensional consolidation'},
     consolidationGibson: {src:'consolidation.html#gibson', title:'Gibson consolidation'},
     mandelCryer: {src:'consolidation.html#cryer', title:'Mandel–Cryer effect'},
-    gpuFem: {src:'gpu-fem.html', title:'GPUs in the FEM pipeline'},
+    gpuFem: {src:'/gpu-fem.html?v=4', title:'Inspect pipeline stages, end-to-end speedup, and global versus partial assembly.', tall:true, flush:true},
     fiberComposites: {src:'fiber-composites.html', title:'Fiber-reinforced composites'},
     randomFibers: {src:'random-fibers.html', title:'Random fibres in a matrix'},
     fiberNeutrality3d: {src:'fiber-neutrality.html', title:'Fibre neutrality'},
@@ -5350,8 +5601,9 @@ function renderContent(topic){
       ${topic.title==='Hyperelasticity'?sceneBlock:""}
       ${topic.title==='Fiber Neutrality and Rigid Line Inclusions' ? `<div class="prose"><h2>Stiffening and local failure can coexist</h2><p>A perfectly bonded rigid line inclusion is also called an anticrack: it constrains displacement while transmitting traction. Unlike a traction-free crack, it may stiffen a composite, yet still produce singular tip stresses. <a href="https://doi.org/10.1016/j.ijsolstr.2020.11.006">Goudarzi, Dal Corso, Bigoni and Simone (2021)</a> examine how inclusion orientation and interactions connect macroscopic stiffening with concentrations that can trigger shear bands. The <a href="#linear-elastic-fracture-mechanics">LEFM crack–anticrack comparison</a> illustrates the boundary-condition distinction with exact antiplane fields; the in-plane and fibre models below have different neutrality conditions.</p></div>` : ''}
       ${cohesiveStory ? renderCohesiveStory(topic) : fractureStory ? renderFractureStory(topic) : `<div class="prose">${prose}</div>`}
+      ${['GPUs in the FEM Pipeline','Metal Plasticity','Balance Laws & Conservation','Cauchy Stress and Traction','Hyperelasticity','Plasticity Formulations & Return Mapping','Viscoplastic Localization & Gradient Damage'].includes(topic.title)?sceneBlock:''}
       ${fractureStory ? '' : storyBlock}
-      ${!customStory && topic.sceneFirst && topic.title!=='Hyperelasticity' ? sceneBlock : ""}
+      ${!customStory && topic.sceneFirst && !['GPUs in the FEM Pipeline','Metal Plasticity','Balance Laws & Conservation','Cauchy Stress and Traction','Hyperelasticity','Plasticity Formulations & Return Mapping','Viscoplastic Localization & Gradient Damage'].includes(topic.title) ? sceneBlock : ""}
       ${flowBlock}
       ${eqBlock}
       ${tableBlock}
@@ -5361,6 +5613,7 @@ function renderContent(topic){
       ${interactiveBlock}
       ${sourceBlock}
       ${topic.title==='Plasticity Formulations & Return Mapping'?'<p class="topic-bridge">Related: <a href="#viscoplastic-localization-gradient-damage">Perzyna localization example</a> · <a href="#metal-plasticity">Metal Plasticity</a> · <a href="#nonlinear-fem">Nonlinear FEM</a> · <a href="#newton-raphson-iteration-in-fem">Global Newton iteration</a></p>':''}${topic.title==='Viscoplastic Localization & Gradient Damage'?'<p class="topic-bridge">Continue with <a href="#plasticity-formulations-return-mapping">return mapping and committed history</a>, <a href="#time-dependent-problems">time-dependent problems</a>, or <a href="#phase-field-modelling-of-fracture">phase-field fracture</a>.</p>':''}${topicBridgeHtml(topic)}
+      ${topic.title==='Introduction to Continuum Mechanics' ? `<nav class="overview-reading" aria-label="Explore the governing equations"><h2>Explore each part of the model</h2><p>The dedicated sections contain the detailed derivations and interactive figures.</p><div><a href="#kinematics-of-deformation">Kinematics</a><a href="#cauchy-stress-and-traction">Stress &amp; traction</a><a href="#balance-laws-conservation">Balance laws</a><a href="#constitutive-models">Constitutive models</a><a href="#finite-element-method-introduction">Finite elements</a></div></nav>` : ''}
       ${topicNavHtml(topic)}
     </article>
   `;
@@ -5569,7 +5822,7 @@ window.addEventListener('keydown', (e)=>{
     ok('studio viewers use absolute src', /data-scene-src="\/kasten-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/steeljoint-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/3pb-viewer\/index.html"/.test(studioHtml) && /data-scene-src="\/pillow-viewer\/index.html"/.test(studioHtml));
     ok('basic equations has momentum', topics.some(t => t.title === 'Basic Equations' && t.scene === 'linearMomentum' && ((t.equations||[]).some(e => /momentum/i.test(e.name)) || (t.flow||[]).some(s => (s.items||[]).some(e => /momentum/i.test(e.name))))));
     ok('basic equations has narrative flow', topics.some(t => t.title === 'Basic Equations' && Array.isArray(t.flow) && t.flow.length >= 4));
-    ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (t.equations||[]).length >= 5));
+    ok('balance laws expanded', topics.some(t => t.title === 'Balance Laws & Conservation' && (((t.equations||[]).length >= 5) || ((t.flow||[]).reduce((n,s)=>n+((s.items||[]).length),0) >= 5))));
     ok('hooke has navier-cauchy', topics.some(t => t.title === "Hooke’s Law" && Array.isArray(t.flow) && t.flow.some(s => (s.items||[]).some(e => /Navier/i.test(e.name)))));
     ok('hyperelasticity material lab', topics.some(t => t.title === 'Hyperelasticity' && t.scene === 'hyperelasticity' && Array.isArray(t.story) && t.story.some(s => /material lab/i.test(s.heading))));
     ok('fluids has navier-stokes equation', topics.some(t => t.title === 'Fluids: Continuity and Navier–Stokes' && (t.equations||[]).some(e => /Navier/i.test(e.name))));
@@ -5587,7 +5840,11 @@ window.addEventListener('keydown', (e)=>{
     ok('xfem crack growth application topic', topics.some(t => t.title === 'XFEM Crack Growth' && t.part === 'Part IV – Applications in Engineering' && Array.isArray(t.scenes) && t.scenes.includes('xfemSif') && t.scenes.includes('xfemParis') && t.scenes.includes('xfemInclusion') && (t.equations||[]).length >= 3));
     ok('fiber composites topic', topics.some(t => t.title === 'Fiber-Reinforced Composites'));
     ok('embedded fiber models topic', topics.some(t => t.title === 'Embedded Fiber Models' && Array.isArray(t.scenes) && t.scenes.includes('fiberInterface') && t.scenes.includes('fiberBox') && t.scenes.includes('fiberPullout') && t.scenes.includes('matfibCenterFiber')));
-    ok('metal plasticity scene', topics.some(t => t.title === 'Metal Plasticity' && t.scene === 'elastoPlasticCantilever'));
+    ok('metal plasticity scene', topics.some(t => t.title === 'Metal Plasticity' && t.scene === 'metalPlasticityLab'));
+    ok('metal plasticity lab src', /data-scene-src="\/metal-plasticity-lab.html/.test(renderTopicScene({scene:'metalPlasticityLab'})));
+    ok('balance lab src', /data-scene-src="\/linear-momentum.html/.test(renderTopicScene({scene:'linearMomentum'})));
+    ok('traction lab src', /data-scene-src="\/traction-cut.html/.test(renderTopicScene({scene:'tractionCut'})));
+    ok('gpu lab src', /data-scene-src="\/gpu-fem.html/.test(renderTopicScene({scene:'gpuFem'})));
     ok('nonlinear fem scene', topics.some(t => t.title === 'Nonlinear FEM' && t.scene === 'steelConnection'));
     ok('time-dependent scenes', topics.some(t => t.title === 'Time-Dependent Problems' && Array.isArray(t.scenes) && t.scenes.includes('swingingSquare') && t.scenes.includes('twistingColumn') && t.scenes.includes('perzynaDamage')));
     ok('fiber neutrality topic', topics.some(t => t.title === 'Fiber Neutrality and Rigid Line Inclusions'));
@@ -5620,5 +5877,41 @@ renderSidebar('');
 selectTopic(initFromHash().title);
 </script>
 <script src="library-navigation.js?v=20260916-2"></script>
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.data?.type!=='traction-explorer-height')return;
+ const frame=document.querySelector('[data-scene-src^="traction-cut"],[data-scene-src^="/traction-cut"] iframe');
+ if(!frame||event.source!==frame.contentWindow)return;
+ const height=Number(event.data.height);
+ if(Number.isFinite(height)&&height>=300&&height<=4000)frame.parentElement.style.setProperty('height',Math.ceil(height)+'px','important');
+});
+</script>
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.data?.type!=='balance-explorer-height')return;
+ const frame=document.querySelector('[data-scene-src^="linear-momentum"],[data-scene-src^="/linear-momentum"] iframe');
+ if(!frame||event.source!==frame.contentWindow)return;
+ const height=Number(event.data.height);
+ if(Number.isFinite(height)&&height>=300&&height<=4000)frame.parentElement.style.setProperty('height',Math.ceil(height)+'px','important');
+});
+</script>
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.data?.type!=='plasticity-explorer-height')return;
+ const frame=document.querySelector('[data-scene-src^="metal-plasticity-lab"],[data-scene-src^="/metal-plasticity-lab"] iframe');
+ if(!frame||event.source!==frame.contentWindow)return;
+ const height=Number(event.data.height);
+ if(Number.isFinite(height)&&height>=300&&height<=4000)frame.parentElement.style.setProperty('height',Math.ceil(height)+'px','important');
+});
+</script>
+<script>
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.data?.type!=='gpu-explorer-height')return;
+ const frame=document.querySelector('[data-scene-src^="gpu-fem"],[data-scene-src^="/gpu-fem"] iframe');
+ if(!frame||event.source!==frame.contentWindow)return;
+ const height=Number(event.data.height);
+ if(Number.isFinite(height)&&height>=300&&height<=5000)frame.parentElement.style.setProperty('height',Math.ceil(height)+'px','important');
+});
+</script>
 </body>
 </html>
